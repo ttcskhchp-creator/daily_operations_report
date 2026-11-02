@@ -30,21 +30,23 @@ header{background:linear-gradient(90deg,#002244,#003366 50%,#0284c7);padding:14p
 .b-word{background:#2563eb}.b-word:hover{background:#1d4ed8}
 .b-in{background:#059669}.b-in:hover{background:#047857}
 .b-img{background:#475569}.b-img:hover{background:#334155}
+.b-del{background:rgba(239,68,68,.2);color:#fca5a5;border:1px solid var(--bad)}.b-del:hover{background:var(--bad);color:#fff}
 .b-attach{background:#7c3aed;display:none}.b-attach:hover{background:#6d28d9}
 .main{padding:18px 24px}
 .fbar{display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:18px;align-items:center;background:var(--card);padding:10px 18px;border-radius:8px;border:1px solid var(--bd)}
 .tabs{display:flex;gap:8px;flex-wrap:wrap}
 .tab{background:var(--bg);color:var(--sub);border:1px solid var(--bd);padding:6px 14px;border-radius:6px;cursor:pointer;font-weight:600;font-size:.85rem;transition:.2s}
 .tab.active,.tab:hover{background:var(--navy);color:#fff;border-color:var(--light)}
-.date-picker-wrap{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
-.date-picker-wrap input{width:150px;padding:6px 10px;background:var(--inp);border:1px solid var(--bd);color:#fff;border-radius:5px}
-.kgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:14px;margin-bottom:20px}
-.kc{background:var(--card);border-radius:8px;padding:15px;border:1px solid var(--bd);position:relative;overflow:hidden;box-shadow:0 4px 10px rgba(0,0,0,.2)}
+.date-picker-wrap{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.date-picker-wrap input{width:135px;padding:6px 8px;background:var(--inp);border:1px solid var(--bd);color:#fff;border-radius:5px;font-size:.85rem}
+.kgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;margin-bottom:20px}
+.kc{background:var(--card);border-radius:8px;padding:15px;border:1px solid var(--bd);position:relative;overflow:hidden;box-shadow:0 4px 10px rgba(0,0,0,.2);display:flex;flex-direction:column;justify-content:space-between}
 .kc::before{content:'';position:absolute;top:0;left:0;width:4px;height:100%;background:var(--light)}
 .kc.warning::before{background:var(--warn)}.kc.danger::before{background:var(--bad)}.kc.success::before{background:var(--ok)}
 .kh{font-size:.8rem;color:var(--sub);margin-bottom:6px;display:flex;justify-content:space-between}
 .kv{font-size:1.6rem;font-weight:700;margin-bottom:4px}.kv small{font-size:.9rem}
-.ks{font-size:.78rem;color:var(--sub)}
+.ks{font-size:.78rem;color:var(--sub);line-height:1.35}
+.ks.error-note{color:#fca5a5;font-weight:500;margin-top:2px}
 .split{display:grid;grid-template-columns:1fr 1fr;gap:18px}
 @media(max-width:1100px){.split{grid-template-columns:1fr}}
 .panel{background:var(--card);border-radius:8px;padding:16px;border:1px solid var(--bd);margin-bottom:18px}
@@ -97,6 +99,7 @@ input:focus,select:focus,textarea:focus{border-color:var(--light)}
   <button class="btn b-attach" id="btn-orig-file" onclick="downloadOriginalFile()"><i class="fa-solid fa-paperclip"></i> Tải Excel Gốc</button>
   <button class="btn b-cloud" onclick="saveToSupabase()"><i class="fa-solid fa-cloud-arrow-up"></i> Lưu Cloud</button>
   <button class="btn b-in" onclick="openModal()"><i class="fa-solid fa-file-excel"></i> Nhập / Upload Excel</button>
+  <button class="btn b-del" onclick="deleteCurrentDayData()"><i class="fa-solid fa-trash-can"></i> Xóa Dữ Liệu Ngày</button>
   <button class="btn b-word" onclick="openWordModal()"><i class="fa-solid fa-file-word"></i> Xuất Báo Cáo Word</button>
   <button class="btn b-img" onclick="exportImage()"><i class="fa-solid fa-camera"></i> Chụp Dashboard</button>
  </div>
@@ -111,29 +114,38 @@ input:focus,select:focus,textarea:focus{border-color:var(--light)}
    <button class="tab" onclick="setPort('DV',this)">Cảng Đình Vũ</button>
   </div>
   <div class="date-picker-wrap">
-    <span style="font-size:.85rem;color:var(--sub)"><i class="fa-regular fa-calendar-days"></i> Chọn Ngày:</span>
-    <input type="date" id="sel-date" onchange="loadDateData(this.value)">
+    <span style="font-size:.85rem;color:var(--sub)"><i class="fa-regular fa-calendar-days"></i> Khoảng thời gian: Từ</span>
+    <input type="date" id="sel-from" onchange="onRangeChange()">
+    <span style="font-size:.85rem;color:var(--sub)">Đến</span>
+    <input type="date" id="sel-to" onchange="onRangeChange()">
     <span style="font-size:.85rem;color:var(--sub)">| Tuần: <strong id="d-week">--</strong></span>
     <span style="font-size:.85rem;color:var(--sub)">| Người lập: <strong id="d-author">--</strong></span>
   </div>
  </div>
 
  <div class="kgrid">
+  <!-- Thẻ An toàn lao động: Đếm số cảng có số vụ mất ATLĐ = 0 -->
   <div class="kc success" id="c-atld">
    <div class="kh"><span>AN TOÀN LAO ĐỘNG</span><i class="fa-solid fa-shield-halved"></i></div>
    <div class="kv" id="k-atld">100%</div>
    <div class="ks" id="s-atld">3/3 cảng an toàn tuyệt đối</div>
   </div>
+
+  <!-- Thẻ Tồn bãi -->
   <div class="kc warning">
    <div class="kh"><span>TỔNG LƯỢNG TỒN BÃI</span><i class="fa-solid fa-cubes"></i></div>
    <div class="kv" id="k-teu">0 <small>TEU</small></div>
    <div class="ks" id="s-teu">--</div>
   </div>
+
+  <!-- Thẻ Hiệu suất bãi -->
   <div class="kc success" id="c-hs">
    <div class="kh"><span>HIỆU SUẤT BÃI TRUNG BÌNH</span><i class="fa-solid fa-chart-pie"></i></div>
    <div class="kv" id="k-hs">0%</div>
    <div class="ks" id="s-hs">Toàn hệ thống</div>
   </div>
+
+  <!-- Thẻ Nhân sự: Kiểm tra chữ Đủ, nếu khác Đủ thì liệt kê bộ phận thiếu -->
   <div class="kc success" id="c-hr">
    <div class="kh"><span>TÌNH TRẠNG NHÂN LỰC</span><i class="fa-solid fa-users"></i></div>
    <div class="kv" id="k-hr">12/12</div>
@@ -148,7 +160,7 @@ input:focus,select:focus,textarea:focus{border-color:var(--light)}
   </div>
   <div style="overflow-x:auto">
    <table>
-    <thead><tr><th>Cảng</th><th>Tên Tàu</th><th>Cập Cảng</th><th>Dự Kiến Rời</th><th>NS Yêu Cầu</th><th>NS Thực Hiện</th><th>Tỷ Lệ Đạt</th></tr></thead>
+    <thead><tr><th>Ngày</th><th>Cảng</th><th>Tên Tàu</th><th>Cập Cảng</th><th>Dự Kiến Rời</th><th>NS Yêu Cầu</th><th>NS Thực Hiện</th><th>Tỷ Lệ Đạt</th></tr></thead>
     <tbody id="t-v"></tbody>
    </table>
   </div>
@@ -168,7 +180,7 @@ input:focus,select:focus,textarea:focus{border-color:var(--light)}
    <div class="ph"><div class="pt"><i class="fa-solid fa-screwdriver-wrench"></i> 3. TÌNH TRẠNG THIẾT BỊ HƯ HỎNG / DỪNG SX</div></div>
    <div style="overflow-x:auto">
     <table>
-     <thead><tr><th>Cảng</th><th>Mã Thiết Bị</th><th>Tình Trạng</th><th>Từ Ngày</th></tr></thead>
+     <thead><tr><th>Cảng</th><th>Mã Thiết Bị</th><th>Tình Trạng</th><th>Từ Ngày</th><th>Ghi Chú</th></tr></thead>
      <tbody id="t-e"></tbody>
     </table>
    </div>
@@ -179,7 +191,7 @@ input:focus,select:focus,textarea:focus{border-color:var(--light)}
   <div class="ph"><div class="pt"><i class="fa-solid fa-users"></i> 4. TÌNH TRẠNG NHÂN LỰC VẬN HÀNH</div></div>
   <div style="overflow-x:auto">
    <table>
-    <thead><tr><th>Cảng</th><th>Vị Trí</th><th>Kế Hoạch</th><th>Thực Tế</th><th>Chênh Lệch</th><th>Đánh Giá</th><th>Nguyên Nhân / Ghi Chú</th></tr></thead>
+    <thead><tr><th>Cảng</th><th>Vị Trí</th><th>Kế Hoạch</th><th>Thực Tế</th><th>Chênh Lệch</th><th>Đánh Giá</th><th>Ghi Chú</th></tr></thead>
     <tbody id="t-h"></tbody>
    </table>
   </div>
@@ -232,12 +244,12 @@ input:focus,select:focus,textarea:focus{border-color:var(--light)}
  </div>
 
  <div style="display:flex;justify-content:space-between;align-items:center;margin-top:15px">
-  <span style="font-size:.85rem;color:var(--sub)"><i class="fa-solid fa-circle-info"></i> Bấm "Lưu" sẽ đồng bộ dữ liệu số và link file vào Database Supabase.</span>
+  <span style="font-size:.85rem;color:var(--sub)"><i class="fa-solid fa-circle-info"></i> Bấm "Lưu" sẽ đồng bộ dữ liệu và file lên Supabase.</span>
   <button class="save-btn" onclick="saveForm()"><i class="fa-solid fa-floppy-disk"></i> Lưu Vào Dashboard & Supabase</button>
  </div>
 </div></div>
 
-<!-- MODAL XUẤT BÁO CÁO WORD THEO KHOẢNG THỜI GIAN -->
+<!-- MODAL XUẤT BÁO CÁO WORD -->
 <div class="modal" id="word-modal"><div class="mc" style="max-width:550px">
  <div class="mh"><h2><i class="fa-solid fa-file-word" style="color:#38bdf8"></i> Xuất Báo Cáo Khai Thác Word</h2><span class="x" onclick="closeWordModal()">×</span></div>
  <div class="fs">
@@ -266,7 +278,6 @@ const SB_URL = 'https://yrzabhuwumeqvntsjssu.supabase.co';
 const SB_KEY = 'sb_publishable_ZJSnlM3HN9Xs2KuQ2c33xg_BAO69Rzg';
 const BUCKET_NAME = 'report-files';
 
-// Khởi tạo client với tên biến sbClient để tránh xung đột window.supabase
 const sbClient = (window.supabase && typeof window.supabase.createClient === 'function') 
   ? window.supabase.createClient(SB_URL, SB_KEY) 
   : null;
@@ -293,6 +304,8 @@ const blankY = () => ({ HD: { teu:'', pct:'', s:0 }, TV: { teu:'', pct:'', s:0 }
 const defH = () => Object.keys(P).flatMap(p => K.map(k => ({ p, k, pl:'', ac:'', st:'Đủ', nt:'' })));
 
 const todayStr = new Date().toISOString().slice(0, 10);
+
+// S: Dữ liệu ngày hiện tại đang chỉnh sửa/upload
 let S = {
   date: todayStr,
   week: isoWeek(todayStr),
@@ -306,6 +319,8 @@ let S = {
   it_note: 'Hệ thống CNTT hoạt động bình thường.'
 };
 
+// Dữ liệu hiển thị (khi xem theo khoảng thời gian)
+let displayedReports = [];
 let F = 'ALL', chart = null;
 
 function setCloudStatus(online, text, busy = false) {
@@ -314,60 +329,85 @@ function setCloudStatus(online, text, busy = false) {
   $('cloud-text').textContent = text;
 }
 
-/* ==================== TẢI & LƯU SUPABASE ==================== */
-async function loadDateData(dateStr) {
-  if (!dateStr) return;
-  if (!sbClient) {
-    setCloudStatus(false, 'Chưa tải được Supabase SDK');
-    render();
+/* ==================== TẢI DỮ LIỆU KHOẢNG THỜI GIAN ==================== */
+function onRangeChange() {
+  const f = $('sel-from').value;
+  const t = $('sel-to').value;
+  if (!f || !t) return;
+  if (f > t) {
+    alert('Ngày bắt đầu không được lớn hơn ngày kết thúc!');
+    $('sel-from').value = t;
     return;
   }
-  setCloudStatus(false, 'Đang tải từ Cloud...', true);
+  loadDateRange(f, t);
+}
+
+async function loadDateRange(fromD, toD) {
+  if (!sbClient) {
+    setCloudStatus(false, 'Chưa kết nối Supabase');
+    renderRangeView();
+    return;
+  }
+  setCloudStatus(false, 'Đang tải dữ liệu Cloud...', true);
   try {
-    const { data, error } = await sbClient.from('daily_reports').select('*').eq('report_date', dateStr).maybeSingle();
+    const { data, error } = await sbClient.from('daily_reports')
+      .select('*')
+      .gte('report_date', fromD)
+      .lte('report_date', toD)
+      .order('report_date', { ascending: true });
+
     if (error) throw error;
-    if (data) {
-      S = {
-        date: data.report_date,
-        week: data.week || isoWeek(data.report_date),
-        author: data.author || '',
-        v: data.vessels || [],
-        y: data.yards || blankY(),
-        e: data.equipments || [],
-        h: data.manpower && data.manpower.length ? data.manpower : defH(),
-        file_url: data.file_url || '',
-        safety_note: data.safety?.note || '',
-        it_note: data.it_status?.note || ''
-      };
-      setCloudStatus(true, `Đã tải: ${dmy(dateStr)}`);
+    displayedReports = data || [];
+
+    // Nếu khoảng thời gian trùng 1 ngày, cập nhật luôn biến S để hỗ trợ xóa/sửa/tải file gốc
+    if (fromD === toD) {
+      if (displayedReports.length > 0) {
+        const d = displayedReports[0];
+        S = {
+          date: d.report_date,
+          week: d.week || isoWeek(d.report_date),
+          author: d.author || '',
+          v: d.vessels || [],
+          y: d.yards || blankY(),
+          e: d.equipments || [],
+          h: d.manpower && d.manpower.length ? d.manpower : defH(),
+          file_url: d.file_url || '',
+          safety_note: d.safety?.note || '',
+          it_note: d.it_status?.note || ''
+        };
+        setCloudStatus(true, `Đã tải: ${dmy(fromD)}`);
+      } else {
+        S = {
+          date: fromD,
+          week: isoWeek(fromD),
+          author: 'Phạm Đức Duy',
+          v: [],
+          y: blankY(),
+          e: [],
+          h: defH(),
+          file_url: '',
+          safety_note: '',
+          it_note: ''
+        };
+        setCloudStatus(true, `Ngày mới (Chưa có trên Cloud)`);
+      }
     } else {
-      S = {
-        date: dateStr,
-        week: isoWeek(dateStr),
-        author: S.author || 'Phạm Đức Duy',
-        v: [],
-        y: blankY(),
-        e: [],
-        h: defH(),
-        file_url: '',
-        safety_note: '',
-        it_note: ''
-      };
-      setCloudStatus(true, `Ngày mới (Chưa lưu Cloud)`);
+      setCloudStatus(true, `Khoảng: ${dmy(fromD)} - ${dmy(toD)} (${displayedReports.length} ngày)`);
     }
   } catch (err) {
-    console.warn('Lỗi Supabase:', err.message);
+    console.warn('Lỗi tải dữ liệu Supabase:', err.message);
     setCloudStatus(false, 'Lỗi kết nối Cloud');
   }
   updateFileButton();
-  render();
+  renderRangeView();
 }
 
 function updateFileButton() {
   const btn = $('btn-orig-file');
-  if (S.file_url) {
+  const isSingleDay = $('sel-from').value === $('sel-to').value;
+  if (isSingleDay && S.file_url) {
     btn.style.display = 'inline-flex';
-    btn.title = `Tải lại file Excel gốc lưu trong Storage cho ngày ${dmy(S.date)}`;
+    btn.title = `Tải lại file Excel gốc trong Storage của ngày ${dmy(S.date)}`;
   } else {
     btn.style.display = 'none';
   }
@@ -377,10 +417,63 @@ function downloadOriginalFile() {
   if (S.file_url) {
     window.open(S.file_url, '_blank');
   } else {
-    alert('Không tìm thấy file đính kèm cho ngày này!');
+    alert('Không tìm thấy file Excel gốc cho ngày này!');
   }
 }
 
+/* ==================== XÓA DỮ LIỆU NGÀY (DATABASE + STORAGE) ==================== */
+async function deleteCurrentDayData() {
+  const targetDate = $('sel-from').value;
+  const isSingle = $('sel-from').value === $('sel-to').value;
+
+  if (!isSingle) {
+    alert('Để đảm bảo an toàn, vui lòng chọn cùng một ngày tại ô "Từ" và "Đến" trước khi bấm xóa dữ liệu.');
+    return;
+  }
+
+  if (!confirm(`Bạn có chắc chắn muốn XÓA TOÀN BỘ dữ liệu và file Excel của ngày ${dmy(targetDate)} trên cả Database và Storage không? Thao tác này không thể hoàn tác!`)) {
+    return;
+  }
+
+  setCloudStatus(false, 'Đang tiến hành xóa...', true);
+  try {
+    // 1. Xóa file nhị phân trong Supabase Storage Bucket (nếu có)
+    const filePaths = [
+      `excel/Bao_Cao_${targetDate}.xlsx`,
+      `excel/Bao_Cao_${targetDate}.xls`
+    ];
+    await sbClient.storage.from(BUCKET_NAME).remove(filePaths);
+
+    // 2. Xóa bản ghi trong database table daily_reports
+    const { error: dbErr } = await sbClient.from('daily_reports').delete().eq('report_date', targetDate);
+    if (dbErr) throw dbErr;
+
+    // 3. Reset dữ liệu local và cập nhật giao diện
+    S = {
+      date: targetDate,
+      week: isoWeek(targetDate),
+      author: 'Phạm Đức Duy',
+      v: [],
+      y: blankY(),
+      e: [],
+      h: defH(),
+      file_url: '',
+      safety_note: '',
+      it_note: ''
+    };
+    displayedReports = [];
+    setCloudStatus(true, `Đã xóa ngày ${dmy(targetDate)}`);
+    updateFileButton();
+    renderRangeView();
+
+    alert(`Đã xóa sạch dữ liệu và file đính kèm của ngày ${dmy(targetDate)} khỏi Cloud.`);
+  } catch (err) {
+    alert('Lỗi khi xóa dữ liệu: ' + err.message);
+    setCloudStatus(false, 'Lỗi xóa dữ liệu');
+  }
+}
+
+/* ==================== LƯU LÊN SUPABASE ==================== */
 async function saveToSupabase() {
   if (!S.date) { alert('Chưa chọn ngày báo cáo'); return; }
   if (!sbClient) { alert('Chưa kết nối được Supabase Client!'); return; }
@@ -405,13 +498,240 @@ async function saveToSupabase() {
     setCloudStatus(true, `Đã đồng bộ Cloud (${dmy(S.date)})`);
     updateFileButton();
     alert(`Đã lưu thành công dữ liệu ngày ${dmy(S.date)} lên Supabase!`);
+    loadDateRange($('sel-from').value, $('sel-to').value);
   } catch (err) {
     alert('Không thể lưu lên Supabase: ' + err.message);
     setCloudStatus(false, 'Lỗi lưu Cloud');
   }
 }
 
-/* ==================== XỬ LÝ UPLOAD STORAGE + PARSE EXCEL ==================== */
+/* ==================== HIỂN THỊ DỮ LIỆU THEO KHOẢNG THỜI GIAN ==================== */
+const ports = () => F === 'ALL' ? Object.keys(P) : [F];
+const ycls = p => p === '' || p == null ? '' : p >= 80 ? 'danger' : p >= 65 ? 'warning' : 'success';
+
+function renderRangeView() {
+  const fromD = $('sel-from').value;
+  const toD = $('sel-to').value;
+  const isSingle = fromD === toD;
+
+  $('d-week').textContent = isSingle ? S.week : `${isoWeek(fromD)} - ${isoWeek(toD)}`;
+  $('d-author').textContent = isSingle ? (S.author || '—') : `${displayedReports.length} ngày báo cáo`;
+
+  const pl = ports();
+
+  // Tập hợp danh sách dữ liệu từ các ngày được truy vấn
+  let combinedV = [];
+  let combinedE = [];
+  let combinedH = [];
+  let yardLatest = { HD: { teu:'', pct:'', s:0 }, TV: { teu:'', pct:'', s:0 }, DV: { teu:'', pct:'', s:0 } };
+  let atldIssuePorts = new Set();
+  let validPortCount = 0;
+
+  if (isSingle) {
+    combinedV = S.v.map(x => ({ ...x, report_date: S.date }));
+    combinedE = S.e;
+    combinedH = S.h;
+    yardLatest = S.y || blankY();
+  } else {
+    displayedReports.forEach(r => {
+      if (Array.isArray(r.vessels)) {
+        r.vessels.forEach(v => combinedV.push({ ...v, report_date: r.report_date }));
+      }
+      if (Array.isArray(r.equipments)) {
+        r.equipments.forEach(eq => {
+          if (!combinedE.some(e => e.c === eq.c && e.p === eq.p)) combinedE.push(eq);
+        });
+      }
+      const y = r.yards || {};
+      ['HD', 'TV', 'DV'].forEach(p => {
+        if (y[p] && y[p].teu !== '') {
+          yardLatest[p] = y[p];
+        }
+      });
+    });
+    // Lấy nhân lực của ngày gần nhất có dữ liệu
+    const latestRep = displayedReports[displayedReports.length - 1];
+    combinedH = latestRep && latestRep.manpower && latestRep.manpower.length ? latestRep.manpower : defH();
+  }
+
+  // Lọc theo Cảng được chọn
+  const vs = combinedV.filter(x => pl.includes(x.p));
+  const es = combinedE.filter(x => pl.includes(x.p));
+  const hs = combinedH.filter(x => pl.includes(x.p));
+
+  // 1. Bảng giám sát tàu
+  $('v-count').textContent = `Tổng số: ${vs.length} lượt tàu`;
+  $('t-v').innerHTML = vs.length ? vs.map(x => {
+    const r = x.r > 0 && x.t !== '' ? (x.t / x.r * 100) : null;
+    const rb = r == null ? '<span class="badge">—</span>' : `<span class="badge badge-${r >= 100 ? 'success' : r >= 90 ? 'warning' : 'danger'}">${r.toFixed(1)}%</span>`;
+    return `<tr>
+      <td style="color:var(--sub)">${x.report_date ? dmy(x.report_date) : dmy(S.date)}</td>
+      <td><span class="badge badge-success">${P[x.p][0]}</span></td>
+      <td><strong>${esc(x.n)}</strong></td>
+      <td>${esc(x.a)}</td>
+      <td>${esc(x.d)}</td>
+      <td>${x.r === '' ? '—' : x.r}</td>
+      <td>${x.t === '' ? '—' : x.t}</td>
+      <td>${rb}</td>
+    </tr>`;
+  }).join('') : '<tr><td colspan="8" class="empty">Chưa có dữ liệu tàu trong khoảng thời gian đã chọn</td></tr>';
+
+  drawChart(vs);
+
+  // 2. Tồn bãi
+  $('yards').innerHTML = pl.map(p => {
+    const y = yardLatest[p] || {};
+    if (y.teu === '' && y.pct === '') return `<div class="ks">${P[p][1]}: Chưa có dữ liệu</div>`;
+    const c = ycls(y.pct) || 'success', col = `var(--${c === 'danger' ? 'bad' : c === 'warning' ? 'warn' : 'ok'})`, w = Math.min(100, +y.pct || 0);
+    return `<div><div style="display:flex;justify-content:space-between;font-size:.85rem"><span>${P[p][1]} (${y.teu === '' ? '—' : fmt(y.teu)} TEU)</span><b style="color:${col}">${y.pct === '' ? '—' : y.pct + '%'}</b></div><div class="pbg"><div class="pf" style="width:${w}%;background:${col}"></div></div></div>`;
+  }).join('');
+
+  // 3. Thiết bị dừng SX
+  $('t-e').innerHTML = es.length ? es.map(x => `<tr>
+    <td>${P[x.p][0]}</td>
+    <td><strong>${esc(x.c)}</strong></td>
+    <td><span class="badge badge-danger">${esc(x.s)}</span></td>
+    <td>${x.d ? dmy(x.d) : '—'}</td>
+    <td style="color:var(--sub)">Dừng SX</td>
+  </tr>`).join('') : '<tr><td colspan="5" class="empty">Không có thiết bị dừng hoạt động</td></tr>';
+
+  // 4. Bảng chi tiết nhân lực
+  $('t-h').innerHTML = hs.length ? hs.map(x => {
+    const df = x.pl !== '' && x.ac !== '' ? x.ac - x.pl : null;
+    const isDu = String(x.st || '').trim().toLowerCase() === 'đủ';
+    return `<tr>
+      <td>${P[x.p][0]}</td>
+      <td>${x.k}</td>
+      <td>${x.pl || '—'}</td>
+      <td>${x.ac || '—'}</td>
+      <td style="color:var(--${df < 0 ? 'bad' : 'ok'})">${df == null ? '—' : (df > 0 ? '+' : '') + df}</td>
+      <td><span class="badge badge-${isDu ? 'success' : 'danger'}">${isDu ? 'Đủ' : 'Thiếu'}</span></td>
+      <td>${esc(x.nt)}</td>
+    </tr>`;
+  }).join('') : '<tr><td colspan="7" class="empty">Chưa có dữ liệu nhân lực</td></tr>';
+
+  /* ==================== XỬ LÝ 4 THẺ KPI ==================== */
+  // THẺ 1: AN TOÀN LAO ĐỘNG (Đếm số cảng có số vụ mất ATLĐ = 0)
+  let safePortCount = 0;
+  let unsafeList = [];
+
+  pl.forEach(p => {
+    if (isSingle) {
+      const sVal = Number(yardLatest[p]?.s || 0);
+      if (sVal === 0) {
+        safePortCount++;
+      } else {
+        unsafeList.push(`${P[p][0]} (${sVal} vụ)`);
+      }
+    } else {
+      // Khi xem khoảng ngày: kiểm tra toàn bộ các ngày xem cảng có ngày nào s > 0 không
+      let sumIncidents = 0;
+      displayedReports.forEach(r => {
+        const yP = r.yards && r.yards[p];
+        if (yP && Number(yP.s || 0) > 0) sumIncidents += Number(yP.s);
+      });
+      if (sumIncidents === 0) {
+        safePortCount++;
+      } else {
+        unsafeList.push(`${P[p][0]} (${sumIncidents} vụ)`);
+      }
+    }
+  });
+
+  const totalPortsChecked = pl.length;
+  const atldPct = totalPortsChecked ? Math.round((safePortCount / totalPortsChecked) * 100) : 100;
+  $('k-atld').textContent = `${atldPct}%`;
+
+  if (unsafeList.length > 0) {
+    $('s-atld').innerHTML = `<span class="error-note">Sự cố: ${unsafeList.join('; ')}</span>`;
+    $('c-atld').className = 'kc danger';
+  } else {
+    $('s-atld').textContent = `${safePortCount}/${totalPortsChecked} cảng an toàn tuyệt đối (0 vụ)`;
+    $('c-atld').className = 'kc success';
+  }
+
+  // THẺ 2: TỔNG LƯỢNG TỒN BÃI
+  const ys = pl.map(p => yardLatest[p]).filter(y => y && y.teu !== '');
+  const totTeu = ys.reduce((a, y) => a + Number(y.teu || 0), 0);
+  $('k-teu').innerHTML = fmt(totTeu) + ' <small>TEU</small>';
+  const topYard = pl.filter(p => yardLatest[p]?.teu !== '').sort((a, b) => yardLatest[b].teu - yardLatest[a].teu)[0];
+  $('s-teu').textContent = topYard ? `Cao nhất: ${P[topYard][1]} (${fmt(yardLatest[topYard].teu)} TEU)` : '—';
+
+  // THẺ 3: HIỆU SUẤT BÃI
+  const ps = pl.map(p => yardLatest[p]?.pct).filter(v => v !== '' && v != null);
+  const avgHs = ps.length ? ps.reduce((a, b) => a + Number(b), 0) / ps.length : null;
+  $('k-hs').textContent = avgHs == null ? '—' : avgHs.toFixed(2) + '%';
+  $('c-hs').className = 'kc ' + (ycls(avgHs) || 'success');
+
+  // THẺ 4: TÌNH TRẠNG NHÂN LỰC (Tìm chữ "Đủ", khác "Đủ" thì ghi chú chi tiết)
+  const missingPositions = [];
+  hs.forEach(x => {
+    const val = String(x.st || '').trim().toLowerCase();
+    if (val !== 'đủ') {
+      const pName = P[x.p] ? P[x.p][0] : x.p;
+      missingPositions.push(`${pName} - ${x.k}`);
+    }
+  });
+
+  const totalPositions = hs.length;
+  const sufficientPositions = totalPositions - missingPositions.length;
+
+  if (missingPositions.length > 0) {
+    $('k-hr').innerHTML = `${sufficientPositions}/${totalPositions} <small style="color:var(--bad)">vị trí</small>`;
+    $('s-hr').innerHTML = `<span class="error-note">Thiếu: ${missingPositions.join('; ')}</span>`;
+    $('c-hr').className = 'kc danger';
+  } else {
+    $('k-hr').innerHTML = totalPositions ? `${totalPositions}/${totalPositions} <small>vị trí</small>` : '12/12';
+    $('s-hr').textContent = 'Đủ nhân lực toàn bộ các bộ phận';
+    $('c-hr').className = 'kc success';
+  }
+}
+
+function drawChart(vs) {
+  if (typeof Chart === 'undefined') return;
+  // Giới hạn hiển thị 15 tàu gần nhất nếu khoảng thời gian có quá nhiều tàu
+  const sliceVs = vs.slice(-15);
+  const labels = sliceVs.map(x => x.n + ' (' + P[x.p][0] + ')');
+  const dReq = sliceVs.map(x => +x.r || 0);
+  const dAct = sliceVs.map(x => +x.t || 0);
+
+  if (chart) {
+    chart.data.labels = labels;
+    chart.data.datasets[0].data = dReq;
+    chart.data.datasets[1].data = dAct;
+    chart.update();
+    return;
+  }
+  const ctx = $('chart').getContext('2d');
+  chart = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels,
+      datasets: [
+        { label: 'NS Yêu cầu', data: dReq, backgroundColor: '#64748b', borderRadius: 4 },
+        { label: 'NS Thực hiện', data: dAct, backgroundColor: '#38bdf8', borderRadius: 4 }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      scales: {
+        x: { ticks: { color: '#94a3b8' }, grid: { color: '#334155' } },
+        y: { ticks: { color: '#94a3b8' }, grid: { color: '#334155' }, beginAtZero: true }
+      },
+      plugins: { legend: { labels: { color: '#e2e8f0' } } }
+    }
+  });
+}
+
+function setPort(p, btn) {
+  F = p;
+  document.querySelectorAll('.tab').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderRangeView();
+}
+
+/* ==================== XỬ LÝ UPLOAD EXCEL + STORAGE ==================== */
 async function uploadToStorage(file, dateStr) {
   if (!sbClient) return '';
   try {
@@ -435,7 +755,7 @@ async function uploadToStorage(file, dateStr) {
     return pubData.publicUrl;
   } catch (err) {
     console.error('Lỗi upload storage:', err);
-    alert('Cảnh báo Storage: ' + err.message + '\n(Hãy đảm bảo bạn đã tạo Bucket "report-files" và cấu hình Public)');
+    alert('Cảnh báo Storage: ' + err.message);
     return '';
   }
 }
@@ -461,7 +781,7 @@ const pkey = v => {
 
 async function importExcelFile(file) {
   if (!file) return;
-  $('dz-text').textContent = 'Đang xử lý và tải lên Cloud Storage...';
+  $('dz-text').textContent = 'Đang đọc và upload lên Cloud Storage...';
 
   const reader = new FileReader();
   reader.onload = async e => {
@@ -515,20 +835,20 @@ async function importExcelFile(file) {
         S.h = [];
         hRows.forEach(r => {
           const p = pport(r[0]), k = pkey(r[1]);
-          if (p && k) S.h.push({ p, k, pl: num(r[2]), ac: num(r[3]), st: /thi[ếe]u/i.test(r[4]) ? 'Thiếu' : 'Đủ', nt: String(r[5] || '').trim() });
+          if (p && k) S.h.push({ p, k, pl: num(r[2]), ac: num(r[3]), st: String(r[4] || 'Đủ').trim(), nt: String(r[5] || '').trim() });
         });
       }
 
       const uploadedUrl = await uploadToStorage(file, S.date);
-      if (uploadedUrl) {
-        S.file_url = uploadedUrl;
-      }
+      if (uploadedUrl) S.file_url = uploadedUrl;
 
       closeModal();
-      render();
+      // Chuyển bộ lọc về ngày vừa upload
+      $('sel-from').value = S.date;
+      $('sel-to').value = S.date;
+
       saveToSupabase();
       $('dz-text').textContent = 'Bấm để chọn hoặc kéo thả file Excel vào đây (File sẽ được lưu vào Storage Bucket)';
-      alert(`Đã tải file lên Storage và cập nhật dữ liệu ngày ${dmy(S.date)} thành công!`);
     } catch (err) {
       alert('Lỗi đọc dữ liệu: ' + err.message);
       $('dz-text').textContent = 'Bấm để chọn hoặc kéo thả file Excel vào đây';
@@ -539,103 +859,6 @@ async function importExcelFile(file) {
 
 $('dz').onclick = () => $('xfile').click();
 $('xfile').onchange = e => importExcelFile(e.target.files[0]);
-
-/* ==================== HIỂN THỊ DASHBOARD ==================== */
-const ports = () => F === 'ALL' ? Object.keys(P) : [F];
-const ycls = p => p === '' || p == null ? '' : p >= 80 ? 'danger' : p >= 65 ? 'warning' : 'success';
-
-function render() {
-  $('sel-date').value = S.date;
-  $('d-week').textContent = S.week;
-  $('d-author').textContent = S.author || '—';
-
-  const pl = ports();
-  const vs = S.v.filter(x => pl.includes(x.p));
-  const es = S.e.filter(x => pl.includes(x.p));
-
-  $('v-count').textContent = 'Tổng số: ' + vs.length + ' tàu';
-  $('t-v').innerHTML = vs.length ? vs.map(x => {
-    const r = x.r > 0 && x.t !== '' ? (x.t / x.r * 100) : null;
-    const rb = r == null ? '<span class="badge">—</span>' : `<span class="badge badge-${r >= 100 ? 'success' : r >= 90 ? 'warning' : 'danger'}">${r.toFixed(1)}%</span>`;
-    return `<tr><td><span class="badge badge-success">${P[x.p][0]}</span></td><td><strong>${esc(x.n)}</strong></td><td>${esc(x.a)}</td><td>${esc(x.d)}</td><td>${x.r === '' ? '—' : x.r}</td><td>${x.t === '' ? '—' : x.t}</td><td>${rb}</td></tr>`;
-  }).join('') : '<tr><td colspan="7" class="empty">Chưa có dữ liệu tàu trong ngày</td></tr>';
-
-  drawChart(vs);
-
-  $('yards').innerHTML = pl.map(p => {
-    const y = S.y[p] || {};
-    if (y.teu === '' && y.pct === '') return `<div class="ks">${P[p][1]}: Chưa có dữ liệu</div>`;
-    const c = ycls(y.pct) || 'success', col = `var(--${c === 'danger' ? 'bad' : c === 'warning' ? 'warn' : 'ok'})`, w = Math.min(100, +y.pct || 0);
-    return `<div><div style="display:flex;justify-content:space-between;font-size:.85rem"><span>${P[p][1]} (${y.teu === '' ? '—' : fmt(y.teu)} TEU)</span><b style="color:${col}">${y.pct === '' ? '—' : y.pct + '%'}</b></div><div class="pbg"><div class="pf" style="width:${w}%;background:${col}"></div></div></div>`;
-  }).join('');
-
-  $('t-e').innerHTML = es.length ? es.map(x => `<tr><td>${P[x.p][0]}</td><td><strong>${esc(x.c)}</strong></td><td><span class="badge badge-danger">${esc(x.s)}</span></td><td>${x.d ? dmy(x.d) : '—'}</td></tr>`).join('') : '<tr><td colspan="4" class="empty">Không có thiết bị dừng hoạt động</td></tr>';
-
-  const hs = S.h.filter(x => pl.includes(x.p));
-  $('t-h').innerHTML = hs.length ? hs.map(x => {
-    const df = x.pl !== '' && x.ac !== '' ? x.ac - x.pl : null, th = x.st === 'Thiếu';
-    return `<tr><td>${P[x.p][0]}</td><td>${x.k}</td><td>${x.pl || '—'}</td><td>${x.ac || '—'}</td><td style="color:var(--${df < 0 ? 'bad' : 'ok'})">${df == null ? '—' : (df > 0 ? '+' : '') + df}</td><td><span class="badge badge-${th ? 'danger' : 'success'}">${th ? 'Thiếu' : 'Đủ'}</span></td><td>${esc(x.nt)}</td></tr>`;
-  }).join('') : '<tr><td colspan="7" class="empty">Chưa có dữ liệu nhân lực</td></tr>';
-
-  const badAt = pl.filter(p => (+S.y[p]?.s || 0) > 0).length, safeAt = pl.length - badAt;
-  $('k-atld').textContent = Math.round(safeAt / pl.length * 100) + '%';
-  $('s-atld').textContent = badAt ? `${badAt} cảng có sự cố` : `${safeAt}/${pl.length} cảng an toàn`;
-  $('c-atld').className = 'kc ' + (badAt ? 'danger' : 'success');
-
-  const ys = pl.map(p => S.y[p]).filter(y => y && y.teu !== ''), totTeu = ys.reduce((a, y) => a + Number(y.teu || 0), 0);
-  $('k-teu').innerHTML = fmt(totTeu) + ' <small>TEU</small>';
-  const topYard = pl.filter(p => S.y[p]?.teu !== '').sort((a, b) => S.y[b].teu - S.y[a].teu)[0];
-  $('s-teu').textContent = topYard ? `Cao nhất: ${P[topYard][1]} (${fmt(S.y[topYard].teu)} TEU)` : '—';
-
-  const ps = pl.map(p => S.y[p]?.pct).filter(v => v !== '' && v != null), avg = ps.length ? ps.reduce((a, b) => a + Number(b), 0) / ps.length : null;
-  $('k-hs').textContent = avg == null ? '—' : avg.toFixed(2) + '%';
-  $('c-hs').className = 'kc ' + (ycls(avg) || 'success');
-
-  const tk = hs.filter(x => x.st === 'Thiếu');
-  $('k-hr').innerHTML = hs.length ? `${hs.length - tk.length}/${hs.length} <small>vị trí đủ</small>` : '—';
-  $('c-hr').className = 'kc ' + (tk.length ? 'danger' : 'success');
-}
-
-function drawChart(vs) {
-  if (typeof Chart === 'undefined') return;
-  const labels = vs.map(x => x.n + ' (' + P[x.p][0] + ')');
-  const dReq = vs.map(x => +x.r || 0);
-  const dAct = vs.map(x => +x.t || 0);
-  if (chart) {
-    chart.data.labels = labels;
-    chart.data.datasets[0].data = dReq;
-    chart.data.datasets[1].data = dAct;
-    chart.update();
-    return;
-  }
-  const ctx = $('chart').getContext('2d');
-  chart = new Chart(ctx, {
-    type: 'bar',
-    data: {
-      labels,
-      datasets: [
-        { label: 'NS Yêu cầu', data: dReq, backgroundColor: '#64748b', borderRadius: 4 },
-        { label: 'NS Thực hiện', data: dAct, backgroundColor: '#38bdf8', borderRadius: 4 }
-      ]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      scales: {
-        x: { ticks: { color: '#94a3b8' }, grid: { color: '#334155' } },
-        y: { ticks: { color: '#94a3b8' }, grid: { color: '#334155' }, beginAtZero: true }
-      },
-      plugins: { legend: { labels: { color: '#e2e8f0' } } }
-    }
-  });
-}
-
-function setPort(p, btn) {
-  F = p;
-  document.querySelectorAll('.tab').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  render();
-}
 
 /* ==================== FORM THỦ CÔNG ==================== */
 const popt = s => Object.keys(P).map(k => `<option value="${k}"${k === s ? ' selected' : ''}>${P[k][1]}</option>`).join('');
@@ -667,7 +890,7 @@ function fillFormModal() {
   }).join('');
   $('m-h').innerHTML = Object.keys(P).flatMap(p => K.map(k => {
     const h = S.h.find(x => x.p === p && x.k === k) || {};
-    return `<tr data-p="${p}" data-k="${k}"><td>${P[p][0]}</td><td>${k}</td><td><input class="hp" type="number" value="${esc(h.pl)}"></td><td><input class="ha" type="number" value="${esc(h.ac)}"></td><td><select class="hs"><option>Đủ</option><option${h.st === 'Thiếu' ? ' selected' : ''}>Thiếu</option></select></td><td><input class="hn" value="${esc(h.nt)}"></td></tr>`;
+    return `<tr data-p="${p}" data-k="${k}"><td>${P[p][0]}</td><td>${k}</td><td><input class="hp" type="number" value="${esc(h.pl)}"></td><td><input class="ha" type="number" value="${esc(h.ac)}"></td><td><select class="hs"><option>Đủ</option><option${String(h.st).trim() !== 'Đủ' ? ' selected' : ''}>Thiếu</option></select></td><td><input class="hn" value="${esc(h.nt)}"></td></tr>`;
   })).join('');
 }
 
@@ -714,7 +937,8 @@ function saveForm() {
   }));
 
   closeModal();
-  render();
+  $('sel-from').value = S.date;
+  $('sel-to').value = S.date;
   saveToSupabase();
 }
 
@@ -742,10 +966,10 @@ function dlTemplate() {
   XLSX.writeFile(wb, `Mau_Nhap_Lieu_v3_${S.date}.xlsx`);
 }
 
-/* ==================== XUẤT BÁO CÁO WORD ==================== */
+/* ==================== XUẤT BÁO CÁO WORD THEO KHOẢNG THỜI GIAN ==================== */
 function openWordModal() {
-  $('w-from').value = S.date;
-  $('w-to').value = S.date;
+  $('w-from').value = $('sel-from').value;
+  $('w-to').value = $('sel-to').value;
   $('word-modal').style.display = 'flex';
 }
 function closeWordModal() { $('word-modal').style.display = 'none'; }
@@ -822,7 +1046,7 @@ async function generateWordReport() {
   <body>
     <h2>BÁO CÁO CÔNG TÁC KHAI THÁC</h2>
     <p><b>Đơn vị:</b> ${$('w-unit').value}</p>
-    <p><b>Tuần:</b> ${S.week}</p>
+    <p><b>Tuần:</b> ${isoWeek(toD)}</p>
     <p><b>Thời gian báo cáo:</b> ${timeRangeStr}</p>
     <p><b>Ngày lập báo cáo:</b> ${dmy(toD)}</p>
 
@@ -903,7 +1127,7 @@ async function generateWordReport() {
             <td class="center">${h.pl || '—'}</td>
             <td class="center">${h.ac || '—'}</td>
             <td class="center">${diff}</td>
-            <td class="center bold">${h.st === 'Thiếu' ? 'Thiếu' : '☑ Đủ'}</td>
+            <td class="center bold">${String(h.st).trim() !== 'Đủ' ? 'Thiếu' : '☑ Đủ'}</td>
           </tr>`;
         }).join('')}
       </tbody>
@@ -951,14 +1175,16 @@ async function exportImage() {
   if (typeof html2canvas === 'undefined') return;
   const canvas = await html2canvas($('capture-area'), { backgroundColor: '#0f172a', scale: 2 });
   const a = document.createElement('a');
-  a.download = `Dashboard_KhaiThac_${S.date}.png`;
+  a.download = `Dashboard_KhaiThac_${$('sel-from').value}_den_${$('sel-to').value}.png`;
   a.href = canvas.toDataURL('image/png');
   a.click();
 }
 
+// Khởi tạo mặc định xem ngày hôm nay
 window.addEventListener('DOMContentLoaded', () => {
-  $('sel-date').value = todayStr;
-  loadDateData(todayStr);
+  $('sel-from').value = todayStr;
+  $('sel-to').value = todayStr;
+  loadDateRange(todayStr, todayStr);
 });
 </script>
 </body>
