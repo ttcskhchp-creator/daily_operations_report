@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Hệ Thống Báo Cáo & Giám Sát Khai Thác - Cảng Hải Phòng</title>
+<title>Giám Sát Báo Cáo Khai Thác - Cảng Hải Phòng</title>
 
 <!-- CDN Thư viện cần thiết -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -13,263 +13,366 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
 <style>
-:root{--bg:#0f172a;--card:#1e293b;--inp:#334155;--tx:#f8fafc;--sub:#94a3b8;--blue:#0284c7;--light:#38bdf8;--navy:#003366;--bd:#334155;--ok:#10b981;--warn:#f59e0b;--bad:#ef4444}
-*{box-sizing:border-box;margin:0;padding:0;font-family:'Segoe UI',-apple-system,Roboto,sans-serif}
-body{background:var(--bg);color:var(--tx);min-height:100vh}
-header{background:linear-gradient(90deg,#002244,#003366 50%,#0284c7);padding:14px 24px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;border-bottom:2px solid var(--light);box-shadow:0 4px 20px rgba(0,0,0,.5)}
-.ht{display:flex;align-items:center;gap:15px}.ht i{font-size:2.2rem;color:var(--light)}
-.ht h1{font-size:1.25rem;text-transform:uppercase;letter-spacing:.5px}.ht span{font-size:.8rem;color:var(--sub);display:block}
-.hm{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-.cloud-status{display:flex;align-items:center;gap:6px;padding:6px 12px;border-radius:20px;font-size:.8rem;background:rgba(0,0,0,.3);border:1px solid rgba(255,255,255,.1)}
-.dot{width:9px;height:9px;border-radius:50%;background:#94a3b8}
-.dot.online{background:var(--ok);box-shadow:0 0 8px var(--ok)}
+:root{
+  --bg:#090d16;
+  --card:#131c2e;
+  --card-sub:#1b263b;
+  --inp:#1e293b;
+  --tx:#f1f5f9;
+  --sub:#94a3b8;
+  --blue:#0284c7;
+  --light:#38bdf8;
+  --navy:#003366;
+  --bd:#223049;
+  --ok:#10b981;
+  --warn:#f59e0b;
+  --bad:#ef4444;
+}
+*{box-sizing:border-box;margin:0;padding:0;font-family:'Segoe UI',-apple-system,BlinkMacSystemFont,Roboto,sans-serif}
+body{background:var(--bg);color:var(--tx);min-height:100vh;overflow-x:hidden}
+#capture-area{background:var(--bg);padding:10px 14px}
+
+/* THANH CÔNG CỤ NHỎ GỌN (COMPACT ACTION BAR) */
+.top-action-bar{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  flex-wrap:wrap;
+  gap:8px;
+  background:rgba(19,28,46,0.85);
+  backdrop-filter:blur(8px);
+  padding:8px 12px;
+  border-radius:8px;
+  border:1px solid var(--bd);
+  margin-bottom:10px;
+}
+.cloud-status{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  padding:4px 10px;
+  border-radius:14px;
+  font-size:.75rem;
+  background:rgba(0,0,0,.35);
+  border:1px solid rgba(255,255,255,.08);
+}
+.dot{width:8px;height:8px;border-radius:50%;background:#64748b}
+.dot.online{background:var(--ok);box-shadow:0 0 6px var(--ok)}
 .dot.busy{background:var(--warn);animation:pulse 1s infinite}
-@keyframes pulse{0%{opacity:.4}50%{opacity:1}100%{opacity:.4}}
-.btn{border:none;padding:9px 13px;border-radius:6px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:7px;color:#fff;font-size:.85rem;transition:.2s}
-.b-cloud{background:#0284c7}.b-cloud:hover{background:#0369a1}
-.b-word{background:#2563eb}.b-word:hover{background:#1d4ed8}
-.b-in{background:#059669}.b-in:hover{background:#047857}
-.b-img{background:#475569}.b-img:hover{background:#334155}
-.b-del{background:rgba(239,68,68,.2);color:#fca5a5;border:1px solid var(--bad)}.b-del:hover{background:var(--bad);color:#fff}
-.b-attach{background:#7c3aed;display:none}.b-attach:hover{background:#6d28d9}
-.main{padding:18px 24px}
-.fbar{display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:18px;align-items:center;background:var(--card);padding:10px 18px;border-radius:8px;border:1px solid var(--bd)}
-.tabs{display:flex;gap:8px;flex-wrap:wrap}
-.tab{background:var(--bg);color:var(--sub);border:1px solid var(--bd);padding:6px 14px;border-radius:6px;cursor:pointer;font-weight:600;font-size:.85rem;transition:.2s}
+@keyframes pulse{0%{opacity:.3}50%{opacity:1}100%{opacity:.3}}
+
+.action-btns{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+
+/* NÚT THU GỌN */
+.btn{
+  border:none;
+  padding:6px 10px;
+  border-radius:5px;
+  font-weight:600;
+  cursor:pointer;
+  display:inline-flex;
+  align-items:center;
+  gap:5px;
+  color:#fff;
+  font-size:.78rem;
+  transition:all .15s ease;
+}
+.btn i{font-size:.8rem}
+.btn:hover{filter:brightness(1.15);transform:translateY(-1px)}
+.btn:active{transform:translateY(0)}
+.b-in{background:#059669}
+.b-word{background:#1d4ed8}
+.b-img{background:#475569}
+.b-del{background:rgba(239,68,68,.18);color:#fca5a5;border:1px solid rgba(239,68,68,.4)}
+.b-del:hover{background:var(--bad);color:#fff}
+.b-attach{background:#7c3aed;display:none}
+
+/* THANH LỌC CẢNG & KHOẢNG THỜI GIAN */
+.fbar{
+  display:flex;
+  justify-content:space-between;
+  flex-wrap:wrap;
+  gap:10px;
+  margin-bottom:12px;
+  align-items:center;
+  background:var(--card);
+  padding:8px 12px;
+  border-radius:8px;
+  border:1px solid var(--bd);
+}
+.tabs{display:flex;gap:6px;flex-wrap:wrap}
+.tab{
+  background:var(--card-sub);
+  color:var(--sub);
+  border:1px solid var(--bd);
+  padding:5px 11px;
+  border-radius:5px;
+  cursor:pointer;
+  font-weight:600;
+  font-size:.78rem;
+  transition:.15s;
+}
 .tab.active,.tab:hover{background:var(--navy);color:#fff;border-color:var(--light)}
-.date-picker-wrap{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
-.date-picker-wrap input{width:135px;padding:6px 8px;background:var(--inp);border:1px solid var(--bd);color:#fff;border-radius:5px;font-size:.85rem}
-.kgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;margin-bottom:20px}
-.kc{background:var(--card);border-radius:8px;padding:15px;border:1px solid var(--bd);position:relative;overflow:hidden;box-shadow:0 4px 10px rgba(0,0,0,.2);display:flex;flex-direction:column;justify-content:space-between}
-.kc::before{content:'';position:absolute;top:0;left:0;width:4px;height:100%;background:var(--light)}
+
+.date-picker-wrap{display:flex;align-items:center;gap:6px;flex-wrap:wrap;font-size:.78rem;color:var(--sub)}
+.date-picker-wrap input{
+  width:125px;
+  padding:4px 6px;
+  background:var(--inp);
+  border:1px solid var(--bd);
+  color:#fff;
+  border-radius:4px;
+  font-size:.78rem;
+}
+
+/* 4 THẺ KPI */
+.kgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px;margin-bottom:12px}
+.kc{
+  background:var(--card);
+  border-radius:7px;
+  padding:12px 14px;
+  border:1px solid var(--bd);
+  position:relative;
+  overflow:hidden;
+  box-shadow:0 3px 8px rgba(0,0,0,.25);
+  display:flex;
+  flex-direction:column;
+  justify-content:space-between;
+}
+.kc::before{content:'';position:absolute;top:0;left:0;width:3.5px;height:100%;background:var(--light)}
 .kc.warning::before{background:var(--warn)}.kc.danger::before{background:var(--bad)}.kc.success::before{background:var(--ok)}
-.kh{font-size:.8rem;color:var(--sub);margin-bottom:6px;display:flex;justify-content:space-between}
-.kv{font-size:1.6rem;font-weight:700;margin-bottom:4px}.kv small{font-size:.9rem}
-.ks{font-size:.78rem;color:var(--sub);line-height:1.35}
-.ks.error-note{color:#fca5a5;font-weight:500;margin-top:2px}
-.split{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.kh{font-size:.74rem;color:var(--sub);margin-bottom:4px;display:flex;justify-content:space-between;font-weight:600}
+.kv{font-size:1.45rem;font-weight:700;margin-bottom:2px}.kv small{font-size:.82rem}
+.ks{font-size:.74rem;color:var(--sub);line-height:1.3}
+.ks.error-note{color:#fca5a5;font-weight:600;margin-top:2px}
+
+/* KHỐI PANEL DỮ LIỆU */
+.split{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 @media(max-width:1100px){.split{grid-template-columns:1fr}}
-.panel{background:var(--card);border-radius:8px;padding:16px;border:1px solid var(--bd);margin-bottom:18px}
-.ph{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--bd)}
-.pt{font-size:1rem;font-weight:600;color:var(--light);display:flex;align-items:center;gap:8px}
-table{width:100%;border-collapse:collapse;font-size:.85rem}
-th,td{padding:8px 10px;text-align:left;border-bottom:1px solid var(--bd)}
-th{background:rgba(0,51,102,.5);color:var(--light);text-transform:uppercase;font-size:.75rem}
-tr:hover{background:rgba(255,255,255,.03)}
-.badge{padding:3px 7px;border-radius:4px;font-size:.72rem;font-weight:600;display:inline-block;border:1px solid var(--sub);color:var(--sub)}
-.badge-success{background:rgba(16,185,129,.2);color:var(--ok);border-color:var(--ok)}
-.badge-warning{background:rgba(245,158,11,.2);color:var(--warn);border-color:var(--warn)}
-.badge-danger{background:rgba(239,68,68,.2);color:var(--bad);border-color:var(--bad)}
-.pbg{background:#334155;border-radius:8px;height:10px;overflow:hidden;margin-top:5px}
-.pf{height:100%;border-radius:8px;transition:width .4s}
-.empty{color:var(--sub);text-align:center;padding:14px;font-size:.85rem}
+.panel{background:var(--card);border-radius:7px;padding:12px 14px;border:1px solid var(--bd);margin-bottom:12px}
+.ph{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid var(--bd)}
+.pt{font-size:.9rem;font-weight:600;color:var(--light);display:flex;align-items:center;gap:7px}
+
+/* BẢNG DỮ LIỆU */
+table{width:100%;border-collapse:collapse;font-size:.8rem}
+th,td{padding:6px 8px;text-align:left;border-bottom:1px solid var(--bd)}
+th{background:rgba(0,51,102,.45);color:var(--light);text-transform:uppercase;font-size:.72rem;letter-spacing:.3px}
+tr:hover{background:rgba(255,255,255,.025)}
+.badge{padding:2px 6px;border-radius:4px;font-size:.7rem;font-weight:600;display:inline-block;border:1px solid var(--sub);color:var(--sub)}
+.badge-success{background:rgba(16,185,129,.18);color:var(--ok);border-color:var(--ok)}
+.badge-warning{background:rgba(245,158,11,.18);color:var(--warn);border-color:var(--warn)}
+.badge-danger{background:rgba(239,68,68,.18);color:var(--bad);border-color:var(--bad)}
+.pbg{background:#223049;border-radius:6px;height:8px;overflow:hidden;margin-top:4px}
+.pf{height:100%;border-radius:6px;transition:width .4s}
+.empty{color:var(--sub);text-align:center;padding:12px;font-size:.8rem}
+
+/* MODAL */
 .modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:1000;justify-content:center;align-items:center;backdrop-filter:blur(4px)}
-.mc{background:var(--card);border-radius:10px;width:95%;max-width:1050px;max-height:90vh;overflow-y:auto;border:1px solid var(--blue);padding:20px}
-.mh{display:flex;justify-content:space-between;align-items:center;margin-bottom:15px;border-bottom:1px solid var(--bd);padding-bottom:8px}
-.x{font-size:1.6rem;cursor:pointer;color:var(--sub)}.x:hover{color:#fff}
-.fs{margin-bottom:16px;background:rgba(0,0,0,.2);padding:14px;border-radius:6px;border:1px solid rgba(255,255,255,.05);overflow-x:auto}
-.fs h3{font-size:.95rem;color:var(--light);margin-bottom:10px;display:flex;justify-content:space-between;align-items:center}
-.fg{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px}
-.fg label{font-size:.8rem;color:var(--sub);display:flex;flex-direction:column;gap:4px}
-input,select,textarea{background:var(--inp);border:1px solid var(--bd);color:#fff;padding:6px 10px;border-radius:4px;outline:none;width:100%;font-size:.85rem}
-input:focus,select:focus,textarea:focus{border-color:var(--light)}
-.dz{border:2px dashed var(--light);background:rgba(2,132,199,.05);padding:18px;border-radius:6px;text-align:center;cursor:pointer;margin-bottom:10px}
+.mc{background:var(--card);border-radius:8px;width:95%;max-width:1000px;max-height:92vh;overflow-y:auto;border:1px solid var(--blue);padding:18px}
+.mh{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;border-bottom:1px solid var(--bd);padding-bottom:6px}
+.x{font-size:1.5rem;cursor:pointer;color:var(--sub)}.x:hover{color:#fff}
+.fs{margin-bottom:12px;background:rgba(0,0,0,.25);padding:12px;border-radius:6px;border:1px solid rgba(255,255,255,.05);overflow-x:auto}
+.fs h3{font-size:.88rem;color:var(--light);margin-bottom:8px;display:flex;justify-content:space-between;align-items:center}
+.fg{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:8px}
+.fg label{font-size:.75rem;color:var(--sub);display:flex;flex-direction:column;gap:3px}
+input,select{background:var(--inp);border:1px solid var(--bd);color:#fff;padding:5px 8px;border-radius:4px;outline:none;width:100%;font-size:.8rem}
+input:focus,select:focus{border-color:var(--light)}
+.dz{border:2px dashed var(--light);background:rgba(2,132,199,.05);padding:14px;border-radius:6px;text-align:center;cursor:pointer;margin-bottom:8px}
 .dz:hover{background:rgba(2,132,199,.15);border-color:#fff}
-.del{background:transparent;border:none;color:var(--bad);cursor:pointer;padding:2px 5px}
-.add{background:rgba(2,132,199,.2);color:var(--light);border:1px dashed var(--light);padding:5px 10px;border-radius:4px;cursor:pointer;font-size:.8rem}
-.save-btn{background:var(--ok);color:#fff;border:none;padding:10px 22px;border-radius:6px;font-weight:600;cursor:pointer;float:right}
+.del{background:transparent;border:none;color:var(--bad);cursor:pointer;padding:2px 4px}
+.add{background:rgba(2,132,199,.2);color:var(--light);border:1px dashed var(--light);padding:4px 8px;border-radius:4px;cursor:pointer;font-size:.75rem}
+.save-btn{background:var(--ok);color:#fff;border:none;padding:7px 18px;border-radius:5px;font-weight:600;cursor:pointer;float:right;font-size:.82rem}
 </style>
 </head>
 <body>
 
 <div id="capture-area">
-<header>
- <div class="ht">
-  <i class="fa-solid fa-ship"></i>
-  <div>
-    <h1>Trung tâm Khai thác & Dịch vụ Khách hàng</h1>
-    <span>HỆ THỐNG GIÁM SÁT KPI & BÁO CÁO TÍCH HỢP SUPABASE CLOUD</span>
-  </div>
- </div>
- <div class="hm">
-  <div class="cloud-status" id="cloud-pill">
-    <div class="dot" id="cloud-dot"></div>
-    <span id="cloud-text">Đang kết nối Supabase...</span>
-  </div>
-  <button class="btn b-attach" id="btn-orig-file" onclick="downloadOriginalFile()"><i class="fa-solid fa-paperclip"></i> Tải Excel Gốc</button>
-  <button class="btn b-cloud" onclick="saveToSupabase()"><i class="fa-solid fa-cloud-arrow-up"></i> Lưu Cloud</button>
-  <button class="btn b-in" onclick="openModal()"><i class="fa-solid fa-file-excel"></i> Nhập / Upload Excel</button>
-  <button class="btn b-del" onclick="deleteCurrentDayData()"><i class="fa-solid fa-trash-can"></i> Xóa Dữ Liệu Ngày</button>
-  <button class="btn b-word" onclick="openWordModal()"><i class="fa-solid fa-file-word"></i> Xuất Báo Cáo Word</button>
-  <button class="btn b-img" onclick="exportImage()"><i class="fa-solid fa-camera"></i> Chụp Dashboard</button>
- </div>
-</header>
+  <!-- THANH CÔNG CỤ COMPACT (ĐÃ BỎ HEADER LỚN & BỎ NÚT LƯU CLOUD) -->
+  <div class="top-action-bar">
+    <div class="cloud-status" id="cloud-pill">
+      <div class="dot" id="cloud-dot"></div>
+      <span id="cloud-text">Đang kết nối Supabase...</span>
+    </div>
 
-<div class="main">
- <div class="fbar">
-  <div class="tabs">
-   <button class="tab active" onclick="setPort('ALL',this)">Tất Cả Cảng</button>
-   <button class="tab" onclick="setPort('HD',this)">Hoàng Diệu Chùa Vẽ</button>
-   <button class="tab" onclick="setPort('TV',this)">Cảng Tân Vũ</button>
-   <button class="tab" onclick="setPort('DV',this)">Cảng Đình Vũ</button>
-  </div>
-  <div class="date-picker-wrap">
-    <span style="font-size:.85rem;color:var(--sub)"><i class="fa-regular fa-calendar-days"></i> Khoảng thời gian: Từ</span>
-    <input type="date" id="sel-from" onchange="onRangeChange()">
-    <span style="font-size:.85rem;color:var(--sub)">Đến</span>
-    <input type="date" id="sel-to" onchange="onRangeChange()">
-    <span style="font-size:.85rem;color:var(--sub)">| Tuần: <strong id="d-week">--</strong></span>
-    <span style="font-size:.85rem;color:var(--sub)">| Người lập: <strong id="d-author">--</strong></span>
-  </div>
- </div>
-
- <div class="kgrid">
-  <!-- Thẻ An toàn lao động: Đếm số cảng có số vụ mất ATLĐ = 0 -->
-  <div class="kc success" id="c-atld">
-   <div class="kh"><span>AN TOÀN LAO ĐỘNG</span><i class="fa-solid fa-shield-halved"></i></div>
-   <div class="kv" id="k-atld">100%</div>
-   <div class="ks" id="s-atld">3/3 cảng an toàn tuyệt đối</div>
+    <div class="action-btns">
+      <button class="btn b-attach" id="btn-orig-file" onclick="downloadOriginalFile()"><i class="fa-solid fa-paperclip"></i> Tải Excel Gốc</button>
+      <button class="btn b-in" onclick="openModal()"><i class="fa-solid fa-file-excel"></i> Nhập / Upload Excel</button>
+      <button class="btn b-del" onclick="deleteCurrentDayData()"><i class="fa-solid fa-trash-can"></i> Xóa Dữ Liệu Ngày</button>
+      <button class="btn b-word" onclick="openWordModal()"><i class="fa-solid fa-file-word"></i> Xuất Báo Cáo Word</button>
+      <button class="btn b-img" onclick="exportImage()"><i class="fa-solid fa-camera"></i> Chụp Dashboard</button>
+    </div>
   </div>
 
-  <!-- Thẻ Tồn bãi -->
-  <div class="kc warning">
-   <div class="kh"><span>TỔNG LƯỢNG TỒN BÃI</span><i class="fa-solid fa-cubes"></i></div>
-   <div class="kv" id="k-teu">0 <small>TEU</small></div>
-   <div class="ks" id="s-teu">--</div>
+  <!-- THANH LỌC CẢNG & KHOẢNG THỜI GIAN -->
+  <div class="fbar">
+    <div class="tabs">
+      <button class="tab active" onclick="setPort('ALL',this)">Tất Cả Cảng</button>
+      <button class="tab" onclick="setPort('HD',this)">Hoàng Diệu Chùa Vẽ</button>
+      <button class="tab" onclick="setPort('TV',this)">Cảng Tân Vũ</button>
+      <button class="tab" onclick="setPort('DV',this)">Cảng Đình Vũ</button>
+    </div>
+    <div class="date-picker-wrap">
+      <span><i class="fa-regular fa-calendar-days"></i> Khoảng thời gian: Từ</span>
+      <input type="date" id="sel-from" onchange="onRangeChange()">
+      <span>Đến</span>
+      <input type="date" id="sel-to" onchange="onRangeChange()">
+      <span>| Tuần: <strong id="d-week" style="color:var(--tx)">--</strong></span>
+      <span>| Người lập: <strong id="d-author" style="color:var(--tx)">--</strong></span>
+    </div>
   </div>
 
-  <!-- Thẻ Hiệu suất bãi -->
-  <div class="kc success" id="c-hs">
-   <div class="kh"><span>HIỆU SUẤT BÃI TRUNG BÌNH</span><i class="fa-solid fa-chart-pie"></i></div>
-   <div class="kv" id="k-hs">0%</div>
-   <div class="ks" id="s-hs">Toàn hệ thống</div>
+  <!-- 4 THẺ KPI TỔNG QUAN -->
+  <div class="kgrid">
+    <!-- 1. Thẻ ATLĐ: Đếm số cảng có số vụ mất ATLĐ = 0 -->
+    <div class="kc success" id="c-atld">
+      <div class="kh"><span>AN TOÀN LAO ĐỘNG</span><i class="fa-solid fa-shield-halved"></i></div>
+      <div class="kv" id="k-atld">100%</div>
+      <div class="ks" id="s-atld">3/3 cảng an toàn tuyệt đối (0 vụ)</div>
+    </div>
+
+    <!-- 2. Thẻ Tồn bãi -->
+    <div class="kc warning">
+      <div class="kh"><span>TỔNG LƯỢNG TỒN BÃI</span><i class="fa-solid fa-cubes"></i></div>
+      <div class="kv" id="k-teu">0 <small>TEU</small></div>
+      <div class="ks" id="s-teu">--</div>
+    </div>
+
+    <!-- 3. Thẻ Hiệu suất bãi -->
+    <div class="kc success" id="c-hs">
+      <div class="kh"><span>HIỆU SUẤT BÃI TRUNG BÌNH</span><i class="fa-solid fa-chart-pie"></i></div>
+      <div class="kv" id="k-hs">0%</div>
+      <div class="ks" id="s-hs">Toàn hệ thống</div>
+    </div>
+
+    <!-- 4. Thẻ Nhân lực: Tìm chữ "Đủ", khác "Đủ" thì hiển thị bộ phận thiếu -->
+    <div class="kc success" id="c-hr">
+      <div class="kh"><span>TÌNH TRẠNG NHÂN LỰC</span><i class="fa-solid fa-users"></i></div>
+      <div class="kv" id="k-hr">12/12</div>
+      <div class="ks" id="s-hr">Đủ nhân lực toàn bộ</div>
+    </div>
   </div>
 
-  <!-- Thẻ Nhân sự: Kiểm tra chữ Đủ, nếu khác Đủ thì liệt kê bộ phận thiếu -->
-  <div class="kc success" id="c-hr">
-   <div class="kh"><span>TÌNH TRẠNG NHÂN LỰC</span><i class="fa-solid fa-users"></i></div>
-   <div class="kv" id="k-hr">12/12</div>
-   <div class="ks" id="s-hr">Đủ nhân lực toàn bộ</div>
-  </div>
- </div>
-
- <div class="panel">
-  <div class="ph">
-   <div class="pt"><i class="fa-solid fa-anchor"></i> 1. BẢNG GIÁM SÁT NĂNG SUẤT XẾP DỠ THEO TÀU (MOVES/GIỜ)</div>
-   <span style="font-size:.8rem;color:var(--sub)" id="v-count">Tổng số: 0 tàu</span>
-  </div>
-  <div style="overflow-x:auto">
-   <table>
-    <thead><tr><th>Ngày</th><th>Cảng</th><th>Tên Tàu</th><th>Cập Cảng</th><th>Dự Kiến Rời</th><th>NS Yêu Cầu</th><th>NS Thực Hiện</th><th>Tỷ Lệ Đạt</th></tr></thead>
-    <tbody id="t-v"></tbody>
-   </table>
-  </div>
- </div>
-
- <div class="panel">
-  <div class="ph"><div class="pt"><i class="fa-solid fa-chart-column"></i> BIỂU ĐỒ SO SÁNH NĂNG SUẤT THỰC HIỆN VS YÊU CẦU</div></div>
-  <div style="height:260px"><canvas id="chart"></canvas></div>
- </div>
-
- <div class="split">
+  <!-- 1. BẢNG TÀU -->
   <div class="panel">
-   <div class="ph"><div class="pt"><i class="fa-solid fa-warehouse"></i> 2. HIỆU SUẤT & TỒN BÃI (YARD)</div></div>
-   <div id="yards" style="display:flex;flex-direction:column;gap:15px"></div>
+    <div class="ph">
+      <div class="pt"><i class="fa-solid fa-anchor"></i> 1. BẢNG GIÁM SÁT NĂNG SUẤT XẾP DỠ THEO TÀU (MOVES/GIỜ)</div>
+      <span style="font-size:.78rem;color:var(--sub)" id="v-count">Tổng số: 0 lượt tàu</span>
+    </div>
+    <div style="overflow-x:auto">
+      <table>
+        <thead><tr><th>Ngày</th><th>Cảng</th><th>Tên Tàu</th><th>Cập Cảng</th><th>Dự Kiến Rời</th><th>NS Yêu Cầu</th><th>NS Thực Hiện</th><th>Tỷ Lệ Đạt</th></tr></thead>
+        <tbody id="t-v"></tbody>
+      </table>
+    </div>
   </div>
-  <div class="panel">
-   <div class="ph"><div class="pt"><i class="fa-solid fa-screwdriver-wrench"></i> 3. TÌNH TRẠNG THIẾT BỊ HƯ HỎNG / DỪNG SX</div></div>
-   <div style="overflow-x:auto">
-    <table>
-     <thead><tr><th>Cảng</th><th>Mã Thiết Bị</th><th>Tình Trạng</th><th>Từ Ngày</th><th>Ghi Chú</th></tr></thead>
-     <tbody id="t-e"></tbody>
-    </table>
-   </div>
-  </div>
- </div>
 
- <div class="panel" style="margin-top:18px">
-  <div class="ph"><div class="pt"><i class="fa-solid fa-users"></i> 4. TÌNH TRẠNG NHÂN LỰC VẬN HÀNH</div></div>
-  <div style="overflow-x:auto">
-   <table>
-    <thead><tr><th>Cảng</th><th>Vị Trí</th><th>Kế Hoạch</th><th>Thực Tế</th><th>Chênh Lệch</th><th>Đánh Giá</th><th>Ghi Chú</th></tr></thead>
-    <tbody id="t-h"></tbody>
-   </table>
+  <!-- BIỂU ĐỒ NĂNG SUẤT -->
+  <div class="panel">
+    <div class="ph"><div class="pt"><i class="fa-solid fa-chart-column"></i> BIỂU ĐỒ SO SÁNH NĂNG SUẤT THỰC HIỆN VS YÊU CẦU</div></div>
+    <div style="height:230px"><canvas id="chart"></canvas></div>
   </div>
- </div>
-</div>
+
+  <!-- BÃI HÀNG & THIẾT BỊ -->
+  <div class="split">
+    <div class="panel">
+      <div class="ph"><div class="pt"><i class="fa-solid fa-warehouse"></i> 2. HIỆU SUẤT & TỒN BÃI (YARD)</div></div>
+      <div id="yards" style="display:flex;flex-direction:column;gap:12px"></div>
+    </div>
+    <div class="panel">
+      <div class="ph"><div class="pt"><i class="fa-solid fa-screwdriver-wrench"></i> 3. TÌNH TRẠNG THIẾT BỊ HƯ HỎNG / DỪNG SX</div></div>
+      <div style="overflow-x:auto">
+        <table>
+          <thead><tr><th>Cảng</th><th>Mã Thiết Bị</th><th>Tình Trạng</th><th>Từ Ngày</th><th>Ghi Chú</th></tr></thead>
+          <tbody id="t-e"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- NHÂN LỰC -->
+  <div class="panel">
+    <div class="ph"><div class="pt"><i class="fa-solid fa-users"></i> 4. TÌNH TRẠNG NHÂN LỰC VẬN HÀNH</div></div>
+    <div style="overflow-x:auto">
+      <table>
+        <thead><tr><th>Cảng</th><th>Vị Trí</th><th>Kế Hoạch</th><th>Thực Tế</th><th>Chênh Lệch</th><th>Đánh Giá</th><th>Ghi Chú</th></tr></thead>
+        <tbody id="t-h"></tbody>
+      </table>
+    </div>
+  </div>
 </div>
 
 <!-- MODAL NHẬP LIỆU EXCEL / FORM -->
 <div class="modal" id="modal"><div class="mc">
- <div class="mh"><h2><i class="fa-solid fa-pen-to-square"></i> Nhập Dữ Liệu Ngày & Upload Excel</h2><span class="x" onclick="closeModal()">×</span></div>
+  <div class="mh"><h2><i class="fa-solid fa-pen-to-square"></i> Nhập Dữ Liệu Ngày & Upload Excel</h2><span class="x" onclick="closeModal()">×</span></div>
  
- <div class="fs">
-  <h3><span><i class="fa-solid fa-file-excel"></i> A. Upload file Excel (.xlsx) vào Storage</span>
-   <button class="add" onclick="dlTemplate()"><i class="fa-solid fa-download"></i> Tải file mẫu v3</button>
-  </h3>
-  <div class="dz" id="dz">
-    <i class="fa-solid fa-cloud-arrow-up" style="font-size:1.8rem;color:var(--light);margin-bottom:6px"></i>
-    <div id="dz-text">Bấm để chọn hoặc kéo thả file Excel vào đây (File sẽ được lưu vào Storage Bucket)</div>
+  <div class="fs">
+    <h3>
+      <span><i class="fa-solid fa-file-excel"></i> A. Upload file Excel (.xlsx) vào Storage</span>
+      <button class="add" onclick="dlTemplate()"><i class="fa-solid fa-download"></i> Tải file mẫu v3</button>
+    </h3>
+    <div class="dz" id="dz">
+      <i class="fa-solid fa-cloud-arrow-up" style="font-size:1.6rem;color:var(--light);margin-bottom:4px"></i>
+      <div id="dz-text" style="font-size:.82rem">Bấm để chọn hoặc kéo thả file Excel vào đây (Tự động lưu vào Storage Bucket & DB)</div>
+    </div>
+    <input type="file" id="xfile" accept=".xlsx,.xls" style="display:none">
   </div>
-  <input type="file" id="xfile" accept=".xlsx,.xls" style="display:none">
- </div>
 
- <div class="fs">
-  <h3>B. Thông tin chung</h3>
-  <div class="fg">
-   <label>Ngày báo cáo<input type="date" id="f-date"></label>
-   <label>Tuần báo cáo<input type="number" id="f-week" min="1" max="53"></label>
-   <label>Người lập báo cáo<input type="text" id="f-author"></label>
+  <div class="fs">
+    <h3>B. Thông tin chung</h3>
+    <div class="fg">
+      <label>Ngày báo cáo<input type="date" id="f-date"></label>
+      <label>Tuần báo cáo<input type="number" id="f-week" min="1" max="53"></label>
+      <label>Người lập báo cáo<input type="text" id="f-author"></label>
+    </div>
   </div>
- </div>
 
- <div class="fs">
-  <h3>C. Năng suất theo tàu <button class="add" onclick="addVRow()"><i class="fa-solid fa-plus"></i> Thêm tàu</button></h3>
-  <table><thead><tr><th>Cảng</th><th>Tên tàu</th><th>Cập cảng</th><th>Dự kiến rời</th><th>NS Yêu cầu</th><th>NS Thực hiện</th><th>Xóa</th></tr></thead><tbody id="m-v"></tbody></table>
- </div>
+  <div class="fs">
+    <h3>C. Năng suất theo tàu <button class="add" onclick="addVRow()"><i class="fa-solid fa-plus"></i> Thêm tàu</button></h3>
+    <table><thead><tr><th>Cảng</th><th>Tên tàu</th><th>Cập cảng</th><th>Dự kiến rời</th><th>NS Yêu cầu</th><th>NS Thực hiện</th><th>Xóa</th></tr></thead><tbody id="m-v"></tbody></table>
+  </div>
 
- <div class="fs">
-  <h3>D. Bãi & An toàn lao động</h3>
-  <table><thead><tr><th>Cảng</th><th>Tồn bãi (TEU)</th><th>Hiệu suất bãi (%)</th><th>Số vụ mất ATLĐ</th></tr></thead><tbody id="m-y"></tbody></table>
- </div>
+  <div class="fs">
+    <h3>D. Bãi & An toàn lao động</h3>
+    <table><thead><tr><th>Cảng</th><th>Tồn bãi (TEU)</th><th>Hiệu suất bãi (%)</th><th>Số vụ mất ATLĐ</th></tr></thead><tbody id="m-y"></tbody></table>
+  </div>
 
- <div class="fs">
-  <h3>E. Thiết bị hỏng <button class="add" onclick="addERow()"><i class="fa-solid fa-plus"></i> Thêm thiết bị</button></h3>
-  <table><thead><tr><th>Cảng</th><th>Mã thiết bị</th><th>Tình trạng</th><th>Hỏng từ ngày</th><th>Xóa</th></tr></thead><tbody id="m-e"></tbody></table>
- </div>
+  <div class="fs">
+    <h3>E. Thiết bị hỏng <button class="add" onclick="addERow()"><i class="fa-solid fa-plus"></i> Thêm thiết bị</button></h3>
+    <table><thead><tr><th>Cảng</th><th>Mã thiết bị</th><th>Tình trạng</th><th>Hỏng từ ngày</th><th>Xóa</th></tr></thead><tbody id="m-e"></tbody></table>
+  </div>
 
- <div class="fs">
-  <h3>F. Nhân lực</h3>
-  <table><thead><tr><th>Cảng</th><th>Vị trí</th><th>Kế hoạch</th><th>Thực tế</th><th>Đánh giá</th><th>Ghi chú</th></tr></thead><tbody id="m-h"></tbody></table>
- </div>
+  <div class="fs">
+    <h3>F. Nhân lực</h3>
+    <table><thead><tr><th>Cảng</th><th>Vị trí</th><th>Kế hoạch</th><th>Thực tế</th><th>Đánh giá</th><th>Ghi chú</th></tr></thead><tbody id="m-h"></tbody></table>
+  </div>
 
- <div style="display:flex;justify-content:space-between;align-items:center;margin-top:15px">
-  <span style="font-size:.85rem;color:var(--sub)"><i class="fa-solid fa-circle-info"></i> Bấm "Lưu" sẽ đồng bộ dữ liệu và file lên Supabase.</span>
-  <button class="save-btn" onclick="saveForm()"><i class="fa-solid fa-floppy-disk"></i> Lưu Vào Dashboard & Supabase</button>
- </div>
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-top:12px">
+    <span style="font-size:.78rem;color:var(--sub)"><i class="fa-solid fa-circle-info"></i> Bấm "Lưu" sẽ đồng bộ trực tiếp lên Database & Cloud Storage.</span>
+    <button class="save-btn" onclick="saveForm()"><i class="fa-solid fa-floppy-disk"></i> Lưu Vào Dashboard & Supabase</button>
+  </div>
 </div></div>
 
 <!-- MODAL XUẤT BÁO CÁO WORD -->
-<div class="modal" id="word-modal"><div class="mc" style="max-width:550px">
- <div class="mh"><h2><i class="fa-solid fa-file-word" style="color:#38bdf8"></i> Xuất Báo Cáo Khai Thác Word</h2><span class="x" onclick="closeWordModal()">×</span></div>
- <div class="fs">
-  <div class="fg" style="grid-template-columns:1fr 1fr">
-   <label>Từ ngày:<input type="date" id="w-from"></label>
-   <label>Đến ngày:<input type="date" id="w-to"></label>
+<div class="modal" id="word-modal"><div class="mc" style="max-width:520px">
+  <div class="mh"><h2><i class="fa-solid fa-file-word" style="color:#38bdf8"></i> Xuất Báo Cáo Khai Thác Word</h2><span class="x" onclick="closeWordModal()">×</span></div>
+  <div class="fs">
+    <div class="fg" style="grid-template-columns:1fr 1fr">
+      <label>Từ ngày:<input type="date" id="w-from"></label>
+      <label>Đến ngày:<input type="date" id="w-to"></label>
+    </div>
+    <div style="margin-top:10px">
+      <label style="font-size:.75rem;color:var(--sub);display:block;margin-bottom:4px">Đơn vị lập:</label>
+      <input type="text" id="w-unit" value="Trung tâm Khai thác và Dịch vụ khách hàng">
+    </div>
+    <div style="margin-top:10px">
+      <label style="font-size:.75rem;color:var(--sub);display:block;margin-bottom:4px">Đánh giá chung công tác an toàn:</label>
+      <input type="text" id="w-safe-note" value="Các lực lượng tuân thủ đúng quy trình an toàn xếp dỡ, trang bị đầy đủ bảo hộ LĐ, sản xuất an toàn.">
+    </div>
   </div>
-  <div style="margin-top:12px">
-   <label style="font-size:.8rem;color:var(--sub);display:block;margin-bottom:5px">Đơn vị lập:</label>
-   <input type="text" id="w-unit" value="Trung tâm Khai thác và Dịch vụ khách hàng">
+  <div style="display:flex;justify-content:flex-end;gap:8px">
+    <button class="btn" style="background:#475569" onclick="closeWordModal()">Hủy</button>
+    <button class="btn b-word" onclick="generateWordReport()"><i class="fa-solid fa-download"></i> Tải Báo Cáo Word (.doc)</button>
   </div>
-  <div style="margin-top:12px">
-   <label style="font-size:.8rem;color:var(--sub);display:block;margin-bottom:5px">Đánh giá chung công tác an toàn:</label>
-   <input type="text" id="w-safe-note" value="Các lực lượng tuân thủ đúng quy trình an toàn xếp dỡ, trang bị đầy đủ bảo hộ LĐ, sản xuất an toàn.">
-  </div>
- </div>
- <div style="display:flex;justify-content:flex-end;gap:10px">
-  <button class="btn" style="background:#475569" onclick="closeWordModal()">Hủy</button>
-  <button class="btn b-word" onclick="generateWordReport()"><i class="fa-solid fa-download"></i> Tải Báo Cáo Word (.doc)</button>
- </div>
 </div></div>
 
 <script>
@@ -305,7 +408,6 @@ const defH = () => Object.keys(P).flatMap(p => K.map(k => ({ p, k, pl:'', ac:'',
 
 const todayStr = new Date().toISOString().slice(0, 10);
 
-// S: Dữ liệu ngày hiện tại đang chỉnh sửa/upload
 let S = {
   date: todayStr,
   week: isoWeek(todayStr),
@@ -319,7 +421,6 @@ let S = {
   it_note: 'Hệ thống CNTT hoạt động bình thường.'
 };
 
-// Dữ liệu hiển thị (khi xem theo khoảng thời gian)
 let displayedReports = [];
 let F = 'ALL', chart = null;
 
@@ -359,7 +460,6 @@ async function loadDateRange(fromD, toD) {
     if (error) throw error;
     displayedReports = data || [];
 
-    // Nếu khoảng thời gian trùng 1 ngày, cập nhật luôn biến S để hỗ trợ xóa/sửa/tải file gốc
     if (fromD === toD) {
       if (displayedReports.length > 0) {
         const d = displayedReports[0];
@@ -421,7 +521,7 @@ function downloadOriginalFile() {
   }
 }
 
-/* ==================== XÓA DỮ LIỆU NGÀY (DATABASE + STORAGE) ==================== */
+/* ==================== XÓA DỮ LIỆU NGÀY ==================== */
 async function deleteCurrentDayData() {
   const targetDate = $('sel-from').value;
   const isSingle = $('sel-from').value === $('sel-to').value;
@@ -437,18 +537,15 @@ async function deleteCurrentDayData() {
 
   setCloudStatus(false, 'Đang tiến hành xóa...', true);
   try {
-    // 1. Xóa file nhị phân trong Supabase Storage Bucket (nếu có)
     const filePaths = [
       `excel/Bao_Cao_${targetDate}.xlsx`,
       `excel/Bao_Cao_${targetDate}.xls`
     ];
     await sbClient.storage.from(BUCKET_NAME).remove(filePaths);
 
-    // 2. Xóa bản ghi trong database table daily_reports
     const { error: dbErr } = await sbClient.from('daily_reports').delete().eq('report_date', targetDate);
     if (dbErr) throw dbErr;
 
-    // 3. Reset dữ liệu local và cập nhật giao diện
     S = {
       date: targetDate,
       week: isoWeek(targetDate),
@@ -473,11 +570,10 @@ async function deleteCurrentDayData() {
   }
 }
 
-/* ==================== LƯU LÊN SUPABASE ==================== */
-async function saveToSupabase() {
-  if (!S.date) { alert('Chưa chọn ngày báo cáo'); return; }
-  if (!sbClient) { alert('Chưa kết nối được Supabase Client!'); return; }
-  setCloudStatus(false, 'Đang lưu Cloud...', true);
+/* ==================== LƯU LÊN SUPABASE (TỰ ĐỘNG KHI SUBMIT FORM/UPLOAD) ==================== */
+async function autoSaveToSupabase() {
+  if (!S.date || !sbClient) return;
+  setCloudStatus(false, 'Đang đồng bộ Cloud...', true);
   const payload = {
     report_date: S.date,
     week: S.week,
@@ -495,17 +591,16 @@ async function saveToSupabase() {
   try {
     const { error } = await sbClient.from('daily_reports').upsert(payload, { onConflict: 'report_date' });
     if (error) throw error;
-    setCloudStatus(true, `Đã đồng bộ Cloud (${dmy(S.date)})`);
+    setCloudStatus(true, `Đã đồng bộ (${dmy(S.date)})`);
     updateFileButton();
-    alert(`Đã lưu thành công dữ liệu ngày ${dmy(S.date)} lên Supabase!`);
     loadDateRange($('sel-from').value, $('sel-to').value);
   } catch (err) {
     alert('Không thể lưu lên Supabase: ' + err.message);
-    setCloudStatus(false, 'Lỗi lưu Cloud');
+    setCloudStatus(false, 'Lỗi đồng bộ Cloud');
   }
 }
 
-/* ==================== HIỂN THỊ DỮ LIỆU THEO KHOẢNG THỜI GIAN ==================== */
+/* ==================== HIỂN THỊ DỮ LIỆU KHOẢNG THỜI GIAN ==================== */
 const ports = () => F === 'ALL' ? Object.keys(P) : [F];
 const ycls = p => p === '' || p == null ? '' : p >= 80 ? 'danger' : p >= 65 ? 'warning' : 'success';
 
@@ -519,13 +614,10 @@ function renderRangeView() {
 
   const pl = ports();
 
-  // Tập hợp danh sách dữ liệu từ các ngày được truy vấn
   let combinedV = [];
   let combinedE = [];
   let combinedH = [];
   let yardLatest = { HD: { teu:'', pct:'', s:0 }, TV: { teu:'', pct:'', s:0 }, DV: { teu:'', pct:'', s:0 } };
-  let atldIssuePorts = new Set();
-  let validPortCount = 0;
 
   if (isSingle) {
     combinedV = S.v.map(x => ({ ...x, report_date: S.date }));
@@ -549,12 +641,10 @@ function renderRangeView() {
         }
       });
     });
-    // Lấy nhân lực của ngày gần nhất có dữ liệu
     const latestRep = displayedReports[displayedReports.length - 1];
     combinedH = latestRep && latestRep.manpower && latestRep.manpower.length ? latestRep.manpower : defH();
   }
 
-  // Lọc theo Cảng được chọn
   const vs = combinedV.filter(x => pl.includes(x.p));
   const es = combinedE.filter(x => pl.includes(x.p));
   const hs = combinedH.filter(x => pl.includes(x.p));
@@ -578,12 +668,12 @@ function renderRangeView() {
 
   drawChart(vs);
 
-  // 2. Tồn bãi
+  // 2. Bãi hàng
   $('yards').innerHTML = pl.map(p => {
     const y = yardLatest[p] || {};
     if (y.teu === '' && y.pct === '') return `<div class="ks">${P[p][1]}: Chưa có dữ liệu</div>`;
     const c = ycls(y.pct) || 'success', col = `var(--${c === 'danger' ? 'bad' : c === 'warning' ? 'warn' : 'ok'})`, w = Math.min(100, +y.pct || 0);
-    return `<div><div style="display:flex;justify-content:space-between;font-size:.85rem"><span>${P[p][1]} (${y.teu === '' ? '—' : fmt(y.teu)} TEU)</span><b style="color:${col}">${y.pct === '' ? '—' : y.pct + '%'}</b></div><div class="pbg"><div class="pf" style="width:${w}%;background:${col}"></div></div></div>`;
+    return `<div><div style="display:flex;justify-content:space-between;font-size:.8rem"><span>${P[p][1]} (${y.teu === '' ? '—' : fmt(y.teu)} TEU)</span><b style="color:${col}">${y.pct === '' ? '—' : y.pct + '%'}</b></div><div class="pbg"><div class="pf" style="width:${w}%;background:${col}"></div></div></div>`;
   }).join('');
 
   // 3. Thiết bị dừng SX
@@ -595,7 +685,7 @@ function renderRangeView() {
     <td style="color:var(--sub)">Dừng SX</td>
   </tr>`).join('') : '<tr><td colspan="5" class="empty">Không có thiết bị dừng hoạt động</td></tr>';
 
-  // 4. Bảng chi tiết nhân lực
+  // 4. Bảng nhân lực
   $('t-h').innerHTML = hs.length ? hs.map(x => {
     const df = x.pl !== '' && x.ac !== '' ? x.ac - x.pl : null;
     const isDu = String(x.st || '').trim().toLowerCase() === 'đủ';
@@ -610,8 +700,8 @@ function renderRangeView() {
     </tr>`;
   }).join('') : '<tr><td colspan="7" class="empty">Chưa có dữ liệu nhân lực</td></tr>';
 
-  /* ==================== XỬ LÝ 4 THẺ KPI ==================== */
-  // THẺ 1: AN TOÀN LAO ĐỘNG (Đếm số cảng có số vụ mất ATLĐ = 0)
+  /* ==================== 4 THẺ KPI ==================== */
+  // THẺ 1: AN TOÀN LAO ĐỘNG
   let safePortCount = 0;
   let unsafeList = [];
 
@@ -624,7 +714,6 @@ function renderRangeView() {
         unsafeList.push(`${P[p][0]} (${sVal} vụ)`);
       }
     } else {
-      // Khi xem khoảng ngày: kiểm tra toàn bộ các ngày xem cảng có ngày nào s > 0 không
       let sumIncidents = 0;
       displayedReports.forEach(r => {
         const yP = r.yards && r.yards[p];
@@ -650,7 +739,7 @@ function renderRangeView() {
     $('c-atld').className = 'kc success';
   }
 
-  // THẺ 2: TỔNG LƯỢNG TỒN BÃI
+  // THẺ 2: TỒN BÃI
   const ys = pl.map(p => yardLatest[p]).filter(y => y && y.teu !== '');
   const totTeu = ys.reduce((a, y) => a + Number(y.teu || 0), 0);
   $('k-teu').innerHTML = fmt(totTeu) + ' <small>TEU</small>';
@@ -663,7 +752,7 @@ function renderRangeView() {
   $('k-hs').textContent = avgHs == null ? '—' : avgHs.toFixed(2) + '%';
   $('c-hs').className = 'kc ' + (ycls(avgHs) || 'success');
 
-  // THẺ 4: TÌNH TRẠNG NHÂN LỰC (Tìm chữ "Đủ", khác "Đủ" thì ghi chú chi tiết)
+  // THẺ 4: TÌNH TRẠNG NHÂN LỰC
   const missingPositions = [];
   hs.forEach(x => {
     const val = String(x.st || '').trim().toLowerCase();
@@ -689,7 +778,6 @@ function renderRangeView() {
 
 function drawChart(vs) {
   if (typeof Chart === 'undefined') return;
-  // Giới hạn hiển thị 15 tàu gần nhất nếu khoảng thời gian có quá nhiều tàu
   const sliceVs = vs.slice(-15);
   const labels = sliceVs.map(x => x.n + ' (' + P[x.p][0] + ')');
   const dReq = sliceVs.map(x => +x.r || 0);
@@ -716,10 +804,10 @@ function drawChart(vs) {
       responsive: true,
       maintainAspectRatio: false,
       scales: {
-        x: { ticks: { color: '#94a3b8' }, grid: { color: '#334155' } },
-        y: { ticks: { color: '#94a3b8' }, grid: { color: '#334155' }, beginAtZero: true }
+        x: { ticks: { color: '#94a3b8', font:{size:11} }, grid: { color: '#223049' } },
+        y: { ticks: { color: '#94a3b8', font:{size:11} }, grid: { color: '#223049' }, beginAtZero: true }
       },
-      plugins: { legend: { labels: { color: '#e2e8f0' } } }
+      plugins: { legend: { labels: { color: '#e2e8f0', font:{size:11} } } }
     }
   });
 }
@@ -735,7 +823,7 @@ function setPort(p, btn) {
 async function uploadToStorage(file, dateStr) {
   if (!sbClient) return '';
   try {
-    setCloudStatus(false, 'Đang lưu file lên Storage...', true);
+    setCloudStatus(false, 'Đang upload file lên Storage...', true);
     const fileExt = file.name.split('.').pop();
     const filePath = `excel/Bao_Cao_${dateStr}.${fileExt}`;
 
@@ -843,12 +931,11 @@ async function importExcelFile(file) {
       if (uploadedUrl) S.file_url = uploadedUrl;
 
       closeModal();
-      // Chuyển bộ lọc về ngày vừa upload
       $('sel-from').value = S.date;
       $('sel-to').value = S.date;
 
-      saveToSupabase();
-      $('dz-text').textContent = 'Bấm để chọn hoặc kéo thả file Excel vào đây (File sẽ được lưu vào Storage Bucket)';
+      await autoSaveToSupabase();
+      $('dz-text').textContent = 'Bấm để chọn hoặc kéo thả file Excel vào đây (Tự động lưu vào Storage Bucket & DB)';
     } catch (err) {
       alert('Lỗi đọc dữ liệu: ' + err.message);
       $('dz-text').textContent = 'Bấm để chọn hoặc kéo thả file Excel vào đây';
@@ -939,7 +1026,7 @@ function saveForm() {
   closeModal();
   $('sel-from').value = S.date;
   $('sel-to').value = S.date;
-  saveToSupabase();
+  autoSaveToSupabase();
 }
 
 function dlTemplate() {
@@ -1173,14 +1260,13 @@ async function generateWordReport() {
 
 async function exportImage() {
   if (typeof html2canvas === 'undefined') return;
-  const canvas = await html2canvas($('capture-area'), { backgroundColor: '#0f172a', scale: 2 });
+  const canvas = await html2canvas($('capture-area'), { backgroundColor: '#090d16', scale: 2 });
   const a = document.createElement('a');
   a.download = `Dashboard_KhaiThac_${$('sel-from').value}_den_${$('sel-to').value}.png`;
   a.href = canvas.toDataURL('image/png');
   a.click();
 }
 
-// Khởi tạo mặc định xem ngày hôm nay
 window.addEventListener('DOMContentLoaded', () => {
   $('sel-from').value = todayStr;
   $('sel-to').value = todayStr;
