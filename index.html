@@ -265,7 +265,11 @@ input:focus,select:focus,textarea:focus{border-color:var(--light)}
 const SB_URL = 'https://yrzabhuwumeqvntsjssu.supabase.co';
 const SB_KEY = 'sb_publishable_ZJSnlM3HN9Xs2KuQ2c33xg_BAO69Rzg';
 const BUCKET_NAME = 'report-files';
-const supabase = window.supabase ? window.supabase.createClient(SB_URL, SB_KEY) : null;
+
+// Khởi tạo client với tên biến sbClient để tránh xung đột window.supabase
+const sbClient = (window.supabase && typeof window.supabase.createClient === 'function') 
+  ? window.supabase.createClient(SB_URL, SB_KEY) 
+  : null;
 
 const $ = id => document.getElementById(id);
 const P = { HD: ['HDCV', 'Hoàng Diệu Chùa Vẽ'], TV: ['Tân Vũ', 'Cảng Tân Vũ'], DV: ['Đình Vũ', 'Cảng Đình Vũ'] };
@@ -313,9 +317,14 @@ function setCloudStatus(online, text, busy = false) {
 /* ==================== TẢI & LƯU SUPABASE ==================== */
 async function loadDateData(dateStr) {
   if (!dateStr) return;
+  if (!sbClient) {
+    setCloudStatus(false, 'Chưa tải được Supabase SDK');
+    render();
+    return;
+  }
   setCloudStatus(false, 'Đang tải từ Cloud...', true);
   try {
-    const { data, error } = await supabase.from('daily_reports').select('*').eq('report_date', dateStr).maybeSingle();
+    const { data, error } = await sbClient.from('daily_reports').select('*').eq('report_date', dateStr).maybeSingle();
     if (error) throw error;
     if (data) {
       S = {
@@ -374,6 +383,7 @@ function downloadOriginalFile() {
 
 async function saveToSupabase() {
   if (!S.date) { alert('Chưa chọn ngày báo cáo'); return; }
+  if (!sbClient) { alert('Chưa kết nối được Supabase Client!'); return; }
   setCloudStatus(false, 'Đang lưu Cloud...', true);
   const payload = {
     report_date: S.date,
@@ -390,7 +400,7 @@ async function saveToSupabase() {
   };
 
   try {
-    const { error } = await supabase.from('daily_reports').upsert(payload, { onConflict: 'report_date' });
+    const { error } = await sbClient.from('daily_reports').upsert(payload, { onConflict: 'report_date' });
     if (error) throw error;
     setCloudStatus(true, `Đã đồng bộ Cloud (${dmy(S.date)})`);
     updateFileButton();
@@ -403,13 +413,13 @@ async function saveToSupabase() {
 
 /* ==================== XỬ LÝ UPLOAD STORAGE + PARSE EXCEL ==================== */
 async function uploadToStorage(file, dateStr) {
+  if (!sbClient) return '';
   try {
     setCloudStatus(false, 'Đang lưu file lên Storage...', true);
     const fileExt = file.name.split('.').pop();
     const filePath = `excel/Bao_Cao_${dateStr}.${fileExt}`;
 
-    // Upload hoặc ghi đè file trong Bucket
-    const { data, error } = await supabase.storage
+    const { data, error } = await sbClient.storage
       .from(BUCKET_NAME)
       .upload(filePath, file, {
         cacheControl: '3600',
@@ -418,15 +428,14 @@ async function uploadToStorage(file, dateStr) {
 
     if (error) throw error;
 
-    // Lấy Public URL của file vừa upload
-    const { data: pubData } = supabase.storage
+    const { data: pubData } = sbClient.storage
       .from(BUCKET_NAME)
       .getPublicUrl(filePath);
 
     return pubData.publicUrl;
   } catch (err) {
     console.error('Lỗi upload storage:', err);
-    alert('Cảnh báo Storage: ' + err.message + '\n(Hãy đảm bảo bạn đã chạy script tạo Bucket "report-files" ở Bước 1).');
+    alert('Cảnh báo Storage: ' + err.message + '\n(Hãy đảm bảo bạn đã tạo Bucket "report-files" và cấu hình Public)');
     return '';
   }
 }
@@ -510,7 +519,6 @@ async function importExcelFile(file) {
         });
       }
 
-      // Đẩy file vật lý lên Supabase Storage
       const uploadedUrl = await uploadToStorage(file, S.date);
       if (uploadedUrl) {
         S.file_url = uploadedUrl;
@@ -749,13 +757,15 @@ async function generateWordReport() {
 
   let reports = [];
   try {
-    const { data, error } = await supabase.from('daily_reports')
-      .select('*')
-      .gte('report_date', fromD)
-      .lte('report_date', toD)
-      .order('report_date', { ascending: true });
-    if (error) throw error;
-    reports = data || [];
+    if (sbClient) {
+      const { data, error } = await sbClient.from('daily_reports')
+        .select('*')
+        .gte('report_date', fromD)
+        .lte('report_date', toD)
+        .order('report_date', { ascending: true });
+      if (error) throw error;
+      reports = data || [];
+    }
   } catch (err) {
     console.warn('Lỗi query Supabase:', err);
   }
