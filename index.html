@@ -3,6 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🚢</text></svg>">
 <title>TOS Dispatch & Crane Balance Pilot - Cảng Tân Vũ</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -903,9 +904,7 @@ function parseBaplieEdi(text) {
 }
 
 function parse604Asc(text) {
-  const lines = text.split(/
-?
-/);
+  const lines = text.split(/\r?\n/);
   const items = [];
   lines.forEach(line => {
     const m = line.match(/^(\d{6})\s+([A-Z]{4}\d{7})\s+[A-Z0-9]+\s+([A-Z0-9]{4})\d{3}[FE]\s+[A-Z]+\s+(\d{5})/);
@@ -1567,8 +1566,7 @@ function recalcDraftLive(fromDim = false) {
 
 // ================= XÓA RIÊNG DỮ LIỆU HÀNG XUẤT =================
 async function clearExportDataOnly() {
-  if (!confirm('Xóa toàn bộ dữ liệu Hàng xuất hiện tại (Final Loading, Reserved, Job List xuất, EDI) để nạp lại?
-(Sơ đồ hầm hàng nhập SBP và thông số tàu vẫn được giữ nguyên)')) return;
+  if (!confirm('Xóa toàn bộ dữ liệu Hàng xuất hiện tại (Final Loading, Reserved, Job List xuất, EDI) để nạp lại?\n(Sơ đồ hầm hàng nhập SBP và thông số tàu vẫn được giữ nguyên)')) return;
   state.finalLoading = [];
   state.reservedExport = [];
   state.preStowagePlan = [];
