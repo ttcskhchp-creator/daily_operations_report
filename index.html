@@ -1,2051 +1,1745 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>TOS Dispatch & Crane Balance Pilot - Cảng Tân Vũ</title>
-<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --bg-main: #f1f5f9;
-    --bg-card: #ffffff;
-    --bg-sub: #f8fafc;
-    --text-main: #0f172a;
-    --text-muted: #475569;
-    --border-col: #cbd5e1;
-    --accent: #0284c7;
-  }
-  html.dark {
-    --bg-main: #090e17;
-    --bg-card: #111827;
-    --bg-sub: #1e293b;
-    --text-main: #f8fafc;
-    --text-muted: #94a3b8;
-    --border-col: #334155;
-    --accent: #38bdf8;
-  }
-  body {
-    font-family: 'Inter', sans-serif;
-    background-color: var(--bg-main);
-    color: var(--text-main);
-    transition: background-color 0.2s, color 0.2s;
-  }
-  .card {
-    background-color: var(--bg-card);
-    border: 1px solid var(--border-col);
-    border-radius: 14px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
-  }
-  .sub-card {
-    background-color: var(--bg-sub);
-    border: 1px solid var(--border-col);
-    border-radius: 10px;
-  }
-  .tab-btn {
-    transition: all 0.15s ease;
-    border-bottom: 3px solid transparent;
-  }
-  .tab-btn.active {
-    border-bottom-color: #0284c7;
-    color: #0284c7;
-    font-weight: 800;
-    background: rgba(2, 132, 199, 0.08);
-  }
-  html.dark .tab-btn.active {
-    border-bottom-color: #38bdf8;
-    color: #38bdf8;
-    background: rgba(56, 189, 248, 0.12);
-  }
-  /* Custom Scrollbar */
-  ::-webkit-scrollbar { width: 6px; height: 6px; }
-  ::-webkit-scrollbar-track { background: transparent; }
-  ::-webkit-scrollbar-thumb { background: #94a3b8; border-radius: 99px; }
+:root {
+  --bg: #f1f5f9;
+  --card: #ffffff;
+  --ink: #0f172a;
+  --muted: #64748b;
+  --line: #cbd5e1;
+  --navy: #0f2942;
+  --cyan: #0284c7;
+  --green: #059669;
+  --amber: #d97706;
+  --red: #dc2626;
+  --purple: #7c3aed;
+}
+:root[data-theme="dark"] {
+  --bg: #09131e;
+  --card: #112236;
+  --ink: #e2e8f0;
+  --muted: #94a3b8;
+  --line: #27405c;
+  --navy: #0a1929;
+  --cyan: #38bdf8;
+  --green: #10b981;
+  --amber: #f59e0b;
+  --red: #ef4444;
+  --purple: #a78bfa;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font: 13px/1.45 Inter, "Segoe UI", Arial, sans-serif;
+}
+button, input, select, textarea { font: inherit; }
+button {
+  cursor: pointer;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  padding: 6px 11px;
+  font-weight: 700;
+  font-size: 12px;
+  background: var(--card);
+  color: var(--ink);
+  transition: all 0.15s;
+}
+button:hover { filter: brightness(0.95); }
+button.primary { background: var(--cyan); color: #fff; border-color: var(--cyan); }
+button.success { background: var(--green); color: #fff; border-color: var(--green); }
+button.danger { background: var(--red); color: #fff; border-color: var(--red); }
+button.warning { background: var(--amber); color: #fff; border-color: var(--amber); }
 
-  /* Floating Tooltip for Crane Hourly Chart */
-  #craneHoverTooltip {
-    position: fixed;
-    z-index: 9999;
-    pointer-events: none;
-    display: none;
-    min-width: 265px;
-    max-width: 330px;
-    background: #0f172a;
-    color: #f8fafc;
-    border: 1.5px solid #38bdf8;
-    border-radius: 12px;
-    padding: 12px 14px;
-    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.45);
-    font-size: 12px;
-  }
-  .bay-cell {
-    transition: transform 0.1s ease, box-shadow 0.1s ease;
-  }
-  .bay-cell:hover {
-    transform: scale(1.06);
-    z-index: 10;
-    box-shadow: 0 0 0 2px #f59e0b;
-  }
+/* TOP HEADER & LIVE DRAFT BAR */
+.topbar {
+  background: linear-gradient(90deg, #0d253f, #153e66);
+  color: #fff;
+  padding: 10px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  box-shadow: 0 3px 12px rgba(0,0,0,0.2);
+}
+.brand-box { display: flex; align-items: center; gap: 10px; }
+.brand-badge {
+  background: #fff;
+  color: #0d253f;
+  font-weight: 900;
+  padding: 5px 9px;
+  border-radius: 8px;
+  border: 2px solid #38bdf8;
+  font-size: 13px;
+}
+.vessel-picker {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(255,255,255,0.12);
+  padding: 5px 10px;
+  border-radius: 8px;
+  border: 1px solid rgba(56,189,248,0.4);
+}
+.vessel-picker select {
+  background: #0d253f;
+  color: #fff;
+  border: 1px solid #38bdf8;
+  border-radius: 6px;
+  padding: 4px 8px;
+  font-weight: 800;
+}
+
+.draft-strip {
+  background: var(--card);
+  border-bottom: 2px solid var(--cyan);
+  padding: 8px 16px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(175px, 1fr));
+  gap: 8px;
+  align-items: center;
+}
+.metric-pill {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 6px 10px;
+  background: var(--bg);
+}
+.metric-pill small { display: block; font-size: 10px; color: var(--muted); font-weight: 700; text-transform: uppercase; }
+.metric-pill strong { font-size: 14px; font-weight: 850; }
+
+/* NAV TABS */
+.nav-tabs {
+  display: flex;
+  gap: 6px;
+  padding: 10px 16px 0;
+  border-bottom: 1px solid var(--line);
+  background: var(--card);
+  overflow-x: auto;
+}
+.nav-tabs button {
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+  border-bottom: 0;
+  padding: 9px 14px;
+  background: transparent;
+  color: var(--muted);
+}
+.nav-tabs button.active {
+  background: var(--bg);
+  color: var(--cyan);
+  border-top: 3px solid var(--cyan);
+  font-weight: 850;
+}
+
+.container { padding: 14px 16px 36px; max-width: 1760px; margin: auto; }
+.tab-pane { display: none; }
+.tab-pane.active { display: block; }
+
+.grid-2 { display: grid; grid-template-columns: 1.25fr 0.75fr; gap: 14px; }
+.grid-3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+@media (max-width: 1100px) { .grid-2, .grid-3 { grid-template-columns: 1fr; } }
+
+.panel {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  margin-bottom: 14px;
+  overflow: hidden;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+}
+.panel-head {
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--line);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  background: rgba(2,132,199,0.05);
+}
+.panel-head h3 { margin: 0; font-size: 13.5px; font-weight: 850; }
+.panel-body { padding: 12px 14px; }
+
+.badge {
+  display: inline-block;
+  padding: 2px 7px;
+  border-radius: 999px;
+  font-size: 10.5px;
+  font-weight: 800;
+  background: rgba(2,132,199,0.14);
+  color: var(--cyan);
+}
+.badge.green { background: rgba(5,150,105,0.15); color: var(--green); }
+.badge.amber { background: rgba(217,119,6,0.16); color: var(--amber); }
+.badge.red { background: rgba(220,38,38,0.15); color: var(--red); }
+.badge.purple { background: rgba(124,58,237,0.15); color: var(--purple); }
+
+/* OFF-DOCK ZONE CARDS */
+.offdock-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(145px, 1fr));
+  gap: 8px;
+  margin-top: 8px;
+}
+.offdock-card {
+  border: 1px solid var(--line);
+  border-left: 4px solid var(--amber);
+  border-radius: 8px;
+  padding: 8px 10px;
+  background: var(--bg);
+}
+.offdock-card.tv { border-left-color: var(--green); }
+.offdock-card strong { font-size: 16px; display: block; }
+
+/* CRANE HOURLY CHART & TOOLTIP */
+.hourly-bars {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  gap: 6px;
+  align-items: end;
+  height: 150px;
+  padding: 12px 6px 4px;
+  border-bottom: 1px solid var(--line);
+}
+.hbar-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 100%;
+  justify-content: flex-end;
+  cursor: pointer;
+}
+.hbar-stack {
+  width: 100%;
+  max-width: 34px;
+  display: flex;
+  flex-direction: column-reverse;
+  border-radius: 4px 4px 0 0;
+  overflow: hidden;
+}
+.hbar-seg { width: 100%; transition: height 0.25s; }
+.hbar-lbl { font-size: 10px; color: var(--muted); margin-top: 4px; font-weight: 700; }
+
+#craneTooltip {
+  position: fixed;
+  display: none;
+  z-index: 999;
+  background: var(--card);
+  border: 1px solid var(--cyan);
+  border-radius: 9px;
+  padding: 10px 12px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.25);
+  min-width: 230px;
+  font-size: 11.5px;
+  pointer-events: none;
+}
+
+/* UPLOAD CARDS */
+.upload-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 12px;
+}
+.upload-card {
+  border: 2px dashed var(--line);
+  border-radius: 10px;
+  padding: 12px;
+  background: var(--bg);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 8px;
+}
+.upload-card.loaded { border-style: solid; border-color: var(--green); }
+.upload-card.optional { border-color: #94a3b8; }
+
+/* TABLES */
+.table-wrap { overflow-x: auto; max-height: 520px; }
+table { width: 100%; border-collapse: collapse; font-size: 11.5px; }
+th, td { padding: 7px 8px; border-bottom: 1px solid var(--line); text-align: left; white-space: nowrap; }
+th { background: var(--bg); font-weight: 800; position: sticky; top: 0; z-index: 5; }
+tr:hover { background: rgba(2,132,199,0.05); }
+
+/* HOLD & BAY GRID */
+.holds-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
+  gap: 12px;
+}
+.hold-box {
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  padding: 10px;
+  background: var(--bg);
+}
+.prog-track { height: 8px; background: var(--line); border-radius: 99px; overflow: hidden; margin: 6px 0; }
+.prog-fill { height: 100%; background: var(--green); transition: width 0.3s; }
+.bay-chips { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 8px; }
+.bay-chip {
+  padding: 4px 8px;
+  border-radius: 6px;
+  border: 1px solid var(--line);
+  background: var(--card);
+  font-weight: 800;
+  font-size: 11px;
+  cursor: pointer;
+}
+.bay-chip.selected { background: var(--cyan); color: #fff; border-color: var(--cyan); }
+
+/* MODAL BAY POPUP */
+.modal-shade {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.55);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+.modal-shade.open { display: flex; }
+.modal-card {
+  background: var(--card);
+  border-radius: 12px;
+  width: min(920px, 95vw);
+  max-height: 90vh;
+  overflow: auto;
+  padding: 16px;
+  box-shadow: 0 14px 36px rgba(0,0,0,0.35);
+}
+.bay-matrix { border-collapse: collapse; margin: auto; }
+.bay-matrix td, .bay-matrix th {
+  border: 1px solid var(--line);
+  width: 78px;
+  height: 44px;
+  text-align: center;
+  font-size: 10px;
+  padding: 3px;
+}
+.slot-C { background: #dcfce7; color: #166534; font-weight: 800; }
+.slot-B { background: #dbeafe; color: #1e40af; font-weight: 800; cursor: pointer; }
+.slot-A { background: #fef3c7; color: #92400e; }
+.slot-CALLED { background: #ffedd5; color: #9a3412; border: 2px solid #f97316 !important; font-weight: 800; }
+.slot-EMPTY { background: transparent; color: var(--muted); }
 </style>
 </head>
-<body class="min-h-screen flex flex-col">
+<body>
 
-<!-- FLOATING TOOLTIP SẢN LƯỢNG CẨU THEO GIỜ -->
-<div id="craneHoverTooltip"></div>
-
-<!-- TOAST NOTIFICATION -->
-<div id="toastBox" class="fixed bottom-4 right-4 z-50 flex flex-col gap-2 pointer-events-none"></div>
-
-<!-- TOP NAVIGATION & VESSEL SELECTOR -->
-<header class="sticky top-0 z-40 border-b border-slate-300 dark:border-slate-700 bg-slate-900 text-white shadow-lg">
-  <div class="max-w-[1600px] mx-auto px-3 sm:px-5 py-2.5 flex flex-wrap items-center justify-between gap-3">
-    <!-- Brand & Vessel Selector -->
-    <div class="flex flex-wrap items-center gap-3">
-      <div class="flex items-center gap-2.5">
-        <div class="w-10 h-10 rounded-xl bg-sky-500/20 border border-sky-400 flex items-center justify-center text-xl font-black text-sky-300">
-          ⚓
-        </div>
-        <div>
-          <div class="text-[10px] font-bold uppercase tracking-wider text-sky-400">Cảng Hải Phòng · CN Tân Vũ</div>
-          <h1 class="text-sm sm:text-base font-black tracking-tight leading-tight">TOS DISPATCH & CRANE PILOT</h1>
-        </div>
-      </div>
-
-      <!-- BỘ CHỌN TÀU CHUYỂN ĐỔI NHANH -->
-      <div class="flex items-center gap-1.5 bg-slate-800 border border-slate-600 rounded-xl px-2.5 py-1.5">
-        <span class="text-xs font-bold text-amber-400 whitespace-nowrap">🚢 Chọn Tàu:</span>
-        <select id="vesselSelector" onchange="handleVesselSwitch(this.value)" class="bg-slate-900 text-white text-xs sm:text-sm font-extrabold rounded-lg px-2.5 py-1 border border-slate-600 focus:outline-none focus:border-sky-400 min-w-[210px]">
-          <option value="KUO_LUNG_1008S">KUO LUNG / 1008S (Cầu TV1 · Mẫu)</option>
-        </select>
-        <button onclick="openNewVesselModal()" title="Tạo phiên tàu mới" class="bg-sky-600 hover:bg-sky-500 text-white text-xs font-bold px-2.5 py-1 rounded-lg transition whitespace-nowrap">
-          + Tàu mới
-        </button>
-        <button onclick="syncAllCloudSources(true)" id="btnSyncCloud" title="Đồng bộ dữ liệu ePort, Thủy triều & Supabase" class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold px-2.5 py-1 rounded-lg transition whitespace-nowrap">
-          ↻ Đồng bộ
-        </button>
-      </div>
-    </div>
-
-    <!-- Live Draft, Tide & Theme Controls -->
-    <div class="flex flex-wrap items-center gap-2 sm:gap-3 text-xs">
-      <!-- Draft Pill -->
-      <div class="flex items-center gap-2 bg-slate-800/90 border border-slate-700 rounded-xl px-3 py-1.5">
-        <div>
-          <div class="text-[10px] text-slate-400 font-semibold">Mớn hiện tại (F/A)</div>
-          <div class="font-extrabold text-amber-300" id="hdrDraftText">7.80m / 8.20m <span class="text-slate-400 font-normal">(Max 9.2m)</span></div>
-        </div>
-        <div class="h-6 w-[1px] bg-slate-700"></div>
-        <div>
-          <div class="text-[10px] text-slate-400 font-semibold">Còn xếp được</div>
-          <div class="font-black text-emerald-400" id="hdrRemainCap">+280 Cont</div>
-        </div>
-      </div>
-
-      <!-- Tide Pill -->
-      <div class="flex items-center gap-2 bg-slate-800/90 border border-slate-700 rounded-xl px-3 py-1.5">
-        <div>
-          <div class="text-[10px] text-sky-400 font-semibold">🌊 Triều Hòn Dáu</div>
-          <div class="font-extrabold text-white" id="hdrTideText">Đỉnh 3.6m (05:00) · Ròng 0.6m</div>
-        </div>
-      </div>
-
-      <!-- Cloud Status & Day/Night -->
-      <div class="flex items-center gap-1.5">
-        <span id="cloudStatusBadge" class="px-2.5 py-1.5 rounded-xl bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 font-bold text-[11px]">
-          ☁️ Cloud Sẵn sàng
-        </span>
-        <button onclick="toggleDarkMode()" class="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-600 text-sm" title="Chế độ Ngày / Đêm ngoài cầu tàu">
-          🌓
-        </button>
-      </div>
+<header class="topbar">
+  <div class="brand-box">
+    <div class="brand-badge">CHP · TÂN VŨ</div>
+    <div>
+      <div style="font-weight:900;font-size:14.5px;">TOS DISPATCH & CRANE BALANCE PILOT</div>
+      <div style="font-size:11px;opacity:0.85;">Chỉ đạo gọi hàng · Đối chiếu Final Loading bãi ngoài · Cân bằng Cẩu & Mớn nước</div>
     </div>
   </div>
 
-  <!-- NAVIGATION TABS -->
-  <div class="bg-white dark:bg-slate-950 text-slate-700 dark:text-slate-300 border-t border-slate-200 dark:border-slate-800">
-    <div class="max-w-[1600px] mx-auto px-3 sm:px-5 flex overflow-x-auto gap-1">
-      <button onclick="switchTab('overview')" id="tabBtn-overview" class="tab-btn active px-4 py-2.5 text-xs sm:text-sm whitespace-nowrap flex items-center gap-1.5">
-        📊 1. Toàn cảnh & Năng suất Cẩu
-      </button>
-      <button onclick="switchTab('dispatch')" id="tabBtn-dispatch" class="tab-btn px-4 py-2.5 text-xs sm:text-sm whitespace-nowrap flex items-center gap-1.5">
-        🎯 2. Khuyến nghị Gọi hàng & Trừ đuổi
-        <span id="badgeReadyCount" class="px-1.5 py-0.5 text-[10px] rounded-full bg-sky-600 text-white font-bold">0</span>
-      </button>
-      <button onclick="switchTab('upload')" id="tabBtn-upload" class="tab-btn px-4 py-2.5 text-xs sm:text-sm whitespace-nowrap flex items-center gap-1.5">
-        📂 3. Nạp PL-TOS / EDI & Cấu hình Tàu
-      </button>
-    </div>
+  <div class="vessel-picker">
+    <span>🚢 Tàu khai thác:</span>
+    <select id="vesselSelect" onchange="onSelectVesselSession(this.value)">
+      <option value="KUO_LUNG_1008S">KUO LUNG (1008S) - TV3</option>
+    </select>
+    <button class="primary" onclick="createNewVesselSession()">+ Tàu mới</button>
+    <button onclick="syncAllCloudData()" title="Đồng bộ dữ liệu từ Supabase & Bot ePort">🔄 Đồng bộ Cloud</button>
+    <button onclick="toggleTheme()">🌓 Giao diện</button>
   </div>
 </header>
 
-<!-- MAIN CONTENT CONTAINER -->
-<main class="flex-1 max-w-[1600px] w-full mx-auto px-3 sm:px-5 py-4 space-y-4">
-
-  <!-- ===================================================================== -->
-  <!-- TAB 1: TOÀN CẢNH, NĂNG SUẤT CẨU THEO GIỜ & SƠ ĐỒ 9 HẦM               -->
-  <!-- ===================================================================== -->
-  <section id="view-overview" class="space-y-4">
-
-    <!-- 5 KPI TỔNG QUAN CHUYẾN TÀU -->
-    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
-      <div class="card p-3.5 border-l-4 border-l-sky-500">
-        <div class="text-xs font-bold text-slate-500 dark:text-slate-400">TIẾN ĐỘ XẾP XUẤT (ePort/TOS)</div>
-        <div class="text-2xl font-black mt-1 text-sky-600 dark:text-sky-400" id="kpiExportProgress">0 / 0</div>
-        <div class="w-full bg-slate-200 dark:bg-slate-700 h-2 rounded-full mt-2 overflow-hidden">
-          <div id="kpiExportBar" class="bg-sky-500 h-full transition-all" style="width: 0%"></div>
-        </div>
-        <div class="text-[11px] text-slate-500 mt-1" id="kpiExportSub">Hoàn thành 0% kế hoạch</div>
-      </div>
-
-      <div class="card p-3.5 border-l-4 border-l-emerald-500">
-        <div class="text-xs font-bold text-slate-500 dark:text-slate-400">CONT SẴN SÀNG GỌI (JOB B)</div>
-        <div class="text-2xl font-black mt-1 text-emerald-600 dark:text-emerald-400" id="kpiReadyJobs">0 Cont</div>
-        <div class="text-[11px] text-slate-500 mt-2" id="kpiHeldJobs">Giữ lại (A): 0 · Bãi ngoài: 0</div>
-      </div>
-
-      <div class="card p-3.5 border-l-4 border-l-amber-500">
-        <div class="text-xs font-bold text-slate-500 dark:text-slate-400">NĂNG SUẤT CẦU TÀU HIỆN TẠI</div>
-        <div class="text-2xl font-black mt-1 text-amber-600 dark:text-amber-400" id="kpiAvgCraneRate">0 Cont/h</div>
-        <div class="text-[11px] text-slate-500 mt-2" id="kpiActiveCranesSub">3 cẩu hoạt động (QC07, QC11, QC12)</div>
-      </div>
-
-      <div class="card p-3.5 border-l-4 border-l-purple-500">
-        <div class="text-xs font-bold text-slate-500 dark:text-slate-400">LỆCH KẾ HOẠCH / CẦN THAY THẾ</div>
-        <div class="text-2xl font-black mt-1 text-purple-600 dark:text-purple-400" id="kpiMissingSlots">0 Vị trí</div>
-        <div class="text-[11px] text-slate-500 mt-2">Slot BAPLIE bị khuyết hoặc đổi cont</div>
-      </div>
-
-      <div class="card p-3.5 border-l-4 border-l-rose-500 col-span-2 sm:col-span-1">
-        <div class="text-xs font-bold text-slate-500 dark:text-slate-400">DỰ BÁO XONG HÀNG / RỜI CẦU</div>
-        <div class="text-xl font-black mt-1 text-rose-600 dark:text-rose-400" id="kpiEtcTime">--:--</div>
-        <div class="text-[11px] text-slate-500 mt-2" id="kpiTideAdvice">Đủ mớn qua luồng 24/24h</div>
-      </div>
-    </div>
-
-    <!-- THẺ SẢN LƯỢNG CẨU THEO KHUNG GIỜ & CẢNH BÁO ĐIỀU CHUYỂN CẨU -->
-    <div class="grid grid-cols-1 xl:grid-cols-12 gap-4">
-      <!-- Cột trái (8/12): Biểu đồ Sản lượng cẩu tại các khung giờ (Hover xem chi tiết) -->
-      <div class="card p-4 xl:col-span-8 flex flex-col justify-between">
-        <div>
-          <div class="flex flex-wrap items-center justify-between gap-2 pb-3 border-b border-slate-200 dark:border-slate-700">
-            <div>
-              <h2 class="text-sm sm:text-base font-black flex items-center gap-2">
-                🏗️ Sản lượng Cẩu theo Khung giờ làm việc
-                <span class="text-[11px] font-bold px-2 py-0.5 rounded-full bg-sky-100 dark:bg-sky-900/50 text-sky-700 dark:text-sky-300">
-                  Rê chuột / Chạm cột giờ để soi từng cẩu
-                </span>
-              </h2>
-              <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-                So sánh trực tiếp nhịp độ giữa các cẩu (<span id="craneLegendNames" class="font-bold">QC07, QC11, QC12</span>) để phát hiện cẩu chậm nhịp hoặc thiếu chân hàng.
-              </p>
-            </div>
-            <div class="flex items-center gap-2">
-              <select id="shiftFilterSelect" onchange="renderCraneHourlyChart()" class="sub-card text-xs font-bold px-2.5 py-1.5">
-                <option value="all">Toàn ca làm tàu (24h)</option>
-                <option value="day">Ca Ngày (07:00 - 18:00)</option>
-                <option value="night">Ca Đêm (19:00 - 06:00)</option>
-              </select>
-              <button onclick="simulateNextHourTick()" class="bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 text-xs font-bold px-2.5 py-1.5 rounded-lg" title="Mô phỏng cập nhật thêm 1 giờ làm hàng">
-                +1h Test
-              </button>
-            </div>
-          </div>
-
-          <!-- Bảng tổng hợp nhanh từng cẩu (Crane Cards) -->
-          <div id="craneSummaryStrip" class="grid grid-cols-1 sm:grid-cols-3 gap-2.5 my-3"></div>
-
-          <!-- Biểu đồ cột nhóm theo khung giờ -->
-          <div class="sub-card p-3 overflow-x-auto">
-            <div id="craneHourlyChartContainer" class="min-w-[680px] h-[220px] flex items-end justify-between gap-1.5 pt-6 pb-1 px-2 border-b border-slate-300 dark:border-slate-600 relative">
-              <!-- Bars rendered by JS -->
-            </div>
-            <div id="craneHourlyLabels" class="min-w-[680px] flex justify-between gap-1.5 px-2 pt-1.5 text-[10px] font-bold text-slate-500">
-              <!-- Hour labels rendered by JS -->
-            </div>
-          </div>
-        </div>
-
-        <div class="flex flex-wrap items-center justify-between gap-2 mt-3 pt-2 border-t border-slate-200 dark:border-slate-700 text-[11px] text-slate-500">
-          <div class="flex items-center gap-3" id="craneColorLegend"></div>
-          <div>💡 <b>Mẹo:</b> Chỉ vào bất kỳ khung giờ nào để xem sản lượng từng cẩu & mức chênh lệch nhịp độ.</div>
-        </div>
-      </div>
-
-      <!-- Cột phải (4/12): Trợ lý Điều phối Cẩu & Gợi ý Chuyển Hầm khi đầy -->
-      <div class="card p-4 xl:col-span-4 flex flex-col justify-between bg-gradient-to-b from-amber-50/60 to-white dark:from-slate-900 dark:to-slate-900 border-amber-300 dark:border-amber-700/60">
-        <div>
-          <div class="flex items-center justify-between gap-2 pb-2.5 border-b border-amber-200 dark:border-slate-700">
-            <h2 class="text-sm sm:text-base font-black text-amber-800 dark:text-amber-300 flex items-center gap-1.5">
-              ⚡ Điều phối Cẩu & Chuyển Hầm Thông Minh
-            </h2>
-            <span class="px-2 py-0.5 text-[10px] font-extrabold rounded bg-amber-500 text-white">AUTO AI</span>
-          </div>
-          <p class="text-xs text-slate-600 dark:text-slate-400 mt-1.5">
-            Tự động phát hiện <b>cẩu ít sản lượng</b> để dồn chân hàng, hoặc <b>hầm phụ trách đã đầy</b> để gợi ý chuyển cẩu sang hầm khác.
-          </p>
-
-          <!-- Danh sách khuyến nghị tự động -->
-          <div id="craneRebalanceList" class="mt-3 space-y-2.5 max-h-[330px] overflow-y-auto pr-1">
-            <!-- Rendered by JS -->
-          </div>
-        </div>
-
-        <!-- Ma trận phân công Cẩu - Hầm hiện tại -->
-        <div class="mt-3 pt-3 border-t border-slate-200 dark:border-slate-700">
-          <div class="text-[11px] font-extrabold uppercase text-slate-500 mb-1.5">Phân công Cẩu ↔ Hầm hiện tại:</div>
-          <div id="activeCraneHoldMatrix" class="flex flex-wrap gap-1.5"></div>
-        </div>
-      </div>
-    </div>
-
-    <!-- SƠ ĐỒ 9 HẦM HÀNG (GENERAL PLAN - HOLD 01 ĐẾN HOLD 09) -->
-    <div class="card p-4">
-      <div class="flex flex-wrap items-center justify-between gap-2 pb-3 border-b border-slate-200 dark:border-slate-700">
-        <div>
-          <h2 class="text-sm sm:text-base font-black flex items-center gap-2">
-            🚢 Sơ đồ Tổng quan 9 Hầm hàng (General Plan · Dưới hầm & Trên boong)
-          </h2>
-          <p class="text-xs text-slate-500 dark:text-slate-400">
-            Bấm vào từng Hầm hoặc từng Bay để mở sơ đồ chi tiết Row × Tier, kiểm tra vị trí trống và điều phối xếp hàng.
-          </p>
-        </div>
-        <div class="flex flex-wrap items-center gap-2 text-[11px] font-bold">
-          <span class="inline-flex items-center gap-1 px-2 py-1 rounded bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-300">
-            <span class="w-2.5 h-2.5 rounded-sm bg-emerald-500"></span> Đã xếp (Job C)
-          </span>
-          <span class="inline-flex items-center gap-1 px-2 py-1 rounded bg-sky-100 text-sky-800 dark:bg-sky-900/40 dark:text-sky-300">
-            <span class="w-2.5 h-2.5 rounded-sm bg-sky-500"></span> Dự kiến / Sẵn sàng (B)
-          </span>
-          <span class="inline-flex items-center gap-1 px-2 py-1 rounded bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300">
-            <span class="w-2.5 h-2.5 rounded-sm bg-amber-500"></span> Bị giữ (A) / Lệch vị trí
-          </span>
-          <span class="inline-flex items-center gap-1 px-2 py-1 rounded bg-rose-100 text-rose-800 dark:bg-rose-900/40 dark:text-rose-300">
-            <span class="w-2.5 h-2.5 rounded-sm bg-rose-500"></span> Hàng nhập chưa dỡ / OOG
-          </span>
-        </div>
-      </div>
-
-      <!-- Grid 9 Hầm -->
-      <div id="nineHoldsGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-3 mt-3">
-        <!-- Rendered by JS -->
-      </div>
-    </div>
-  </section>
-
-  <!-- ===================================================================== -->
-  <!-- TAB 2: KHUYẾN NGHỊ GỌI HÀNG THEO CẨU & TRỪ ĐUỔI THAY THẾ             -->
-  <!-- ===================================================================== -->
-  <section id="view-dispatch" class="hidden space-y-4">
-    <!-- Thanh chiến thuật điều phối -->
-    <div class="card p-3.5 flex flex-wrap items-center justify-between gap-3">
-      <div class="flex flex-wrap items-center gap-2">
-        <span class="text-xs font-extrabold uppercase text-slate-500">Chiến thuật gọi hàng:</span>
-        <button onclick="setDispatchStrategy('small_pod')" id="strat-small_pod" class="strat-btn px-3 py-1.5 rounded-lg text-xs font-bold bg-sky-600 text-white">
-          🎯 Cảng ít trước
-        </button>
-        <button onclick="setDispatchStrategy('big_pod')" id="strat-big_pod" class="strat-btn px-3 py-1.5 rounded-lg text-xs font-bold bg-slate-200 dark:bg-slate-700">
-          📦 Cảng nhiều trước
-        </button>
-        <button onclick="setDispatchStrategy('heavy_first')" id="strat-heavy_first" class="strat-btn px-3 py-1.5 rounded-lg text-xs font-bold bg-slate-200 dark:bg-slate-700">
-          ⚖️ Tấn to xếp đáy
-        </button>
-        <button onclick="setDispatchStrategy('precall_far')" id="strat-precall_far" class="strat-btn px-3 py-1.5 rounded-lg text-xs font-bold bg-slate-200 dark:bg-slate-700">
-          🚚 Gọi sớm bãi ngoài (KHM/SAO A)
-        </button>
-      </div>
-      <div class="flex items-center gap-2">
-        <input type="text" id="dispatchSearchInput" oninput="renderDispatchBoard()" placeholder="🔍 Tìm số Cont, cảng dỡ, block..." class="sub-card px-3 py-1.5 text-xs font-medium w-56">
-      </div>
-    </div>
-
-    <!-- Danh sách gọi hàng theo từng Cẩu (QC07, QC11, QC12...) -->
-    <div id="craneDispatchColumns" class="grid grid-cols-1 lg:grid-cols-3 gap-4">
-      <!-- Rendered by JS -->
-    </div>
-
-    <!-- Bảng Đối chiếu Trừ đuổi & Khuyến nghị Thay thế gần tấn tạ nhất -->
-    <div class="card p-4">
-      <div class="flex flex-wrap items-center justify-between gap-2 pb-3 border-b border-slate-200 dark:border-slate-700">
-        <div>
-          <h3 class="text-sm sm:text-base font-black text-purple-700 dark:text-purple-300">
-            🔄 Đối chiếu Trừ đuổi Kế hoạch (BAPLIE / $604) & Gợi ý Thay thế Gần Tấn Tạ Nhất
-          </h3>
-          <p class="text-xs text-slate-500">
-            Tự động phát hiện vị trí dự kiến bị khuyết (do cont gốc giữ <b>A</b>, kẹt bãi ngoài hoặc đã xếp sang vị trí khác) và tìm Top 3 cont sẵn sàng (<b>B</b>) đồng cảng, đồng kích cỡ, sát trọng lượng nhất.
-          </p>
-        </div>
-        <span id="substitutionCountBadge" class="px-3 py-1 rounded-full bg-purple-100 dark:bg-purple-900/40 text-purple-700 dark:text-purple-300 text-xs font-extrabold">
-          0 vị trí cần xử lý
-        </span>
-      </div>
-      <div class="overflow-x-auto mt-3">
-        <table class="w-full text-left border-collapse text-xs">
-          <thead>
-            <tr class="border-b border-slate-300 dark:border-slate-700 bg-slate-100 dark:bg-slate-800 text-[11px] uppercase">
-              <th class="p-2.5">Vị trí Bay-Row-Tier</th>
-              <th class="p-2.5">Cont Dự kiến (BAPLIE)</th>
-              <th class="p-2.5">Trạng thái thực tế</th>
-              <th class="p-2.5">Top 3 Cont Sẵn sàng (B) Thay thế sát tấn nhất</th>
-              <th class="p-2.5 text-right">Thao tác</th>
-            </tr>
-          </thead>
-          <tbody id="substitutionTableBody" class="divide-y divide-slate-200 dark:divide-slate-700">
-            <!-- Rendered by JS -->
-          </tbody>
-        </table>
-      </div>
-    </div>
-  </section>
-
-  <!-- ===================================================================== -->
-  <!-- TAB 3: NẠP DỮ LIỆU PL-TOS / EDI & CẤU HÌNH TÀU / CLOUD BUCKET       -->
-  <!-- ===================================================================== -->
-  <section id="view-upload" class="hidden space-y-4">
-    <!-- 5 Ô UPLOAD CHUẨN HÓA CHỐNG NHẦM LẪN -->
-    <div class="card p-4">
-      <div class="flex flex-wrap items-center justify-between gap-2 pb-3 border-b border-slate-200 dark:border-slate-700">
-        <div>
-          <h2 class="text-sm sm:text-base font-black">📂 Nạp Dữ Liệu Khai Thác Từ PL-TOS & Hãng Tàu (EDI)</h2>
-          <p class="text-xs text-slate-500">Thả đúng tệp vào từng khung bên dưới. Hệ thống tự động bóc tách, lưu trữ nén lên Supabase Bucket và đồng bộ giữa các ca.</p>
-        </div>
-        <div class="flex flex-wrap gap-2">
-          <button onclick="saveSessionToSupabase()" class="bg-sky-600 hover:bg-sky-500 text-white text-xs font-bold px-3.5 py-2 rounded-xl shadow">
-            ☁️ Lưu & Đồng bộ lên Cloud
-          </button>
-          <button onclick="cleanupOldCloudSessions()" class="bg-rose-600 hover:bg-rose-500 text-white text-xs font-bold px-3 py-2 rounded-xl">
-            🧹 Dọn tàu cũ (&gt;7 ngày)
-          </button>
-        </div>
-      </div>
-
-      <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-5 gap-3 mt-4">
-        <!-- Ô 1: SBP Nhập -->
-        <div class="sub-card p-3.5 border-2 border-dashed border-slate-300 dark:border-slate-600 hover:border-sky-500 transition flex flex-col justify-between">
-          <div>
-            <div class="flex items-center justify-between">
-              <span class="px-2 py-0.5 rounded bg-slate-200 dark:bg-slate-700 text-[10px] font-extrabold">Ô 1 · NẠP 1 LẦN</span>
-              <span id="status-sbp" class="text-[11px] font-bold text-emerald-600">✓ Đã có</span>
-            </div>
-            <h3 class="font-black text-xs sm:text-sm mt-2">1. Sơ đồ hầm hàng nhập (SBP)</h3>
-            <p class="text-[11px] text-slate-500 mt-1">Menu PL-TOS: <i>Hàng nhập → Sơ đồ hầm hàng</i>. Dùng để dựng khung xương 9 hầm & vị trí hàng quá cảnh.</p>
-          </div>
-          <label class="mt-3 block text-center bg-slate-800 hover:bg-slate-700 text-white text-xs font-bold py-2 rounded-lg cursor-pointer">
-            Chọn file SBP (.xlsx)
-            <input type="file" accept=".xlsx,.xls,.csv" class="hidden" onchange="handleExcelUpload(event, 'sbp')">
-          </label>
-        </div>
-
-        <!-- Ô 2: Reserved Xuất -->
-        <div class="sub-card p-3.5 border-2 border-dashed border-sky-400/70 hover:border-sky-500 transition flex flex-col justify-between">
-          <div>
-            <div class="flex items-center justify-between">
-              <span class="px-2 py-0.5 rounded bg-sky-100 text-sky-800 text-[10px] font-extrabold">Ô 2 · KHI ĐỔI KH</span>
-              <span id="status-reserved" class="text-[11px] font-bold text-emerald-600">✓ Đã có</span>
-            </div>
-            <h3 class="font-black text-xs sm:text-sm mt-2">2. Danh sách Xuất (Reserved)</h3>
-            <p class="text-[11px] text-slate-500 mt-1">Menu PL-TOS: <i>Hàng xuất → DS Cont Xuất tàu</i>. Chỉ lấy các dòng có cột <b>Chọn = 1</b>, cảng dỡ, tấn, block bãi.</p>
-          </div>
-          <label class="mt-3 block text-center bg-sky-600 hover:bg-sky-500 text-white text-xs font-bold py-2 rounded-lg cursor-pointer">
-            Chọn file Reserved (.xlsx)
-            <input type="file" accept=".xlsx,.xls,.csv" class="hidden" onchange="handleExcelUpload(event, 'reserved')">
-          </label>
-        </div>
-
-        <!-- Ô 3: Thay đổi công việc tàu -->
-        <div class="sub-card p-3.5 border-2 border-dashed border-emerald-400/80 hover:border-emerald-500 transition flex flex-col justify-between">
-          <div>
-            <div class="flex items-center justify-between">
-              <span class="px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 text-[10px] font-extrabold">Ô 3 · NẠP LIÊN TỤC</span>
-              <span id="status-jobs" class="text-[11px] font-bold text-emerald-600">✓ Đã có</span>
-            </div>
-            <h3 class="font-black text-xs sm:text-sm mt-2">3. Thay đổi công việc tàu</h3>
-            <p class="text-[11px] text-slate-500 mt-1">Menu PL-TOS: <i>Thay đổi số liệu → Thay đổi CV tàu</i>. Cập nhật trạng thái <b>A</b> (Giữ), <b>B</b> (Chờ), <b>C</b> (Xong) & vị trí thực tế.</p>
-          </div>
-          <label class="mt-3 block text-center bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold py-2 rounded-lg cursor-pointer">
-            Cập nhật Job List (.xlsx)
-            <input type="file" accept=".xlsx,.xls,.csv" class="hidden" onchange="handleExcelUpload(event, 'jobs')">
-          </label>
-        </div>
-
-        <!-- Ô 4: Chỉ dẫn xếp dỡ -->
-        <div class="sub-card p-3.5 border-2 border-dashed border-amber-400/70 hover:border-amber-500 transition flex flex-col justify-between">
-          <div>
-            <div class="flex items-center justify-between">
-              <span class="px-2 py-0.5 rounded bg-amber-100 text-amber-800 text-[10px] font-extrabold">Ô 4 · TÙY CHỌN</span>
-              <span id="status-stow" class="text-[11px] font-bold text-slate-400">Không bắt buộc</span>
-            </div>
-            <h3 class="font-black text-xs sm:text-sm mt-2">4. Chỉ dẫn xếp dỡ</h3>
-            <p class="text-[11px] text-slate-500 mt-1">Menu PL-TOS: <i>Hàng xuất → Chỉ dẫn xếp dỡ</i>. Bóc tách <b>CntrJobType</b> (<code>UD</code>, <code>OD</code>, <code>NOI, NHE</code>, <code>OW</code>...).</p>
-          </div>
-          <label class="mt-3 block text-center bg-amber-600 hover:bg-amber-500 text-white text-xs font-bold py-2 rounded-lg cursor-pointer">
-            Chọn file Chỉ dẫn (.xlsx)
-            <input type="file" accept=".xlsx,.xls,.csv" class="hidden" onchange="handleExcelUpload(event, 'stow')">
-          </label>
-        </div>
-
-        <!-- Ô 5: EDIFACT BAPLIE / $604 -->
-        <div class="sub-card p-3.5 border-2 border-dashed border-purple-400/80 hover:border-purple-500 transition flex flex-col justify-between">
-          <div>
-            <div class="flex items-center justify-between">
-              <span class="px-2 py-0.5 rounded bg-purple-100 text-purple-800 text-[10px] font-extrabold">Ô 5 · SƠ ĐỒ HÃNG TÀU</span>
-              <span id="status-edi" class="text-[11px] font-bold text-purple-600">✓ BAPLIE/$604</span>
-            </div>
-            <h3 class="font-black text-xs sm:text-sm mt-2">5. Sơ đồ chỉ định BAPLIE / $604</h3>
-            <p class="text-[11px] text-slate-500 mt-1">Hỗ trợ tệp <b>.edi</b> (EDIFACT BAPLIE 95B) và tệp <b>.asc / .txt</b> (định dạng <code>$604</code>) để dựng sơ đồ vị trí chỉ định.</p>
-          </div>
-          <label class="mt-3 block text-center bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold py-2 rounded-lg cursor-pointer">
-            Nạp BAPLIE / $604 (.edi/.asc)
-            <input type="file" accept=".edi,.asc,.txt,.bap" class="hidden" onchange="handleEdiUpload(event)">
-          </label>
-        </div>
-      </div>
-    </div>
-
-    <!-- CẤU HÌNH THÔNG SỐ TÀU, MỚN NƯỚC & PHÂN CÔNG CẨU -->
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
-      <div class="card p-4 space-y-3">
-        <h3 class="text-sm font-black border-b border-slate-200 dark:border-slate-700 pb-2">📐 Thông số Tàu & Giới hạn Mớn nước</h3>
-        <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 text-xs">
-          <div>
-            <label class="font-bold text-slate-500">Tên tàu</label>
-            <input id="cfgVesselName" type="text" class="sub-card w-full px-2.5 py-1.5 font-bold mt-1" value="KUO LUNG">
-          </div>
-          <div>
-            <label class="font-bold text-slate-500">Chuyến (Voyage)</label>
-            <input id="cfgVoyage" type="text" class="sub-card w-full px-2.5 py-1.5 font-bold mt-1" value="1008S">
-          </div>
-          <div>
-            <label class="font-bold text-slate-500">Cầu bến</label>
-            <input id="cfgBerth" type="text" class="sub-card w-full px-2.5 py-1.5 font-bold mt-1" value="TV1">
-          </div>
-          <div>
-            <label class="font-bold text-slate-500">Chiều dài L (m)</label>
-            <input id="cfgLength" type="number" step="0.1" onchange="recalcDraftConfig()" class="sub-card w-full px-2.5 py-1.5 font-bold mt-1" value="172">
-          </div>
-          <div>
-            <label class="font-bold text-slate-500">Chiều rộng B (m)</label>
-            <input id="cfgBeam" type="number" step="0.1" onchange="recalcDraftConfig()" class="sub-card w-full px-2.5 py-1.5 font-bold mt-1" value="27.6">
-          </div>
-          <div>
-            <label class="font-bold text-slate-500">Định mức Cont / 10cm</label>
-            <input id="cfgContPer10cm" type="number" step="1" onchange="recalcDraftConfig()" class="sub-card w-full px-2.5 py-1.5 font-bold mt-1" value="28">
-          </div>
-          <div>
-            <label class="font-bold text-slate-500">Mớn Mũi TF (m)</label>
-            <input id="cfgDraftF" type="number" step="0.05" onchange="recalcDraftConfig()" class="sub-card w-full px-2.5 py-1.5 font-bold mt-1" value="7.80">
-          </div>
-          <div>
-            <label class="font-bold text-slate-500">Mớn Lái TA (m)</label>
-            <input id="cfgDraftA" type="number" step="0.05" onchange="recalcDraftConfig()" class="sub-card w-full px-2.5 py-1.5 font-bold mt-1" value="8.20">
-          </div>
-          <div>
-            <label class="font-bold text-slate-500">Mớn tối đa Tmax (m)</label>
-            <input id="cfgMaxDraft" type="number" step="0.05" onchange="recalcDraftConfig()" class="sub-card w-full px-2.5 py-1.5 font-bold mt-1" value="9.20">
-          </div>
-        </div>
-      </div>
-
-      <!-- Cấu hình Cẩu & Hầm phụ trách -->
-      <div class="card p-4 space-y-3">
-        <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-700 pb-2">
-          <h3 class="text-sm font-black">🏗️ Phân công Cẩu Bờ & Hầm Phụ Trách</h3>
-          <button onclick="addNewCrane()" class="bg-sky-600 text-white text-xs font-bold px-2.5 py-1 rounded-lg">+ Thêm Cẩu</button>
-        </div>
-        <div id="craneConfigEditor" class="space-y-2 max-h-[210px] overflow-y-auto pr-1">
-          <!-- Rendered by JS -->
-        </div>
-      </div>
-    </div>
-  </section>
-
-</main>
-
-<!-- MODAL CHI TIẾT BAY PLAN (ROW x TIER) -->
-<div id="bayDetailModal" class="fixed inset-0 z-50 hidden bg-black/60 backdrop-blur-xs flex items-center justify-center p-3">
-  <div class="card w-full max-w-4xl max-h-[90vh] flex flex-col overflow-hidden">
-    <div class="px-4 py-3 bg-slate-900 text-white flex items-center justify-between">
-      <div>
-        <h3 id="modalBayTitle" class="font-black text-base">Sơ đồ Chi tiết Hầm / Bay</h3>
-        <p id="modalBaySub" class="text-xs text-sky-300">Nhấp vào ô container để đánh dấu Gọi xe hoặc Hoàn tất (C)</p>
-      </div>
-      <button onclick="closeBayModal()" class="px-3 py-1 rounded-lg bg-slate-700 hover:bg-slate-600 text-xs font-bold">✕ Đóng</button>
-    </div>
-    <div id="modalBayTabs" class="px-4 py-2 border-b border-slate-200 dark:border-slate-700 flex gap-2 overflow-x-auto bg-slate-50 dark:bg-slate-900"></div>
-    <div id="modalBayBody" class="p-4 overflow-auto flex-1 space-y-4"></div>
+<!-- THANH TRẠNG THÁI MỚN NƯỚC, THỦY TRIỀU & SẢN LƯỢNG EPORT -->
+<div class="draft-strip">
+  <div class="metric-pill">
+    <small>Tiến độ ePort Tân Vũ</small>
+    <strong id="kpiEportProgress" style="color:var(--cyan)">425 / 1,346 Cont (32%)</strong>
+    <div style="font-size:10px;color:var(--muted)" id="kpiEportSub">Nguồn: Bot ePort Live</div>
+  </div>
+  <div class="metric-pill">
+    <small>Mớn Mũi / Lái Dự Kiến</small>
+    <strong id="kpiDraftLive">7.80m / 8.20m</strong>
+    <div style="font-size:10px;color:var(--green)" id="kpiDraftStatus">An toàn (Còn ~280 cont tới Tmax)</div>
+  </div>
+  <div class="metric-pill">
+    <small>Thủy Triều Hòn Dáu Live</small>
+    <strong id="kpiTideLive" style="color:var(--cyan)">Đỉnh 3.8m · Ròng 0.4m</strong>
+    <div style="font-size:10px;color:var(--muted)" id="kpiTideWindow">Cửa sổ rời cầu: Tốt</div>
+  </div>
+  <div class="metric-pill">
+    <small>Tồn Xuất (Sẵn sàng B / Giữ A)</small>
+    <strong id="kpiExportPool">0 B / 0 A (0 Đã xếp C)</strong>
+    <div style="font-size:10px;color:var(--amber)" id="kpiOffDockSummary">Bãi ngoài: Chưa nạp Final Loading</div>
+  </div>
+  <div class="metric-pill">
+    <small>Trạng thái Cloud Supabase</small>
+    <strong id="kpiCloudStatus" style="color:var(--green)">● Đã kết nối</strong>
+    <div style="font-size:10px;color:var(--muted)" id="kpiLastSync">Bucket: tos-vessel-plans</div>
   </div>
 </div>
 
-<!-- MODAL TẠO TÀU MỚI -->
-<div id="newVesselModal" class="fixed inset-0 z-50 hidden bg-black/60 flex items-center justify-center p-3">
-  <div class="card w-full max-w-md p-5 space-y-3">
-    <h3 class="font-black text-base">🚢 Khởi tạo Phiên làm việc Tàu mới</h3>
-    <div class="space-y-2 text-xs">
-      <div>
-        <label class="font-bold text-slate-500">Tên tàu (*)</label>
-        <input id="newVName" type="text" placeholder="VD: SITC HAIPHONG" class="sub-card w-full px-3 py-2 font-bold mt-1 uppercase">
+<!-- THANH ĐIỀU HƯỚNG -->
+<nav class="nav-tabs">
+  <button class="active" onclick="switchTab('tab-dispatch', this)">1. Khuyến nghị Gọi hàng & Cẩu</button>
+  <button onclick="switchTab('tab-holds', this)">2. Sơ đồ 9 Hầm & Gọi hàng Đuổi</button>
+  <button onclick="switchTab('tab-cranes', this)">3. Thiết lập Tàu, Cẩu & Sự cố</button>
+  <button onclick="switchTab('tab-upload', this)">4. Nạp Dữ liệu (PL-TOS / Final Loading / EDI)</button>
+</nav>
+
+<div class="container">
+
+  <!-- TAB 1: KHUYẾN NGHỊ GỌI HÀNG & CÂN BẰNG CẨU -->
+  <div id="tab-dispatch" class="tab-pane active">
+    <div class="grid-2">
+      <!-- BIỂU ĐỒ SẢN LƯỢNG CẨU THEO KHUNG GIỜ -->
+      <div class="panel">
+        <div class="panel-head">
+          <h3>📊 Sản lượng Cẩu theo Khung giờ (Rê chuột vào cột giờ để xem cẩu ít/nhiều)</h3>
+          <div style="display:flex;gap:6px;align-items:center;">
+            <select id="shiftFilter" onchange="renderCraneHourlyChart()">
+              <option value="ALL">Toàn ca (24h)</option>
+              <option value="DAY">Ca Ngày (07:00 - 18:00)</option>
+              <option value="NIGHT">Ca Đêm (19:00 - 06:00)</option>
+            </select>
+            <span class="badge" id="craneImbalanceBadge">Cân bằng nhịp cẩu</span>
+          </div>
+        </div>
+        <div class="panel-body">
+          <div class="hourly-bars" id="craneHourlyBars"></div>
+          <div id="craneAdviceBox" style="margin-top:10px;padding:8px 10px;border-radius:7px;background:rgba(2,132,199,0.08);font-size:11.5px;"></div>
+        </div>
       </div>
-      <div class="grid grid-cols-2 gap-2">
-        <div>
-          <label class="font-bold text-slate-500">Chuyến (Voyage)</label>
-          <input id="newVVoyage" type="text" placeholder="VD: 2612S" class="sub-card w-full px-3 py-2 font-bold mt-1 uppercase">
+
+      <!-- THỐNG KÊ BÃI NGOÀI TỪ FILE FINAL LOADING (CỘT CUỐI: CẢNG CHUYỂN TRỪ TV) -->
+      <div class="panel">
+        <div class="panel-head">
+          <h3>🚛 Phân bổ Bãi ngoài từ Final Loading (Cột cuối "Cảng chuyển" trừ TV)</h3>
+          <span class="badge amber" id="offDockTotalBadge">0 Cont bãi ngoài</span>
         </div>
-        <div>
-          <label class="font-bold text-slate-500">Cầu bến</label>
-          <select id="newVBerth" class="sub-card w-full px-3 py-2 font-bold mt-1">
-            <option value="TV1">Cầu TV1</option>
-            <option value="TV2">Cầu TV2</option>
-            <option value="TV3">Cầu TV3</option>
-            <option value="TV4">Cầu TV4</option>
-            <option value="TV5">Cầu TV5</option>
-          </select>
-        </div>
-      </div>
-      <div class="grid grid-cols-3 gap-2">
-        <div>
-          <label class="font-bold text-slate-500">Dài L (m)</label>
-          <input id="newVLen" type="number" value="172" class="sub-card w-full px-2.5 py-1.5 font-bold mt-1">
-        </div>
-        <div>
-          <label class="font-bold text-slate-500">Rộng B (m)</label>
-          <input id="newVBeam" type="number" value="27.6" class="sub-card w-full px-2.5 py-1.5 font-bold mt-1">
-        </div>
-        <div>
-          <label class="font-bold text-slate-500">Mớn Max (m)</label>
-          <input id="newVMaxDraft" type="number" step="0.1" value="9.2" class="sub-card w-full px-2.5 py-1.5 font-bold mt-1">
+        <div class="panel-body">
+          <div style="font-size:11px;color:var(--muted);">
+            Tự động lọc cột cuối (<b>Cảng chuyển</b>) trong file <i>Final Loading</i>: loại trừ <b>TV</b> (Cảng Tân Vũ), cảnh báo gọi sớm (Pre-call) các bãi vệ tinh <b>GFW, HHH, SA, VNB DV, SI...</b>
+          </div>
+          <div class="offdock-grid" id="offDockCards">
+            <div style="font-size:11px;color:var(--muted);padding:10px;">Hãy nạp file <b>Final Loading</b> ở Tab 4 để xem chi tiết từng bãi ngoài.</div>
+          </div>
         </div>
       </div>
     </div>
-    <div class="flex justify-end gap-2 pt-2">
-      <button onclick="document.getElementById('newVesselModal').classList.add('hidden')" class="px-3 py-1.5 rounded-lg bg-slate-200 dark:bg-slate-700 text-xs font-bold">Hủy</button>
-      <button onclick="createNewVesselSession()" class="px-4 py-1.5 rounded-lg bg-sky-600 text-white text-xs font-bold">Tạo phiên tàu</button>
+
+    <!-- BỘ LỌC CHIẾN THUẬT GỌI HÀNG -->
+    <div class="panel">
+      <div class="panel-head">
+        <h3>🎯 Bảng Khuyến nghị Gọi hàng Thông minh theo Từng Thiết bị</h3>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
+          <label>Chiến thuật cảng:
+            <select id="podStrategy" onchange="renderDispatchRecommendations()">
+              <option value="FEWEST_FIRST">Ưu tiên cảng ít trước (Dứt điểm gọn)</option>
+              <option value="ROUND_ROBIN">Xếp san đều các cảng</option>
+              <option value="MOST_FIRST">Ưu tiên cảng nhiều trước</option>
+            </select>
+          </label>
+          <label>Trọng lượng:
+            <select id="weightStrategy" onchange="renderDispatchRecommendations()">
+              <option value="HEAVY_FIRST">Tấn to xếp trước (Đáy hầm)</option>
+              <option value="LIGHT_FIRST">Tấn nhẹ xếp trước</option>
+            </select>
+          </label>
+          <label>Lọc nguồn bãi:
+            <select id="yardFilter" onchange="renderDispatchRecommendations()">
+              <option value="ALL">Tất cả (Tự động trộn bãi ngoài)</option>
+              <option value="OFF_DOCK_ONLY">Chỉ gọi Bãi ngoài (GFW, HHH, SA...)</option>
+              <option value="TV_ONLY">Chỉ gọi Bãi nội bộ Tân Vũ (TV)</option>
+            </select>
+          </label>
+          <button class="danger" onclick="clearExportDataOnly()">🗑️ Xóa dữ liệu Hàng xuất (Nạp lại)</button>
+        </div>
+      </div>
+      <div class="panel-body">
+        <div class="grid-3" id="craneDispatchColumns"></div>
+      </div>
     </div>
+  </div>
+
+  <!-- TAB 2: SƠ ĐỒ 9 HẦM & GỌI HÀNG ĐUỔI CHIA THEO HẦM -->
+  <div id="tab-holds" class="tab-pane">
+    <div class="panel">
+      <div class="panel-head">
+        <h3>🚢 Tổng quan Tiến độ 9 Hầm hàng (HOLD 01 → HOLD 09) & Tích chọn Bay xếp</h3>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;">
+          <button class="primary" onclick="autoSelectDischargedBays()">⚡ Tự động tích các Bay đã dỡ xong hàng nhập</button>
+          <button onclick="toggleAllBays(true)">Chọn tất cả Bay</button>
+          <button onclick="toggleAllBays(false)">Bỏ chọn tất cả</button>
+        </div>
+      </div>
+      <div class="panel-body">
+        <div class="holds-grid" id="holdsOverviewGrid"></div>
+      </div>
+    </div>
+
+    <!-- KHUYẾN NGHỊ GỌI HÀNG ĐUỔI & THAY THẾ ĐỒNG TRỌNG LƯỢNG CHIA THEO HẦM -->
+    <div class="panel">
+      <div class="panel-head">
+        <h3>🔁 Khuyến nghị Gọi hàng Đuổi & Thay thế Gần Tấn Tạ Nhất (Chia theo từng Hầm)</h3>
+        <div style="display:flex;gap:8px;align-items:center;">
+          <label>Lọc Hầm:
+            <select id="chaseHoldFilter" onchange="renderRollingChaseByHold()">
+              <option value="ALL">Tất cả 9 Hầm</option>
+            </select>
+          </label>
+          <span class="badge purple" id="chaseMissingBadge">0 vị trí khuyết</span>
+        </div>
+      </div>
+      <div class="panel-body" id="rollingChaseContainer"></div>
+    </div>
+  </div>
+
+  <!-- TAB 3: THIẾT LẬP TÀU, CẨU & XỬ LÝ SỰ CỐ -->
+  <div id="tab-cranes" class="tab-pane">
+    <div class="grid-2">
+      <div class="panel">
+        <div class="panel-head">
+          <h3>📐 Thông số Tàu & Tự động tính Mớn nước (28 cont ≈ 10cm)</h3>
+          <button class="success" onclick="saveVesselSessionToCloud()">💾 Lưu cấu hình lên Cloud</button>
+        </div>
+        <div class="panel-body">
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;">
+            <div><label>Tên tàu<br><input id="cfgVesselName" value="KUO LUNG" style="width:100%" oninput="recalcDraftLive()"></label></div>
+            <div><label>Chuyến (Voyage)<br><input id="cfgVoyage" value="1008S" style="width:100%"></label></div>
+            <div><label>Cầu bến<br><input id="cfgBerth" value="TV3" style="width:100%"></label></div>
+            <div><label>Chiều dài L (m)<br><input id="cfgLength" type="number" value="172" style="width:100%" oninput="recalcDraftLive(true)"></label></div>
+            <div><label>Chiều rộng B (m)<br><input id="cfgBeam" type="number" step="0.1" value="27.6" style="width:100%" oninput="recalcDraftLive(true)"></label></div>
+            <div><label>Định mức Cont / 10cm<br><input id="cfgContPer10cm" type="number" value="28" style="width:100%" oninput="recalcDraftLive()"></label></div>
+            <div><label>Mớn Mũi ban đầu (m)<br><input id="cfgDraftF" type="number" step="0.01" value="7.80" style="width:100%" oninput="recalcDraftLive()"></label></div>
+            <div><label>Mớn Lái ban đầu (m)<br><input id="cfgDraftA" type="number" step="0.01" value="8.20" style="width:100%" oninput="recalcDraftLive()"></label></div>
+            <div><label>Mớn Giới hạn Tmax (m)<br><input id="cfgMaxDraft" type="number" step="0.01" value="9.20" style="width:100%" oninput="recalcDraftLive()"></label></div>
+            <div><label>Ngưỡng Tier Boong (>=)<br><input id="cfgDeckTier" type="number" value="80" style="width:100%"></label></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- QUẢN LÝ PHƯƠNG TIỆN & SỰ CỐ GIÁN ĐOẠN -->
+      <div class="panel">
+        <div class="panel-head">
+          <h3>🏗️ Danh sách Phương tiện Cẩu Tân Vũ & Xử lý Sự cố</h3>
+          <div style="display:flex;gap:5px;">
+            <input id="customCraneInput" placeholder="Nhập mã cẩu (VD: QC14)..." style="width:150px;">
+            <button class="primary" onclick="addCustomCrane()">+ Thêm</button>
+          </div>
+        </div>
+        <div class="panel-body">
+          <div style="font-size:11px;color:var(--muted);margin-bottom:8px;">
+            Tích chọn thiết bị tham gia làm tàu, chọn chế độ <b>Chỉ làm Nhập (Xong nghỉ)</b> hoặc <b>Nhập + Xuất</b>, và bấm <b>⏸ Tạm dừng / Sự cố</b> để tính giờ gián đoạn & gợi ý bổ khuyết:
+          </div>
+          <div id="craneRosterList" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px;"></div>
+          <div id="craneAssignmentTable"></div>
+          <div id="failoverAdvicePanel" style="margin-top:12px;"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB 4: NẠP DỮ LIỆU CHUYÊN BIỆT 5 Ô -->
+  <div id="tab-upload" class="tab-pane">
+    <div class="panel">
+      <div class="panel-head">
+        <h3>📂 Trung tâm Nạp & Đồng bộ Dữ liệu PL-TOS / Final Loading / EDI</h3>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <button class="primary" onclick="loadDemoKuoLungData()">⚡ Nạp dữ liệu mẫu KUO LUNG (768 cont)</button>
+          <button class="danger" onclick="clearExportDataOnly()">🗑️ Xóa riêng dữ liệu Hàng xuất</button>
+        </div>
+      </div>
+      <div class="panel-body">
+        <div class="upload-grid">
+          <!-- Ô 1: SƠ ĐỒ HẦM HÀNG NHẬP SBP -->
+          <div class="upload-card" id="card-sbp">
+            <div>
+              <span class="badge green">Ô 1 · Nạp 1 lần đầu ca</span>
+              <h4 style="margin:6px 0 4px;">1. Sơ đồ hầm hàng nhập (SBP)</h4>
+              <div style="font-size:11px;color:var(--muted);">
+                Màn hình PL-TOS: <i>Hàng nhập → Sơ đồ hầm hàng (SBP)</i>.<br>
+                Tự đọc: <b>Vị Trí</b> (vẽ 9 hầm/Bay), <b>Số Container, Kích Cỡ, Trọng Lượng Hàng</b>.
+              </div>
+            </div>
+            <div>
+              <input type="file" accept=".xlsx,.xls,.csv" onchange="handleUploadExcel(event, 'sbp')">
+              <div id="stat-sbp" style="font-size:11px;font-weight:700;margin-top:4px;color:var(--muted);">Chưa nạp</div>
+            </div>
+          </div>
+
+          <!-- Ô 2: FINAL LOADING (MỚI THÊM THEO YÊU CẦU) -->
+          <div class="upload-card" id="card-final">
+            <div>
+              <span class="badge amber">Ô 2 · Phân loại bãi ngoài (Cột cuối)</span>
+              <h4 style="margin:6px 0 4px;">2. Danh sách Final Loading</h4>
+              <div style="font-size:11px;color:var(--muted);">
+                Tự đọc cột cuối <b>"Cảng chuyển"</b> (trừ <b>TV</b> = Tân Vũ để lọc bãi ngoài <b>GFW, HHH, SA, VNB DV, SI</b>), <b>Vị trí bãi, TL hải quan, Vị trí tàu, Ghi chú</b>.
+              </div>
+            </div>
+            <div>
+              <input type="file" accept=".xlsx,.xls,.csv" onchange="handleUploadExcel(event, 'final')">
+              <div id="stat-final" style="font-size:11px;font-weight:700;margin-top:4px;color:var(--muted);">Chưa nạp</div>
+            </div>
+          </div>
+
+          <!-- Ô 3: DANH SÁCH XUẤT RESERVED -->
+          <div class="upload-card" id="card-reserved">
+            <div>
+              <span class="badge">Ô 3 · Nạp khi có thay đổi</span>
+              <h4 style="margin:6px 0 4px;">3. Danh sách Xuất tàu (Reserved)</h4>
+              <div style="font-size:11px;color:var(--muted);">
+                Màn hình PL-TOS: <i>Danh sách Container Xuất tàu</i>.<br>
+                Chỉ lọc các dòng có cột <b>Chọn = 1</b>, đọc <b>Block, Cảng dỡ, TL Hàng, Kích cỡ</b>.
+              </div>
+            </div>
+            <div>
+              <input type="file" accept=".xlsx,.xls,.csv" onchange="handleUploadExcel(event, 'reserved')">
+              <div id="stat-reserved" style="font-size:11px;font-weight:700;margin-top:4px;color:var(--muted);">Chưa nạp</div>
+            </div>
+          </div>
+
+          <!-- Ô 4: THAY ĐỔI CÔNG VIỆC TÀU (JOB LIST) -->
+          <div class="upload-card" id="card-jobs">
+            <div>
+              <span class="badge red">Ô 4 · Nạp liên tục trong ca</span>
+              <h4 style="margin:6px 0 4px;">4. Thay đổi công việc tàu (Job List)</h4>
+              <div style="font-size:11px;color:var(--muted);">
+                Cập nhật trạng thái thực tế: <b>C</b> (Completed - trừ đuổi & vẽ Bay), <b>B</b> (Sẵn sàng gọi), <b>A</b> (Giữ lại đợi thủ tục), <b>Mã thiết bị</b>.
+              </div>
+            </div>
+            <div>
+              <input type="file" accept=".xlsx,.xls,.csv" onchange="handleUploadExcel(event, 'jobs')">
+              <div id="stat-jobs" style="font-size:11px;font-weight:700;margin-top:4px;color:var(--muted);">Chưa nạp</div>
+            </div>
+          </div>
+
+          <!-- Ô 5: CHỈ DẪN XẾP DỠ & FILE EDI / BAPLIE / $604 -->
+          <div class="upload-card optional" id="card-edi">
+            <div>
+              <span class="badge purple">Ô 5 · Tùy chọn / Dự kiến xuất</span>
+              <h4 style="margin:6px 0 4px;">5. Chỉ dẫn xếp dỡ (.xlsx) & EDI / $604</h4>
+              <div style="font-size:11px;color:var(--muted);">
+                Hỗ trợ nạp cả file <b>Chỉ dẫn xếp dỡ (CntrJobType)</b> lẫn file sơ đồ tàu <b>.edi (BAPLIE)</b> hoặc <b>.asc / .txt ($604)</b>.
+              </div>
+            </div>
+            <div>
+              <input type="file" multiple accept=".xlsx,.xls,.edi,.asc,.txt,.bap" onchange="handleUploadEdiOrStowage(event)">
+              <div id="stat-edi" style="font-size:11px;font-weight:700;margin-top:4px;color:var(--muted);">Chưa nạp</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- TOOLTIP SẢN LƯỢNG CẨU -->
+<div id="craneTooltip"></div>
+
+<!-- POPUP SƠ ĐỒ BAY -->
+<div class="modal-shade" id="bayModal" onclick="if(event.target===this) closeBayModal()">
+  <div class="modal-card">
+    <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--line);padding-bottom:8px;margin-bottom:12px;">
+      <h3 id="bayModalTitle" style="margin:0;">Sơ đồ Bay</h3>
+      <button onclick="closeBayModal()">✕ Đóng</button>
+    </div>
+    <div id="bayModalBody"></div>
   </div>
 </div>
 
 <script>
-// ============================================================================
-// 1. CẤU HÌNH SUPABASE CLOUD (DB CỦA BẠN + BOT EPORT/THỦY TRIỀU HÒN DÁU)
-// ============================================================================
-const TOS_SUPABASE_URL = 'https://tncacmmosygygbplwobr.supabase.co';
-const TOS_SUPABASE_KEY = 'sb_publishable_sIaJPsZCE_1GNMZJF7DfLQ_7Vbg3gsL';
-const TOS_BUCKET = 'tos-vessel-plans';
+// ================= KẾT NỐI SUPABASE =================
+const SUPABASE_URL = 'https://tncacmmosygygbplwobr.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_sIaJPsZCE_1GNMZJF7DfLQ_7Vbg3gsL';
+const BUCKET_NAME = 'tos-vessel-plans';
+const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
+// Supabase Bot ePort & Thủy triều Hòn Dáu
 const BOT_SUPABASE_URL = 'https://cyxjnexehyoblzwzrmsu.supabase.co';
 const BOT_SUPABASE_KEY = 'sb_publishable_ZQdpAmhE4LLfsbKGsRiHIw_ShoTsfIe';
+const sbBot = window.supabase.createClient(BOT_SUPABASE_URL, BOT_SUPABASE_KEY);
 
-let tosDb = null;
-let botDb = null;
-try {
-  if (window.supabase) {
-    tosDb = window.supabase.createClient(TOS_SUPABASE_URL, TOS_SUPABASE_KEY);
-    botDb = window.supabase.createClient(BOT_SUPABASE_URL, BOT_SUPABASE_KEY);
-  }
-} catch (e) { console.warn('Supabase init error:', e); }
-
-// ============================================================================
-// 2. TRẠNG THÁI DỮ LIỆU TRUNG TÂM CỦA ỨNG DỤNG
-// ============================================================================
-const CRANE_PALETTE = ['#0284c7', '#10b981', '#f59e0b', '#8b5cf6', '#ec4899'];
-
-let appState = {
-  currentSessionId: 'KUO_LUNG_1008S',
-  strategy: 'small_pod',
-  eportJobs: {},
-  savedSessions: [],
-  tideInfo: { highVal: 3.6, highTime: '05:00', lowVal: 0.6, lowTime: '17:30' },
-  vessel: {
-    session_id: 'KUO_LUNG_1008S',
-    vessel_name: 'KUO LUNG',
-    voyage: '1008S',
-    berth: 'TV1',
-    length_m: 172,
-    beam_m: 27.6,
-    draft_f: 7.80,
-    draft_a: 8.20,
-    max_draft: 9.20,
-    cont_per_10cm: 28,
-    deck_tier_min: 80
-  },
-  // Cấu hình 9 Hầm chuẩn General Plan KUO LUNG
-  holds: [
-    { id: 1, name: 'HOLD 01', bays: ['01', '02', '03'], maxCap: 56 },
-    { id: 2, name: 'HOLD 02', bays: ['05', '06', '07'], maxCap: 88 },
-    { id: 3, name: 'HOLD 03', bays: ['09', '10', '11'], maxCap: 92 },
-    { id: 4, name: 'HOLD 04', bays: ['13', '14', '15'], maxCap: 96 },
-    { id: 5, name: 'HOLD 05', bays: ['17', '18', '19'], maxCap: 96 },
-    { id: 6, name: 'HOLD 06', bays: ['21', '22', '23'], maxCap: 92 },
-    { id: 7, name: 'HOLD 07', bays: ['25', '26', '27'], maxCap: 88 },
-    { id: 8, name: 'HOLD 08', bays: ['29', '30', '31'], maxCap: 78 },
-    { id: 9, name: 'HOLD 09', bays: ['33'], maxCap: 32 }
-  ],
-  // Phân công cẩu mặc định
-  cranes: {
-    'QC07': { active: true, holds: [1, 2, 3], color: '#0284c7' },
-    'QC11': { active: true, holds: [4, 5, 6], color: '#10b981' },
-    'QC12': { active: true, holds: [7, 8, 9], color: '#f59e0b' }
-  },
-  // Dữ liệu sản lượng cẩu theo khung giờ (07:00 -> 16:00)
-  hourlyCraneStats: [
-    { hour: '07:00', QC07: 18, QC11: 22, QC12: 24 },
-    { hour: '08:00', QC07: 21, QC11: 26, QC12: 28 },
-    { hour: '09:00', QC07: 16, QC11: 27, QC12: 30 },
-    { hour: '10:00', QC07: 14, QC11: 25, QC12: 29 },
-    { hour: '11:00', QC07: 15, QC11: 24, QC12: 31 },
-    { hour: '12:00', QC07: 12, QC11: 20, QC12: 26 },
-    { hour: '13:00', QC07: 15, QC11: 28, QC12: 32 },
-    { hour: '14:00', QC07: 13, QC11: 26, QC12: 30 }
-  ],
-  importSbpSlots: [],      // Từ file SBP nhập
-  preStowagePlan: [],      // Từ file BAPLIE (.edi) hoặc $604
-  reservedList: [],        // Từ file Danh sách xuất Reserved (Chọn=1)
-  liveJobs: {},            // Map container_no -> { status: 'A'|'B'|'C', pos: '140184', crane: 'QC11' }
-  stowInstructions: {},    // Map container_no -> 'UD' | 'OD' | 'NOI, NHE' ...
-  calledContainers: new Set()
+// ================= TRẠNG THÁI ỨNG DỤNG =================
+const PRESET_CRANES = ['QC10','QC09','QC08','QC07','QC11','QC12','TK07','TK10','QC06','QC05','TK11','TK12'];
+const OFF_DOCK_LABELS = {
+  'GFW': 'Bãi GFW (Ngoài cảng)',
+  'HHH': 'Bãi HHH (Hoàng Huy)',
+  'SA': 'Bãi Sao Á (SA)',
+  'VNB DV': 'Bãi VNB Đình Vũ',
+  'SI': 'Bãi SI (Ngoài cảng)'
 };
 
-// ============================================================================
-// 3. KHỞI TẠO DỮ LIỆU MẪU THỰC TẾ (KUO LUNG / 1008S) ĐỂ CHẠY NGAY LẬP TỨC
-// ============================================================================
-function seedRealisticDemoData() {
-  const samplePreStow = [
-    // Hold 1-3 (QC07)
-    { container_no: 'TLLU8330432', pos: '010204', bay: '01', row: '02', tier: '04', size: '20DC', pod: 'SGSIN', weight: 29.3, block: 'AA', instr: 'UD' },
-    { container_no: 'CAIU3845235', pos: '010206', bay: '01', row: '02', tier: '06', size: '20DC', pod: 'SGSIN', weight: 16.3, block: 'AB', instr: 'UD' },
-    { container_no: 'OOCU7252638', pos: '021082', bay: '02', row: '10', tier: '82', size: '40HC', pod: 'SGSIN', weight: 28.2, block: 'BA', instr: 'OD' },
-    { container_no: 'ONEU5029472', pos: '021084', bay: '02', row: '10', tier: '84', size: '40HC', pod: 'IDJKT', weight: 12.0, block: 'KHM', instr: 'OD' },
-    { container_no: 'ECMU2959898', pos: '030608', bay: '03', row: '06', tier: '08', size: '20DC', pod: 'TWTXG', weight: 7.1, block: 'CA', instr: 'NOI, NHE' },
-    { container_no: 'CSNU2889279', pos: '050606', bay: '05', row: '06', tier: '06', size: '20DC', pod: 'SGSIN', weight: 15.3, block: 'BB', instr: 'UD' },
-    { container_no: 'APZU3769370', pos: '050406', bay: '05', row: '04', tier: '06', size: '20DC', pod: 'SGSIN', weight: 15.9, block: 'KHM', instr: 'UD' },
-    { container_no: 'OOCU7295603', pos: '060608', bay: '06', row: '06', tier: '08', size: '40HC', pod: 'SGSIN', weight: 16.8, block: 'CB', instr: 'UD' },
-    { container_no: 'BEAU2228147', pos: '070406', bay: '07', row: '04', tier: '06', size: '20DC', pod: 'IDJKT', weight: 15.7, block: 'DA', instr: 'UD' },
-    { container_no: 'TEMU5924445', pos: '090606', bay: '09', row: '06', tier: '06', size: '20DC', pod: 'SGSIN', weight: 23.0, block: 'AA', instr: 'UD' },
-    { container_no: 'OOCU5643398', pos: '101082', bay: '10', row: '10', tier: '82', size: '40HC', pod: 'SGSIN', weight: 28.9, block: 'SAO A', instr: 'OD' },
-    // Hold 4-6 (QC11)
-    { container_no: 'BEAU5484332', pos: '140184', bay: '14', row: '01', tier: '84', size: '40HC', pod: 'SGSIN', weight: 9.8, block: 'AB', instr: 'OD' },
-    { container_no: 'SEGU5140386', pos: '140084', bay: '14', row: '00', tier: '84', size: '40HC', pod: 'SGSIN', weight: 19.6, block: 'BA', instr: 'OD' },
-    { container_no: 'BEAU4769460', pos: '140088', bay: '14', row: '00', tier: '88', size: '40HC', pod: 'SGSIN', weight: 7.8, block: 'CA', instr: 'NOI, NHE' },
-    { container_no: 'BEAU5530037', pos: '140984', bay: '14', row: '09', tier: '84', size: '40HC', pod: 'SGSIN', weight: 12.0, block: 'DB', instr: 'OD' },
-    { container_no: 'BMOU1540685', pos: '150406', bay: '15', row: '04', tier: '06', size: '20DC', pod: 'SGSIN', weight: 15.5, block: 'KHM', instr: 'UD' },
-    { container_no: 'BSIU2666164', pos: '170604', bay: '17', row: '06', tier: '04', size: '20DC', pod: 'SGSIN', weight: 29.6, block: 'AA', instr: 'UD' },
-    { container_no: 'BMOU1052124', pos: '170104', bay: '17', row: '01', tier: '04', size: '20DC', pod: 'SGSIN', weight: 29.9, block: 'BB', instr: 'UD' },
-    { container_no: 'BEAU2042466', pos: '190404', bay: '19', row: '04', tier: '04', size: '20DC', pod: 'SGSIN', weight: 24.3, block: 'CB', instr: 'UD' },
-    { container_no: 'BEAU2741015', pos: '210804', bay: '21', row: '08', tier: '04', size: '20DC', pod: 'SGSIN', weight: 28.1, block: 'DA', instr: 'UD' },
-    { container_no: 'BEAU6152380', pos: '220808', bay: '22', row: '08', tier: '08', size: '40HC', pod: 'SGSIN', weight: 20.6, block: 'AB', instr: 'UD/AWFH' },
-    { container_no: 'BEAU4680644', pos: '220684', bay: '22', row: '06', tier: '84', size: '40HC', pod: 'SGSIN', weight: 16.3, block: 'KHM', instr: 'OD' },
-    { container_no: 'BEAU5587433', pos: '220584', bay: '22', row: '05', tier: '84', size: '40HC', pod: 'SGSIN', weight: 16.2, block: 'BA', instr: 'OD' },
-    // Hold 7-9 (QC12 - Gần đầy 95% để kích hoạt gợi ý chuyển hầm)
-    { container_no: 'BMOU1578090', pos: '250302', bay: '25', row: '03', tier: '02', size: '20DC', pod: 'SGSIN', weight: 30.3, block: 'AA', instr: 'UD' },
-    { container_no: 'BEAU4807894', pos: '261084', bay: '26', row: '10', tier: '84', size: '40HC', pod: 'SGSIN', weight: 12.2, block: 'BB', instr: 'OD' },
-    { container_no: 'APHU7260990', pos: '260084', bay: '26', row: '00', tier: '84', size: '40HC', pod: 'SGSIN', weight: 17.5, block: 'CA', instr: 'OD' },
-    { container_no: 'BEAU4154275', pos: '260086', bay: '26', row: '00', tier: '86', size: '40HC', pod: 'SGSIN', weight: 11.4, block: 'CB', instr: 'OD' },
-    { container_no: 'BMOU1655128', pos: '290406', bay: '29', row: '04', tier: '06', size: '20DC', pod: 'SGSIN', weight: 29.2, block: 'DA', instr: 'UD' },
-    { container_no: 'BMOU1549070', pos: '290706', bay: '29', row: '07', tier: '06', size: '20DC', pod: 'SGSIN', weight: 29.2, block: 'DB', instr: 'UD' },
-    { container_no: 'APZU4915822', pos: '300810', bay: '30', row: '08', tier: '10', size: '40DC', pod: 'SGSIN', weight: 8.3, block: 'AA', instr: 'UD' },
-    { container_no: 'APZU4707290', pos: '300684', bay: '30', row: '06', tier: '84', size: '40DC', pod: 'SGSIN', weight: 12.1, block: 'AB', instr: 'OD' },
-    { container_no: 'APZU4847970', pos: '300686', bay: '30', row: '06', tier: '86', size: '40DC', pod: 'SGSIN', weight: 12.6, block: 'BA', instr: 'OD' },
-    { container_no: 'BMOU6393376', pos: '300784', bay: '30', row: '07', tier: '84', size: '40HC', pod: 'SGSIN', weight: 28.4, block: 'BB', instr: 'OD' },
-    { container_no: 'APZU3236196', pos: '330404', bay: '33', row: '04', tier: '84', size: '20DC', pod: 'SGSIN', weight: 13.9, block: 'CA', instr: 'OD' }
-  ];
+let state = {
+  sessionId: 'KUO_LUNG_1008S',
+  sbpImport: [],
+  finalLoading: [],
+  reservedExport: [],
+  liveJobs: [],
+  stowageInstructions: {},
+  preStowagePlan: [],
+  selectedBays: new Set(['01','02','03','05','06','07','09','10','11','13','14','15','17','18','19','21','22','23','25','26','27','29','30','31','33']),
+  calledContainers: new Set(),
+  cranes: [
+    { id: 'QC07', active: true, mode: 'BOTH', holds: [1,2,3], paused: false, pauseStart: null, rate: 28 },
+    { id: 'QC11', active: true, mode: 'BOTH', holds: [4,5,6], paused: false, pauseStart: null, rate: 28 },
+    { id: 'QC12', active: true, mode: 'BOTH', holds: [7,8,9], paused: false, pauseStart: null, rate: 30 },
+    { id: 'TK07', active: true, mode: 'IMPORT_ONLY', holds: [1,2], paused: false, pauseStart: null, rate: 18 }
+  ],
+  eportJobs: {},
+  tideInfo: null
+};
 
-  // Thêm các container dự phòng sẵn sàng (Job B) chưa có vị trí cố định để phục vụ thuật toán Thay thế sát tấn
-  const extraReservePool = [
-    { container_no: 'CMAU4714715', pos: '', bay: '', row: '', tier: '', size: '40HC', pod: 'SGSIN', weight: 12.1, block: 'AA', instr: 'OD' },
-    { container_no: 'ONEU5786774', pos: '', bay: '', row: '', tier: '', size: '40HC', pod: 'SGSIN', weight: 11.9, block: 'AB', instr: 'OD' },
-    { container_no: 'TCLU6756755', pos: '', bay: '', row: '', tier: '', size: '40HC', pod: 'SGSIN', weight: 12.3, block: 'BA', instr: 'OD' },
-    { container_no: 'TLLU4084480', pos: '', bay: '', row: '', tier: '', size: '40HC', pod: 'SGSIN', weight: 14.9, block: 'CA', instr: 'UD' },
-    { container_no: 'FSCU8769536', pos: '', bay: '', row: '', tier: '', size: '40HC', pod: 'SGSIN', weight: 14.7, block: 'CB', instr: 'UD' },
-    { container_no: 'CSNU2138405', pos: '', bay: '', row: '', tier: '', size: '20DC', pod: 'SGSIN', weight: 16.0, block: 'DA', instr: 'UD' },
-    { container_no: 'TLLU2159214', pos: '', bay: '', row: '', tier: '', size: '20DC', pod: 'SGSIN', weight: 15.8, block: 'DB', instr: 'UD' },
-    { container_no: 'TCKU1258048', pos: '', bay: '', row: '', tier: '', size: '20DC', pod: 'TWTXG', weight: 7.3, block: 'AA', instr: 'NOI, NHE' },
-    { container_no: 'GCXU2392198', pos: '', bay: '', row: '', tier: '', size: '20DC', pod: 'IDJKT', weight: 11.8, block: 'AB', instr: 'OD' }
-  ];
+const HOLD_DEFS = [
+  { hold: 1, bays: ['01','02','03'] },
+  { hold: 2, bays: ['05','06','07'] },
+  { hold: 3, bays: ['09','10','11'] },
+  { hold: 4, bays: ['13','14','15'] },
+  { hold: 5, bays: ['17','18','19'] },
+  { hold: 6, bays: ['21','22','23'] },
+  { hold: 7, bays: ['25','26','27'] },
+  { hold: 8, bays: ['29','30','31'] },
+  { hold: 9, bays: ['33'] }
+];
 
-  appState.preStowagePlan = samplePreStow;
-  appState.reservedList = [...samplePreStow, ...extraReservePool].map(x => ({ ...x, selected: 1 }));
-
-  // Thiết lập trạng thái thực tế A / B / C
-  const jobs = {};
-  // Hold 7, 8, 9 (QC12) đã xếp gần hết (C) để tạo tình huống hầm đầy -> gợi ý chuyển hầm
-  ['BMOU1578090','BEAU4807894','APHU7260990','BEAU4154275','BMOU1655128','BMOU1549070','APZU4915822','APZU4707290','APZU4847970','BMOU6393376'].forEach(c => {
-    const item = samplePreStow.find(x => x.container_no === c);
-    jobs[c] = { status: 'C', pos: item.pos, crane: 'QC12', type: 'Xếp tàu' };
-  });
-  // Hold 4, 5, 6 (QC11) đã xếp một nửa (C), nửa còn lại sẵn sàng (B)
-  ['BEAU5484332','SEGU5140386','BEAU5530037','BSIU2666164','BMOU1052124'].forEach(c => {
-    const item = samplePreStow.find(x => x.container_no === c);
-    jobs[c] = { status: 'C', pos: item.pos, crane: 'QC11', type: 'Xếp tàu' };
-  });
-  // Hold 1, 2, 3 (QC07) mới xếp 2 cont (C), 2 cont bị giữ thủ tục (A) để kích hoạt gợi ý thay thế
-  ['TLLU8330432','OOCU7252638'].forEach(c => {
-    const item = samplePreStow.find(x => x.container_no === c);
-    jobs[c] = { status: 'C', pos: item.pos, crane: 'QC07', type: 'Xếp tàu' };
-  });
-  jobs['ONEU5029472'] = { status: 'A', pos: '', crane: 'QC07', type: 'Xếp tàu' }; // Bị giữ A ở Bay 02
-  jobs['APZU3769370'] = { status: 'A', pos: '', crane: 'QC07', type: 'Xếp tàu' }; // Bị giữ A ở Bay 05
-
-  // Tất cả các cont còn lại sẵn sàng (B)
-  appState.reservedList.forEach(item => {
-    if (!jobs[item.container_no]) {
-      jobs[item.container_no] = { status: 'B', pos: '', crane: '', type: 'Xếp tàu' };
-    }
-    if (item.instr) appState.stowInstructions[item.container_no] = item.instr;
-  });
-
-  appState.liveJobs = jobs;
+// ================= TIỆN ÍCH CHUNG =================
+function switchTab(tabId, btn) {
+  document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-tabs button').forEach(b => b.classList.remove('active'));
+  document.getElementById(tabId).classList.add('active');
+  if (btn) btn.classList.add('active');
 }
 
-// ============================================================================
-// 4. ĐỒNG BỘ CLOUD (BOT EPORT TÂN VŨ, THỦY TRIỀU HÒN DÁU & SUPABASE DB)
-// ============================================================================
-async function syncAllCloudSources(showNotify = false) {
-  const badge = document.getElementById('cloudStatusBadge');
-  if (badge) badge.textContent = '⏳ Đang đồng bộ Cloud...';
-
-  try {
-    // 1. Tải danh sách tàu đang làm hàng từ Bot ePort Tân Vũ
-    const eportUrl = `${BOT_SUPABASE_URL}/storage/v1/object/public/port-documents/eport_tanvu_jobs.json?t=${Date.now()}`;
-    const resEport = await fetch(eportUrl, { cache: 'no-store' });
-    if (resEport.ok) {
-      appState.eportJobs = await resEport.json();
-    }
-
-    // 2. Tải dữ liệu Thủy triều Hòn Dáu
-    const tideUrl = `${BOT_SUPABASE_URL}/storage/v1/object/public/port-documents/hon_dau_tide_full.json?t=${Date.now()}`;
-    const resTide = await fetch(tideUrl, { cache: 'no-store' });
-    if (resTide.ok) {
-      const tideObj = await resTide.json();
-      const todayKey = new Date().toISOString().split('T')[0];
-      const rec = tideObj[todayKey] || Object.values(tideObj)[0];
-      if (rec) {
-        appState.tideInfo = {
-          highVal: Number(rec.high_val || 3.6),
-          highTime: rec.high_time || '05:00',
-          lowVal: Number(rec.low_val || 0.6),
-          lowTime: rec.low_time || '17:30'
-        };
-      }
-    }
-
-    // 3. Tải danh sách phiên tàu đã lưu trên Supabase DB của bạn
-    if (tosDb) {
-      const { data: sessions } = await tosDb
-        .from('vessel_sessions')
-        .select('*')
-        .order('updated_at', { ascending: false })
-        .limit(20);
-      if (Array.isArray(sessions)) {
-        appState.savedSessions = sessions;
-      }
-
-      // Tải nhật ký gọi hàng của phiên hiện tại
-      const { data: logs } = await tosDb
-        .from('dispatch_logs')
-        .select('*')
-        .eq('session_id', appState.currentSessionId);
-      if (Array.isArray(logs)) {
-        logs.forEach(l => {
-          if (l.action_type === 'CALLED') appState.calledContainers.add(l.container_no);
-          if (l.action_type === 'COMPLETED' && appState.liveJobs[l.container_no]) {
-            appState.liveJobs[l.container_no].status = 'C';
-            if (l.target_slot) appState.liveJobs[l.container_no].pos = l.target_slot;
-          }
-        });
-      }
-    }
-
-    populateVesselSelectorDropdown();
-    updateTopHeaderBars();
-    renderAllViews();
-
-    if (badge) badge.textContent = `☁️ Đã đồng bộ (${new Date().toLocaleTimeString('vi-VN', {hour:'2-digit', minute:'2-digit'})})`;
-    if (showNotify) showToast('✅ Đã đồng bộ dữ liệu ePort Tân Vũ, Thủy triều Hòn Dáu & Supabase!');
-  } catch (err) {
-    console.warn('Sync warning:', err);
-    if (badge) badge.textContent = '⚠️ Chế độ Offline / Cục bộ';
-  }
+function toggleTheme() {
+  const cur = document.documentElement.getAttribute('data-theme');
+  document.documentElement.setAttribute('data-theme', cur === 'dark' ? 'light' : 'dark');
 }
 
-function populateVesselSelectorDropdown() {
-  const sel = document.getElementById('vesselSelector');
-  if (!sel) return;
-  const curVal = appState.currentSessionId;
-  const seen = new Set();
-  let opts = '';
-
-  // 1. Phiên hiện tại
-  opts += `<option value="${appState.vessel.session_id}">🚢 ${appState.vessel.vessel_name} / ${appState.vessel.voyage} (${appState.vessel.berth})</option>`;
-  seen.add(appState.vessel.session_id);
-
-  // 2. Các tàu đang làm hàng trực tiếp trên ePort Tân Vũ
-  Object.entries(appState.eportJobs || {}).forEach(([vName, info]) => {
-    if (info.isBarge) return;
-    const sid = `${vName.replace(/\s+/g, '_')}_LIVE`;
-    if (!seen.has(sid) && vName !== appState.vessel.vessel_name) {
-      seen.add(sid);
-      opts += `<option value="EPORT::${vName}">🟢 [ePort] ${vName} (${info.berth || 'TV'} · ${info.pct || 0}%)</option>`;
-    }
-  });
-
-  // 3. Các phiên tàu đã lưu trên Supabase DB
-  (appState.savedSessions || []).forEach(s => {
-    if (!seen.has(s.session_id)) {
-      seen.add(s.session_id);
-      opts += `<option value="DB::${s.session_id}">☁️ [Cloud] ${s.vessel_name} / ${s.voyage || ''} (${s.berth || 'TV1'})</option>`;
-    }
-  });
-
-  sel.innerHTML = opts;
-  sel.value = curVal;
-}
-
-async function handleVesselSwitch(val) {
-  if (!val) return;
-  if (val.startsWith('EPORT::')) {
-    const vName = val.replace('EPORT::', '');
-    const ep = appState.eportJobs[vName] || {};
-    appState.currentSessionId = `${vName.replace(/\s+/g, '_')}_LIVE`;
-    appState.vessel = {
-      ...appState.vessel,
-      session_id: appState.currentSessionId,
-      vessel_name: vName,
-      voyage: 'LIVE',
-      berth: ep.berth || 'TV1'
-    };
-    // Đồng bộ sản lượng ePort vào thanh tiến độ nếu chưa nạp Excel
-    if (ep.planNum > 0) {
-      showToast(`🚢 Đã chuyển sang tàu ${vName} (${ep.berth || 'TV1'} · Tiến độ ePort: ${ep.doneNum}/${ep.planNum} - ${ep.pct}%)`);
-    }
-    populateVesselSelectorDropdown();
-    syncInputsFromState();
-    renderAllViews();
-  } else if (val.startsWith('DB::')) {
-    const sid = val.replace('DB::', '');
-    await loadSessionFromSupabase(sid);
-  }
-}
-
-async function saveSessionToSupabase() {
-  if (!tosDb) return;
-  try {
-    showToast('⏳ Đang lưu cấu hình & nén dữ liệu lên Supabase Bucket...');
-    const sid = appState.vessel.session_id;
-    const payload = {
-      session_id: sid,
-      vessel_name: appState.vessel.vessel_name,
-      voyage: appState.vessel.voyage,
-      berth: appState.vessel.berth,
-      length_m: appState.vessel.length_m,
-      beam_m: appState.vessel.beam_m,
-      draft_f: appState.vessel.draft_f,
-      draft_a: appState.vessel.draft_a,
-      max_draft: appState.vessel.max_draft,
-      cont_per_10cm: appState.vessel.cont_per_10cm,
-      deck_tier_min: appState.vessel.deck_tier_min,
-      crane_config: appState.cranes,
-      hold_config: appState.holds,
-      updated_at: new Date().toISOString()
-    };
-
-    await tosDb.from('vessel_sessions').upsert(payload, { onConflict: 'session_id' });
-
-    // Lưu 4 file JSON nén gọn vào Storage Bucket (ghi đè theo session_id)
-    const uploadJson = async (fileName, obj) => {
-      const blob = new Blob([JSON.stringify(obj)], { type: 'application/json' });
-      await tosDb.storage.from(TOS_BUCKET).upload(`${sid}/${fileName}`, blob, { upsert: true });
-    };
-
-    await Promise.all([
-      uploadJson('sbp_import.json', appState.importSbpSlots),
-      uploadJson('pre_stowage.json', appState.preStowagePlan),
-      uploadJson('reserved_export.json', appState.reservedList),
-      uploadJson('live_jobs.json', { jobs: appState.liveJobs, instr: appState.stowInstructions, hourly: appState.hourlyCraneStats })
-    ]);
-
-    showToast(`✅ Đã lưu toàn bộ dữ liệu tàu ${appState.vessel.vessel_name} lên Cloud!`);
-    await syncAllCloudSources(false);
-  } catch (err) {
-    showToast('❌ Lỗi lưu Cloud: ' + err.message);
-  }
-}
-
-async function loadSessionFromSupabase(sid) {
-  if (!tosDb) return;
-  try {
-    const { data: row } = await tosDb.from('vessel_sessions').select('*').eq('session_id', sid).single();
-    if (row) {
-      appState.currentSessionId = sid;
-      appState.vessel = row;
-      if (row.crane_config && Object.keys(row.crane_config).length) appState.cranes = row.crane_config;
-      if (Array.isArray(row.hold_config) && row.hold_config.length) appState.holds = row.hold_config;
-    }
-
-    const downloadJson = async (fileName) => {
-      const { data } = await tosDb.storage.from(TOS_BUCKET).download(`${sid}/${fileName}`);
-      return data ? JSON.parse(await data.text()) : null;
-    };
-
-    const [sbp, pre, resv, live] = await Promise.all([
-      downloadJson('sbp_import.json'),
-      downloadJson('pre_stowage.json'),
-      downloadJson('reserved_export.json'),
-      downloadJson('live_jobs.json')
-    ]);
-
-    if (sbp) appState.importSbpSlots = sbp;
-    if (pre) appState.preStowagePlan = pre;
-    if (resv) appState.reservedList = resv;
-    if (live) {
-      appState.liveJobs = live.jobs || {};
-      appState.stowInstructions = live.instr || {};
-      if (Array.isArray(live.hourly)) appState.hourlyCraneStats = live.hourly;
-    }
-
-    syncInputsFromState();
-    populateVesselSelectorDropdown();
-    renderAllViews();
-    showToast(`☁️ Đã nạp thành công tàu ${appState.vessel.vessel_name} từ Cloud!`);
-  } catch (err) {
-    showToast('⚠️ Không tải được tệp chi tiết từ Bucket: ' + err.message);
-  }
-}
-
-async function cleanupOldCloudSessions() {
-  if (!tosDb) return;
-  const cutoffIso = new Date(Date.now() - 7 * 86400000).toISOString();
-  const { data: oldRows } = await tosDb.from('vessel_sessions').select('session_id').lt('updated_at', cutoffIso);
-  if (!oldRows || oldRows.length === 0) {
-    showToast('✨ Không có phiên tàu nào cũ hơn 7 ngày cần dọn.');
-    return;
-  }
-  for (const r of oldRows) {
-    await tosDb.storage.from(TOS_BUCKET).remove([
-      `${r.session_id}/sbp_import.json`,
-      `${r.session_id}/pre_stowage.json`,
-      `${r.session_id}/reserved_export.json`,
-      `${r.session_id}/live_jobs.json`
-    ]);
-    await tosDb.from('vessel_sessions').delete().eq('session_id', r.session_id);
-  }
-  showToast(`🧹 Đã giải phóng dung lượng ${oldRows.length} chuyến tàu cũ (>7 ngày)!`);
-  await syncAllCloudSources(false);
-}
-
-// ============================================================================
-// 5. THUẬT TOÁN TÍNH SẢN LƯỢNG CẨU, ĐỘ ĐẦY HẦM & GỢI Ý ĐIỀU CHUYỂN THÔNG MINH
-// ============================================================================
-function getHoldProgressStats() {
-  // Tính toán độ đầy thực tế (Job C) và tổng dự kiến cho từng Hầm (1..9)
-  return appState.holds.map(h => {
-    const plannedInHold = appState.preStowagePlan.filter(p => h.bays.includes(p.bay));
-    const completedInHold = Object.entries(appState.liveJobs).filter(([cNo, j]) => {
-      if (j.status !== 'C') return false;
-      const posBay = j.pos ? j.pos.padStart(6, '0').slice(0, 2) : '';
-      return h.bays.includes(posBay);
-    });
-    const readyInHold = plannedInHold.filter(p => {
-      const j = appState.liveJobs[p.container_no];
-      return j && j.status === 'B';
-    });
-
-    const targetCount = Math.max(plannedInHold.length, completedInHold.length, 1);
-    const doneCount = completedInHold.length;
-    const pct = Math.min(100, Math.round((doneCount / targetCount) * 100));
-
-    // Tìm cẩu đang phụ trách hầm này
-    const assignedCranes = Object.entries(appState.cranes)
-      .filter(([_, cfg]) => cfg.active && cfg.holds.includes(h.id))
-      .map(([cId]) => cId);
-
-    return {
-      ...h,
-      plannedCount: plannedInHold.length,
-      doneCount,
-      readyCount: readyInHold.length,
-      pct,
-      assignedCranes
-    };
-  });
-}
-
-function renderCraneHourlyChart() {
-  const shiftFilter = document.getElementById('shiftFilterSelect')?.value || 'all';
-  const craneIds = Object.keys(appState.cranes);
-  const activeCranes = craneIds.filter(c => appState.cranes[c].active);
-
-  let rows = [...appState.hourlyCraneStats];
-  if (shiftFilter === 'day') {
-    rows = rows.filter(r => {
-      const h = parseInt(r.hour.split(':')[0], 10);
-      return h >= 7 && h <= 18;
-    });
-  } else if (shiftFilter === 'night') {
-    rows = rows.filter(r => {
-      const h = parseInt(r.hour.split(':')[0], 10);
-      return h >= 19 || h <= 6;
-    });
-  }
-
-  // Tính tổng & trung bình của từng cẩu
-  const totals = {};
-  craneIds.forEach(c => totals[c] = 0);
-  rows.forEach(r => {
-    craneIds.forEach(c => { totals[c] += (Number(r[c]) || 0); });
-  });
-
-  const hoursCount = Math.max(1, rows.length);
-  const avgRates = {};
-  craneIds.forEach(c => avgRates[c] = +(totals[c] / hoursCount).toFixed(1));
-
-  // Xác định cẩu ít nhất và cẩu nhiều nhất trong các cẩu đang hoạt động
-  let minCrane = activeCranes[0] || '';
-  let maxCrane = activeCranes[0] || '';
-  activeCranes.forEach(c => {
-    if (totals[c] < totals[minCrane]) minCrane = c;
-    if (totals[c] > totals[maxCrane]) maxCrane = c;
-  });
-
-  // Render dải thẻ tổng hợp từng cẩu
-  const stripEl = document.getElementById('craneSummaryStrip');
-  if (stripEl) {
-    stripEl.innerHTML = craneIds.map(cId => {
-      const cfg = appState.cranes[cId];
-      const isMin = cfg.active && cId === minCrane && activeCranes.length > 1;
-      const isMax = cfg.active && cId === maxCrane && activeCranes.length > 1;
-      const holdTags = cfg.holds.map(hid => `H${hid}`).join(', ') || 'Chưa gán';
-      const statusBadge = !cfg.active
-        ? `<span class="px-1.5 py-0.5 text-[10px] rounded bg-rose-600 text-white font-bold">NGỪNG / HỎNG</span>`
-        : (isMin
-          ? `<span class="px-1.5 py-0.5 text-[10px] rounded bg-amber-500 text-white font-bold">⚠️ CẨU ÍT NHẤT</span>`
-          : (isMax
-            ? `<span class="px-1.5 py-0.5 text-[10px] rounded bg-emerald-600 text-white font-bold">🏆 NHANH NHẤT</span>`
-            : `<span class="px-1.5 py-0.5 text-[10px] rounded bg-sky-600 text-white font-bold">ỔN ĐỊNH</span>`));
-
-      return `
-        <div class="sub-card p-2.5 border-l-4" style="border-left-color: ${cfg.color}">
-          <div class="flex items-center justify-between">
-            <span class="font-black text-sm" style="color: ${cfg.color}">${cId} <span class="text-[11px] font-semibold text-slate-500">(${holdTags})</span></span>
-            ${statusBadge}
-          </div>
-          <div class="flex items-baseline justify-between mt-1.5">
-            <div class="text-lg font-black">${totals[cId]} <span class="text-xs font-normal text-slate-500">Cont</span></div>
-            <div class="text-xs font-extrabold text-slate-600 dark:text-slate-300">TB: ${avgRates[cId]} Cont/h</div>
-          </div>
-        </div>
-      `;
-    }).join('');
-  }
-
-  // Render biểu đồ cột theo khung giờ
-  const chartBox = document.getElementById('craneHourlyChartContainer');
-  const labelBox = document.getElementById('craneHourlyLabels');
-  const legendBox = document.getElementById('craneColorLegend');
-  if (!chartBox || !labelBox) return;
-
-  let maxVal = 35;
-  rows.forEach(r => {
-    craneIds.forEach(c => { if ((r[c] || 0) > maxVal) maxVal = r[c]; });
-  });
-
-  chartBox.innerHTML = rows.map((r, idx) => {
-    const barsHtml = craneIds.map(cId => {
-      const val = Number(r[cId]) || 0;
-      const hPct = Math.max(6, Math.round((val / maxVal) * 100));
-      const color = appState.cranes[cId].color;
-      return `
-        <div class="flex-1 rounded-t-md transition-all relative group"
-             style="height: ${hPct}%; background-color: ${color}; opacity: ${appState.cranes[cId].active ? '0.92' : '0.3'}">
-          <span class="absolute -top-4 left-1/2 -translate-x-1/2 text-[9px] font-extrabold opacity-80">${val}</span>
-        </div>
-      `;
-    }).join('');
-
-    return `
-      <div class="flex-1 h-full flex items-end gap-0.5 px-1 rounded-lg hover:bg-sky-500/10 cursor-pointer transition"
-           onmouseenter="showCraneHourTooltip(event, ${idx})"
-           onmousemove="moveCraneHourTooltip(event)"
-           onmouseleave="hideCraneHourTooltip()"
-           onclick="showCraneHourTooltip(event, ${idx})">
-        ${barsHtml}
-      </div>
-    `;
-  }).join('');
-
-  labelBox.innerHTML = rows.map(r => `<div class="flex-1 text-center">${r.hour}</div>`).join('');
-
-  if (legendBox) {
-    legendBox.innerHTML = craneIds.map(cId => `
-      <span class="inline-flex items-center gap-1 font-bold">
-        <span class="w-2.5 h-2.5 rounded-sm" style="background:${appState.cranes[cId].color}"></span> ${cId}
-      </span>
-    `).join('');
-  }
-
-  // Cập nhật KPI năng suất cầu tàu
-  const totalRateAll = activeCranes.reduce((sum, c) => sum + avgRates[c], 0);
-  const kpiRateEl = document.getElementById('kpiAvgCraneRate');
-  if (kpiRateEl) kpiRateEl.textContent = `${Math.round(totalRateAll)} Cont/h`;
-}
-
-function showCraneHourTooltip(e, rowIdx) {
-  const shiftFilter = document.getElementById('shiftFilterSelect')?.value || 'all';
-  let rows = [...appState.hourlyCraneStats];
-  if (shiftFilter === 'day') rows = rows.filter(r => parseInt(r.hour) >= 7 && parseInt(r.hour) <= 18);
-  if (shiftFilter === 'night') rows = rows.filter(r => parseInt(r.hour) >= 19 || parseInt(r.hour) <= 6);
-
-  const r = rows[rowIdx];
-  if (!r) return;
-
-  const craneIds = Object.keys(appState.cranes);
-  const entries = craneIds.map(cId => ({
-    id: cId,
-    val: Number(r[cId]) || 0,
-    color: appState.cranes[cId].color,
-    holds: appState.cranes[cId].holds.map(h => `H${h}`).join(',')
-  })).sort((a, b) => b.val - a.val);
-
-  const top = entries[0];
-  const low = entries[entries.length - 1];
-  const diff = top && low ? (top.val - low.val) : 0;
-  const totalHourMoves = entries.reduce((s, x) => s + x.val, 0);
-
-  const tt = document.getElementById('craneHoverTooltip');
-  tt.innerHTML = `
-    <div class="flex items-center justify-between border-b border-slate-700 pb-1.5 mb-2">
-      <span class="font-black text-sky-400 text-sm">🕒 Khung giờ ${r.hour}</span>
-      <span class="px-2 py-0.5 rounded bg-sky-500/20 text-sky-300 font-extrabold text-[11px]">Tổng: ${totalHourMoves} Cont</span>
-    </div>
-    <div class="space-y-1.5">
-      ${entries.map(item => `
-        <div class="flex items-center justify-between">
-          <span class="flex items-center gap-1.5 font-bold">
-            <span class="w-2.5 h-2.5 rounded-full" style="background:${item.color}"></span>
-            ${item.id} <span class="text-[10px] text-slate-400">(${item.holds || '—'})</span>
-          </span>
-          <span class="font-black ${item.id === low.id && entries.length > 1 ? 'text-amber-400' : 'text-white'}">
-            ${item.val} Cont/h ${item.id === low.id && entries.length > 1 ? '⚠️' : ''}
-          </span>
-        </div>
-      `).join('')}
-    </div>
-    ${diff >= 6 ? `
-      <div class="mt-2.5 pt-2 border-t border-slate-700 text-[11px] text-amber-300 leading-snug">
-        💡 <b>${low.id}</b> đang kém <b>${top.id}</b> <b>${diff} cont</b> trong giờ này. Nên ưu tiên gọi dồn cont bãi gần cho ${low.id}!
-      </div>
-    ` : ''}
-  `;
-  tt.style.display = 'block';
-  moveCraneHourTooltip(e);
-}
-
-function moveCraneHourTooltip(e) {
-  const tt = document.getElementById('craneHoverTooltip');
-  if (!tt || tt.style.display === 'none') return;
-  const x = Math.min(window.innerWidth - 340, e.clientX + 14);
-  const y = Math.min(window.innerHeight - 200, e.clientY + 14);
-  tt.style.left = Math.max(10, x) + 'px';
-  tt.style.top = Math.max(10, y) + 'px';
-}
-
-function hideCraneHourTooltip() {
-  const tt = document.getElementById('craneHoverTooltip');
-  if (tt) tt.style.display = 'none';
-}
-
-// Thuật toán tự động phát hiện Hầm đầy hoặc Cẩu thiếu sản lượng để gợi ý điều chuyển
-function renderCraneRebalanceAdvisories() {
-  const listEl = document.getElementById('craneRebalanceList');
-  const matrixEl = document.getElementById('activeCraneHoldMatrix');
-  if (!listEl) return;
-
-  const holdStats = getHoldProgressStats();
-  const advisories = [];
-
-  // 1. Kiểm tra hầm nào đã đầy (>= 85% hoàn thành hoặc hết Job B) -> Gợi ý chuyển cẩu sang hầm còn nhiều hàng
-  Object.entries(appState.cranes).forEach(([cId, cfg]) => {
-    if (!cfg.active) return;
-    const myHolds = holdStats.filter(h => cfg.holds.includes(h.id));
-    const totalReady = myHolds.reduce((s, h) => s + h.readyCount, 0);
-    const avgPct = myHolds.length ? Math.round(myHolds.reduce((s, h) => s + h.pct, 0) / myHolds.length) : 0;
-
-    if (avgPct >= 85 || totalReady <= 2) {
-      // Tìm hầm khác đang có nhiều cont sẵn sàng nhất để điều chuyển cẩu sang hỗ trợ
-      const needyHolds = holdStats
-        .filter(h => !cfg.holds.includes(h.id) && h.readyCount >= 3)
-        .sort((a, b) => b.readyCount - a.readyCount);
-
-      if (needyHolds.length > 0) {
-        const targetHold = needyHolds[0];
-        const partnerCrane = targetHold.assignedCranes[0] || 'cẩu bạn';
-        advisories.push({
-          type: 'HOLD_FULL',
-          craneId: cId,
-          targetHoldId: targetHold.id,
-          title: `🚨 ${cId} (${myHolds.map(h => 'H' + h.id).join(', ')}) đã đạt ${avgPct}% (Còn ${totalReady} job)`,
-          desc: `Hầm phụ trách sắp hết hàng. Đề xuất điều chuyển <b>${cId}</b> sang hỗ trợ <b>${targetHold.name}</b> (cùng ${partnerCrane} · còn ${targetHold.readyCount} cont chờ xếp).`,
-          btnText: `⚡ Chuyển ${cId} sang ${targetHold.name}`
-        });
-      }
-    }
-  });
-
-  // 2. Kiểm tra cẩu có sản lượng giờ thấp nhất để gợi ý dồn xe/chân hàng
-  const activeCranes = Object.keys(appState.cranes).filter(c => appState.cranes[c].active);
-  if (activeCranes.length >= 2) {
-    const totals = {};
-    activeCranes.forEach(c => totals[c] = 0);
-    appState.hourlyCraneStats.forEach(r => activeCranes.forEach(c => totals[c] += (r[c] || 0)));
-    const sorted = [...activeCranes].sort((a, b) => totals[a] - totals[b]);
-    const slowest = sorted[0];
-    const fastest = sorted[sorted.length - 1];
-    if (totals[fastest] - totals[slowest] >= 25) {
-      const slowHolds = appState.cranes[slowest].holds.map(h => `HOLD 0${h}`).join(', ');
-      advisories.push({
-        type: 'LOW_PROD',
-        craneId: slowest,
-        title: `📉 ${slowest} đang ít sản lượng nhất (${totals[slowest]} vs ${totals[fastest]} Cont)`,
-        desc: `Chênh lệch ${totals[fastest] - totals[slowest]} cont so với ${fastest}. Khuyến nghị dồn thêm đầu kéo & ưu tiên gọi cont bãi gần (AA, AB, BA) vào <b>${slowHolds}</b>.`,
-        btnText: `🎯 Dồn gọi hàng cho ${slowest}`
-      });
-    }
-  }
-
-  if (advisories.length === 0) {
-    listEl.innerHTML = `
-      <div class="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-xs text-emerald-700 dark:text-emerald-300 font-semibold">
-        ✅ Nhịp độ các cẩu đang cân bằng và các hầm đều còn đủ chân hàng khai thác.
-      </div>
-    `;
-  } else {
-    listEl.innerHTML = advisories.map(adv => `
-      <div class="p-3 rounded-xl bg-white dark:bg-slate-800 border border-amber-300 dark:border-amber-700 shadow-xs space-y-2">
-        <div class="font-extrabold text-xs text-amber-800 dark:text-amber-300">${adv.title}</div>
-        <div class="text-[11px] text-slate-600 dark:text-slate-300 leading-relaxed">${adv.desc}</div>
-        <button onclick="${adv.type === 'HOLD_FULL' ? `applyCraneRebalance('${adv.craneId}', ${adv.targetHoldId})` : `focusCraneInDispatch('${adv.craneId}')`}"
-                class="w-full py-1.5 px-3 rounded-lg bg-amber-500 hover:bg-amber-600 text-white text-xs font-extrabold transition shadow-xs">
-          ${adv.btnText}
-        </button>
-      </div>
-    `).join('');
-  }
-
-  if (matrixEl) {
-    matrixEl.innerHTML = Object.entries(appState.cranes).map(([cId, cfg]) => `
-      <span class="px-2 py-1 rounded-lg text-[11px] font-bold border" style="border-color:${cfg.color}; color:${cfg.color}">
-        ${cId}: ${cfg.holds.map(h => 'H' + h).join(', ') || 'Trống'}
-      </span>
-    `).join('');
-  }
-}
-
-function applyCraneRebalance(craneId, targetHoldId) {
-  const cfg = appState.cranes[craneId];
-  if (!cfg) return;
-  if (!cfg.holds.includes(targetHoldId)) {
-    cfg.holds.push(targetHoldId);
-    cfg.holds.sort((a, b) => a - b);
-  }
-  renderAllViews();
-  showToast(`✅ Đã bố trí ${craneId} sang hỗ trợ HOLD 0${targetHoldId}!`);
-}
-
-function focusCraneInDispatch(craneId) {
-  switchTab('dispatch');
-  showToast(`🎯 Đã chuyển sang bảng gọi hàng ưu tiên cho ${craneId}`);
-}
-
-function simulateNextHourTick() {
-  const lastHourStr = appState.hourlyCraneStats[appState.hourlyCraneStats.length - 1]?.hour || '14:00';
-  const nextH = (parseInt(lastHourStr.split(':')[0], 10) + 1) % 24;
-  const label = `${String(nextH).padStart(2, '0')}:00`;
-  const newRow = { hour: label };
-  Object.keys(appState.cranes).forEach(cId => {
-    if (!appState.cranes[cId].active) newRow[cId] = 0;
-    else newRow[cId] = cId === 'QC07' ? Math.floor(13 + Math.random() * 6) : Math.floor(23 + Math.random() * 8);
-  });
-  appState.hourlyCraneStats.push(newRow);
-  renderCraneHourlyChart();
-  renderCraneRebalanceAdvisories();
-  showToast(`⏱️ Đã cập nhật sản lượng khung giờ ${label}`);
-}
-
-// ============================================================================
-// 6. VẼ SƠ ĐỒ 9 HẦM (GENERAL PLAN) & POPUP CHI TIẾT ROW x TIER
-// ============================================================================
-function renderNineHoldsGrid() {
-  const grid = document.getElementById('nineHoldsGrid');
-  if (!grid) return;
-
-  const holdStats = getHoldProgressStats();
-  grid.innerHTML = holdStats.map(h => {
-    const isFull = h.pct >= 90;
-    const craneBadges = h.assignedCranes.map(cId =>
-      `<span class="px-1.5 py-0.5 rounded text-[10px] font-black text-white" style="background:${appState.cranes[cId].color}">${cId}</span>`
-    ).join(' ');
-
-    return `
-      <div onclick="openHoldModal(${h.id})" class="sub-card p-3 cursor-pointer hover:border-sky-500 transition flex flex-col justify-between ${isFull ? 'ring-2 ring-amber-400' : ''}">
-        <div>
-          <div class="flex items-center justify-between gap-1">
-            <span class="font-black text-xs sm:text-sm text-sky-700 dark:text-sky-300">${h.name}</span>
-            <div class="flex gap-1">${craneBadges || '<span class="text-[10px] text-slate-400">Chưa gán</span>'}</div>
-          </div>
-          <div class="text-[11px] font-bold text-slate-500 mt-0.5">Bay: ${h.bays.join(' · ')}</div>
-
-          <div class="mt-2.5 flex items-center justify-between text-xs font-extrabold">
-            <span>Đã xếp: ${h.doneCount}/${h.plannedCount}</span>
-            <span class="${isFull ? 'text-amber-600' : 'text-emerald-600'}">${h.pct}%</span>
-          </div>
-          <div class="w-full bg-slate-200 dark:bg-slate-700 h-2 rounded-full mt-1 overflow-hidden">
-            <div class="h-full transition-all ${isFull ? 'bg-amber-500' : 'bg-emerald-500'}" style="width:${h.pct}%"></div>
-          </div>
-        </div>
-
-        <div class="mt-2.5 pt-2 border-t border-slate-200 dark:border-slate-700 flex items-center justify-between text-[11px]">
-          <span class="text-slate-500">Sẵn sàng (B): <b class="text-sky-600 dark:text-sky-400">${h.readyCount}</b></span>
-          <span class="font-bold text-sky-600 dark:text-sky-400">Soi Bay ↗</span>
-        </div>
-      </div>
-    `;
-  }).join('');
-}
-
-function openHoldModal(holdId) {
-  const hold = appState.holds.find(h => h.id === holdId);
-  if (!hold) return;
-  const modal = document.getElementById('bayDetailModal');
-  document.getElementById('modalBayTitle').textContent = `${hold.name} · Sơ đồ Chi tiết Bay (${hold.bays.join(', ')})`;
-
-  const tabsEl = document.getElementById('modalBayTabs');
-  tabsEl.innerHTML = hold.bays.map((b, idx) => `
-    <button onclick="renderSingleBayMatrix('${b}')" class="px-3 py-1.5 rounded-lg text-xs font-extrabold ${idx === 0 ? 'bg-sky-600 text-white' : 'bg-slate-200 dark:bg-slate-700'}">
-      BAY ${b}
-    </button>
-  `).join('');
-
-  renderSingleBayMatrix(hold.bays[0]);
-  modal.classList.remove('hidden');
-}
-
-function renderSingleBayMatrix(bayCode) {
-  const body = document.getElementById('modalBayBody');
-  const slots = appState.preStowagePlan.filter(p => p.bay === bayCode);
-
-  if (slots.length === 0) {
-    body.innerHTML = `<div class="p-8 text-center text-slate-500 text-xs">Chưa có dữ liệu container chỉ định tại Bay ${bayCode}.</div>`;
-    return;
-  }
-
-  const deckSlots = slots.filter(s => parseInt(s.tier, 10) >= appState.vessel.deck_tier_min);
-  const holdSlots = slots.filter(s => parseInt(s.tier, 10) < appState.vessel.deck_tier_min);
-
-  const renderGroup = (title, list) => {
-    if (!list.length) return '';
-    return `
-      <div>
-        <div class="text-xs font-black uppercase text-slate-500 mb-2">${title} (${list.length} Cont)</div>
-        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
-          ${list.map(s => {
-            const job = appState.liveJobs[s.container_no] || { status: 'B' };
-            const isDone = job.status === 'C';
-            const isHeld = job.status === 'A';
-            const bgCls = isDone
-              ? 'bg-emerald-600 text-white border-emerald-400'
-              : (isHeld ? 'bg-amber-500 text-white border-amber-300' : 'bg-sky-600 text-white border-sky-400');
-            return `
-              <div onclick="toggleSlotComplete('${s.container_no}', '${s.pos}')" class="bay-cell p-2.5 rounded-xl border cursor-pointer ${bgCls}">
-                <div class="flex justify-between text-[10px] font-bold opacity-90">
-                  <span>Vị trí: ${s.pos}</span>
-                  <span>${s.size} · ${s.weight}T</span>
-                </div>
-                <div class="font-black text-xs mt-0.5">${s.container_no}</div>
-                <div class="flex justify-between items-center text-[10px] mt-1 pt-1 border-t border-white/20">
-                  <span>POD: <b>${s.pod}</b></span>
-                  <span class="px-1.5 py-0.2 rounded bg-black/25 font-extrabold">
-                    ${isDone ? '✓ ĐÃ XẾP (C)' : (isHeld ? '⏸ GIỮ (A)' : '▶ CHỜ XẾP (B)')}
-                  </span>
-                </div>
-              </div>
-            `;
-          }).join('')}
-        </div>
-      </div>
-    `;
+function parsePos6(posStr) {
+  const s = String(posStr || '').replace(/\D/g, '').padStart(6, '0');
+  if (s.length < 6 || s === '000000') return null;
+  const trimmed = s.length === 7 ? s.slice(1) : s.slice(-6);
+  return {
+    raw: trimmed,
+    bay: trimmed.slice(0, 2),
+    row: trimmed.slice(2, 4),
+    tier: trimmed.slice(4, 6),
+    tierNum: parseInt(trimmed.slice(4, 6), 10)
   };
-
-  body.innerHTML = renderGroup('🌤️ TRÊN BOONG (ON DECK · TIER ≥ 80)', deckSlots) +
-                   renderGroup('⚓ DƯỚI HẦM (UNDER DECK · TIER < 80)', holdSlots);
 }
 
-function toggleSlotComplete(containerNo, pos) {
-  const cur = appState.liveJobs[containerNo] || { status: 'B', pos };
-  cur.status = cur.status === 'C' ? 'B' : 'C';
-  if (cur.status === 'C') cur.pos = pos;
-  appState.liveJobs[containerNo] = cur;
-  renderSingleBayMatrix(pos.slice(0, 2));
-  renderAllViews();
-  showToast(`🔄 Cập nhật ${containerNo} ➔ ${cur.status === 'C' ? 'Đã xếp xong (C)' : 'Mở lại chờ xếp (B)'}`);
+function getHoldByBay(bay) {
+  const b = String(bay).padStart(2, '0');
+  const found = HOLD_DEFS.find(h => h.bays.includes(b));
+  return found ? found.hold : 1;
 }
 
-function closeBayModal() {
-  document.getElementById('bayDetailModal').classList.add('hidden');
-}
-
-// ============================================================================
-// 7. KHUYẾN NGHỊ GỌI HÀNG THEO CẨU & ĐỐI CHIẾU TRỪ ĐUỔI THAY THẾ SÁT TẤN
-// ============================================================================
-function setDispatchStrategy(strat) {
-  appState.strategy = strat;
-  document.querySelectorAll('.strat-btn').forEach(b => {
-    b.className = 'strat-btn px-3 py-1.5 rounded-lg text-xs font-bold bg-slate-200 dark:bg-slate-700';
-  });
-  const activeBtn = document.getElementById('strat-' + strat);
-  if (activeBtn) activeBtn.className = 'strat-btn px-3 py-1.5 rounded-lg text-xs font-bold bg-sky-600 text-white';
-  renderDispatchBoard();
-}
-
-function renderDispatchBoard() {
-  const colsEl = document.getElementById('craneDispatchColumns');
-  if (!colsEl) return;
-
-  const query = (document.getElementById('dispatchSearchInput')?.value || '').trim().toUpperCase();
-
-  // Tính tần suất cảng dỡ để ưu tiên cảng ít / cảng nhiều
-  const podCounts = {};
-  appState.reservedList.forEach(c => {
-    if (c.selected === 1) podCounts[c.pod] = (podCounts[c.pod] || 0) + 1;
-  });
-
-  const FAR_BLOCKS = ['KHM', 'SAO A', 'HHH', 'BAI NGOAI'];
-
-  colsEl.innerHTML = Object.entries(appState.cranes).map(([cId, cfg]) => {
-    const holdBays = appState.holds.filter(h => cfg.holds.includes(h.id)).flatMap(h => h.bays);
-
-    // Lấy danh sách container thuộc các Bay cẩu phụ trách và đang ở trạng thái sẵn sàng (B)
-    let candidates = appState.preStowagePlan.filter(p => {
-      if (!holdBays.includes(p.bay)) return false;
-      const job = appState.liveJobs[p.container_no];
-      if (!job || job.status !== 'B') return false;
-      if (query && !`${p.container_no} ${p.pod} ${p.block} ${p.pos}`.includes(query)) return false;
-      return true;
-    });
-
-    // Sắp xếp theo chiến thuật đã chọn
-    candidates.sort((a, b) => {
-      const aFar = FAR_BLOCKS.some(fb => (a.block || '').toUpperCase().includes(fb)) ? 1 : 0;
-      const bFar = FAR_BLOCKS.some(fb => (b.block || '').toUpperCase().includes(fb)) ? 1 : 0;
-      if (appState.strategy === 'precall_far' && aFar !== bFar) return bFar - aFar;
-      if (appState.strategy === 'small_pod') return (podCounts[a.pod] || 999) - (podCounts[b.pod] || 999);
-      if (appState.strategy === 'big_pod') return (podCounts[b.pod] || 0) - (podCounts[a.pod] || 0);
-      if (appState.strategy === 'heavy_first') return (b.weight || 0) - (a.weight || 0);
-      return parseInt(a.tier || '0', 10) - parseInt(b.tier || '0', 10);
-    });
-
-    return `
-      <div class="card p-3.5 flex flex-col justify-between border-t-4" style="border-top-color:${cfg.color}">
-        <div>
-          <div class="flex items-center justify-between pb-2 border-b border-slate-200 dark:border-slate-700">
-            <div>
-              <span class="font-black text-sm" style="color:${cfg.color}">${cId}</span>
-              <span class="text-xs font-bold text-slate-500 ml-1">(${cfg.holds.map(h => 'H' + h).join(', ')})</span>
-            </div>
-            <button onclick="toggleCraneActive('${cId}')" class="px-2 py-0.5 rounded text-[11px] font-bold ${cfg.active ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-600 text-white'}">
-              ${cfg.active ? '● Hoạt động' : '✕ Báo hỏng / Dừng'}
-            </button>
-          </div>
-
-          <div class="mt-2.5 space-y-2 max-h-[360px] overflow-y-auto pr-1">
-            ${!cfg.active ? `<div class="p-4 text-center text-xs text-rose-500 font-bold">Cẩu đang tạm ngừng. Hãy điều chuyển hàng sang cẩu khác!</div>` :
-              (candidates.length === 0 ? `<div class="p-4 text-center text-xs text-slate-400">Đã gọi hết danh sách sẵn sàng (B) cho các hầm này!</div>` :
-              candidates.map(c => {
-                const isCalled = appState.calledContainers.has(c.container_no);
-                const isFar = FAR_BLOCKS.some(fb => (c.block || '').toUpperCase().includes(fb));
-                return `
-                  <div class="sub-card p-2.5 flex items-center justify-between gap-2 ${isCalled ? 'opacity-65 border-emerald-500' : ''}">
-                    <div class="min-w-0">
-                      <div class="flex items-center gap-1.5 flex-wrap">
-                        <span class="font-black text-xs">${c.container_no}</span>
-                        <span class="px-1.5 py-0.2 rounded bg-slate-200 dark:bg-slate-700 text-[10px] font-bold">${c.size}</span>
-                        <span class="px-1.5 py-0.2 rounded bg-sky-100 text-sky-800 text-[10px] font-extrabold">${c.pod}</span>
-                        ${isFar ? `<span class="px-1.5 py-0.2 rounded bg-amber-500 text-white text-[9px] font-extrabold">BÃI NGOÀI: ${c.block}</span>` : `<span class="text-[10px] text-slate-500">Bãi: ${c.block || '—'}</span>`}
-                      </div>
-                      <div class="text-[11px] text-slate-500 mt-0.5">
-                        Vị trí: <b class="text-slate-700 dark:text-slate-200">${c.pos}</b> · Nặng: <b>${c.weight}T</b> ${c.instr ? `· <span class="text-purple-600 font-bold">[${c.instr}]</span>` : ''}
-                      </div>
-                    </div>
-                    <button onclick="dispatchContainerCall('${c.container_no}', '${cId}', '${c.pos}')"
-                            class="px-2.5 py-1.5 rounded-lg text-[11px] font-extrabold whitespace-nowrap ${isCalled ? 'bg-emerald-600 text-white' : 'bg-sky-600 hover:bg-sky-500 text-white'}">
-                      ${isCalled ? '✓ Đã gọi' : '📢 Gọi xe'}
-                    </button>
-                  </div>
-                `;
-              }).join(''))}
-          </div>
-        </div>
-      </div>
-    `;
-  }).join('');
-
-  renderSubstitutionTable();
-}
-
-function toggleCraneActive(cId) {
-  appState.cranes[cId].active = !appState.cranes[cId].active;
-  renderAllViews();
-  showToast(`🏗️ Đã chuyển trạng thái ${cId} sang: ${appState.cranes[cId].active ? 'Hoạt động' : 'Tạm ngừng / Hỏng'}`);
-}
-
-async function dispatchContainerCall(containerNo, craneId, targetSlot) {
-  appState.calledContainers.add(containerNo);
-  renderDispatchBoard();
-  showToast(`📢 Đã phát lệnh gọi xe container ${containerNo} ra ${craneId} (Vị trí ${targetSlot})`);
-
-  if (tosDb) {
-    try {
-      await tosDb.from('dispatch_logs').upsert({
-        session_id: appState.currentSessionId,
-        container_no: containerNo,
-        action_type: 'CALLED',
-        crane_id: craneId,
-        target_slot: targetSlot
-      }, { onConflict: 'session_id,container_no' });
-    } catch (e) {}
-  }
-}
-
-// Thuật toán Trừ đuổi & Tìm Top 3 container thay thế gần tấn tạ nhất
-function renderSubstitutionTable() {
-  const tbody = document.getElementById('substitutionTableBody');
-  const badge = document.getElementById('substitutionCountBadge');
-  if (!tbody) return;
-
-  // Tìm các slot dự kiến bị khuyết (cont gốc đang ở trạng thái A hoặc không có trong Reserved)
-  const problematicSlots = appState.preStowagePlan.filter(p => {
-    const j = appState.liveJobs[p.container_no];
-    return !j || j.status === 'A';
-  });
-
-  if (badge) badge.textContent = `${problematicSlots.length} vị trí cần thay thế`;
-
-  if (problematicSlots.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-emerald-600 font-bold">✅ Tất cả vị trí dự kiến đều khớp container sẵn sàng (B) hoặc đã xếp xong (C)!</td></tr>`;
-    return;
-  }
-
-  // Nguồn container thay thế: Trạng thái B, đã được tích chọn trong Reserved, chưa gắn vị trí cố định trên tàu
-  const assignedSet = new Set(appState.preStowagePlan.map(p => p.container_no));
-  const freeReadyPool = appState.reservedList.filter(r => {
-    const j = appState.liveJobs[r.container_no];
-    return r.selected === 1 && j && j.status === 'B' && !assignedSet.has(r.container_no);
-  });
-
-  tbody.innerHTML = problematicSlots.map(target => {
-    const isDeck = parseInt(target.tier || '0', 10) >= appState.vessel.deck_tier_min;
-
-    // Lọc ứng viên cùng cảng dỡ (POD), cùng cỡ (20/40), khớp chỉ dẫn UD/OD và xếp theo độ lệch tấn nhỏ nhất
-    const substitutes = freeReadyPool
-      .filter(cand => {
-        if (cand.pod !== target.pod) return false;
-        if (cand.size.slice(0, 2) !== target.size.slice(0, 2)) return false;
-        const ins = (appState.stowInstructions[cand.container_no] || cand.instr || '').toUpperCase();
-        if (isDeck && ins.includes('UD') && !ins.includes('OD')) return false;
-        if (!isDeck && ins.includes('OD') && !ins.includes('UD')) return false;
-        return true;
-      })
-      .map(cand => ({
-        ...cand,
-        diffW: Math.abs((cand.weight || 0) - (target.weight || 0))
-      }))
-      .sort((a, b) => a.diffW - b.diffW)
-      .slice(0, 3);
-
-    const subsHtml = substitutes.length === 0
-      ? `<span class="text-slate-400 italic">Chưa có cont dự phòng khớp POD & kích cỡ</span>`
-      : substitutes.map(sub => `
-          <div class="inline-flex items-center gap-1.5 px-2 py-1 rounded-lg bg-emerald-50 dark:bg-emerald-950/50 border border-emerald-300 dark:border-emerald-700 mr-1.5 mb-1">
-            <div>
-              <div class="font-black text-[11px] text-emerald-800 dark:text-emerald-300">${sub.container_no} (${sub.size})</div>
-              <div class="text-[10px] text-slate-600 dark:text-slate-400">Nặng: <b>${sub.weight}T</b> (Lệch <b>${sub.diffW.toFixed(1)}T</b>) · Bãi ${sub.block || '—'}</div>
-            </div>
-            <button onclick="executeSlotSubstitution('${target.container_no}', '${sub.container_no}', '${target.pos}')"
-                    class="px-2 py-1 rounded bg-emerald-600 hover:bg-emerald-500 text-white text-[10px] font-extrabold">
-              Thay thế
-            </button>
-          </div>
-        `).join('');
-
-    return `
-      <tr>
-        <td class="p-2.5 font-black text-sky-700 dark:text-sky-400">${target.pos} <span class="text-[10px] font-normal text-slate-500">(Bay ${target.bay})</span></td>
-        <td class="p-2.5">
-          <div class="font-bold">${target.container_no} (${target.size})</div>
-          <div class="text-[11px] text-slate-500">POD: <b>${target.pod}</b> · Mục tiêu: <b>${target.weight}T</b></div>
-        </td>
-        <td class="p-2.5">
-          <span class="px-2 py-0.5 rounded bg-amber-100 text-amber-800 font-extrabold text-[11px]">⏸ Giữ lại (Job A)</span>
-        </td>
-        <td class="p-2.5">${subsHtml}</td>
-        <td class="p-2.5 text-right text-[11px] text-slate-400">Tự động khớp ΔW</td>
-      </tr>
-    `;
-  }).join('');
-}
-
-function executeSlotSubstitution(oldContainer, newContainer, targetPos) {
-  const idx = appState.preStowagePlan.findIndex(p => p.container_no === oldContainer && p.pos === targetPos);
-  const newRec = appState.reservedList.find(r => r.container_no === newContainer);
-  if (idx !== -1 && newRec) {
-    appState.preStowagePlan[idx] = {
-      ...appState.preStowagePlan[idx],
-      container_no: newRec.container_no,
-      weight: newRec.weight,
-      block: newRec.block,
-      size: newRec.size
-    };
-    appState.calledContainers.add(newContainer);
-    renderAllViews();
-    showToast(`🔄 Đã thế ${newContainer} (${newRec.weight}T) vào vị trí ${targetPos} thay cho ${oldContainer}!`);
-  }
-}
-
-// ============================================================================
-// 8. ĐỌC FILE EXCEL PL-TOS (4 FILE) & EDIFACT BAPLIE (.EDI) / $604 (.ASC)
-// ============================================================================
-function handleExcelUpload(event, fileRole) {
-  const file = event.target.files[0];
-  if (!file || typeof XLSX === 'undefined') return;
-
+// ================= ĐỌC DỮ LIỆU TỪ 5 Ô UPLOAD =================
+function handleUploadExcel(evt, kind) {
+  const file = evt.target.files[0];
+  if (!file) return;
   const reader = new FileReader();
-  reader.onload = function (e) {
-    try {
-      const wb = XLSX.read(new Uint8Array(e.target.result), { type: 'array' });
-      const rows = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], { defval: '' });
-
-      if (fileRole === 'sbp') {
-        appState.importSbpSlots = rows.map(r => ({
-          container_no: String(r['Số Container'] || r['Container'] || '').trim().toUpperCase(),
-          pos: String(r['Vị Trí'] || r['Vị trí'] || '').trim().padStart(6, '0'),
-          size: String(r['Kích Cỡ'] || r['Kích cỡ'] || '20DC').trim(),
-          weight: parseFloat(r['Trọng Lượng Hàng'] || r['TL Hàng'] || 0) || 0
-        })).filter(x => x.pos.length >= 5);
-        document.getElementById('status-sbp').textContent = `✓ ${appState.importSbpSlots.length} ô nhập`;
-        showToast(`✅ Đã nạp Sơ đồ hầm hàng nhập SBP (${appState.importSbpSlots.length} vị trí)`);
-      }
-
-      if (fileRole === 'reserved') {
-        appState.reservedList = rows.map(r => {
-          const chon = r['Chọn'] !== undefined ? Number(r['Chọn']) : 1;
-          return {
-            selected: chon === 1 ? 1 : 0,
-            container_no: String(r['Số Container'] || '').trim().toUpperCase(),
-            size: String(r['Kích cỡ'] || r['Kích Cỡ'] || '40HC').trim(),
-            pod: String(r['Cảng dỡ'] || r['Cảng đích'] || 'SGSIN').trim().toUpperCase(),
-            weight: parseFloat(r['TL Hàng'] || r['Trọng lượng'] || 15) || 15,
-            block: String(r['Block'] || '').trim().toUpperCase(),
-            pos: ''
-          };
-        }).filter(x => x.container_no && x.selected === 1);
-        document.getElementById('status-reserved').textContent = `✓ ${appState.reservedList.length} cont chọn`;
-        showToast(`✅ Đã cập nhật Danh sách Reserved (${appState.reservedList.length} cont được tích chọn = 1)`);
-      }
-
-      if (fileRole === 'jobs') {
-        let updatedCount = 0;
-        rows.forEach(r => {
-          const cNo = String(r['Số Container'] || '').trim().toUpperCase();
-          const jobType = String(r['Loại công việc'] || '').trim();
-          const status = String(r['Trạng thái công việc'] || '').trim().toUpperCase();
-          const pos = String(r['Vị trí'] || '').trim().padStart(6, '0');
-          const crane = String(r['Mã thiết bị'] || '').trim().toUpperCase();
-          if (cNo && (!jobType || jobType.includes('Xếp'))) {
-            appState.liveJobs[cNo] = { status: status || 'B', pos: pos.length === 6 ? pos : '', crane, type: 'Xếp tàu' };
-            updatedCount++;
-          }
-        });
-        document.getElementById('status-jobs').textContent = `✓ ${updatedCount} job`;
-        showToast(`✅ Đã cập nhật tiến độ thực tế A/B/C cho ${updatedCount} job xếp tàu!`);
-      }
-
-      if (fileRole === 'stow') {
-        let count = 0;
-        rows.forEach(r => {
-          const cNo = String(r['Số Container'] || '').trim().toUpperCase();
-          const instr = String(r['CntrJobType xếp dỡ'] || r['P.A xếp dỡ'] || '').trim();
-          if (cNo && instr) {
-            appState.stowInstructions[cNo] = instr;
-            count++;
-          }
-        });
-        document.getElementById('status-stow').textContent = `✓ ${count} chỉ dẫn`;
-        showToast(`✅ Đã nạp ${count} chỉ dẫn xếp dỡ (UD / OD / Hàng nhẹ)`);
-      }
-
-      renderAllViews();
-    } catch (err) {
-      showToast('❌ Lỗi đọc file Excel: ' + err.message);
-    }
+  reader.onload = async (e) => {
+    const wb = XLSX.read(new Uint8Array(e.target.result), { type: 'array' });
+    const rows = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], { defval: '' });
+    processUploadedRows(kind, rows);
+    await uploadJsonToBucket(`${kind}.json`, rows);
+    renderAll();
   };
   reader.readAsArrayBuffer(file);
 }
 
-function handleEdiUpload(event) {
-  const file = event.target.files[0];
-  if (!file) return;
-  const reader = new FileReader();
-  reader.onload = function (e) {
-    const text = String(e.target.result || '');
-    const parsed = [];
+function processUploadedRows(kind, rows) {
+  if (kind === 'sbp') {
+    state.sbpImport = rows.map(r => ({
+      pos: String(r['Vị Trí'] || r['Vị trí'] || '').trim(),
+      cntr: String(r['Số Container'] || '').trim().toUpperCase(),
+      size: String(r['Kích Cỡ'] || r['Kích cỡ'] || '').trim(),
+      weight: parseFloat(r['Trọng Lượng Hàng'] || r['TL Hàng'] || 0) || 0,
+      pod: String(r['Cảng Dỡ'] || r['Cảng dỡ'] || '').trim()
+    })).filter(x => x.cntr);
+    document.getElementById('stat-sbp').textContent = `✓ Đã nạp ${state.sbpImport.length} cont nhập`;
+    document.getElementById('card-sbp').classList.add('loaded');
+  }
 
-    if (text.includes('BAPLIE') || text.includes('LOC+147')) {
-      // Đọc chuẩn EDIFACT BAPLIE 95B
-      const segments = text.split("'").map(s => s.trim()).filter(Boolean);
-      let curSlot = null;
-      segments.forEach(seg => {
-        if (seg.startsWith('LOC+147+')) {
-          const rawPos = seg.split('+')[2]?.split(':')[0] || '';
-          const pos6 = rawPos.length === 7 ? rawPos.slice(1) : rawPos.padStart(6, '0');
-          curSlot = { pos: pos6, bay: pos6.slice(0, 2), row: pos6.slice(2, 4), tier: pos6.slice(4, 6), pod: 'SGSIN', weight: 15, size: '40HC', block: 'AA', instr: '' };
-        } else if (seg.startsWith('EQD+CN+') && curSlot) {
-          const parts = seg.split('+');
-          curSlot.container_no = (parts[2] || '').trim().toUpperCase();
-          const iso = parts[3] || '';
-          curSlot.size = iso.startsWith('2') ? '20DC' : '40HC';
-          if (curSlot.container_no) parsed.push({ ...curSlot });
-        } else if (seg.startsWith('MEA+WT+') && parsed.length > 0) {
-          const kg = parseFloat(seg.split(':').pop() || '0');
-          if (kg > 0) parsed[parsed.length - 1].weight = +(kg / 1000).toFixed(2);
-        } else if (seg.startsWith('LOC+11+') && parsed.length > 0) {
-          parsed[parsed.length - 1].pod = (seg.split('+')[2] || 'SGSIN').split(':')[0];
-        }
-      });
-    } else if (text.includes('$604') || /^\d{6}\s+[A-Z]{4}\d{7}/m.test(text)) {
-      // Đọc định dạng tệp chỉ định xuất $604 (.asc)
-      text.split(/[\r\n]+/).forEach(line => {
-        const m = line.match(/^(\d{6})\s+([A-Z]{4}\d{7})\s+[A-Z]{6}\s+(\d{2}[A-Z0-9]{2})(\d{3})[A-Z]\s+([A-Z]{2})\s+(\d{5})/);
-        if (m) {
-          const pos6 = m[1];
-          parsed.push({
-            pos: pos6,
-            bay: pos6.slice(0, 2),
-            row: pos6.slice(2, 4),
-            tier: pos6.slice(4, 6),
-            container_no: m[2],
-            size: m[3].startsWith('2') ? '20DC' : '40HC',
-            weight: +(parseInt(m[6], 10) / 1000).toFixed(2),
-            pod: line.slice(-5).trim() || 'SGSIN',
-            block: 'AA',
-            instr: ''
-          });
-        }
-      });
-    }
+  if (kind === 'final') {
+    const headers = rows.length ? Object.keys(rows[0]) : [];
+    const lastColName = headers[headers.length - 1] || 'Cảng chuyển';
+    state.finalLoading = rows.map(r => {
+      const transferPort = String(r[lastColName] || r['Cảng chuyển'] || '').trim().toUpperCase();
+      const isOffDock = transferPort !== '' && transferPort !== 'TV' && transferPort !== 'VNTVP';
+      return {
+        cancel: Boolean(r['Cancel']),
+        stt: r['STT Hãng tàu'] || '',
+        cntr: String(r['Số Container'] || '').trim().toUpperCase(),
+        status: String(r['Trạng thái Cont'] || '').trim(),
+        opr: String(r['Hãng khai thác'] || '').trim(),
+        size: String(r['Kích cỡ'] || '').trim(),
+        iso: String(r['Kích cỡ ISO'] || '').trim(),
+        weight: parseFloat(r['TL Hàng'] || 0) || 0,
+        yardPos: String(r['Vị trí bãi'] || '').trim(),
+        pod: String(r['Cảng dỡ'] || '').trim().toUpperCase(),
+        fpod: String(r['Cảng đích'] || '').trim().toUpperCase(),
+        customs: Boolean(r['TL hải quan']),
+        shipPos: String(r['Vị trí tàu'] || '').trim(),
+        note: String(r['Ghi chú'] || '').trim(),
+        transferPort: transferPort || 'TV',
+        isOffDock
+      };
+    }).filter(x => x.cntr && !x.cancel);
+    document.getElementById('stat-final').textContent = `✓ Đã nạp ${state.finalLoading.length} cont (Cột cuối: ${lastColName})`;
+    document.getElementById('card-final').classList.add('loaded');
+  }
 
-    if (parsed.length > 0) {
-      appState.preStowagePlan = parsed;
-      document.getElementById('status-edi').textContent = `✓ ${parsed.length} vị trí`;
-      renderAllViews();
-      showToast(`✅ Đã đọc thành công ${parsed.length} vị trí chỉ định xuất từ tệp EDI / $604!`);
+  if (kind === 'reserved') {
+    state.reservedExport = rows.filter(r => String(r['Chọn'] ?? '1').trim() === '1' || r['Chọn'] === true).map(r => ({
+      cntr: String(r['Số Container'] || '').trim().toUpperCase(),
+      size: String(r['Kích cỡ'] || '').trim(),
+      pod: String(r['Cảng dỡ'] || '').trim().toUpperCase(),
+      weight: parseFloat(r['TL Hàng'] || 0) || 0,
+      block: String(r['Block'] || '').trim().toUpperCase(),
+      yardPos: `${r['Block'] || ''}-${r['Bay'] || ''}-${r['Row'] || ''}-${r['Tier'] || ''}`
+    })).filter(x => x.cntr);
+    document.getElementById('stat-reserved').textContent = `✓ Đã lọc ${state.reservedExport.length} cont (Chọn=1)`;
+    document.getElementById('card-reserved').classList.add('loaded');
+  }
+
+  if (kind === 'jobs') {
+    state.liveJobs = rows.map(r => ({
+      cntr: String(r['Số Container'] || '').trim().toUpperCase(),
+      type: String(r['Loại công việc'] || '').trim(),
+      io: String(r['Nhập/xuất'] || '').trim(),
+      crane: String(r['Mã thiết bị'] || '').trim().toUpperCase(),
+      truck: String(r['Xe kéo'] || '').trim(),
+      pos: String(r['Vị trí'] || '').trim(),
+      status: String(r['Trạng thái công việc'] || '').trim().toUpperCase(),
+      pod: String(r['Cảng dỡ'] || '').trim().toUpperCase(),
+      fpod: String(r['Cảng đích'] || '').trim().toUpperCase(),
+      doneTime: String(r['Ngày hoàn tất'] || '').trim()
+    })).filter(x => x.cntr);
+
+    // Tự động bổ sung mã thiết bị nếu xuất hiện trong Job List
+    const jobCranes = new Set(state.liveJobs.map(j => j.crane).filter(Boolean));
+    jobCranes.forEach(cId => {
+      if (!state.cranes.some(c => c.id === cId)) {
+        state.cranes.push({ id: cId, active: true, mode: 'BOTH', holds: [1,2,3], paused: false, pauseStart: null, rate: 25 });
+      }
+    });
+    document.getElementById('stat-jobs').textContent = `✓ Đã nạp ${state.liveJobs.length} job thực tế (A/B/C)`;
+    document.getElementById('card-jobs').classList.add('loaded');
+  }
+}
+
+function handleUploadEdiOrStowage(evt) {
+  const files = Array.from(evt.target.files || []);
+  files.forEach(file => {
+    const reader = new FileReader();
+    if (file.name.toLowerCase().endsWith('.xlsx') || file.name.toLowerCase().endsWith('.xls')) {
+      reader.onload = (e) => {
+        const wb = XLSX.read(new Uint8Array(e.target.result), { type: 'array' });
+        const rows = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], { defval: '' });
+        rows.forEach(r => {
+          const cntr = String(r['Số Container'] || '').trim().toUpperCase();
+          const inst = String(r['CntrJobType xếp dỡ'] || '').trim();
+          if (cntr && inst) state.stowageInstructions[cntr] = inst;
+        });
+        document.getElementById('stat-edi').textContent = `✓ Đã nạp chỉ dẫn xếp dỡ & EDI (${state.preStowagePlan.length} vị trí)`;
+        document.getElementById('card-edi').classList.add('loaded');
+        renderAll();
+      };
+      reader.readAsArrayBuffer(file);
     } else {
-      showToast('⚠️ Không nhận diện được cấu trúc BAPLIE hoặc $604 trong tệp.');
+      reader.onload = (e) => {
+        const text = e.target.result;
+        if (text.includes('UNH+') && text.includes('BAPLIE')) {
+          parseBaplieEdi(text);
+        } else {
+          parse604Asc(text);
+        }
+        document.getElementById('stat-edi').textContent = `✓ Đã nạp sơ đồ dự kiến xuất (${state.preStowagePlan.length} vị trí)`;
+        document.getElementById('card-edi').classList.add('loaded');
+        renderAll();
+      };
+      reader.readAsText(file);
     }
-  };
-  reader.readAsText(file);
-}
-
-// ============================================================================
-// 9. TÍNH TOÁN MỚN NƯỚC, QUẢN LÝ TAB & CẤU HÌNH CẨU
-// ============================================================================
-function recalcDraftConfig() {
-  appState.vessel.vessel_name = document.getElementById('cfgVesselName').value.trim().toUpperCase();
-  appState.vessel.voyage = document.getElementById('cfgVoyage').value.trim().toUpperCase();
-  appState.vessel.berth = document.getElementById('cfgBerth').value.trim().toUpperCase();
-  appState.vessel.length_m = parseFloat(document.getElementById('cfgLength').value) || 172;
-  appState.vessel.beam_m = parseFloat(document.getElementById('cfgBeam').value) || 27.6;
-  appState.vessel.cont_per_10cm = parseFloat(document.getElementById('cfgContPer10cm').value) || 28;
-  appState.vessel.draft_f = parseFloat(document.getElementById('cfgDraftF').value) || 7.8;
-  appState.vessel.draft_a = parseFloat(document.getElementById('cfgDraftA').value) || 8.2;
-  appState.vessel.max_draft = parseFloat(document.getElementById('cfgMaxDraft').value) || 9.2;
-  updateTopHeaderBars();
-}
-
-function updateTopHeaderBars() {
-  const v = appState.vessel;
-  const maxCur = Math.max(v.draft_f, v.draft_a);
-  const remainCm = Math.max(0, (v.max_draft - maxCur) * 100);
-  const remainCont = Math.round((remainCm / 10) * v.cont_per_10cm);
-
-  document.getElementById('hdrDraftText').innerHTML = `${v.draft_f.toFixed(2)}m / ${v.draft_a.toFixed(2)}m <span class="text-slate-400 font-normal">(Max ${v.max_draft.toFixed(2)}m)</span>`;
-  document.getElementById('hdrRemainCap').textContent = `+${remainCont} Cont`;
-
-  const t = appState.tideInfo;
-  document.getElementById('hdrTideText').textContent = `Đỉnh ${t.highVal.toFixed(1)}m (${t.highTime}) · Ròng ${t.lowVal.toFixed(1)}m (${t.lowTime})`;
-}
-
-function syncInputsFromState() {
-  const v = appState.vessel;
-  if (document.getElementById('cfgVesselName')) document.getElementById('cfgVesselName').value = v.vessel_name;
-  if (document.getElementById('cfgVoyage')) document.getElementById('cfgVoyage').value = v.voyage;
-  if (document.getElementById('cfgBerth')) document.getElementById('cfgBerth').value = v.berth;
-  if (document.getElementById('cfgLength')) document.getElementById('cfgLength').value = v.length_m;
-  if (document.getElementById('cfgBeam')) document.getElementById('cfgBeam').value = v.beam_m;
-  if (document.getElementById('cfgContPer10cm')) document.getElementById('cfgContPer10cm').value = v.cont_per_10cm;
-  if (document.getElementById('cfgDraftF')) document.getElementById('cfgDraftF').value = v.draft_f;
-  if (document.getElementById('cfgDraftA')) document.getElementById('cfgDraftA').value = v.draft_a;
-  if (document.getElementById('cfgMaxDraft')) document.getElementById('cfgMaxDraft').value = v.max_draft;
-}
-
-function renderCraneConfigEditor() {
-  const box = document.getElementById('craneConfigEditor');
-  if (!box) return;
-  box.innerHTML = Object.entries(appState.cranes).map(([cId, cfg]) => `
-    <div class="sub-card p-2.5 flex flex-wrap items-center justify-between gap-2 text-xs">
-      <div class="flex items-center gap-2">
-        <span class="w-3 h-3 rounded-full" style="background:${cfg.color}"></span>
-        <b class="text-sm">${cId}</b>
-      </div>
-      <div class="flex flex-wrap gap-1">
-        ${appState.holds.map(h => {
-          const checked = cfg.holds.includes(h.id);
-          return `
-            <button onclick="toggleCraneHoldAssign('${cId}', ${h.id})"
-                    class="px-2 py-0.5 rounded font-bold ${checked ? 'bg-sky-600 text-white' : 'bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300'}">
-              H${h.id}
-            </button>
-          `;
-        }).join('')}
-      </div>
-    </div>
-  `).join('');
-}
-
-function toggleCraneHoldAssign(cId, holdId) {
-  const cfg = appState.cranes[cId];
-  if (!cfg) return;
-  if (cfg.holds.includes(holdId)) {
-    cfg.holds = cfg.holds.filter(x => x !== holdId);
-  } else {
-    cfg.holds.push(holdId);
-    cfg.holds.sort((a, b) => a - b);
-  }
-  renderAllViews();
-}
-
-function addNewCrane() {
-  const name = prompt('Nhập mã cẩu bờ (VD: QC14):');
-  if (!name) return;
-  const clean = name.trim().toUpperCase();
-  if (!appState.cranes[clean]) {
-    const color = CRANE_PALETTE[Object.keys(appState.cranes).length % CRANE_PALETTE.length];
-    appState.cranes[clean] = { active: true, holds: [], color };
-    appState.hourlyCraneStats.forEach(r => { r[clean] = 20; });
-    renderAllViews();
-    showToast(`✅ Đã thêm cẩu ${clean}`);
-  }
-}
-
-function updateKpiCards() {
-  const totalPlan = appState.reservedList.length || appState.preStowagePlan.length || 1;
-  const doneC = Object.values(appState.liveJobs).filter(j => j.status === 'C').length;
-  const readyB = Object.values(appState.liveJobs).filter(j => j.status === 'B').length;
-  const heldA = Object.values(appState.liveJobs).filter(j => j.status === 'A').length;
-  const pct = Math.min(100, Math.round((doneC / totalPlan) * 100));
-
-  document.getElementById('kpiExportProgress').textContent = `${doneC} / ${totalPlan}`;
-  document.getElementById('kpiExportBar').style.width = `${pct}%`;
-  document.getElementById('kpiExportSub').textContent = `Hoàn thành ${pct}% kế hoạch xuất`;
-  document.getElementById('kpiReadyJobs').textContent = `${readyB} Cont`;
-  document.getElementById('kpiHeldJobs').textContent = `Giữ lại (A): ${heldA} · Sẵn sàng gọi`;
-  document.getElementById('badgeReadyCount').textContent = readyB;
-
-  const missingCount = appState.preStowagePlan.filter(p => !appState.liveJobs[p.container_no] || appState.liveJobs[p.container_no].status === 'A').length;
-  document.getElementById('kpiMissingSlots').textContent = `${missingCount} Vị trí`;
-
-  const remainToLoad = Math.max(0, totalPlan - doneC);
-  const estHours = (remainToLoad / 60).toFixed(1);
-  document.getElementById('kpiEtcTime').textContent = `~${estHours} giờ nữa`;
-}
-
-function renderAllViews() {
-  updateTopHeaderBars();
-  updateKpiCards();
-  renderCraneHourlyChart();
-  renderCraneRebalanceAdvisories();
-  renderNineHoldsGrid();
-  renderDispatchBoard();
-  renderCraneConfigEditor();
-}
-
-function switchTab(tabName) {
-  ['overview', 'dispatch', 'upload'].forEach(t => {
-    document.getElementById('view-' + t)?.classList.toggle('hidden', t !== tabName);
-    document.getElementById('tabBtn-' + t)?.classList.toggle('active', t === tabName);
   });
 }
 
-function openNewVesselModal() {
-  document.getElementById('newVesselModal').classList.remove('hidden');
+function parseBaplieEdi(text) {
+  const segments = text.split("'");
+  const items = [];
+  let curPos = '', curWeight = 0, curPod = '', curInst = '';
+  segments.forEach(seg => {
+    const s = seg.trim();
+    if (s.startsWith('LOC+147+')) {
+      curPos = s.split('+')[2].split(':')[0];
+      curWeight = 0; curInst = '';
+    } else if (s.startsWith('MEA+WT+')) {
+      const m = s.match(/KGM:(\d+)/);
+      if (m) curWeight = parseInt(m[1], 10) / 1000;
+    } else if (s.startsWith('LOC+11+')) {
+      curPod = s.split('+')[2].split(':')[0];
+    } else if (s.startsWith('FTX+HAN+')) {
+      curInst += (curInst ? '/' : '') + s.split('+').pop();
+    } else if (s.startsWith('EQD+CN+')) {
+      const parts = s.split('+');
+      const cntr = (parts[2] || '').trim().toUpperCase();
+      const iso = (parts[3] || '').trim();
+      const p6 = parsePos6(curPos);
+      if (cntr && p6) {
+        items.push({ pos: p6.raw, cntr, iso, weight: curWeight, pod: curPod || 'SGSIN', inst: curInst });
+      }
+    }
+  });
+  if (items.length) state.preStowagePlan = items;
+}
+
+function parse604Asc(text) {
+  const lines = text.split(/
+?
+/);
+  const items = [];
+  lines.forEach(line => {
+    const m = line.match(/^(\d{6})\s+([A-Z]{4}\d{7})\s+[A-Z0-9]+\s+([A-Z0-9]{4})\d{3}[FE]\s+[A-Z]+\s+(\d{5})/);
+    if (m) {
+      const pos = m[1];
+      const cntr = m[2];
+      const iso = m[3];
+      const weight = parseInt(m[4], 10) / 1000;
+      const pod = line.trim().slice(-5);
+      items.push({ pos, cntr, iso, weight, pod: pod || 'SGSIN', inst: '' });
+    }
+  });
+  if (items.length) state.preStowagePlan = items;
+}
+
+// ================= HỢP NHẤT DỮ LIỆU XUẤT THỰC TẾ =================
+function buildUnifiedExportPool() {
+  const map = new Map();
+
+  // 1. Lấy từ Pre-stowage (BAPLIE / $604)
+  state.preStowagePlan.forEach(p => {
+    map.set(p.cntr, {
+      cntr: p.cntr,
+      plannedPos: p.pos,
+      actualPos: '',
+      size: p.iso.startsWith('2') ? '20DC' : '40HC',
+      weight: p.weight,
+      pod: p.pod,
+      yardPos: '---',
+      transferPort: 'TV',
+      isOffDock: false,
+      customs: true,
+      jobStatus: 'B',
+      crane: '',
+      inst: state.stowageInstructions[p.cntr] || p.inst || ''
+    });
+  });
+
+  // 2. Ghép Reserved (Chọn=1)
+  state.reservedExport.forEach(r => {
+    const cur = map.get(r.cntr) || {
+      cntr: r.cntr, plannedPos: '', actualPos: '', size: r.size, weight: r.weight,
+      pod: r.pod, yardPos: r.yardPos, transferPort: 'TV', isOffDock: false, customs: true, jobStatus: 'A', crane: '', inst: ''
+    };
+    cur.size = r.size || cur.size;
+    cur.weight = r.weight || cur.weight;
+    cur.pod = r.pod || cur.pod;
+    cur.yardPos = r.yardPos || cur.yardPos;
+    if (['KHM','HHH','SA','GFW'].includes(r.block)) {
+      cur.transferPort = r.block;
+      cur.isOffDock = true;
+    }
+    if (state.stowageInstructions[r.cntr]) cur.inst = state.stowageInstructions[r.cntr];
+    map.set(r.cntr, cur);
+  });
+
+  // 3. Ghép Final Loading (Cột cuối "Cảng chuyển" trừ TV)
+  state.finalLoading.forEach(f => {
+    const cur = map.get(f.cntr) || {
+      cntr: f.cntr, plannedPos: '', actualPos: '', size: f.size, weight: f.weight,
+      pod: f.pod, yardPos: f.yardPos, transferPort: f.transferPort, isOffDock: f.isOffDock,
+      customs: f.customs, jobStatus: f.customs ? 'B' : 'A', crane: '', inst: ''
+    };
+    cur.weight = f.weight || cur.weight;
+    cur.pod = f.pod || cur.pod;
+    cur.yardPos = f.yardPos !== '---' ? f.yardPos : cur.yardPos;
+    cur.transferPort = f.transferPort;
+    cur.isOffDock = f.isOffDock;
+    cur.customs = f.customs;
+    if (f.shipPos && f.shipPos !== '--') cur.plannedPos = cur.plannedPos || f.shipPos;
+    if (state.stowageInstructions[f.cntr]) cur.inst = state.stowageInstructions[f.cntr];
+    map.set(f.cntr, cur);
+  });
+
+  // 4. Đối chiếu tiến độ thực tế từ Job List (Xếp tàu: A / B / C)
+  state.liveJobs.filter(j => j.type === 'Xếp tàu' || j.io === 'Export').forEach(j => {
+    const cur = map.get(j.cntr);
+    if (cur) {
+      cur.jobStatus = j.status || cur.jobStatus;
+      cur.crane = j.crane || cur.crane;
+      if (j.status === 'C' && j.pos) cur.actualPos = j.pos;
+    }
+  });
+
+  return Array.from(map.values());
+}
+
+// ================= RENDER BÃI NGOÀI TỪ FINAL LOADING =================
+function renderOffDockSummary(pool) {
+  const offDockItems = pool.filter(x => x.isOffDock && x.jobStatus !== 'C');
+  const groups = {};
+  offDockItems.forEach(item => {
+    const key = item.transferPort || 'KHÁC';
+    if (!groups[key]) groups[key] = { total: 0, readyB: 0, holdA: 0 };
+    groups[key].total++;
+    if (item.jobStatus === 'B') groups[key].readyB++;
+    else groups[key].holdA++;
+  });
+
+  document.getElementById('offDockTotalBadge').textContent = `${offDockItems.length} Cont bãi ngoài còn lại`;
+  const tvRemain = pool.filter(x => !x.isOffDock && x.jobStatus !== 'C').length;
+  document.getElementById('kpiOffDockSummary').textContent = `Bãi ngoài: ${offDockItems.length} cont · Nội bộ TV: ${tvRemain} cont`;
+
+  const container = document.getElementById('offDockCards');
+  const keys = Object.keys(groups);
+  if (!keys.length) {
+    container.innerHTML = `<div class="offdock-card tv"><small>Nội bộ Tân Vũ (TV)</small><strong>${tvRemain} Cont</strong><span>Không còn tồn bãi ngoài</span></div>`;
+    return;
+  }
+
+  container.innerHTML = `
+    <div class="offdock-card tv">
+      <small>Nội bộ Cảng Tân Vũ (TV)</small>
+      <strong>${tvRemain} Cont</strong>
+      <span style="font-size:10.5px;color:var(--green)">Xe chạy 3–5 phút</span>
+    </div>
+    ${keys.map(k => `
+      <div class="offdock-card">
+        <small>${OFF_DOCK_LABELS[k] || ('Bãi ngoài ' + k)}</small>
+        <strong>${groups[k].total} Cont</strong>
+        <span style="font-size:10.5px;">
+          <b style="color:var(--cyan)">${groups[k].readyB} B</b> · <b style="color:var(--amber)">${groups[k].holdA} A</b>
+        </span>
+      </div>
+    `).join('')}
+  `;
+}
+
+// ================= BIỂU ĐỒ SẢN LƯỢNG CẨU THEO KHUNG GIỜ =================
+function renderCraneHourlyChart() {
+  const filter = document.getElementById('shiftFilter').value;
+  const hours = filter === 'DAY' ? [7,8,9,10,11,12,13,14,15,16,17,18]
+              : filter === 'NIGHT' ? [19,20,21,22,23,0,1,2,3,4,5,6]
+              : [8,10,12,14,16,18,20,22,0,2,4,6];
+
+  const craneIds = state.cranes.filter(c => c.active).map(c => c.id);
+  const colors = ['#0284c7', '#059669', '#d97706', '#7c3aed', '#e11d48'];
+
+  // Tính sản lượng từ Job List hoặc dữ liệu mô phỏng
+  const hourlyMap = {};
+  hours.forEach(h => {
+    hourlyMap[h] = {};
+    craneIds.forEach(cId => hourlyMap[h][cId] = 0);
+  });
+
+  const completedJobs = state.liveJobs.filter(j => j.status === 'C');
+  if (completedJobs.length > 0) {
+    completedJobs.forEach(j => {
+      const m = j.doneTime.match(/\s(\d{2}):/);
+      if (m) {
+        let h = parseInt(m[1], 10);
+        if (filter === 'ALL' && h % 2 === 1) h = (h + 23) % 24;
+        if (hourlyMap[h] && hourlyMap[h][j.crane] !== undefined) {
+          hourlyMap[h][j.crane]++;
+        }
+      }
+    });
+  } else {
+    hours.forEach((h, idx) => {
+      craneIds.forEach((cId, cIdx) => {
+        hourlyMap[h][cId] = 18 + ((idx * 5 + cIdx * 7) % 15);
+      });
+    });
+  }
+
+  let maxTotal = 1;
+  hours.forEach(h => {
+    const sum = Object.values(hourlyMap[h]).reduce((a, b) => a + b, 0);
+    if (sum > maxTotal) maxTotal = sum;
+  });
+
+  const barsEl = document.getElementById('craneHourlyBars');
+  barsEl.innerHTML = hours.map(h => {
+    const segs = craneIds.map((cId, i) => {
+      const val = hourlyMap[h][cId] || 0;
+      const pct = Math.round((val / maxTotal) * 100);
+      return `<div class="hbar-seg" style="height:${pct}%;background:${colors[i % colors.length]}"></div>`;
+    }).join('');
+    return `
+      <div class="hbar-col" onmousemove="showCraneTooltip(event, ${h}, ${JSON.stringify(hourlyMap[h]).replace(/"/g, '&quot;')})" onmouseleave="hideCraneTooltip()">
+        <div class="hbar-stack">${segs}</div>
+        <div class="hbar-lbl">${String(h).padStart(2,'0')}h</div>
+      </div>
+    `;
+  }).join('');
+
+  // Tính tổng từng cẩu & đưa ra khuyến nghị tập trung hàng / chuyển hầm
+  const totals = craneIds.map(cId => ({
+    id: cId,
+    moves: hours.reduce((s, h) => s + (hourlyMap[h][cId] || 0), 0)
+  })).sort((a, b) => a.moves - b.moves);
+
+  const adviceEl = document.getElementById('craneAdviceBox');
+  if (totals.length >= 2) {
+    const slowest = totals[0];
+    const fastest = totals[totals.length - 1];
+    const diff = fastest.moves - slowest.moves;
+    document.getElementById('craneImbalanceBadge').textContent = `Chênh lệch nhịp: ${diff} moves`;
+    adviceEl.innerHTML = `
+      💡 <b>Khuyến nghị điều phối:</b> Cẩu <b>${slowest.id}</b> đang có sản lượng thấp nhất (<b>${slowest.moves} moves</b>) so với <b>${fastest.id}</b> (${fastest.moves} moves).
+      Ưu tiên gọi container bãi nội bộ <b>TV</b> cho <b>${slowest.id}</b> hoặc <button class="primary" style="padding:2px 8px;font-size:11px;" onclick="switchTab('tab-cranes')">⚡ Chuyển hầm phụ trách</button> để cân bằng giải phóng tàu.
+    `;
+  }
+}
+
+function showCraneTooltip(evt, hour, dataObj) {
+  const tt = document.getElementById('craneTooltip');
+  const entries = Object.entries(dataObj).sort((a, b) => b[1] - a[1]);
+  const total = entries.reduce((s, e) => s + e[1], 0);
+  const lowCrane = entries[entries.length - 1];
+  tt.innerHTML = `
+    <div style="font-weight:850;color:var(--cyan);margin-bottom:4px;">🕒 Khung ${String(hour).padStart(2,'0')}:00 · Tổng: ${total} moves</div>
+    ${entries.map(([k, v]) => `<div>• <b>${k}</b>: ${v} moves ${k === lowCrane[0] ? '<span class="badge red">Ít nhất</span>' : ''}</div>`).join('')}
+    <div style="margin-top:6px;padding-top:4px;border-top:1px dashed var(--line);font-size:10.5px;color:var(--amber);">
+      👉 Gợi ý: Dồn thêm xe kéo & cont bãi gần cho <b>${lowCrane[0]}</b>.
+    </div>
+  `;
+  tt.style.display = 'block';
+  tt.style.left = Math.min(evt.clientX + 12, window.innerWidth - 260) + 'px';
+  tt.style.top = Math.min(evt.clientY + 12, window.innerHeight - 160) + 'px';
+}
+function hideCraneTooltip() { document.getElementById('craneTooltip').style.display = 'none'; }
+
+// ================= KHUYẾN NGHỊ GỌI HÀNG THEO CẨU =================
+function renderDispatchRecommendations() {
+  const pool = buildUnifiedExportPool();
+  const readyB = pool.filter(x => x.jobStatus === 'B');
+  const podStrat = document.getElementById('podStrategy').value;
+  const weightStrat = document.getElementById('weightStrategy').value;
+  const yardFilter = document.getElementById('yardFilter').value;
+
+  // Đếm số lượng theo POD
+  const podCounts = {};
+  readyB.forEach(c => podCounts[c.pod] = (podCounts[c.pod] || 0) + 1);
+
+  let candidates = readyB.filter(c => {
+    if (yardFilter === 'OFF_DOCK_ONLY') return c.isOffDock;
+    if (yardFilter === 'TV_ONLY') return !c.isOffDock;
+    return true;
+  });
+
+  candidates.sort((a, b) => {
+    // Ưu tiên Pre-call bãi ngoài (GFW, HHH, SA...)
+    if (a.isOffDock !== b.isOffDock) return a.isOffDock ? -1 : 1;
+    // Chiến thuật POD
+    if (podStrat === 'FEWEST_FIRST' && podCounts[a.pod] !== podCounts[b.pod]) {
+      return podCounts[a.pod] - podCounts[b.pod];
+    }
+    if (podStrat === 'MOST_FIRST' && podCounts[a.pod] !== podCounts[b.pod]) {
+      return podCounts[b.pod] - podCounts[a.pod];
+    }
+    // Chiến thuật trọng lượng
+    return weightStrat === 'HEAVY_FIRST' ? (b.weight - a.weight) : (a.weight - b.weight);
+  });
+
+  const exportCranes = state.cranes.filter(c => c.active && c.mode !== 'IMPORT_ONLY');
+  const container = document.getElementById('craneDispatchColumns');
+
+  if (!exportCranes.length) {
+    container.innerHTML = `<div style="padding:12px;color:var(--amber);">Tất cả thiết bị đang đặt chế độ <b>Chỉ làm Nhập</b> hoặc tạm dừng.</div>`;
+    return;
+  }
+
+  container.innerHTML = exportCranes.map(crane => {
+    const holdSet = new Set(crane.holds);
+    const matched = candidates.filter(c => {
+      const p6 = parsePos6(c.plannedPos);
+      if (!p6) return true;
+      return holdSet.has(getHoldByBay(p6.bay));
+    }).slice(0, 6);
+
+    return `
+      <div class="panel" style="margin:0;border-top:3px solid ${crane.paused ? 'var(--red)' : 'var(--cyan)'}">
+        <div class="panel-head">
+          <div>
+            <strong>${crane.id}</strong> <span class="badge">Hầm ${crane.holds.join(', ')}</span>
+            ${crane.paused ? '<span class="badge red">⏸ ĐANG SỰ CỐ</span>' : ''}
+          </div>
+          <span style="font-size:11px;color:var(--muted);">${matched.length} gợi ý</span>
+        </div>
+        <div class="panel-body" style="padding:8px;">
+          ${matched.length ? matched.map(item => `
+            <div style="border:1px solid var(--line);border-radius:7px;padding:7px 9px;margin-bottom:6px;background:var(--bg);display:flex;justify-content:space-between;align-items:center;gap:6px;">
+              <div>
+                <div style="font-weight:850;font-size:12px;">${item.cntr} <span class="badge">${item.size}</span> <span class="badge green">${item.pod}</span></div>
+                <div style="font-size:10.5px;color:var(--muted);">
+                  Vị trí: <b>${item.plannedPos || 'Tự chọn'}</b> · <b>${item.weight.toFixed(1)}T</b> ·
+                  ${item.isOffDock ? `<b style="color:var(--amber)">🚛 Bãi ${item.transferPort} (Gọi sớm)</b>` : `Bãi TV (${item.yardPos})`}
+                </div>
+              </div>
+              <button class="primary" style="padding:4px 8px;font-size:11px;" onclick="markContainerCalled('${item.cntr}', '${crane.id}', '${item.plannedPos}')">
+                ${state.calledContainers.has(item.cntr) ? '✓ Đã gọi' : 'Gọi xe'}
+              </button>
+            </div>
+          `).join('') : '<div style="font-size:11px;color:var(--muted);padding:8px;">Hết hàng sẵn sàng B trong hầm phụ trách.</div>'}
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+async function markContainerCalled(cntr, craneId, targetSlot) {
+  state.calledContainers.add(cntr);
+  renderDispatchRecommendations();
+  try {
+    await sb.from('dispatch_logs').upsert({
+      session_id: state.sessionId,
+      container_no: cntr,
+      action_type: 'CALLED',
+      crane_id: craneId,
+      target_slot: targetSlot || ''
+    }, { onConflict: 'session_id,container_no' });
+  } catch (e) {}
+}
+
+// ================= SƠ ĐỒ 9 HẦM & GỌI HÀNG ĐUỔI CHIA THEO HẦM =================
+function renderHoldsAndChase() {
+  const pool = buildUnifiedExportPool();
+  const grid = document.getElementById('holdsOverviewGrid');
+  const chaseFilter = document.getElementById('chaseHoldFilter');
+
+  if (chaseFilter.options.length <= 1) {
+    HOLD_DEFS.forEach(h => {
+      const opt = document.createElement('option');
+      opt.value = h.hold;
+      opt.textContent = `HOLD 0${h.hold} (Bay ${h.bays.join(', ')})`;
+      chaseFilter.appendChild(opt);
+    });
+  }
+
+  grid.innerHTML = HOLD_DEFS.map(h => {
+    const inHold = pool.filter(c => {
+      const p = parsePos6(c.actualPos || c.plannedPos);
+      return p && h.bays.includes(p.bay);
+    });
+    const doneC = inHold.filter(c => c.jobStatus === 'C').length;
+    const total = inHold.length;
+    const pct = total > 0 ? Math.round((doneC / total) * 100) : 0;
+
+    return `
+      <div class="hold-box">
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <strong>HOLD 0${h.hold}</strong>
+          <span class="badge ${pct >= 90 ? 'green' : ''}">${doneC}/${total} (${pct}%)</span>
+        </div>
+        <div class="prog-track"><div class="prog-fill" style="width:${pct}%"></div></div>
+        <div class="bay-chips">
+          ${h.bays.map(b => `
+            <span class="bay-chip ${state.selectedBays.has(b) ? 'selected' : ''}" onclick="openBayPopup('${b}')">
+              Bay ${b}
+            </span>
+          `).join('')}
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  renderRollingChaseByHold();
+}
+
+function renderRollingChaseByHold() {
+  const pool = buildUnifiedExportPool();
+  const actualOccupiedPos = new Set(pool.filter(c => c.jobStatus === 'C' && c.actualPos).map(c => c.actualPos));
+
+  // Tìm các vị trí dự kiến bị khuyết (kế hoạch có nhưng chưa xếp xong C, và cont gốc đang bị giữ A hoặc chưa sẵn sàng)
+  const missingSlots = pool.filter(c =>
+    c.plannedPos &&
+    c.jobStatus !== 'C' &&
+    !actualOccupiedPos.has(c.plannedPos)
+  );
+
+  // Kho cont sẵn sàng B chưa có vị trí cố định để đề xuất thay thế
+  const freeReadyB = pool.filter(c => c.jobStatus === 'B' && !c.plannedPos);
+
+  document.getElementById('chaseMissingBadge').textContent = `${missingSlots.length} vị trí cần gọi đuổi`;
+  const selectedHold = document.getElementById('chaseHoldFilter').value;
+  const container = document.getElementById('rollingChaseContainer');
+
+  const holdsToRender = selectedHold === 'ALL' ? HOLD_DEFS : HOLD_DEFS.filter(h => String(h.hold) === selectedHold);
+
+  container.innerHTML = holdsToRender.map(h => {
+    const holdMissing = missingSlots.filter(m => {
+      const p = parsePos6(m.plannedPos);
+      return p && h.bays.includes(p.bay);
+    });
+    if (!holdMissing.length) return '';
+
+    return `
+      <div style="border:1px solid var(--line);border-radius:8px;padding:10px;margin-bottom:10px;background:var(--bg);">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+          <strong style="color:var(--cyan);">HOLD 0${h.hold} (Bay ${h.bays.join(', ')})</strong>
+          <span class="badge amber">${holdMissing.length} vị trí dự kiến cần bù</span>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Vị trí khuyết</th>
+                <th>Cont dự kiến (Trạng thái)</th>
+                <th>POD / Size</th>
+                <th>Trọng lượng mục tiêu</th>
+                <th>Top Cont thay thế gần tấn tạ nhất (Trạng thái B)</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${holdMissing.slice(0, 12).map(m => {
+                const subs = freeReadyB
+                  .filter(cand => cand.pod === m.pod && cand.size === m.size)
+                  .map(cand => ({ ...cand, diff: Math.abs(cand.weight - m.weight) }))
+                  .sort((a, b) => a.diff - b.diff)
+                  .slice(0, 2);
+
+                return `
+                  <tr>
+                    <td><b>${m.plannedPos}</b></td>
+                    <td>${m.cntr} <span class="badge ${m.jobStatus === 'A' ? 'red' : 'amber'}">${m.jobStatus}</span></td>
+                    <td>${m.pod} · ${m.size}</td>
+                    <td><b>${m.weight.toFixed(2)} T</b></td>
+                    <td>
+                      ${subs.length ? subs.map(s => `
+                        <span class="badge green" style="margin-right:4px;">
+                          ${s.cntr} (${s.weight.toFixed(1)}T, Δ${s.diff.toFixed(1)}T · ${s.isOffDock ? s.transferPort : 'TV'})
+                        </span>
+                      `).join('') : '<span style="color:var(--muted)">Dùng chính cont dự kiến khi mở trạng thái B</span>'}
+                    </td>
+                  </tr>
+                `;
+              }).join('')}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    `;
+  }).join('') || '<div style="color:var(--muted);">Tất cả các vị trí dự kiến đã khớp hoặc chưa nạp file sơ đồ xuất.</div>';
+}
+
+function autoSelectDischargedBays() {
+  HOLD_DEFS.forEach(h => h.bays.forEach(b => state.selectedBays.add(b)));
+  renderHoldsAndChase();
+}
+function toggleAllBays(flag) {
+  if (flag) HOLD_DEFS.forEach(h => h.bays.forEach(b => state.selectedBays.add(b)));
+  else state.selectedBays.clear();
+  renderHoldsAndChase();
+}
+
+function openBayPopup(bay) {
+  const pool = buildUnifiedExportPool();
+  const inBay = pool.filter(c => {
+    const p = parsePos6(c.actualPos || c.plannedPos);
+    return p && p.bay === bay;
+  });
+  document.getElementById('bayModalTitle').textContent = `Sơ đồ chi tiết Bay ${bay} (HOLD 0${getHoldByBay(bay)}) · ${inBay.length} container`;
+
+  const rows = ['10','08','06','04','02','00','01','03','05','07','09'];
+  const tiers = ['90','88','86','84','82','10','08','06','04','02'];
+  const slotMap = {};
+  inBay.forEach(c => {
+    const p = parsePos6(c.actualPos || c.plannedPos);
+    if (p) slotMap[`${p.row}_${p.tier}`] = c;
+  });
+
+  let html = `<table class="bay-matrix"><thead><tr><th>Tier \ Row</th>${rows.map(r => `<th>${r}</th>`).join('')}</tr></thead><tbody>`;
+  tiers.forEach(t => {
+    html += `<tr><th>${t}</th>`;
+    rows.forEach(r => {
+      const item = slotMap[`${r}_${t}`];
+      if (!item) {
+        html += `<td class="slot-EMPTY">-</td>`;
+      } else {
+        const cls = state.calledContainers.has(item.cntr) ? 'slot-CALLED' : `slot-${item.jobStatus}`;
+        html += `<td class="${cls}" title="${item.cntr} - ${item.weight}T - ${item.transferPort}">
+          <div>${item.pod}</div>
+          <div>${item.weight.toFixed(1)}T</div>
+          <div style="font-size:9px;">${item.cntr.slice(-4)}</div>
+        </td>`;
+      }
+    });
+    html += `</tr>`;
+  });
+  html += `</tbody></table>`;
+  document.getElementById('bayModalBody').innerHTML = html;
+  document.getElementById('bayModal').classList.add('open');
+}
+function closeBayModal() { document.getElementById('bayModal').classList.remove('open'); }
+
+// ================= QUẢN LÝ PHƯƠNG TIỆN & SỰ CỐ GIÁN ĐOẠN =================
+function renderCranesSetup() {
+  const roster = document.getElementById('craneRosterList');
+  roster.innerHTML = PRESET_CRANES.map(cId => {
+    const exists = state.cranes.some(c => c.id === cId && c.active);
+    return `<button class="${exists ? 'primary' : ''}" onclick="togglePresetCrane('${cId}')">${exists ? '✓ ' : '+ '}${cId}</button>`;
+  }).join('');
+
+  const tableDiv = document.getElementById('craneAssignmentTable');
+  tableDiv.innerHTML = `
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Thiết bị</th>
+            <th>Chế độ khai thác</th>
+            <th>Hầm phụ trách</th>
+            <th>Trạng thái & Gián đoạn</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${state.cranes.filter(c => c.active).map((c, idx) => {
+            const pauseSec = c.paused && c.pauseStart ? Math.floor((Date.now() - c.pauseStart) / 1000) : 0;
+            const mm = String(Math.floor(pauseSec / 60)).padStart(2, '0');
+            const ss = String(pauseSec % 60).padStart(2, '0');
+            return `
+              <tr>
+                <td><b>${c.id}</b></td>
+                <td>
+                  <select onchange="updateCraneMode(${idx}, this.value)">
+                    <option value="BOTH" ${c.mode === 'BOTH' ? 'selected' : ''}>Nhập + Xuất</option>
+                    <option value="IMPORT_ONLY" ${c.mode === 'IMPORT_ONLY' ? 'selected' : ''}>Chỉ làm Nhập (Xong nghỉ)</option>
+                    <option value="EXPORT_ONLY" ${c.mode === 'EXPORT_ONLY' ? 'selected' : ''}>Chỉ làm Xuất</option>
+                  </select>
+                </td>
+                <td><input value="${c.holds.join(',')}" style="width:90px" onchange="updateCraneHolds(${idx}, this.value)"></td>
+                <td>
+                  <button class="${c.paused ? 'danger' : 'warning'}" onclick="toggleCranePause(${idx})">
+                    ${c.paused ? `▶ Tiếp tục (Dừng ${mm}:${ss})` : '⏸ Tạm dừng / Sự cố'}
+                  </button>
+                </td>
+              </tr>
+            `;
+          }).join('')}
+        </tbody>
+      </table>
+    </div>
+  `;
+
+  renderFailoverAdvice();
+}
+
+function togglePresetCrane(cId) {
+  const found = state.cranes.find(c => c.id === cId);
+  if (found) found.active = !found.active;
+  else state.cranes.push({ id: cId, active: true, mode: 'BOTH', holds: [1,2], paused: false, pauseStart: null, rate: 25 });
+  renderAll();
+}
+
+function addCustomCrane() {
+  const val = document.getElementById('customCraneInput').value.trim().toUpperCase();
+  if (!val) return;
+  if (!state.cranes.some(c => c.id === val)) {
+    state.cranes.push({ id: val, active: true, mode: 'BOTH', holds: [1,2], paused: false, pauseStart: null, rate: 25 });
+  }
+  document.getElementById('customCraneInput').value = '';
+  renderAll();
+}
+
+function updateCraneMode(idx, mode) {
+  const activeList = state.cranes.filter(c => c.active);
+  if (activeList[idx]) activeList[idx].mode = mode;
+  renderAll();
+}
+
+function updateCraneHolds(idx, str) {
+  const activeList = state.cranes.filter(c => c.active);
+  if (activeList[idx]) {
+    activeList[idx].holds = str.split(',').map(x => parseInt(x.trim(), 10)).filter(n => n >= 1 && n <= 9);
+  }
+  renderAll();
+}
+
+function toggleCranePause(idx) {
+  const activeList = state.cranes.filter(c => c.active);
+  const c = activeList[idx];
+  if (!c) return;
+  c.paused = !c.paused;
+  c.pauseStart = c.paused ? Date.now() : null;
+  renderAll();
+}
+
+function renderFailoverAdvice() {
+  const pausedCranes = state.cranes.filter(c => c.active && c.paused);
+  const panel = document.getElementById('failoverAdvicePanel');
+  if (!pausedCranes.length) {
+    panel.innerHTML = '';
+    return;
+  }
+  const healthy = state.cranes.filter(c => c.active && !c.paused && c.mode !== 'IMPORT_ONLY');
+  const backup = PRESET_CRANES.find(id => !state.cranes.some(c => c.id === id && c.active)) || 'QC09';
+
+  panel.innerHTML = pausedCranes.map(pc => {
+    const mins = pc.pauseStart ? Math.max(1, Math.round((Date.now() - pc.pauseStart) / 60000)) : 1;
+    const lostMoves = Math.max(1, Math.round((mins / 60) * pc.rate));
+    const helper = healthy[0];
+    return `
+      <div style="border:1px solid var(--red);background:rgba(220,38,38,0.08);border-radius:8px;padding:10px;margin-top:8px;">
+        <strong style="color:var(--red);">⚠️ Sự cố thiết bị ${pc.id} (Gián đoạn ${mins} phút · Hụt ~${lostMoves} moves):</strong>
+        <div style="margin-top:6px;font-size:11.5px;">
+          • <b>Phương án A (Không bổ sung được thiết bị):</b> Chuyển Hầm <b>${pc.holds.join(', ')}</b> sang cho <b>${helper ? helper.id : 'cẩu kế cận'}</b> gánh tiếp.
+          ${helper ? `<button class="primary" style="padding:2px 8px;font-size:11px;" onclick="transferHolds('${pc.id}', '${helper.id}')">⚡ Chuyển hầm sang ${helper.id}</button>` : ''}<br>
+          • <b>Phương án B (Bổ sung thiết bị dự phòng):</b> Đưa <b>${backup}</b> vào thay thế nguyên trạng vị trí của <b>${pc.id}</b>.
+          <button class="success" style="padding:2px 8px;font-size:11px;" onclick="swapBackupCrane('${pc.id}', '${backup}')">🔄 Thay thế bằng ${backup}</button>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+function transferHolds(fromId, toId) {
+  const fromC = state.cranes.find(c => c.id === fromId);
+  const toC = state.cranes.find(c => c.id === toId);
+  if (fromC && toC) {
+    toC.holds = Array.from(new Set([...toC.holds, ...fromC.holds])).sort();
+    fromC.holds = [];
+  }
+  renderAll();
+}
+
+function swapBackupCrane(oldId, newId) {
+  const oldC = state.cranes.find(c => c.id === oldId);
+  if (oldC) {
+    state.cranes.push({ id: newId, active: true, mode: oldC.mode, holds: [...oldC.holds], paused: false, pauseStart: null, rate: oldC.rate });
+    oldC.active = false;
+  }
+  renderAll();
+}
+
+// ================= TÍNH TOÁN MỚN NƯỚC LIVE =================
+function recalcDraftLive(fromDim = false) {
+  const L = parseFloat(document.getElementById('cfgLength').value) || 172;
+  const B = parseFloat(document.getElementById('cfgBeam').value) || 27.6;
+  if (fromDim) {
+    const tpc = (L * B * 0.82 * 1.025) / 100;
+    const estCont = Math.max(10, Math.round((tpc * 10) / 14));
+    document.getElementById('cfgContPer10cm').value = estCont;
+  }
+  const contPer10 = parseFloat(document.getElementById('cfgContPer10cm').value) || 28;
+  const dF = parseFloat(document.getElementById('cfgDraftF').value) || 7.80;
+  const dA = parseFloat(document.getElementById('cfgDraftA').value) || 8.20;
+  const maxD = parseFloat(document.getElementById('cfgMaxDraft').value) || 9.20;
+
+  const pool = buildUnifiedExportPool();
+  const doneExport = pool.filter(c => c.jobStatus === 'C').length;
+  const sinkM = (doneExport / contPer10) * 0.10;
+  const curF = dF + sinkM * 0.95;
+  const curA = dA + sinkM * 1.05;
+  const maxCur = Math.max(curF, curA);
+  const remCm = Math.max(0, (maxD - maxCur) * 100);
+  const remCont = Math.floor((remCm / 10) * contPer10);
+
+  document.getElementById('kpiDraftLive').textContent = `${curF.toFixed(2)}m / ${curA.toFixed(2)}m`;
+  const stEl = document.getElementById('kpiDraftStatus');
+  if (maxCur >= maxD) {
+    stEl.textContent = `⛔ CHẠM MỚN GIỚI HẠN ${maxD.toFixed(2)}m!`;
+    stEl.style.color = 'var(--red)';
+  } else {
+    stEl.textContent = `An toàn (Còn ~${remCont} cont tới Tmax ${maxD.toFixed(2)}m)`;
+    stEl.style.color = 'var(--green)';
+  }
+}
+
+// ================= XÓA RIÊNG DỮ LIỆU HÀNG XUẤT =================
+async function clearExportDataOnly() {
+  if (!confirm('Xóa toàn bộ dữ liệu Hàng xuất hiện tại (Final Loading, Reserved, Job List xuất, EDI) để nạp lại?
+(Sơ đồ hầm hàng nhập SBP và thông số tàu vẫn được giữ nguyên)')) return;
+  state.finalLoading = [];
+  state.reservedExport = [];
+  state.preStowagePlan = [];
+  state.stowageInstructions = {};
+  state.liveJobs = state.liveJobs.filter(j => j.type !== 'Xếp tàu' && j.io !== 'Export');
+  state.calledContainers.clear();
+
+  ['card-final','card-reserved','card-jobs','card-edi'].forEach(id => document.getElementById(id).classList.remove('loaded'));
+  document.getElementById('stat-final').textContent = 'Đã xóa · Sẵn sàng nạp lại';
+  document.getElementById('stat-reserved').textContent = 'Đã xóa · Sẵn sàng nạp lại';
+  document.getElementById('stat-jobs').textContent = 'Đã xóa job xuất · Sẵn sàng nạp lại';
+  document.getElementById('stat-edi').textContent = 'Đã xóa · Sẵn sàng nạp lại';
+
+  try {
+    await sb.from('dispatch_logs').delete().eq('session_id', state.sessionId);
+    await sb.storage.from(BUCKET_NAME).remove([
+      `${state.sessionId}/final.json`,
+      `${state.sessionId}/reserved.json`,
+      `${state.sessionId}/jobs.json`
+    ]);
+  } catch (e) {}
+  renderAll();
+}
+
+// ================= ĐỒNG BỘ SUPABASE CLOUD & BOT EPORT / THỦY TRIỀU =================
+async function uploadJsonToBucket(fileName, dataObj) {
+  try {
+    const blob = new Blob([JSON.stringify(dataObj)], { type: 'application/json' });
+    await sb.storage.from(BUCKET_NAME).upload(`${state.sessionId}/${fileName}`, blob, { upsert: true });
+    document.getElementById('kpiLastSync').textContent = `Đã lưu ${fileName} lên Cloud`;
+  } catch (e) {}
+}
+
+async function saveVesselSessionToCloud() {
+  const vName = document.getElementById('cfgVesselName').value.trim().toUpperCase() || 'KUO LUNG';
+  const voy = document.getElementById('cfgVoyage').value.trim().toUpperCase() || '1008S';
+  state.sessionId = `${vName.replace(/\s+/g, '_')}_${voy}`;
+
+  try {
+    await sb.from('vessel_sessions').upsert({
+      session_id: state.sessionId,
+      vessel_name: vName,
+      voyage: voy,
+      berth: document.getElementById('cfgBerth').value,
+      length_m: parseFloat(document.getElementById('cfgLength').value) || 172,
+      beam_m: parseFloat(document.getElementById('cfgBeam').value) || 27.6,
+      draft_f: parseFloat(document.getElementById('cfgDraftF').value) || 7.8,
+      draft_a: parseFloat(document.getElementById('cfgDraftA').value) || 8.2,
+      max_draft: parseFloat(document.getElementById('cfgMaxDraft').value) || 9.2,
+      cont_per_10cm: parseFloat(document.getElementById('cfgContPer10cm').value) || 28,
+      deck_tier_min: parseInt(document.getElementById('cfgDeckTier').value, 10) || 80,
+      crane_config: state.cranes,
+      updated_at: new Date().toISOString()
+    }, { onConflict: 'session_id' });
+    alert(`✓ Đã lưu cấu hình chuyến tàu ${vName} (${voy}) lên Supabase!`);
+  } catch (e) {
+    alert('Lỗi lưu Supabase: ' + e.message);
+  }
+}
+
+async function syncAllCloudData() {
+  try {
+    // 1. Tải tiến độ ePort Tân Vũ từ Bot
+    const { data: eportBlob } = await sbBot.storage.from('port-documents').download('eport_tanvu_jobs.json');
+    if (eportBlob) {
+      state.eportJobs = JSON.parse(await eportBlob.text());
+      const sel = document.getElementById('vesselSelect');
+      Object.keys(state.eportJobs).forEach(vKey => {
+        if (!Array.from(sel.options).some(o => o.text.includes(vKey))) {
+          const opt = document.createElement('option');
+          opt.value = vKey.replace(/\s+/g, '_');
+          opt.textContent = `${vKey} (${state.eportJobs[vKey].berth}) - ePort ${state.eportJobs[vKey].pct}%`;
+          sel.appendChild(opt);
+        }
+      });
+    }
+
+    // 2. Tải Thủy triều Hòn Dáu
+    const today = new Date().toISOString().split('T')[0];
+    const { data: tideRows } = await sbBot.from('tide_readings').select('*').eq('date_key', today).limit(1);
+    if (tideRows && tideRows.length) {
+      const t = tideRows[0];
+      document.getElementById('kpiTideLive').textContent = `Đỉnh ${t.high_val}m (${t.high_time}) · Ròng ${t.low_val}m (${t.low_time})`;
+    }
+  } catch (e) {}
+}
+
+function onSelectVesselSession(val) {
+  state.sessionId = val;
+  const vKey = val.replace(/_/g, ' ');
+  const foundKey = Object.keys(state.eportJobs).find(k => val.includes(k.replace(/\s+/g, '_')));
+  if (foundKey && state.eportJobs[foundKey]) {
+    const ej = state.eportJobs[foundKey];
+    document.getElementById('kpiEportProgress').textContent = `${ej.doneCont} / ${ej.totalCont} ${ej.cargoUnit} (${ej.pct}%)`;
+    document.getElementById('kpiEportSub').textContent = `Cầu ${ej.berth} · Còn lại: ${ej.remCont} ${ej.cargoUnit}`;
+  }
+  renderAll();
 }
 
 function createNewVesselSession() {
-  const vName = (document.getElementById('newVName').value || '').trim().toUpperCase();
-  if (!vName) { showToast('⚠️ Vui lòng nhập tên tàu!'); return; }
-  const voy = (document.getElementById('newVVoyage').value || '001S').trim().toUpperCase();
-  const berth = document.getElementById('newVBerth').value || 'TV1';
-  const sid = `${vName.replace(/\s+/g, '_')}_${voy}`;
-
-  appState.currentSessionId = sid;
-  appState.vessel = {
-    session_id: sid,
-    vessel_name: vName,
-    voyage: voy,
-    berth: berth,
-    length_m: parseFloat(document.getElementById('newVLen').value) || 172,
-    beam_m: parseFloat(document.getElementById('newVBeam').value) || 27.6,
-    draft_f: 7.5,
-    draft_a: 7.9,
-    max_draft: parseFloat(document.getElementById('newVMaxDraft').value) || 9.2,
-    cont_per_10cm: 28,
-    deck_tier_min: 80
-  };
-  appState.preStowagePlan = [];
-  appState.reservedList = [];
-  appState.liveJobs = {};
-  appState.calledContainers.clear();
-
-  document.getElementById('newVesselModal').classList.add('hidden');
-  populateVesselSelectorDropdown();
-  syncInputsFromState();
-  renderAllViews();
-  switchTab('upload');
-  showToast(`🚢 Đã tạo phiên tàu ${vName} / ${voy}. Hãy nạp file PL-TOS hoặc BAPLIE!`);
+  const name = prompt('Nhập tên tàu mới (VD: SITC HAI PHONG):');
+  if (!name) return;
+  const voy = prompt('Nhập số chuyến (VD: 2612S):') || '001S';
+  const id = `${name.trim().toUpperCase().replace(/\s+/g, '_')}_${voy.trim().toUpperCase()}`;
+  const sel = document.getElementById('vesselSelect');
+  const opt = document.createElement('option');
+  opt.value = id;
+  opt.textContent = `${name.toUpperCase()} (${voy.toUpperCase()})`;
+  sel.appendChild(opt);
+  sel.value = id;
+  document.getElementById('cfgVesselName').value = name.toUpperCase();
+  document.getElementById('cfgVoyage').value = voy.toUpperCase();
+  state.sessionId = id;
+  renderAll();
 }
 
-function toggleDarkMode() {
-  document.documentElement.classList.toggle('dark');
-  localStorage.setItem('tos_dark_mode', document.documentElement.classList.contains('dark') ? '1' : '0');
+// ================= DỮ LIỆU MẪU KUO LUNG (BAO GỒM FINAL LOADING BÃI NGOÀI) =================
+function loadDemoKuoLungData() {
+  state.finalLoading = [
+    { cntr: 'OOCU1084060', size: '20DC', weight: 30.08, pod: 'SGSIN', yardPos: '---', transferPort: 'GFW', isOffDock: true, customs: true, shipPos: '010204' },
+    { cntr: 'OOLU0198104', size: '20DC', weight: 29.30, pod: 'SGSIN', yardPos: '---', transferPort: 'GFW', isOffDock: true, customs: true, shipPos: '010206' },
+    { cntr: 'APHU7260990', size: '40HC', weight: 17.45, pod: 'SGSIN', yardPos: 'AA-12-03', transferPort: 'TV', isOffDock: false, customs: true, shipPos: '260084' },
+    { cntr: 'BEAU4154275', size: '40HC', weight: 11.44, pod: 'SGSIN', yardPos: 'AA-06-06-1', transferPort: 'TV', isOffDock: false, customs: true, shipPos: '260086' },
+    { cntr: 'TCNU4920506', size: '40HC', weight: 27.86, pod: 'SGSIN', yardPos: '---', transferPort: 'HHH', isOffDock: true, customs: true, shipPos: '020982' },
+    { cntr: 'SEGU4316212', size: '40HC', weight: 10.06, pod: 'IDJKT', yardPos: '---', transferPort: 'SA', isOffDock: true, customs: true, shipPos: '020986' },
+    { cntr: 'CAIU3845235', size: '20DC', weight: 29.23, pod: 'TWTXG', yardPos: 'BB-10-02', transferPort: 'TV', isOffDock: false, customs: true, shipPos: '010104' },
+    { cntr: 'TRLU9180390', size: '20DC', weight: 28.23, pod: 'SGSIN', yardPos: '---', transferPort: 'VNB DV', isOffDock: true, customs: false, shipPos: '021082' },
+    { cntr: 'OOCU7252638', size: '40HC', weight: 12.00, pod: 'SGSIN', yardPos: 'CB-08-01', transferPort: 'TV', isOffDock: false, customs: true, shipPos: '021084' },
+    { cntr: 'ONEU5029472', size: '40HC', weight: 10.10, pod: 'SGSIN', yardPos: '---', transferPort: 'SI', isOffDock: true, customs: true, shipPos: '' }
+  ];
+  state.liveJobs = [
+    { cntr: 'APHU7260990', type: 'Xếp tàu', io: 'Export', crane: 'QC12', pos: '260084', status: 'C', pod: 'SGSIN', doneTime: '26/11/2026 09:15:00' },
+    { cntr: 'BEAU4154275', type: 'Xếp tàu', io: 'Export', crane: 'QC12', pos: '260086', status: 'C', pod: 'SGSIN', doneTime: '26/11/2026 10:20:00' },
+    { cntr: 'OOCU1084060', type: 'Xếp tàu', io: 'Export', crane: 'QC07', pos: '', status: 'B', pod: 'SGSIN', doneTime: '' },
+    { cntr: 'TCNU4920506', type: 'Xếp tàu', io: 'Export', crane: 'QC07', pos: '', status: 'B', pod: 'SGSIN', doneTime: '' },
+    { cntr: 'SEGU4316212', type: 'Xếp tàu', io: 'Export', crane: 'QC07', pos: '', status: 'B', pod: 'IDJKT', doneTime: '' },
+    { cntr: 'CAIU3845235', type: 'Xếp tàu', io: 'Export', crane: 'QC07', pos: '', status: 'B', pod: 'TWTXG', doneTime: '' },
+    { cntr: 'TRLU9180390', type: 'Xếp tàu', io: 'Export', crane: 'QC07', pos: '', status: 'A', pod: 'SGSIN', doneTime: '' },
+    { cntr: 'OOCU7252638', type: 'Xếp tàu', io: 'Export', crane: 'QC07', pos: '', status: 'B', pod: 'SGSIN', doneTime: '' },
+    { cntr: 'ONEU5029472', type: 'Xếp tàu', io: 'Export', crane: 'QC11', pos: '', status: 'B', pod: 'SGSIN', doneTime: '' }
+  ];
+  document.getElementById('stat-final').textContent = '✓ Đã nạp mẫu 10 cont (GFW, HHH, SA, VNB DV, SI, TV)';
+  document.getElementById('card-final').classList.add('loaded');
+  document.getElementById('stat-jobs').textContent = '✓ Đã nạp mẫu 9 job (A/B/C)';
+  document.getElementById('card-jobs').classList.add('loaded');
+  renderAll();
 }
 
-function showToast(msg) {
-  const box = document.getElementById('toastBox');
-  if (!box) return;
-  const el = document.createElement('div');
-  el.className = 'px-4 py-2.5 rounded-xl bg-slate-900 text-white border border-sky-400 shadow-xl text-xs font-bold';
-  el.textContent = msg;
-  box.appendChild(el);
-  setTimeout(() => el.remove(), 3800);
+// ================= RENDER TOÀN BỘ GIAO DIỆN =================
+function renderAll() {
+  const pool = buildUnifiedExportPool();
+  const cDone = pool.filter(c => c.jobStatus === 'C').length;
+  const bReady = pool.filter(c => c.jobStatus === 'B').length;
+  const aHold = pool.filter(c => c.jobStatus === 'A').length;
+  document.getElementById('kpiExportPool').textContent = `${bReady} B / ${aHold} A (${cDone} Đã xếp C)`;
+
+  renderOffDockSummary(pool);
+  renderCraneHourlyChart();
+  renderDispatchRecommendations();
+  renderHoldsAndChase();
+  renderCranesSetup();
+  recalcDraftLive();
 }
 
-// Khởi chạy ứng dụng
+setInterval(() => {
+  if (state.cranes.some(c => c.active && c.paused)) renderCranesSetup();
+}, 1000);
+
 window.addEventListener('DOMContentLoaded', () => {
-  if (localStorage.getItem('tos_dark_mode') === '1') {
-    document.documentElement.classList.add('dark');
-  }
-  seedRealisticDemoData();
-  syncInputsFromState();
-  populateVesselSelectorDropdown();
-  renderAllViews();
-  syncAllCloudSources(false);
+  loadDemoKuoLungData();
+  syncAllCloudData();
 });
 </script>
 </body>
