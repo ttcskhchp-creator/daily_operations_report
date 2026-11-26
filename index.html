@@ -38,13 +38,21 @@
   --purple: #a78bfa;
 }
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-html, body { margin: 0; padding: 0; max-width: 100%; overflow-x: hidden; background: var(--bg); color: var(--ink); font: 13px/1.45 Inter, "Segoe UI", system-ui, -apple-system, sans-serif; }
+html, body {
+  margin: 0;
+  padding: 0;
+  max-width: 100%;
+  overflow-x: hidden;
+  background: var(--bg);
+  color: var(--ink);
+  font: 13px/1.45 Inter, "Segoe UI", system-ui, -apple-system, sans-serif;
+}
 button, input, select, textarea { font: inherit; color: var(--ink); }
 button {
   cursor: pointer;
   border: 1px solid var(--line);
   border-radius: 8px;
-  padding: 7px 12px;
+  padding: 6px 11px;
   font-weight: 700;
   font-size: 12px;
   background: var(--card);
@@ -55,17 +63,18 @@ button {
   gap: 5px;
   min-height: 34px;
 }
-button:hover { filter: brightness(0.96); }
+button:hover { filter: brightness(0.95); }
 button:active { transform: scale(0.98); }
 button.primary { background: var(--cyan); color: #fff; border-color: var(--cyan); }
 button.success { background: var(--green); color: #fff; border-color: var(--green); }
 button.danger { background: var(--red); color: #fff; border-color: var(--red); }
 button.warning { background: var(--amber); color: #fff; border-color: var(--amber); }
-button.ghost { background: transparent; color: #fff; border-color: rgba(255,255,255,0.28); }
+button.ghost { background: rgba(255,255,255,0.08); color: #fff; border-color: rgba(255,255,255,0.28); }
+button.sm { padding: 3px 8px; min-height: 26px; font-size: 11px; }
 input, select {
   border: 1px solid var(--line);
   border-radius: 7px;
-  padding: 6px 9px;
+  padding: 5px 8px;
   background: var(--card);
   min-height: 34px;
 }
@@ -74,7 +83,7 @@ input, select {
 .topbar {
   background: linear-gradient(95deg, var(--navy), var(--navy2));
   color: #fff;
-  padding: 10px 16px;
+  padding: 9px 14px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -93,24 +102,18 @@ input, select {
   padding: 5px 9px;
   border-radius: 8px;
   border: 2px solid #38bdf8;
-  font-size: 12.5px;
+  font-size: 12px;
   white-space: nowrap;
 }
 .brand-title { font-weight: 900; font-size: 14px; letter-spacing: 0.2px; }
 .brand-sub { font-size: 11px; opacity: 0.85; }
-
-.topbar-controls {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  flex-wrap: wrap;
-}
+.topbar-controls { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
 .vessel-select-box {
   display: flex;
   align-items: center;
   gap: 6px;
   background: rgba(255,255,255,0.12);
-  padding: 4px 8px;
+  padding: 3px 8px;
   border-radius: 9px;
   border: 1px solid rgba(56,189,248,0.5);
 }
@@ -119,15 +122,16 @@ input, select {
   color: #fff;
   border: 1px solid #38bdf8;
   font-weight: 800;
-  min-width: 195px;
+  min-width: 190px;
   max-width: 260px;
+  min-height: 30px;
 }
 
 /* ==================== KPI STRIP ==================== */
 .kpi-strip {
   background: var(--card);
   border-bottom: 2px solid var(--cyan);
-  padding: 8px 16px;
+  padding: 8px 14px;
   display: grid;
   grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: 8px;
@@ -139,15 +143,38 @@ input, select {
   background: var(--bg);
   min-width: 0;
 }
-.kpi-card small { display: block; font-size: 10px; color: var(--muted); font-weight: 800; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.kpi-card strong { display: block; font-size: 13.5px; font-weight: 900; margin: 2px 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.kpi-card .kpi-sub { font-size: 10.5px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.kpi-card small {
+  display: block;
+  font-size: 10px;
+  color: var(--muted);
+  font-weight: 800;
+  text-transform: uppercase;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.kpi-card strong {
+  display: block;
+  font-size: 13.5px;
+  font-weight: 900;
+  margin: 2px 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.kpi-card .kpi-sub {
+  font-size: 10.5px;
+  color: var(--muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
 
-/* ==================== DESKTOP TABS & MOBILE BOTTOM BAR ==================== */
+/* ==================== DESKTOP TABS & MOBILE BOTTOM NAV ==================== */
 .nav-tabs-desktop {
   display: flex;
   gap: 6px;
-  padding: 10px 16px 0;
+  padding: 9px 14px 0;
   border-bottom: 1px solid var(--line);
   background: var(--card);
   overflow-x: auto;
@@ -156,7 +183,7 @@ input, select {
   border-bottom-left-radius: 0;
   border-bottom-right-radius: 0;
   border-bottom: 0;
-  padding: 9px 15px;
+  padding: 8px 14px;
   background: transparent;
   color: var(--muted);
   white-space: nowrap;
@@ -176,9 +203,9 @@ input, select {
   right: 0;
   background: var(--card);
   border-top: 1px solid var(--line);
-  box-shadow: 0 -4px 16px rgba(0,0,0,0.12);
+  box-shadow: 0 -4px 16px rgba(0,0,0,0.14);
   z-index: 60;
-  padding: 5px 4px calc(5px + env(safe-area-inset-bottom));
+  padding: 4px 4px calc(4px + env(safe-area-inset-bottom));
   grid-template-columns: repeat(4, 1fr);
   gap: 4px;
 }
@@ -188,37 +215,33 @@ input, select {
   color: var(--muted);
   flex-direction: column;
   gap: 2px;
-  padding: 5px 2px;
+  padding: 4px 2px;
   font-size: 10px;
   font-weight: 700;
-  min-height: 44px;
+  min-height: 46px;
 }
 .mobile-bottom-nav button .m-ico { font-size: 16px; line-height: 1; }
-.mobile-bottom-nav button.active {
-  color: var(--cyan);
-  background: rgba(2,132,199,0.1);
-}
+.mobile-bottom-nav button.active { color: var(--cyan); background: rgba(2,132,199,0.1); }
 
 /* ==================== LAYOUT & PANELS ==================== */
-.container { padding: 14px 16px 40px; max-width: 1760px; margin: auto; }
+.container { padding: 12px 14px 40px; max-width: 1760px; margin: auto; }
 .tab-pane { display: none; }
-.tab-pane.active { display: block; animation: fadeIn 0.15s ease; }
-@keyframes fadeIn { from { opacity: 0.7; } to { opacity: 1; } }
+.tab-pane.active { display: block; }
 
-.grid-2 { display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 14px; }
-.grid-3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
-.grid-form { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+.grid-2 { display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 12px; }
+.grid-3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+.grid-form { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 9px; }
 
 .panel {
   background: var(--card);
   border: 1px solid var(--line);
   border-radius: var(--radius);
-  margin-bottom: 14px;
+  margin-bottom: 12px;
   overflow: hidden;
   box-shadow: 0 2px 6px rgba(0,0,0,0.04);
 }
 .panel-head {
-  padding: 10px 14px;
+  padding: 9px 13px;
   border-bottom: 1px solid var(--line);
   display: flex;
   justify-content: space-between;
@@ -227,14 +250,14 @@ input, select {
   flex-wrap: wrap;
   background: rgba(2,132,199,0.05);
 }
-.panel-head h3 { margin: 0; font-size: 13.5px; font-weight: 850; }
-.panel-body { padding: 12px 14px; }
+.panel-head h3 { margin: 0; font-size: 13px; font-weight: 850; }
+.panel-body { padding: 11px 13px; }
 
 .badge {
   display: inline-flex;
   align-items: center;
   gap: 3px;
-  padding: 2px 8px;
+  padding: 2px 7px;
   border-radius: 999px;
   font-size: 10.5px;
   font-weight: 800;
@@ -247,54 +270,46 @@ input, select {
 .badge.red { background: rgba(220,38,38,0.15); color: var(--red); }
 .badge.purple { background: rgba(124,58,237,0.15); color: var(--purple); }
 
-/* ==================== STEP 1 VESSEL LOCK BANNER ==================== */
+/* ==================== STEP 1 VESSEL GUARD ==================== */
 .step1-guard {
   border: 2px solid var(--amber);
   background: rgba(217,119,6,0.09);
   border-radius: 10px;
-  padding: 12px 14px;
-  margin-bottom: 14px;
+  padding: 11px 13px;
+  margin-bottom: 12px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
   flex-wrap: wrap;
 }
-.step1-guard.confirmed {
-  border-color: var(--green);
-  background: rgba(5,150,105,0.09);
-}
-.step1-guard-title { font-weight: 900; font-size: 13.5px; color: var(--amber); margin-bottom: 4px; }
+.step1-guard.confirmed { border-color: var(--green); background: rgba(5,150,105,0.09); }
+.step1-guard-title { font-weight: 900; font-size: 13px; color: var(--amber); margin-bottom: 3px; }
 .step1-guard.confirmed .step1-guard-title { color: var(--green); }
-.upload-zone-locked {
-  position: relative;
-  opacity: 0.55;
-  pointer-events: none;
-  filter: grayscale(0.3);
-}
+.upload-zone-locked { opacity: 0.5; pointer-events: none; filter: grayscale(0.35); }
 .upload-lock-notice {
-  background: rgba(220,38,38,0.1);
+  background: rgba(220,38,38,0.09);
   border: 1px dashed var(--red);
   color: var(--red);
-  padding: 9px 12px;
+  padding: 8px 12px;
   border-radius: 8px;
   font-weight: 800;
   font-size: 12px;
-  margin-bottom: 12px;
+  margin-bottom: 10px;
   text-align: center;
 }
 
 /* ==================== HOURLY CRANE CHART ==================== */
-.crane-legend { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 8px; font-size: 11px; font-weight: 700; }
+.crane-legend { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 6px; font-size: 11px; font-weight: 700; }
 .crane-legend-item { display: inline-flex; align-items: center; gap: 5px; }
 .crane-legend-dot { width: 10px; height: 10px; border-radius: 3px; }
 .hourly-bars {
   display: grid;
   grid-template-columns: repeat(12, minmax(0, 1fr));
-  gap: 6px;
+  gap: 5px;
   align-items: end;
-  height: 170px;
-  padding: 16px 4px 4px;
+  height: 165px;
+  padding: 14px 4px 4px;
   border-bottom: 1px solid var(--line);
   background: linear-gradient(to top, rgba(2,132,199,0.04) 1px, transparent 1px);
   background-size: 100% 34px;
@@ -315,7 +330,7 @@ input, select {
 .hbar-stack {
   width: 100%;
   max-width: 34px;
-  height: 118px;
+  height: 114px;
   display: flex;
   flex-direction: column-reverse;
   justify-content: flex-start;
@@ -323,10 +338,9 @@ input, select {
   overflow: hidden;
   background: rgba(148,163,184,0.14);
 }
-.hbar-seg { width: 100%; transition: height 0.25s ease; border-top: 1px solid rgba(255,255,255,0.22); }
+.hbar-seg { width: 100%; transition: height 0.25s ease; border-top: 1px solid rgba(255,255,255,0.2); }
 .hbar-lbl { font-size: 10px; color: var(--muted); margin-top: 4px; font-weight: 700; }
 
-/* Mobile-friendly pinned hour detail bar */
 .hour-detail-bar {
   margin-top: 8px;
   padding: 8px 10px;
@@ -353,16 +367,16 @@ input, select {
 }
 
 /* ==================== OFF-DOCK & UPLOAD CARDS ==================== */
-.offdock-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(135px, 1fr)); gap: 8px; margin-top: 8px; }
+.offdock-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 8px; margin-top: 8px; }
 .offdock-card { border: 1px solid var(--line); border-left: 4px solid var(--amber); border-radius: 8px; padding: 8px 10px; background: var(--bg); }
 .offdock-card.tv { border-left-color: var(--green); }
-.offdock-card strong { font-size: 16px; display: block; margin: 2px 0; }
+.offdock-card strong { font-size: 15.5px; display: block; margin: 2px 0; }
 
-.upload-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px; }
+.upload-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(255px, 1fr)); gap: 10px; }
 .upload-card {
   border: 2px dashed var(--line);
   border-radius: 10px;
-  padding: 12px;
+  padding: 11px;
   background: var(--bg);
   display: flex;
   flex-direction: column;
@@ -371,17 +385,17 @@ input, select {
 }
 .upload-card.loaded { border-style: solid; border-color: var(--green); }
 .upload-card.optional { border-color: #94a3b8; }
-.upload-card input[type="file"] { width: 100%; font-size: 11.5px; padding: 5px; }
+.upload-card input[type="file"] { width: 100%; font-size: 11.5px; padding: 4px; }
 
-/* ==================== HOLDS, TABLES & MODALS ==================== */
+/* ==================== HOLDS, MANUAL HOLD EDITOR & TABLES ==================== */
 .holds-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 10px; }
 .hold-box { border: 1px solid var(--line); border-radius: 9px; padding: 10px; background: var(--bg); }
-.prog-track { height: 8px; background: var(--line); border-radius: 99px; overflow: hidden; margin: 5px 0; }
+.prog-track { height: 7px; background: var(--line); border-radius: 99px; overflow: hidden; margin: 4px 0; }
 .prog-fill { height: 100%; background: var(--green); transition: width 0.3s; }
 .prog-fill.imp { background: var(--cyan); }
 .bay-chips { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 8px; }
 .bay-chip {
-  padding: 5px 9px;
+  padding: 4px 8px;
   border-radius: 6px;
   border: 1px solid var(--line);
   background: var(--card);
@@ -391,20 +405,38 @@ input, select {
 }
 .bay-chip.selected { background: var(--cyan); color: #fff; border-color: var(--cyan); }
 
-.table-wrap { overflow-x: auto; max-height: 480px; -webkit-overflow-scrolling: touch; }
+.hold-editor-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 8px;
+  padding-top: 7px;
+  border-top: 1px dashed var(--line);
+}
+.hold-editor-row input {
+  flex: 1;
+  min-width: 0;
+  min-height: 28px;
+  padding: 3px 7px;
+  font-size: 11px;
+}
+
+.table-wrap { overflow-x: auto; max-height: 460px; -webkit-overflow-scrolling: touch; }
 table { width: 100%; border-collapse: collapse; font-size: 11.5px; }
 th, td { padding: 7px 8px; border-bottom: 1px solid var(--line); text-align: left; white-space: nowrap; }
 th { background: var(--bg); font-weight: 800; position: sticky; top: 0; z-index: 4; }
 
+/* ==================== MODALS (BAY PLAN, BOT SCHEMA, ADMIN PIN) ==================== */
 .modal-shade {
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,0.58);
+  background: rgba(0,0,0,0.6);
   display: none;
   align-items: center;
   justify-content: center;
   z-index: 1000;
   padding: 12px;
+  backdrop-filter: blur(2px);
 }
 .modal-shade.open { display: flex; }
 .modal-card {
@@ -414,22 +446,40 @@ th { background: var(--bg); font-weight: 800; position: sticky; top: 0; z-index:
   max-height: 88vh;
   overflow: auto;
   padding: 16px;
-  box-shadow: 0 14px 36px rgba(0,0,0,0.35);
+  box-shadow: 0 16px 40px rgba(0,0,0,0.35);
 }
+.modal-card.narrow { width: min(440px, 100%); }
 .bay-matrix { border-collapse: collapse; margin: auto; }
 .bay-matrix td, .bay-matrix th {
   border: 1px solid var(--line);
-  width: 74px;
+  width: 72px;
   height: 44px;
   text-align: center;
   font-size: 10px;
   padding: 3px;
+}
+.deck-divider td {
+  height: 10px !important;
+  background: repeating-linear-gradient(45deg, #334155, #334155 6px, #475569 6px, #475569 12px);
+  color: #fff;
+  font-size: 9px;
+  font-weight: 800;
+  padding: 1px !important;
 }
 .slot-C { background: #dcfce7; color: #166534; font-weight: 800; }
 .slot-B { background: #dbeafe; color: #1e40af; font-weight: 800; cursor: pointer; }
 .slot-A { background: #fef3c7; color: #92400e; }
 .slot-CALLED { background: #ffedd5; color: #9a3412; border: 2px solid #f97316 !important; font-weight: 800; }
 .slot-EMPTY { background: transparent; color: var(--muted); }
+
+.pin-tabs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-bottom: 12px; }
+.pin-tabs button.active { background: var(--cyan); color: #fff; border-color: var(--cyan); }
+.pin-section { display: none; }
+.pin-section.active { display: block; }
+.form-field { margin-bottom: 10px; }
+.form-field label { display: block; font-size: 11px; font-weight: 800; color: var(--muted); margin-bottom: 4px; }
+.form-field input { width: 100%; }
+.pin-msg { font-size: 11.5px; font-weight: 700; margin-top: 6px; min-height: 18px; }
 
 pre.schema-box {
   background: #0f172a;
@@ -441,14 +491,14 @@ pre.schema-box {
   line-height: 1.5;
 }
 
-/* ==================== RESPONSIVE BREAKPOINTS (MOBILE & TABLET) ==================== */
+/* ==================== RESPONSIVE BREAKPOINTS ==================== */
 @media (max-width: 1100px) {
   .grid-2, .grid-3 { grid-template-columns: 1fr; }
   .kpi-strip { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 }
 @media (max-width: 768px) {
   body { padding-bottom: 66px; }
-  .topbar { padding: 8px 10px; gap: 8px; }
+  .topbar { padding: 8px 10px; gap: 7px; }
   .brand-sub { display: none; }
   .topbar-controls { width: 100%; justify-content: space-between; }
   .vessel-select-box { width: 100%; }
@@ -460,17 +510,17 @@ pre.schema-box {
     padding: 8px 10px;
     gap: 8px;
   }
-  .kpi-card { min-width: 175px; flex: 0 0 auto; scroll-snap-align: start; }
+  .kpi-card { min-width: 170px; flex: 0 0 auto; scroll-snap-align: start; }
   .nav-tabs-desktop { display: none; }
   .mobile-bottom-nav { display: grid; }
   .container { padding: 10px 10px 24px; }
-  .panel-head { padding: 9px 10px; }
+  .panel-head { padding: 8px 10px; }
   .panel-body { padding: 10px; }
   .grid-form { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .hourly-bars { gap: 3px; height: 155px; }
-  .hbar-stack { max-width: 24px; height: 108px; }
+  .hourly-bars { gap: 3px; height: 150px; }
+  .hbar-stack { max-width: 24px; height: 104px; }
   .hbar-lbl { font-size: 9px; }
-  #craneTooltip { display: none !important; } /* Mobile dùng khung detail chạm tay */
+  #craneTooltip { display: none !important; }
 }
 @media (max-width: 440px) {
   .grid-form { grid-template-columns: 1fr; }
@@ -484,7 +534,7 @@ pre.schema-box {
     <div class="brand-logo">CHP · TÂN VŨ</div>
     <div>
       <div class="brand-title">TOS DISPATCH & CRANE PILOT</div>
-      <div class="brand-sub">Chỉ đạo gọi hàng · Final Loading bãi ngoài · Cân bằng Cẩu · Sẵn sàng Bot OM</div>
+      <div class="brand-sub">Chỉ đạo gọi hàng · Final Loading bãi ngoài · Chia Hầm Động · Bảo mật PIN & Bot OM</div>
     </div>
   </div>
 
@@ -497,12 +547,13 @@ pre.schema-box {
     </div>
     <button class="primary" onclick="createNewVesselSession()">+ Tàu mới</button>
     <button class="ghost" onclick="syncAllCloudData()" title="Đồng bộ dữ liệu từ Supabase Cloud & Bot ePort">🔄 Cloud</button>
-    <button class="ghost" id="btnAutoPoll" onclick="toggleBotAutoPoll()" title="Tự động tải Job List từ Bot OM mỗi 60 giây">🤖 Bot: Tắt</button>
+    <button class="ghost" id="btnAutoPoll" onclick="openBotControlModal()" title="Điều khiển Bot OM tự động đăng nhập PL-TOS & reload F5 mỗi 5 phút">🤖 Bot OM</button>
+    <button class="ghost" id="btnAdminPinHeader" onclick="openAdminPinModal('quản lý mã PIN', true)" title="Xác thực / Đổi PIN / Quên PIN">🔒 PIN</button>
     <button class="ghost" onclick="toggleTheme()" title="Sáng / Tối">🌓</button>
   </div>
 </header>
 
-<!-- THANH KPI LIVE (TRÊN MOBILE VUỐT NGANG GỌN) -->
+<!-- THANH KPI LIVE -->
 <div class="kpi-strip">
   <div class="kpi-card">
     <small>Tiến độ ePort Tân Vũ</small>
@@ -510,7 +561,7 @@ pre.schema-box {
     <div class="kpi-sub" id="kpiEportSub">Bot ePort Live</div>
   </div>
   <div class="kpi-card">
-    <small>Mớn Mũi / Lái Dự Kiến</small>
+    <small>Mớn Mũi / Lái & Trim</small>
     <strong id="kpiDraftLive">7.80m / 8.20m</strong>
     <div class="kpi-sub" id="kpiDraftStatus" style="color:var(--green)">An toàn (28 cont / 10cm)</div>
   </div>
@@ -532,9 +583,9 @@ pre.schema-box {
 </div>
 
 <!-- TAB DESKTOP -->
-<nav class="nav-tabs-desktop" id="desktopTabs">
+<nav class="nav-tabs-desktop">
   <button class="active" data-tab="tab-dispatch" onclick="switchTab('tab-dispatch')">1. Khuyến nghị Gọi hàng & Cẩu</button>
-  <button data-tab="tab-holds" onclick="switchTab('tab-holds')">2. Sơ đồ 9 Hầm & Gọi hàng Đuổi</button>
+  <button data-tab="tab-holds" onclick="switchTab('tab-holds')">2. Chia Hầm Động & Gọi hàng Đuổi</button>
   <button data-tab="tab-cranes" onclick="switchTab('tab-cranes')">3. Thiết lập Tàu, Cẩu & Sự cố</button>
   <button data-tab="tab-upload" onclick="switchTab('tab-upload')">4. Nạp File riêng theo Tàu & Bot OM</button>
 </nav>
@@ -544,10 +595,9 @@ pre.schema-box {
   <!-- ==================== TAB 1: KHUYẾN NGHỊ GỌI HÀNG & CẨU ==================== -->
   <div id="tab-dispatch" class="tab-pane active">
     <div class="grid-2">
-      <!-- BIỂU ĐỒ SẢN LƯỢNG CẨU THEO KHUNG GIỜ -->
       <div class="panel">
         <div class="panel-head">
-          <h3>📊 Sản lượng Cẩu theo Khung giờ (Chạm/Rê vào cột giờ xem cẩu ít/nhiều)</h3>
+          <h3>📊 Sản lượng Cẩu theo Khung giờ (Chạm/Rê chuột vào cột giờ xem cẩu ít/nhiều)</h3>
           <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">
             <select id="shiftFilter" onchange="renderCraneHourlyChart()">
               <option value="ALL">Tự động theo giờ thực tế</option>
@@ -561,30 +611,28 @@ pre.schema-box {
           <div class="crane-legend" id="craneChartLegend"></div>
           <div class="hourly-bars" id="craneHourlyBars"></div>
           <div class="hour-detail-bar" id="mobileHourDetail"></div>
-          <div id="craneAdviceBox" style="margin-top:10px;padding:8px 10px;border-radius:7px;background:rgba(2,132,199,0.08);font-size:11.5px;"></div>
+          <div id="craneAdviceBox" style="margin-top:9px;padding:8px 10px;border-radius:7px;background:rgba(2,132,199,0.08);font-size:11.5px;"></div>
         </div>
       </div>
 
-      <!-- BÃI NGOÀI TỪ FINAL LOADING (CỘT CUỐI TRỪ TV) -->
       <div class="panel">
         <div class="panel-head">
-          <h3>🚛 Bãi ngoài từ Final Loading (Cột "Cảng chuyển" trừ TV)</h3>
+          <h3>🚛 Phân bổ Bãi ngoài từ Final Loading (Cột "Cảng chuyển" trừ TV)</h3>
           <span class="badge amber" id="offDockTotalBadge">0 Cont bãi ngoài</span>
         </div>
         <div class="panel-body">
           <div style="font-size:11px;color:var(--muted);">
-            Tự lọc cột cuối <b>Cảng chuyển</b>: bỏ <b>TV</b> & hàng đã <b>Stacking</b> trong bãi Tân Vũ; gom các bãi vệ tinh <b>GFW, HHH, SA, VNB DV, SI</b> để gọi sớm (Pre-call).
+            Tự lọc cột cuối <b>Cảng chuyển</b>: bỏ <b>TV</b> & hàng <b>Stacking</b> trong bãi Tân Vũ; gom các bãi vệ tinh <b>GFW, HHH, SA, VNB DV, SI</b> để gọi sớm (Pre-call).
           </div>
           <div class="offdock-grid" id="offDockCards"></div>
         </div>
       </div>
     </div>
 
-    <!-- BẢNG KHUYẾN NGHỊ GỌI HÀNG -->
     <div class="panel">
       <div class="panel-head">
         <h3>🎯 Khuyến nghị Gọi hàng Thông minh theo Thiết bị</h3>
-        <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
+        <div style="display:flex;gap:7px;flex-wrap:wrap;align-items:center;">
           <select id="podStrategy" onchange="renderDispatchRecommendations()">
             <option value="FEWEST_FIRST">POD: Ưu tiên cảng ít trước</option>
             <option value="ROUND_ROBIN">POD: Xếp san đều các cảng</option>
@@ -595,7 +643,7 @@ pre.schema-box {
             <option value="LIGHT_FIRST">Tấn: Tấn nhẹ xếp trước</option>
           </select>
           <select id="yardFilter" onchange="renderDispatchRecommendations()">
-            <option value="ALL">Bãi: Trộn tự động (Ưu tiên gọi sớm bãi ngoài)</option>
+            <option value="ALL">Bãi: Trộn tự động (Gọi sớm bãi ngoài)</option>
             <option value="OFF_DOCK_ONLY">Bãi: Chỉ gọi Bãi ngoài (GFW, HHH, SA...)</option>
             <option value="TV_ONLY">Bãi: Chỉ gọi nội bộ Tân Vũ (TV)</option>
           </select>
@@ -608,18 +656,27 @@ pre.schema-box {
     </div>
   </div>
 
-  <!-- ==================== TAB 2: SƠ ĐỒ 9 HẦM & GỌI HÀNG ĐUỔI ==================== -->
+  <!-- ==================== TAB 2: CHIA HẦM ĐỘNG & GỌI HÀNG ĐUỔI ==================== -->
   <div id="tab-holds" class="tab-pane">
     <div class="panel">
       <div class="panel-head">
-        <h3>🚢 Tiến độ Dỡ nhập & Xếp xuất theo 9 Hầm (HOLD 01 → HOLD 09)</h3>
-        <div style="display:flex;gap:6px;flex-wrap:wrap;">
-          <button class="primary" onclick="autoSelectDischargedBays()">⚡ Tích Bay đã dỡ xong nhập</button>
-          <button onclick="toggleAllBays(true)">Chọn tất cả</button>
-          <button onclick="toggleAllBays(false)">Bỏ chọn</button>
+        <h3>🚢 Cấu trúc Hầm hàng Động (<span id="holdCountBadge" style="color:var(--cyan);">0 Hầm</span>) & Tiến độ Dỡ/Xếp</h3>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;">
+          <label style="font-size:11.5px;display:inline-flex;align-items:center;gap:4px;">
+            Số hầm mục tiêu:
+            <input id="desiredHoldCountInput" type="number" min="0" max="15" value="0" style="width:58px;min-height:30px;" title="Để 0 = Tự chia theo số Bay & chiều dài tàu">
+          </label>
+          <button class="primary sm" onclick="recalcHoldsAuto()">⚡ Tự chia lại theo Bay & LOA</button>
+          <button class="sm" onclick="addManualHold()">+ Thêm Hầm</button>
+          <button class="success sm" onclick="saveHoldConfigToCloud()">💾 Lưu sơ đồ Hầm</button>
+          <button class="sm" onclick="toggleAllBays(true)">Chọn tất cả Bay</button>
+          <button class="sm" onclick="toggleAllBays(false)">Bỏ chọn</button>
         </div>
       </div>
       <div class="panel-body">
+        <div style="font-size:11px;color:var(--muted);margin-bottom:8px;">
+          💡 Số hầm tự động chia theo <b>số Bay thực tế</b> trong file & <b>chiều dài tàu (LOA)</b>. Chỉ đạo viên có thể sửa trực tiếp dãy số Bay ngay dưới mỗi thẻ Hầm (VD: <code>01, 02, 03</code>) rồi bấm <b>Lưu sơ đồ Hầm</b> lên Cloud. Bấm vào từng nút <b>Bay</b> để mở Popup sơ đồ <b>Row × Tier</b>.
+        </div>
         <div class="holds-grid" id="holdsOverviewGrid"></div>
       </div>
     </div>
@@ -629,7 +686,7 @@ pre.schema-box {
         <h3>🔁 Khuyến nghị Gọi hàng Đuổi & Thay thế Gần Tấn Tạ Nhất (Chia theo từng Hầm)</h3>
         <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
           <select id="chaseHoldFilter" onchange="renderRollingChaseByHold()">
-            <option value="ALL">Tất cả 9 Hầm</option>
+            <option value="ALL">Tất cả các Hầm</option>
           </select>
           <span class="badge purple" id="chaseMissingBadge">0 vị trí khuyết</span>
         </div>
@@ -643,28 +700,32 @@ pre.schema-box {
     <div class="grid-2">
       <div class="panel">
         <div class="panel-head">
-          <h3>📐 Thông số Tàu & Tự động tính Mớn nước (~28 cont / 10cm)</h3>
-          <button class="success" onclick="saveVesselSessionToCloud()">💾 Lưu Cloud</button>
+          <h3>📐 Thông số Tàu, Mớn nước (~28 cont/10cm) & Ngưỡng Boong</h3>
+          <div style="display:flex;gap:6px;flex-wrap:wrap;">
+            <button class="success sm" onclick="saveVesselSessionToCloud()">💾 Lưu Cloud (PIN)</button>
+            <button class="danger sm" onclick="deleteCurrentVesselSession()">🗑️ Xóa tàu (Dừng Bot)</button>
+          </div>
         </div>
         <div class="panel-body">
           <div class="grid-form">
             <div><label>Tên tàu<br><input id="cfgVesselName" value="KUO LUNG" style="width:100%" oninput="recalcDraftLive()"></label></div>
             <div><label>Chuyến (Voyage)<br><input id="cfgVoyage" value="1009S" style="width:100%"></label></div>
             <div><label>Cầu bến<br><input id="cfgBerth" value="TV3" style="width:100%"></label></div>
-            <div><label>Chiều dài L (m)<br><input id="cfgLength" type="number" value="172" style="width:100%" oninput="recalcDraftLive(true)"></label></div>
-            <div><label>Chiều rộng B (m)<br><input id="cfgBeam" type="number" step="0.1" value="27.6" style="width:100%" oninput="recalcDraftLive(true)"></label></div>
+            <div><label>Chiều dài L (m)<br><input id="cfgLength" type="number" value="172" style="width:100%" oninput="onLengthBeamChange()"></label></div>
+            <div><label>Chiều rộng B (m)<br><input id="cfgBeam" type="number" step="0.1" value="27.6" style="width:100%" oninput="onLengthBeamChange()"></label></div>
             <div><label>Định mức Cont / 10cm<br><input id="cfgContPer10cm" type="number" value="28" style="width:100%" oninput="recalcDraftLive()"></label></div>
             <div><label>Mớn Mũi ban đầu (m)<br><input id="cfgDraftF" type="number" step="0.01" value="7.80" style="width:100%" oninput="recalcDraftLive()"></label></div>
             <div><label>Mớn Lái ban đầu (m)<br><input id="cfgDraftA" type="number" step="0.01" value="8.20" style="width:100%" oninput="recalcDraftLive()"></label></div>
             <div><label>Mớn Giới hạn Tmax (m)<br><input id="cfgMaxDraft" type="number" step="0.01" value="9.20" style="width:100%" oninput="recalcDraftLive()"></label></div>
-            <div><label>Ngưỡng Tier Boong (>=)<br><input id="cfgDeckTier" type="number" value="80" style="width:100%"></label></div>
+            <div><label>Độ sâu đáy bến (m)<br><input id="cfgBerthDepth" type="number" step="0.1" value="9.0" style="width:100%" oninput="recalcDraftLive()"></label></div>
+            <div><label>Ngưỡng Tier Boong (>=)<br><input id="cfgDeckTier" type="number" value="80" style="width:100%" oninput="renderAll()"></label></div>
           </div>
         </div>
       </div>
 
       <div class="panel">
         <div class="panel-head">
-          <h3>🏗️ Thiết bị Cẩu Tân Vũ & Xử lý Sự cố Gián đoạn</h3>
+          <h3>🏗️ Phương tiện Cẩu Tân Vũ & Xử lý Sự cố Gián đoạn</h3>
           <div style="display:flex;gap:5px;">
             <input id="customCraneInput" placeholder="Thêm mã (VD: QC14)" style="width:130px;">
             <button class="primary" onclick="addCustomCrane()">+ Thêm</button>
@@ -672,9 +733,9 @@ pre.schema-box {
         </div>
         <div class="panel-body">
           <div style="font-size:11px;color:var(--muted);margin-bottom:8px;">
-            Chọn thiết bị tham gia, phân loại <b>Chỉ làm Nhập (Xong nghỉ)</b> hoặc <b>Nhập + Xuất</b>, và bấm <b>⏸ Tạm dừng</b> khi sự cố để tính giờ gián đoạn & phương án bổ khuyết:
+            Tích chọn thiết bị, phân loại <b>Chỉ làm Nhập (Xong nghỉ)</b> hoặc <b>Nhập + Xuất</b>, và bấm <b>⏸ Tạm dừng</b> khi sự cố để tính giờ gián đoạn & 2 phương án bổ khuyết:
           </div>
-          <div id="craneRosterList" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px;"></div>
+          <div id="craneRosterList" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px;"></div>
           <div id="craneAssignmentTable"></div>
           <div id="failoverAdvicePanel" style="margin-top:10px;"></div>
         </div>
@@ -682,15 +743,32 @@ pre.schema-box {
     </div>
   </div>
 
-  <!-- ==================== TAB 4: BƯỚC 1 CẢNH BÁO CHỌN TÀU + 5 Ô UPLOAD + CHUẨN BOT OM ==================== -->
+  <!-- ==================== TAB 4: BƯỚC 1 CẢNH BÁO CHỌN TÀU + 5 Ô UPLOAD + BOT OM ==================== -->
   <div id="tab-upload" class="tab-pane">
-    <!-- BƯỚC 1 BẮT BUỘC: CẢNH BÁO & KHÓA XÁC NHẬN CHỌN ĐÚNG TÀU -->
+    <!-- BẢNG ĐIỀU KHIỂN NHANH BOT OM WINDOWS -->
+    <div class="panel" style="border-left:4px solid var(--cyan);">
+      <div class="panel-head">
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+          <h3>🤖 Bot Tự động PL-TOS (Operation Management Windows · Reload F5 mỗi 5 phút)</h3>
+          <span class="badge" id="botLiveBadge">IDLE</span>
+        </div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;">
+          <button class="primary sm" onclick="openBotControlModal()">🚀 Nhập TK/MK & Khởi động Bot</button>
+          <button class="danger sm" id="btnQuickStopBot" style="display:none;" onclick="stopRemoteBot()">🛑 Dừng Bot</button>
+          <button class="sm" onclick="refreshBotCommandStatus(true)">🔄 Kiểm tra Bot</button>
+        </div>
+      </div>
+      <div class="panel-body" style="padding:9px 13px;font-size:12px;">
+        <div id="botLiveSummaryText" style="color:var(--muted);">Chưa khởi động Bot cho tàu này. Bấm <b>"Nhập TK/MK & Khởi động Bot"</b> để máy Windows tự mở PL-TOS, đăng nhập, bấm F5 và đẩy dữ liệu lên Cloud mỗi 5 phút.</div>
+      </div>
+    </div>
+
     <div class="step1-guard" id="step1GuardBox">
       <div style="flex:1;min-width:240px;">
         <div class="step1-guard-title" id="step1GuardTitle">⚠️ BƯỚC 1 (BẮT BUỘC): KIỂM TRA & XÁC NHẬN ĐÚNG TÀU TRƯỚC KHI NẠP FILE</div>
         <div style="font-size:12px;">
-          Mỗi tàu được lưu vào thư mục riêng trên Supabase: <b id="activeCloudFolder" style="color:var(--cyan);">tos-vessel-plans/KUO_LUNG_1009S/</b>.<br>
-          Vui lòng kiểm tra kỹ tên tàu trên thanh chọn phía trên để <b>tránh nạp nhầm file của tàu này đè lên dữ liệu tàu khác</b>!
+          Mỗi tàu được lưu vào thư mục độc lập trên Supabase: <b id="activeCloudFolder" style="color:var(--cyan);">tos-vessel-plans/KUO_LUNG_1009S/</b>.<br>
+          Vui lòng đối chiếu tên tàu ở góc trên cùng để <b>không nạp nhầm file của tàu này đè lên tàu khác</b>!
         </div>
       </div>
       <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
@@ -703,8 +781,8 @@ pre.schema-box {
       <div class="panel-head">
         <h3>📂 Bước 2: Nạp File riêng cho tàu <span id="uploadVesselLabel" style="color:var(--cyan);">KUO_LUNG_1009S</span></h3>
         <div style="display:flex;gap:8px;flex-wrap:wrap;">
-          <button class="primary" onclick="loadSampleKuoLung1009S()">⚡ Chạy thử bộ mẫu KUO LUNG 1009S</button>
-          <button class="danger" onclick="clearExportDataOnly()">🗑️ Xóa riêng dữ liệu Hàng xuất</button>
+          <button class="primary" onclick="loadSampleKuoLung1009S(false)">⚡ Chạy thử mẫu KUO LUNG 1009S</button>
+          <button class="danger" onclick="clearExportDataOnly()">🗑️ Xóa riêng dữ liệu Hàng xuất (PIN)</button>
         </div>
       </div>
       <div class="panel-body">
@@ -713,14 +791,13 @@ pre.schema-box {
         </div>
 
         <div class="upload-grid upload-zone-locked" id="uploadCardsContainer">
-          <!-- Ô 1: SBP NHẬP -->
           <div class="upload-card" id="card-sbp">
             <div>
               <span class="badge green">Ô 1 · Nạp 1 lần đầu ca</span>
               <h4 style="margin:6px 0 4px;">1. Sơ đồ hầm hàng nhập (SBP)</h4>
               <div style="font-size:11px;color:var(--muted);">
                 Màn hình OM: <i>Hàng nhập → Sơ đồ hầm hàng (SBP)</i>.<br>
-                Cột chuẩn: <b>Vị Trí, Số Container, Kích Cỡ, Trọng Lượng Hàng</b>.
+                Tự đọc: <b>Vị Trí</b> (tự dựng khung Bay/Hầm), <b>Số Container, Kích Cỡ, Trọng Lượng</b>.
               </div>
             </div>
             <div>
@@ -729,13 +806,12 @@ pre.schema-box {
             </div>
           </div>
 
-          <!-- Ô 2: FINAL LOADING -->
           <div class="upload-card" id="card-final">
             <div>
               <span class="badge amber">Ô 2 · Bãi ngoài (Cột cuối)</span>
               <h4 style="margin:6px 0 4px;">2. Danh sách Final Loading</h4>
               <div style="font-size:11px;color:var(--muted);">
-                Đọc cột cuối <b>Cảng chuyển</b> (trừ <b>TV</b> để tách bãi ngoài <b>GFW, HHH, SA, VNB DV, SI</b>), <b>Vị trí bãi, TL hải quan</b>.
+                Đọc cột cuối <b>Cảng chuyển</b> (trừ <b>TV</b> & Stacking để lọc <b>GFW, HHH, SA, VNB DV, SI</b>), <b>Vị trí bãi, TL hải quan</b>.
               </div>
             </div>
             <div>
@@ -744,14 +820,13 @@ pre.schema-box {
             </div>
           </div>
 
-          <!-- Ô 3: RESERVED -->
           <div class="upload-card" id="card-reserved">
             <div>
               <span class="badge">Ô 3 · Nạp khi có thay đổi</span>
               <h4 style="margin:6px 0 4px;">3. Danh sách Xuất (Reserved)</h4>
               <div style="font-size:11px;color:var(--muted);">
                 Màn hình OM: <i>Danh sách Container Xuất tàu</i>.<br>
-                Lọc cột <b>Chọn = 1</b>, đọc <b>Block, Cảng dỡ, TL Hàng, Kích cỡ</b>.
+                Chỉ giữ dòng <b>Chọn = 1</b>, đọc <b>Block, Cảng dỡ, TL Hàng, Kích cỡ</b>.
               </div>
             </div>
             <div>
@@ -760,10 +835,9 @@ pre.schema-box {
             </div>
           </div>
 
-          <!-- Ô 4: THAY ĐỔI CÔNG VIỆC TÀU (BOT OM SẼ GHI ĐÈ FILE NÀY) -->
           <div class="upload-card" id="card-jobs">
             <div>
-              <span class="badge red">Ô 4 · Cập nhật liên tục / Bot OM</span>
+              <span class="badge red">Ô 4 · Nạp liên tục / Bot OM</span>
               <h4 style="margin:6px 0 4px;">4. Thay đổi công việc tàu (Job List)</h4>
               <div style="font-size:11px;color:var(--muted);">
                 Chuẩn hóa sang <b>jobs.json (v1.0)</b> cho cả Excel tay lẫn <b>Bot OM tự động</b>. Cập nhật A/B/C, Vị trí thực tế & Cẩu.
@@ -775,13 +849,12 @@ pre.schema-box {
             </div>
           </div>
 
-          <!-- Ô 5: CHỈ DẪN XẾP DỠ & EDI / $604 -->
           <div class="upload-card optional" id="card-edi">
             <div>
               <span class="badge purple">Ô 5 · Dự kiến xuất & Chỉ dẫn</span>
               <h4 style="margin:6px 0 4px;">5. Sơ đồ .ASC ($604) / .EDI & Chỉ dẫn xếp</h4>
               <div style="font-size:11px;color:var(--muted);">
-                Chọn 1 hoặc nhiều file: <b>.asc ($604)</b>, <b>.edi (BAPLIE)</b>, <b>chi dan xep (.xlsx)</b>. Hỗ trợ đủ DG, RF, OH/AK, UD/OD.
+                Chọn 1 hoặc nhiều file: <b>.asc ($604)</b>, <b>.edi (BAPLIE)</b>, <b>chi dan xep (.xlsx)</b>. Đọc đủ 100% DG, RF, OH/AK, UD/OD.
               </div>
             </div>
             <div>
@@ -796,10 +869,10 @@ pre.schema-box {
 
 </div>
 
-<!-- MOBILE BOTTOM NAV BAR -->
-<nav class="mobile-bottom-nav" id="mobileTabs">
+<!-- MOBILE BOTTOM NAV -->
+<nav class="mobile-bottom-nav">
   <button class="active" data-tab="tab-dispatch" onclick="switchTab('tab-dispatch')"><span class="m-ico">🎯</span><span>Gọi hàng</span></button>
-  <button data-tab="tab-holds" onclick="switchTab('tab-holds')"><span class="m-ico">🚢</span><span>9 Hầm</span></button>
+  <button data-tab="tab-holds" onclick="switchTab('tab-holds')"><span class="m-ico">🚢</span><span>Hầm & Bay</span></button>
   <button data-tab="tab-cranes" onclick="switchTab('tab-cranes')"><span class="m-ico">🏗️</span><span>Cẩu & Mớn</span></button>
   <button data-tab="tab-upload" onclick="switchTab('tab-upload')"><span class="m-ico">📂</span><span>Nạp File</span></button>
 </nav>
@@ -807,27 +880,32 @@ pre.schema-box {
 <!-- TOOLTIP DESKTOP -->
 <div id="craneTooltip"></div>
 
-<!-- MODAL SƠ ĐỒ BAY -->
+<!-- MODAL 1: SƠ ĐỒ BAY -->
 <div class="modal-shade" id="bayModal" onclick="if(event.target===this) closeModal('bayModal')">
   <div class="modal-card">
-    <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--line);padding-bottom:8px;margin-bottom:12px;">
+    <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--line);padding-bottom:8px;margin-bottom:10px;gap:8px;flex-wrap:wrap;">
       <h3 id="bayModalTitle" style="margin:0;">Sơ đồ Bay</h3>
-      <button onclick="closeModal('bayModal')">✕ Đóng</button>
+      <div style="display:flex;gap:6px;align-items:center;font-size:10.5px;">
+        <span class="badge green">C: Đã xếp</span>
+        <span class="badge">B: Sẵn sàng (Bấm để gọi)</span>
+        <span class="badge amber">A: Giữ lại</span>
+        <button class="sm" onclick="closeModal('bayModal')">✕ Đóng</button>
+      </div>
     </div>
     <div id="bayModalBody"></div>
   </div>
 </div>
 
-<!-- MODAL CHUẨN DỮ LIỆU CHO BOT OM TỰ ĐỘNG -->
+<!-- MODAL 2: CHUẨN JSON BOT OM -->
 <div class="modal-shade" id="botSchemaModal" onclick="if(event.target===this) closeModal('botSchemaModal')">
   <div class="modal-card">
     <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--line);padding-bottom:8px;margin-bottom:10px;">
-      <h3 style="margin:0;">🤖 Chuẩn JSON & API Endpoint cho Bot Tự động lấy Màn hình OM (PL-TOS)</h3>
-      <button onclick="closeModal('botSchemaModal')">✕ Đóng</button>
+      <h3 style="margin:0;">🤖 Chuẩn JSON & Endpoint cho Bot Tự động lấy Màn hình OM (PL-TOS)</h3>
+      <button class="sm" onclick="closeModal('botSchemaModal')">✕ Đóng</button>
     </div>
     <div style="font-size:12px;margin-bottom:8px;">
-      Khi viết con Bot tự đăng nhập <b>Operation Management (PL-TOS)</b> và cào màn hình <i>Thay đổi công việc tàu</i>, Bot chỉ cần <b>POST/PUT</b> (<code>x-upsert: true</code>) vào đúng đường dẫn Storage Bucket của tàu đang khai thác:<br>
-      <code style="color:var(--cyan);font-weight:800;">POST https://tncacmmosygygbplwobr.supabase.co/storage/v1/object/tos-vessel-plans/{SESSION_ID}/jobs.json</code>
+      Bot tự đăng nhập <b>Operation Management (PL-TOS)</b> chỉ cần <b>POST</b> (<code>x-upsert: true</code>) lên Storage Bucket của tàu đang khai thác:<br>
+      <code id="botEndpointUrl" style="color:var(--cyan);font-weight:800;word-break:break-all;"></code>
     </div>
     <pre class="schema-box" id="botSchemaPreview"></pre>
     <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:10px;">
@@ -837,9 +915,145 @@ pre.schema-box {
   </div>
 </div>
 
+<!-- MODAL 3: BẢO MẬT MÃ PIN QUẢN TRỊ (XÁC THỰC / ĐỔI PIN / RESET BẰNG TK NGÂN HÀNG) -->
+<div class="modal-shade" id="adminPinModal" onclick="if(event.target===this) closeAdminPinModal(false)">
+  <div class="modal-card narrow">
+    <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--line);padding-bottom:8px;margin-bottom:10px;">
+      <h3 style="margin:0;">🔐 Quản trị Bảo mật Mã PIN (Supabase RPC)</h3>
+      <button class="sm" onclick="closeAdminPinModal(false)">✕</button>
+    </div>
+
+    <div class="pin-tabs">
+      <button id="ptab-verify" class="active" onclick="switchPinTab('verify')">🔒 Xác thực</button>
+      <button id="ptab-change" onclick="switchPinTab('change')">🔑 Đổi PIN</button>
+      <button id="ptab-reset" onclick="switchPinTab('reset')">🏦 Quên PIN</button>
+    </div>
+
+    <!-- TAB VERIFY -->
+    <div id="psec-verify" class="pin-section active">
+      <div id="pinActionPrompt" style="font-size:12px;color:var(--muted);margin-bottom:10px;">
+        Nhập mã PIN quản trị để mở khóa thao tác quản trị trên Cloud (giữ phiên 15 phút).
+      </div>
+      <div class="form-field">
+        <label>Mã PIN quản trị</label>
+        <input type="password" id="inpVerifyPin" inputmode="numeric" placeholder="Nhập mã PIN..." style="font-size:16px;text-align:center;letter-spacing:4px;" onkeydown="if(event.key==='Enter') submitVerifyPin()">
+      </div>
+      <div class="pin-msg" id="msgVerifyPin"></div>
+      <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:10px;">
+        <button id="btnLockPinNow" class="danger" style="display:none;margin-right:auto;" onclick="lockAdminSessionNow()">🔒 Khóa ngay</button>
+        <button onclick="closeAdminPinModal(false)">Hủy</button>
+        <button class="primary" onclick="submitVerifyPin()">Xác nhận</button>
+      </div>
+    </div>
+
+    <!-- TAB CHANGE PIN -->
+    <div id="psec-change" class="pin-section">
+      <div class="form-field">
+        <label>Mã PIN hiện tại (*)</label>
+        <input type="password" id="inpOldPin" inputmode="numeric" placeholder="Nhập mã PIN cũ...">
+      </div>
+      <div class="form-field">
+        <label>Mã PIN mới (4 – 12 ký tự) (*)</label>
+        <input type="password" id="inpNewPin" inputmode="numeric" placeholder="Nhập mã PIN mới...">
+      </div>
+      <div class="form-field">
+        <label>Nhập lại mã PIN mới (*)</label>
+        <input type="password" id="inpConfirmNewPin" inputmode="numeric" placeholder="Xác nhận mã PIN mới...">
+      </div>
+      <div class="pin-msg" id="msgChangePin"></div>
+      <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:10px;">
+        <button onclick="closeAdminPinModal(false)">Đóng</button>
+        <button class="success" onclick="submitChangePin()">💾 Cập nhật PIN mới</button>
+      </div>
+    </div>
+
+    <!-- TAB RESET PIN -->
+    <div id="psec-reset" class="pin-section">
+      <div style="font-size:11.5px;color:var(--muted);margin-bottom:10px;">
+        Nhập chính xác <b>số tài khoản ngân hàng xác minh của Admin</b> đã lưu mã hóa trên Supabase để đặt lại mã PIN về mặc định (<b>6868</b>) và gỡ khóa tạm thời.
+      </div>
+      <div class="form-field">
+        <label>Số tài khoản ngân hàng Admin (*)</label>
+        <input type="password" id="inpRecoveryBank" inputmode="numeric" placeholder="Nhập số TK ngân hàng xác minh...">
+      </div>
+      <div class="pin-msg" id="msgResetPin"></div>
+      <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:10px;">
+        <button onclick="closeAdminPinModal(false)">Đóng</button>
+        <button class="warning" onclick="submitResetPin()">♻️ Reset PIN về 6868</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL 4: ĐIỀU KHIỂN BOT OM WINDOWS TỪ XA (NHẬP TK/MK & KHỞI ĐỘNG) -->
+<div class="modal-shade" id="botControlModal" onclick="if(event.target===this) closeModal('botControlModal')">
+  <div class="modal-card" style="width:min(620px, 100%);">
+    <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--line);padding-bottom:8px;margin-bottom:10px;gap:8px;">
+      <h3 style="margin:0;">🤖 Điều khiển Bot OM Tự động (Windows PL-TOS)</h3>
+      <button class="sm" onclick="closeModal('botControlModal')">✕ Đóng</button>
+    </div>
+
+    <div style="background:rgba(2,132,199,0.08);border:1px solid var(--cyan);border-radius:8px;padding:9px 11px;margin-bottom:12px;font-size:11.5px;">
+      <div><b>Tàu đang chọn:</b> <span id="botModalSessionId" style="color:var(--cyan);font-weight:900;"></span> · <b>Trạng thái Bot:</b> <span class="badge" id="botModalStatusBadge">IDLE</span></div>
+      <div id="botModalLastMsg" style="margin-top:4px;color:var(--muted);">Bot Windows tự xóa mật khẩu về NULL trên Supabase ngay sau khi đọc vào RAM, tự dừng khi tàu đạt 100% hoặc khi có người xóa tàu.</div>
+    </div>
+
+    <div class="grid-form" style="grid-template-columns:repeat(2, minmax(0, 1fr));gap:10px;">
+      <div class="form-field" style="margin:0;">
+        <label>Tài khoản PL-TOS (OM) (*)</label>
+        <input id="botTosUser" placeholder="VD: dungvt" autocomplete="off">
+      </div>
+      <div class="form-field" style="margin:0;">
+        <label>Mật khẩu PL-TOS (*)</label>
+        <input type="password" id="botTosPass" placeholder="Tự xóa khỏi Cloud ngay khi Bot đọc" autocomplete="new-password">
+      </div>
+      <div class="form-field" style="margin:0;">
+        <label>Mã tàu trong OM (Vessel Code)</label>
+        <input id="botVesselCode" placeholder="VD: KULU">
+      </div>
+      <div class="form-field" style="margin:0;">
+        <label>Năm / Lượt (VD: 2026 / 0006)</label>
+        <div style="display:flex;gap:6px;">
+          <input id="botVesselYear" value="2026" style="width:48%;" placeholder="2026">
+          <input id="botVesselSeq" value="0006" style="width:52%;" placeholder="0006">
+        </div>
+      </div>
+      <div class="form-field" style="margin:0;">
+        <label>Chế độ trích xuất dữ liệu</label>
+        <select id="botExtractMode" style="width:100%;">
+          <option value="EXCEL">EXCEL (Bấm nút xuất Excel - Chuẩn 100%)</option>
+          <option value="CLIPBOARD">CLIPBOARD (Ctrl+A / Ctrl+C trực tiếp lưới)</option>
+        </select>
+      </div>
+      <div class="form-field" style="margin:0;">
+        <label>Chu kỳ F5 Reload (phút)</label>
+        <input type="number" id="botIntervalMin" min="1" max="60" value="5">
+      </div>
+    </div>
+
+    <div class="form-field" style="margin-top:10px;">
+      <label>Đường dẫn file Operation Management.exe trên máy Windows</label>
+      <input id="botExePath" value="F:\PLTOS\PLTOS_TVP_QR\PLTOS_TVP\Operation Management.exe">
+    </div>
+
+    <div id="botModalActionMsg" class="pin-msg"></div>
+
+    <div style="display:flex;gap:8px;justify-content:space-between;flex-wrap:wrap;margin-top:12px;padding-top:10px;border-top:1px solid var(--line);">
+      <div style="display:flex;gap:6px;flex-wrap:wrap;">
+        <button class="danger" onclick="stopRemoteBot()">🛑 Dừng Bot</button>
+        <button onclick="toggleBotAutoPoll()" id="btnToggleWebPollModal">🔄 Tự tải Web (60s): Tắt</button>
+      </div>
+      <div style="display:flex;gap:6px;">
+        <button onclick="closeModal('botControlModal')">Đóng</button>
+        <button class="success" onclick="startRemoteBot()">🚀 Khởi động Bot ngay (PIN)</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <script>
 // =========================================================================
-// MODULE 1: CẤU HÌNH HỆ THỐNG & KẾT NỐI SUPABASE (DỄ THAY THẾ)
+// [PHẦN 1] CONFIG, SUPABASE CLOUD REPO, BƯỚC 1 GUARD & ADMIN PIN RPC
 // =========================================================================
 const APP_CONFIG = {
   SUPABASE_URL: 'https://tncacmmosygygbplwobr.supabase.co',
@@ -862,22 +1076,9 @@ const OFF_DOCK_LABELS = {
   'VNB DV': 'Bãi VNB Đình Vũ',
   'SI': 'Bãi SI (Ngoài cảng)'
 };
-const HOLD_DEFS = [
-  { hold: 1, bays: ['01','02','03'] },
-  { hold: 2, bays: ['05','06','07'] },
-  { hold: 3, bays: ['09','10','11'] },
-  { hold: 4, bays: ['13','14','15'] },
-  { hold: 5, bays: ['17','18','19'] },
-  { hold: 6, bays: ['21','22','23'] },
-  { hold: 7, bays: ['25','26','27'] },
-  { hold: 8, bays: ['29','30','31'] },
-  { hold: 9, bays: ['33'] }
-];
 
-// Trạng thái trung tâm (Single Source of Truth)
 const state = {
   sessionId: 'KUO_LUNG_1009S',
-  uploadConfirmedForSession: null, // Bắt buộc xác nhận Bước 1 cho đúng tàu
   autoPollEnabled: false,
   autoPollTimer: null,
   jobsSource: 'EXCEL_WEB',
@@ -888,7 +1089,9 @@ const state = {
   liveJobs: [],
   stowageInstructions: {},
   preStowagePlan: [],
-  selectedBays: new Set(HOLD_DEFS.flatMap(h => h.bays)),
+  holdConfig: [],
+  isCustomHoldConfig: false,
+  selectedBays: new Set(),
   calledContainers: new Set(),
   cranes: [
     { id: 'QC11', active: true, mode: 'BOTH', holds: [1,2,3], paused: false, pauseStart: null, rate: 28 },
@@ -897,213 +1100,90 @@ const state = {
     { id: 'TK10', active: true, mode: 'IMPORT_ONLY', holds: [1,2], paused: false, pauseStart: null, rate: 22 }
   ],
   eportJobs: {},
+  todayTide: null,
   selectedChartHour: null
 };
 
-// =========================================================================
-// MODULE 2: BỘ ADAPTER CHUẨN HÓA DỮ LIỆU (DÙNG CHUNG CHO EXCEL & BOT OM)
-// =========================================================================
-const DataAdapters = {
-  parsePos6(posStr) {
-    const s = String(posStr ?? '').replace(/\.\d+$/, '').replace(/\D/g, '');
-    if (!s || s === '0') return null;
-    const padded = s.length === 7 ? s.slice(1) : s.padStart(6, '0').slice(-6);
-    if (padded === '000000') return null;
-    return {
-      raw: padded,
-      bay: padded.slice(0, 2),
-      row: padded.slice(2, 4),
-      tier: padded.slice(4, 6),
-      tierNum: parseInt(padded.slice(4, 6), 10)
-    };
+const AdminPinGuard = {
+  unlockedUntil: 0,
+  SESSION_TTL_MS: 15 * 60 * 1000,
+  pendingResolve: null,
+
+  isUnlocked() {
+    return Date.now() < this.unlockedUntil;
   },
 
-  getHoldByBay(bay) {
-    const b = String(bay).padStart(2, '0');
-    const found = HOLD_DEFS.find(h => h.bays.includes(b));
-    return found ? found.hold : 1;
+  lockNow() {
+    this.unlockedUntil = 0;
+    updateAdminPinHeaderBtn();
   },
 
-  // Chuẩn hóa Jobs từ cả Excel PL-TOS lẫn JSON Bot OM (schema_version 1.0)
-  normalizeJobsPayload(rawPayload) {
-    let source = 'EXCEL_WEB';
-    let updatedAt = new Date().toISOString();
-    let rows = [];
-
-    if (rawPayload && !Array.isArray(rawPayload) && Array.isArray(rawPayload.rows)) {
-      source = rawPayload.source || 'OM_AUTO_BOT';
-      updatedAt = rawPayload.updated_at || updatedAt;
-      rows = rawPayload.rows;
-    } else if (Array.isArray(rawPayload)) {
-      rows = rawPayload;
+  async verify(pinStr) {
+    const { data, error } = await sb.rpc('verify_admin_pin', { p_pin: String(pinStr || '').trim() });
+    if (error) return { ok: false, message: 'Lỗi RPC: ' + error.message };
+    if (data && data.ok) {
+      this.unlockedUntil = Date.now() + this.SESSION_TTL_MS;
+      updateAdminPinHeaderBtn();
     }
-
-    const normalized = rows.map(r => {
-      // Hỗ trợ cả key chuẩn tiếng Anh (Bot OM) và tên cột tiếng Việt (Excel PL-TOS)
-      const cntr = String(r.cntr || r['Số Container'] || '').trim().toUpperCase();
-      const jobType = String(r.job_type || r['Loại công việc'] || '').trim();
-      const ioRaw = String(r.io || r['Nhập/xuất'] || '').trim();
-      const io = (ioRaw.toLowerCase().includes('exp') || jobType === 'Xếp tàu') ? 'Export' : 'Import';
-      const posObj = this.parsePos6(r.pos ?? r['Vị trí']);
-      return {
-        cntr,
-        io,
-        job_type: jobType || (io === 'Export' ? 'Xếp tàu' : 'Dỡ tàu'),
-        status: String(r.status || r['Trạng thái công việc'] || '').trim().toUpperCase(),
-        crane: String(r.crane || r['Mã thiết bị'] || '').trim().toUpperCase(),
-        truck: String(r.truck || r['Xe kéo'] || '').trim(),
-        pos: posObj ? posObj.raw : '',
-        pod: String(r.pod || r['Cảng dỡ'] || '').trim().toUpperCase(),
-        fpod: String(r.fpod || r['Cảng đích'] || '').trim().toUpperCase(),
-        done_at: String(r.done_at || r['Ngày hoàn tất'] || '').trim()
-      };
-    }).filter(x => x.cntr);
-
-    return {
-      schema_version: APP_CONFIG.SCHEMA_VERSION,
-      session_id: state.sessionId,
-      source,
-      updated_at: updatedAt,
-      rows: normalized
-    };
+    return data || { ok: false, message: 'Không nhận được phản hồi xác thực.' };
   },
 
-  normalizeFinalLoading(rawPayload) {
-    const rows = Array.isArray(rawPayload) ? rawPayload : (rawPayload?.rows || []);
-    const headers = rows.length ? Object.keys(rows[0]) : [];
-    const lastColName = headers.includes('Cảng chuyển') ? 'Cảng chuyển' : (headers[headers.length - 1] || 'transfer_port');
-    return rows.map(r => {
-      const tp = String(r.transfer_port ?? r[lastColName] ?? '').trim().toUpperCase();
-      const yardStatus = String(r.yard_status ?? r['Trạng thái Cont'] ?? '').trim();
-      // Cột cuối rỗng + đang Stacking tại bãi TV -> nội bộ TV
-      const isOffDock = tp !== '' && tp !== 'TV' && tp !== 'VNTVP';
-      return {
-        cancel: Boolean(r.cancel ?? r['Cancel']),
-        cntr: String(r.cntr || r['Số Container'] || '').trim().toUpperCase(),
-        yard_status: yardStatus,
-        size: String(r.size || r['Kích cỡ'] || '').trim(),
-        weight: parseFloat(r.weight ?? r['TL Hàng'] ?? 0) || 0,
-        yard_pos: String(r.yard_pos || r['Vị trí bãi'] || '').trim(),
-        pod: String(r.pod || r['Cảng dỡ'] || '').trim().toUpperCase(),
-        customs: Boolean(r.customs ?? r['TL hải quan']),
-        ship_pos: String(r.ship_pos || r['Vị trí tàu'] || '').trim(),
-        transfer_port: tp || 'TV',
-        is_off_dock: isOffDock
-      };
-    }).filter(x => x.cntr && !x.cancel);
-  },
-
-  normalizeReserved(rawPayload) {
-    const rows = Array.isArray(rawPayload) ? rawPayload : (rawPayload?.rows || []);
-    return rows.filter(r => {
-      if (r.cntr) return true;
-      const sel = r['Chọn'];
-      return sel === 1 || sel === '1' || sel === true;
-    }).map(r => {
-      const blk = String(r.block || r['Block'] || '').trim().toUpperCase();
-      const yardPos = r.yard_pos || (blk ? `${blk}-${r['Bay'] || ''}-${r['Row'] || ''}-${r['Tier'] || ''}` : '---');
-      return {
-        cntr: String(r.cntr || r['Số Container'] || '').trim().toUpperCase(),
-        size: String(r.size || r['Kích cỡ'] || '').trim(),
-        pod: String(r.pod || r['Cảng dỡ'] || '').trim().toUpperCase(),
-        weight: parseFloat(r.weight ?? r['TL Hàng'] ?? 0) || 0,
-        block: blk,
-        yard_pos: yardPos
-      };
-    }).filter(x => x.cntr);
-  },
-
-  normalizeSbp(rawPayload) {
-    const rows = Array.isArray(rawPayload) ? rawPayload : (rawPayload?.rows || []);
-    return rows.map(r => {
-      const p = this.parsePos6(r.pos ?? r['Vị Trí'] ?? r['Vị trí']);
-      return {
-        pos: p ? p.raw : '',
-        cntr: String(r.cntr || r['Số Container'] || '').trim().toUpperCase(),
-        size: String(r.size || r['Kích Cỡ'] || r['Kích cỡ'] || '').trim(),
-        weight: parseFloat(r.weight ?? r['Trọng Lượng Hàng'] ?? r['TL Hàng'] ?? 0) || 0
-      };
-    }).filter(x => x.cntr);
-  },
-
-  // Parser chuẩn fixed-width cho file $604 (.ASC) đọc đủ 100% cả DG, RF-200C, AK/OH, 445
-  parse604Asc(text) {
-    const lines = text.split(/\r?\n/);
-    let detectedVessel = '';
-    const hdr = lines[0] || '';
-    const mHdr = hdr.match(/\$604([A-Z0-9]+)\/([^/]+)/);
-    if (mHdr) detectedVessel = `${mHdr[1]} / ${mHdr[2].trim()}`;
-
-    const items = [];
-    lines.forEach(line => {
-      if (!/^\d{6}\s+/.test(line)) return;
-      const pos = line.slice(0, 6).trim();
-      const cntr = line.slice(7, 20).trim().toUpperCase();
-      const iso = line.slice(44, 48).trim();
-      const cargoCode = line.slice(53, 66).trim();
-      let wt = 0;
-      const kgSlice = line.length >= 92 ? line.slice(86, 92) : '';
-      const mKg = kgSlice.match(/(\d{5})/);
-      if (mKg) {
-        wt = parseInt(mKg[1], 10) / 1000;
-      } else {
-        const mFallback = line.slice(68, 110).match(/\s(\d{5})(?:\s|\d)/);
-        if (mFallback) wt = parseInt(mFallback[1], 10) / 1000;
-      }
-      const trimmed = line.trim();
-      const pod = trimmed.length >= 5 ? trimmed.slice(-5) : 'SGSIN';
-      if (cntr && pos) {
-        items.push({
-          pos,
-          cntr,
-          iso: iso || '45G0',
-          weight: wt,
-          pod,
-          inst: cargoCode && cargoCode !== 'GP' ? cargoCode : ''
-        });
-      }
+  async changePin(oldPin, newPin) {
+    const { data, error } = await sb.rpc('change_admin_pin', {
+      p_old_pin: String(oldPin || '').trim(),
+      p_new_pin: String(newPin || '').trim()
     });
-    return { detectedVessel, items };
+    if (error) return { ok: false, message: 'Lỗi đổi PIN: ' + error.message };
+    return data || { ok: false, message: 'Đổi PIN thất bại.' };
   },
 
-  parseBaplieEdi(text) {
-    const segments = text.split("'");
-    let detectedVessel = '';
-    const items = [];
-    let curPos = '', curWeight = 0, curPod = '', curInst = '';
-    segments.forEach(seg => {
-      const s = seg.trim();
-      if (s.startsWith('TDT+20+')) {
-        detectedVessel = s.split(':').pop() || '';
-      } else if (s.startsWith('LOC+147+')) {
-        curPos = s.split('+')[2].split(':')[0];
-        curWeight = 0; curInst = '';
-      } else if (s.startsWith('MEA+WT+')) {
-        const m = s.match(/KGM:(\d+)/);
-        if (m) curWeight = parseInt(m[1], 10) / 1000;
-      } else if (s.startsWith('LOC+11+')) {
-        curPod = s.split('+')[2].split(':')[0];
-      } else if (s.startsWith('FTX+HAN+')) {
-        curInst += (curInst ? '/' : '') + s.split('+').pop();
-      } else if (s.startsWith('DGS+')) {
-        curInst += (curInst ? '/' : '') + 'DG';
-      } else if (s.startsWith('EQD+CN+')) {
-        const parts = s.split('+');
-        const cntr = (parts[2] || '').trim().toUpperCase();
-        const iso = (parts[3] || '').trim();
-        const p6 = this.parsePos6(curPos);
-        if (cntr && p6) {
-          items.push({ pos: p6.raw, cntr, iso, weight: curWeight, pod: curPod || 'SGSIN', inst: curInst });
-        }
-      }
+  async resetPinByBankAccount(bankAccount) {
+    const { data, error } = await sb.rpc('reset_admin_pin', {
+      p_recovery_account: String(bankAccount || '').trim()
     });
-    return { detectedVessel, items };
+    if (error) return { ok: false, message: 'Lỗi reset PIN: ' + error.message };
+    if (data && data.ok) {
+      this.unlockedUntil = 0;
+      updateAdminPinHeaderBtn();
+    }
+    return data || { ok: false, message: 'Reset PIN thất bại.' };
+  },
+
+  async requireAuth(actionName = 'thao tác quản trị') {
+    if (this.isUnlocked()) return true;
+    return await openAdminPinModal(actionName, false);
   }
 };
 
-// =========================================================================
-// MODULE 3: LỚP ĐỒNG BỘ SUPABASE CLOUD (POSTGRES + STORAGE BUCKET RIÊNG TÀU)
-// =========================================================================
+const VesselUploadGuard = {
+  confirmedSessionId: null,
+  lock() { this.confirmedSessionId = null; },
+  isUnlocked(sessionId) { return this.confirmedSessionId === sessionId; },
+  confirmUnlock(sessionId) {
+    const ok = confirm(
+      `⚠️ BƯỚC 1 - XÁC NHẬN ĐÚNG TÀU:\n\n` +
+      `Tàu đang chọn: [ ${sessionId} ]\n` +
+      `Thư mục Cloud: ${APP_CONFIG.BUCKET_NAME}/${sessionId}/\n\n` +
+      `Vui lòng xác nhận ĐÚNG tàu này để mở khóa 5 ô nạp file!`
+    );
+    if (ok) this.confirmedSessionId = sessionId;
+    return ok;
+  },
+  verifyFileVesselMatch(sessionId, fileName, detectedInFile) {
+    if (!detectedInFile) return true;
+    const normSession = sessionId.toUpperCase().replace(/[^A-Z0-9]/g, '');
+    const normFile = detectedInFile.toUpperCase().replace(/[^A-Z0-9]/g, '');
+    const token = sessionId.split('_')[0].toUpperCase();
+    if (normFile.includes(token) || normSession.includes(normFile.slice(0, 4))) return true;
+    return confirm(
+      `🚨 CẢNH BÁO LỆCH TÊN TÀU TRONG FILE!\n` +
+      `• Tàu đang chọn trên web: ${sessionId}\n` +
+      `• File "${fileName}" ghi tàu: ${detectedInFile}\n\n` +
+      `Bạn có CHẮC CHẮN muốn nạp file này vào ${sessionId}?`
+    );
+  }
+};
+
 const CloudRepo = {
   setStatus(txt, isErr = false) {
     const el = document.getElementById('kpiCloudStatus');
@@ -1114,29 +1194,23 @@ const CloudRepo = {
     if (el) el.textContent = txt;
   },
 
-  async uploadBucketJson(fileName, payloadObj) {
-    try {
-      const blob = new Blob([JSON.stringify(payloadObj)], { type: 'application/json' });
-      const path = `${state.sessionId}/${fileName}`;
-      const { error } = await sb.storage.from(APP_CONFIG.BUCKET_NAME).upload(path, blob, { upsert: true, cacheControl: '0' });
-      if (error) {
-        this.setStatus('⚠ Lỗi ghi Bucket', true);
-        this.setSub(`${path}: ${error.message}`);
-        return false;
-      }
-      this.setStatus('● Đã đồng bộ Cloud');
-      this.setSub(`Đã lưu ${path} (${new Date().toLocaleTimeString('vi-VN')})`);
-      return true;
-    } catch (e) {
-      this.setStatus('⚠ Lỗi mạng Cloud', true);
-      return false;
+  async uploadFile(sessionId, fileName, payloadObj) {
+    const path = `${sessionId}/${fileName}`;
+    const blob = new Blob([JSON.stringify(payloadObj)], { type: 'application/json' });
+    const { error } = await sb.storage.from(APP_CONFIG.BUCKET_NAME).upload(path, blob, { upsert: true, cacheControl: '0' });
+    if (error) {
+      this.setStatus('⚠ Lỗi ghi Bucket', true);
+      this.setSub(`${path}: ${error.message}`);
+      throw error;
     }
+    this.setStatus('● Đã đồng bộ Cloud');
+    this.setSub(`Đã lưu ${path} (${new Date().toLocaleTimeString('vi-VN')})`);
+    return path;
   },
 
-  async downloadBucketJson(fileName) {
+  async downloadFile(sessionId, fileName) {
     try {
-      const path = `${state.sessionId}/${fileName}`;
-      const { data, error } = await sb.storage.from(APP_CONFIG.BUCKET_NAME).download(path);
+      const { data, error } = await sb.storage.from(APP_CONFIG.BUCKET_NAME).download(`${sessionId}/${fileName}`);
       if (error || !data) return null;
       return JSON.parse(await data.text());
     } catch (e) {
@@ -1144,32 +1218,63 @@ const CloudRepo = {
     }
   },
 
-  async upsertVesselSession() {
+  async clearExportFiles(sessionId) {
+    await sb.from('dispatch_logs').delete().eq('session_id', sessionId);
+    await sb.storage.from(APP_CONFIG.BUCKET_NAME).remove([
+      `${sessionId}/final.json`,
+      `${sessionId}/reserved.json`,
+      `${sessionId}/jobs.json`,
+      `${sessionId}/edi_stowage.json`
+    ]);
+  },
+
+  async saveSessionMeta() {
     const vName = (document.getElementById('cfgVesselName')?.value || 'KUO LUNG').trim().toUpperCase();
     const voy = (document.getElementById('cfgVoyage')?.value || '1009S').trim().toUpperCase();
+    const { error } = await sb.from('vessel_sessions').upsert({
+      session_id: state.sessionId,
+      vessel_name: vName,
+      voyage: voy,
+      berth: document.getElementById('cfgBerth')?.value || 'TV3',
+      length_m: parseFloat(document.getElementById('cfgLength')?.value) || 172,
+      beam_m: parseFloat(document.getElementById('cfgBeam')?.value) || 27.6,
+      draft_f: parseFloat(document.getElementById('cfgDraftF')?.value) || 7.8,
+      draft_a: parseFloat(document.getElementById('cfgDraftA')?.value) || 8.2,
+      max_draft: parseFloat(document.getElementById('cfgMaxDraft')?.value) || 9.2,
+      cont_per_10cm: parseFloat(document.getElementById('cfgContPer10cm')?.value) || 28,
+      deck_tier_min: parseInt(document.getElementById('cfgDeckTier')?.value, 10) || 80,
+      crane_config: state.cranes,
+      hold_config: state.holdConfig,
+      stats_summary: { isCustomHoldConfig: state.isCustomHoldConfig, berth_depth: parseFloat(document.getElementById('cfgBerthDepth')?.value) || 9.0 },
+      updated_at: new Date().toISOString()
+    }, { onConflict: 'session_id' });
+    if (error) throw error;
+  },
+
+  async listAllVessels() {
+    const [dbRes, eportRes] = await Promise.allSettled([
+      sb.from('vessel_sessions').select('session_id, vessel_name, voyage, berth, updated_at').order('updated_at', { ascending: false }).limit(30),
+      sbBot.storage.from('port-documents').download('eport_tanvu_jobs.json')
+    ]);
+    const sessions = (dbRes.status === 'fulfilled' && Array.isArray(dbRes.value.data)) ? dbRes.value.data : [];
+    let eportMap = {};
+    if (eportRes.status === 'fulfilled' && eportRes.value.data) {
+      try { eportMap = JSON.parse(await eportRes.value.data.text()); } catch (e) {}
+    }
+    return { sessions, eportMap };
+  },
+
+  async fetchTodayTide() {
     try {
-      await sb.from('vessel_sessions').upsert({
-        session_id: state.sessionId,
-        vessel_name: vName,
-        voyage: voy,
-        berth: document.getElementById('cfgBerth')?.value || 'TV3',
-        length_m: parseFloat(document.getElementById('cfgLength')?.value) || 172,
-        beam_m: parseFloat(document.getElementById('cfgBeam')?.value) || 27.6,
-        draft_f: parseFloat(document.getElementById('cfgDraftF')?.value) || 7.8,
-        draft_a: parseFloat(document.getElementById('cfgDraftA')?.value) || 8.2,
-        max_draft: parseFloat(document.getElementById('cfgMaxDraft')?.value) || 9.2,
-        cont_per_10cm: parseFloat(document.getElementById('cfgContPer10cm')?.value) || 28,
-        deck_tier_min: parseInt(document.getElementById('cfgDeckTier')?.value, 10) || 80,
-        crane_config: state.cranes,
-        updated_at: new Date().toISOString()
-      }, { onConflict: 'session_id' });
-    } catch (e) {}
+      const today = new Date().toISOString().split('T')[0];
+      const { data } = await sbBot.from('tide_readings').select('*').eq('date_key', today).limit(1);
+      return (data && data.length) ? data[0] : null;
+    } catch (e) { return null; }
   },
 
   async loadSessionFromCloud(sessionId) {
     state.sessionId = sessionId;
-    // Tự động khóa lại Bước 1 mỗi khi đổi tàu để tránh nạp nhầm file!
-    state.uploadConfirmedForSession = null;
+    VesselUploadGuard.lock();
     updateStep1GuardUI();
 
     state.sbpImport = [];
@@ -1178,9 +1283,12 @@ const CloudRepo = {
     state.liveJobs = [];
     state.stowageInstructions = {};
     state.preStowagePlan = [];
+    state.holdConfig = [];
+    state.isCustomHoldConfig = false;
+    state.selectedBays = new Set();
     state.calledContainers.clear();
 
-    this.setSub(`Đang tải dữ liệu ${sessionId}...`);
+    this.setSub(`Đang tải ${sessionId} từ Cloud...`);
 
     try {
       const { data: sessRows } = await sb.from('vessel_sessions').select('*').eq('session_id', sessionId).limit(1);
@@ -1196,45 +1304,53 @@ const CloudRepo = {
         document.getElementById('cfgMaxDraft').value = s.max_draft || 9.2;
         document.getElementById('cfgContPer10cm').value = s.cont_per_10cm || 28;
         document.getElementById('cfgDeckTier').value = s.deck_tier_min || 80;
+        if (s.stats_summary && s.stats_summary.berth_depth) {
+          document.getElementById('cfgBerthDepth').value = s.stats_summary.berth_depth;
+        }
         if (Array.isArray(s.crane_config) && s.crane_config.length) state.cranes = s.crane_config;
+        if (Array.isArray(s.hold_config) && s.hold_config.length) {
+          state.holdConfig = s.hold_config;
+          state.isCustomHoldConfig = Boolean(s.stats_summary?.isCustomHoldConfig);
+        }
       }
 
+      const deckTier = parseInt(document.getElementById('cfgDeckTier')?.value, 10) || 80;
       const [sbpJson, finalJson, resJson, jobsJson, ediJson, logsRes] = await Promise.all([
-        this.downloadBucketJson('sbp.json'),
-        this.downloadBucketJson('final.json'),
-        this.downloadBucketJson('reserved.json'),
-        this.downloadBucketJson('jobs.json'),
-        this.downloadBucketJson('edi_stowage.json'),
+        this.downloadFile(sessionId, 'sbp.json'),
+        this.downloadFile(sessionId, 'final.json'),
+        this.downloadFile(sessionId, 'reserved.json'),
+        this.downloadFile(sessionId, 'jobs.json'),
+        this.downloadFile(sessionId, 'edi_stowage.json'),
         sb.from('dispatch_logs').select('container_no').eq('session_id', sessionId)
       ]);
 
-      let foundCloudFiles = 0;
+      let foundCount = 0;
       if (sbpJson) {
-        state.sbpImport = DataAdapters.normalizeSbp(sbpJson);
+        state.sbpImport = DataAdapters.normalizeSbp(sbpJson, deckTier);
         setCardStatus('sbp', `✓ Cloud: ${state.sbpImport.length} cont nhập`, true);
-        foundCloudFiles++;
+        foundCount++;
       } else setCardStatus('sbp', 'Chưa nạp cho tàu này', false);
 
       if (finalJson) {
         state.finalLoading = DataAdapters.normalizeFinalLoading(finalJson);
         setCardStatus('final', `✓ Cloud: ${state.finalLoading.length} cont Final Loading`, true);
-        foundCloudFiles++;
+        foundCount++;
       } else setCardStatus('final', 'Chưa nạp cho tàu này', false);
 
       if (resJson) {
         state.reservedExport = DataAdapters.normalizeReserved(resJson);
         setCardStatus('reserved', `✓ Cloud: ${state.reservedExport.length} cont Reserved`, true);
-        foundCloudFiles++;
+        foundCount++;
       } else setCardStatus('reserved', 'Chưa nạp cho tàu này', false);
 
       if (jobsJson) {
-        const norm = DataAdapters.normalizeJobsPayload(jobsJson);
+        const norm = DataAdapters.normalizeJobsPayload(jobsJson, sessionId);
         state.liveJobs = norm.rows;
         state.jobsSource = norm.source;
         state.jobsUpdatedAt = norm.updated_at;
         syncCranesFromJobs(state.liveJobs);
         setCardStatus('jobs', `✓ ${norm.source}: ${state.liveJobs.length} job (A/B/C)`, true);
-        foundCloudFiles++;
+        foundCount++;
       } else setCardStatus('jobs', 'Chưa nạp cho tàu này', false);
 
       if (ediJson && typeof ediJson === 'object') {
@@ -1242,7 +1358,7 @@ const CloudRepo = {
         state.preStowagePlan = Array.isArray(ediJson.preStowage) ? ediJson.preStowage : [];
         if (state.preStowagePlan.length || Object.keys(state.stowageInstructions).length) {
           setCardStatus('edi', `✓ Cloud: ${state.preStowagePlan.length} vị trí + ${Object.keys(state.stowageInstructions).length} chỉ dẫn`, true);
-          foundCloudFiles++;
+          foundCount++;
         } else setCardStatus('edi', 'Chưa nạp', false);
       } else setCardStatus('edi', 'Chưa nạp', false);
 
@@ -1250,11 +1366,13 @@ const CloudRepo = {
         logsRes.data.forEach(r => r.container_no && state.calledContainers.add(r.container_no));
       }
 
-      if (foundCloudFiles === 0 && sessionId === 'KUO_LUNG_1009S') {
+      if (foundCount === 0 && sessionId === 'KUO_LUNG_1009S') {
         loadSampleKuoLung1009S(false);
       } else {
+        HoldLayoutEngine.syncHoldsForState(state, parseFloat(document.getElementById('cfgLength').value) || 172, false);
         renderAll();
       }
+
       this.setStatus('● Đã đồng bộ Cloud');
       this.setSub(`${sessionId} · ${state.jobsSource} · ${new Date().toLocaleTimeString('vi-VN')}`);
     } catch (e) {
@@ -1263,11 +1381,10 @@ const CloudRepo = {
     }
   },
 
-  // Polling nhẹ dành riêng cho Bot OM tự động đẩy jobs.json lên Supabase
   async pollLatestJobsOnly() {
-    const jobsJson = await this.downloadBucketJson('jobs.json');
+    const jobsJson = await this.downloadFile(state.sessionId, 'jobs.json');
     if (!jobsJson) return;
-    const norm = DataAdapters.normalizeJobsPayload(jobsJson);
+    const norm = DataAdapters.normalizeJobsPayload(jobsJson, state.sessionId);
     if (norm.updated_at && norm.updated_at !== state.jobsUpdatedAt) {
       state.liveJobs = norm.rows;
       state.jobsSource = norm.source;
@@ -1281,8 +1398,642 @@ const CloudRepo = {
 };
 
 // =========================================================================
-// MODULE 4: BẢO VỆ BƯỚC 1 CHỌN ĐÚNG TÀU & XỬ LÝ UPLOAD
+// [PHẦN 2] BỘ ĐỌC & CHUẨN HÓA 5 NGUỒN DỮ LIỆU
 // =========================================================================
+const DataAdapters = {
+  parsePos6(posStr, deckTierMin = 80) {
+    const clean = String(posStr ?? '').replace(/\.\d+$/, '').replace(/\D/g, '');
+    if (!clean || /^0+$/.test(clean)) return null;
+    const raw = clean.length === 7 ? clean.slice(1) : clean.padStart(6, '0').slice(-6);
+    if (raw === '000000') return null;
+    const bay = raw.slice(0, 2);
+    const row = raw.slice(2, 4);
+    const tier = raw.slice(4, 6);
+    const tierNum = parseInt(tier, 10);
+    return {
+      raw, bay, row, tier, tierNum,
+      isDeck: tierNum >= deckTierMin
+    };
+  },
+
+  parseInstructionFlags(instStr) {
+    const s = String(instStr || '').toUpperCase().trim();
+    const bayMatch = s.match(/BAY\s*(\d{2})|LOAD\s*(\d{2})/);
+    return {
+      raw: s,
+      mustUnderDeck: /\bUD\b|UNDER\s*DECK|RFU/.test(s) && !/UD\s*OR\s*OD|UD\/OD/.test(s),
+      mustOnDeck: /\bOD\b|ON\s*DECK|ODSW|OD\s*ONLY|RFO/.test(s) && !/UD\s*OR\s*OD|UD\/OD/.test(s),
+      preferTopLight: /HANG\s*NHE|NOI,\s*NHE|\bTOP\b|\bTS\b/.test(s),
+      isDanger: /\bDG\b|IMD/.test(s),
+      isReefer: /\bRF\b|RF-|\bRD\b/.test(s),
+      isOog: /\bOH\b|\bOG\b|\bAK\b|OVERHEIGHT/.test(s),
+      isStandby: /CHO\s*XTAU|ST\s*BK|\bST\b/.test(s),
+      forcedBay: bayMatch ? (bayMatch[1] || bayMatch[2]) : ''
+    };
+  },
+
+  normalizeSbp(rawPayload, deckTierMin = 80) {
+    const rows = Array.isArray(rawPayload) ? rawPayload : (rawPayload?.rows || []);
+    return rows.map(r => {
+      const p = this.parsePos6(r.pos ?? r['Vị Trí'] ?? r['Vị trí'], deckTierMin);
+      return {
+        cntr: String(r.cntr || r['Số Container'] || '').trim().toUpperCase(),
+        pos: p ? p.raw : '',
+        bay: p ? p.bay : '',
+        size: String(r.size || r['Kích Cỡ'] || r['Kích cỡ'] || '').trim(),
+        iso: String(r.iso || r['Kích Cỡ ISO'] || r['Kích cỡ ISO'] || '').trim(),
+        weight: parseFloat(r.weight ?? r['Trọng Lượng Hàng'] ?? r['TL Hàng'] ?? 0) || 0,
+        pod: String(r.pod || r['Cảng Dỡ'] || r['Cảng dỡ'] || '').trim().toUpperCase()
+      };
+    }).filter(x => x.cntr);
+  },
+
+  normalizeFinalLoading(rawPayload) {
+    const rows = Array.isArray(rawPayload) ? rawPayload : (rawPayload?.rows || []);
+    const headers = rows.length ? Object.keys(rows[0]) : [];
+    const lastColName = headers.includes('Cảng chuyển') ? 'Cảng chuyển' : (headers[headers.length - 1] || 'transfer_port');
+    return rows.map(r => {
+      const cancelVal = r.cancel ?? r['Cancel'];
+      const isCancelled = cancelVal === true || String(cancelVal).toLowerCase() === 'true';
+      const tpRaw = String(r.transfer_port ?? r[lastColName] ?? '').trim().toUpperCase();
+      const yardStatus = String(r.yard_status ?? r['Trạng thái Cont'] ?? '').trim();
+      const isOffDock = tpRaw !== '' && tpRaw !== 'TV' && tpRaw !== 'VNTVP';
+      return {
+        cancel: isCancelled,
+        cntr: String(r.cntr || r['Số Container'] || '').trim().toUpperCase(),
+        opr: String(r.opr || r['Hãng khai thác'] || '').trim().toUpperCase(),
+        size: String(r.size || r['Kích cỡ'] || '').trim(),
+        iso: String(r.iso || r['Kích cỡ ISO'] || '').trim(),
+        weight: parseFloat(r.weight ?? r['TL Hàng'] ?? 0) || 0,
+        yard_status: yardStatus,
+        yard_pos: String(r.yard_pos || r['Vị trí bãi'] || '').trim(),
+        pod: String(r.pod || r['Cảng dỡ'] || '').trim().toUpperCase(),
+        fpod: String(r.fpod || r['Cảng đích'] || '').trim().toUpperCase(),
+        customs: Boolean(r.customs ?? r['TL hải quan']),
+        ship_pos: String(r.ship_pos || r['Vị trí tàu'] || '').trim(),
+        note: String(r.note || r['Ghi chú'] || '').trim(),
+        transfer_port: tpRaw || 'TV',
+        is_off_dock: isOffDock
+      };
+    }).filter(x => x.cntr && !x.cancel);
+  },
+
+  normalizeReserved(rawPayload) {
+    const rows = Array.isArray(rawPayload) ? rawPayload : (rawPayload?.rows || []);
+    return rows.filter(r => {
+      if (r.cntr && r['Chọn'] === undefined) return true;
+      const sel = r['Chọn'];
+      return sel === 1 || sel === '1' || sel === 1.0 || sel === true;
+    }).map(r => {
+      const blk = String(r.block || r['Block'] || '').trim().toUpperCase();
+      const bay = r['Bay'] !== undefined && r['Bay'] !== '' ? String(parseInt(r['Bay'], 10)).padStart(2, '0') : '';
+      const row = r['Row'] !== undefined && r['Row'] !== '' ? String(parseInt(r['Row'], 10)).padStart(2, '0') : '';
+      const tier = r['Tier'] !== undefined && r['Tier'] !== '' ? String(parseInt(r['Tier'], 10)) : '';
+      const yardPos = r.yard_pos || (blk ? [blk, bay, row, tier].filter(Boolean).join('-') : '---');
+      return {
+        cntr: String(r.cntr || r['Số Container'] || '').trim().toUpperCase(),
+        opr: String(r.opr || r['Hãng khai thác'] || '').trim().toUpperCase(),
+        size: String(r.size || r['Kích cỡ'] || '').trim(),
+        iso: String(r.iso || r['Kích cỡ ISO'] || '').trim(),
+        pod: String(r.pod || r['Cảng dỡ'] || '').trim().toUpperCase(),
+        fpod: String(r.fpod || r['Cảng đích'] || '').trim().toUpperCase(),
+        weight: parseFloat(r.weight ?? r['TL Hàng'] ?? 0) || 0,
+        block: blk,
+        yard_pos: yardPos
+      };
+    }).filter(x => x.cntr);
+  },
+
+  normalizeJobsPayload(rawPayload, sessionId) {
+    let source = 'EXCEL_WEB';
+    let updatedAt = new Date().toISOString();
+    let rows = [];
+    if (rawPayload && !Array.isArray(rawPayload) && Array.isArray(rawPayload.rows)) {
+      source = rawPayload.source || 'OM_AUTO_BOT';
+      updatedAt = rawPayload.updated_at || updatedAt;
+      rows = rawPayload.rows;
+    } else if (Array.isArray(rawPayload)) {
+      rows = rawPayload;
+    }
+    const normalized = rows.map(r => {
+      const cntr = String(r.cntr || r['Số Container'] || '').trim().toUpperCase();
+      const jobType = String(r.job_type || r['Loại công việc'] || '').trim();
+      const ioRaw = String(r.io || r['Nhập/xuất'] || '').trim();
+      const io = (/exp/i.test(ioRaw) || jobType === 'Xếp tàu') ? 'Export' : 'Import';
+      const p = this.parsePos6(r.pos ?? r['Vị trí']);
+      return {
+        cntr, io,
+        job_type: jobType || (io === 'Export' ? 'Xếp tàu' : 'Dỡ tàu'),
+        status: String(r.status || r['Trạng thái công việc'] || '').trim().toUpperCase(),
+        crane: String(r.crane || r['Mã thiết bị'] || '').trim().toUpperCase(),
+        truck: String(r.truck || r['Xe kéo'] || '').trim(),
+        pos: p ? p.raw : '',
+        pod: String(r.pod || r['Cảng dỡ'] || '').trim().toUpperCase(),
+        fpod: String(r.fpod || r['Cảng đích'] || '').trim().toUpperCase(),
+        done_at: String(r.done_at || r['Ngày hoàn tất'] || '').trim()
+      };
+    }).filter(x => x.cntr);
+    return { schema_version: APP_CONFIG.SCHEMA_VERSION, session_id: sessionId, source, updated_at: updatedAt, rows: normalized };
+  },
+
+  normalizeStowageInstructions(rows) {
+    const map = {};
+    (rows || []).forEach(r => {
+      const cntr = String(r.cntr || r['Số Container'] || '').trim().toUpperCase();
+      const inst = String(r.inst || r['CntrJobType xếp dỡ'] || '').trim();
+      const dg = String(r.dg || r['Mã nguy hiểm'] || '').trim();
+      if (cntr && (inst || dg)) map[cntr] = [inst, dg ? `DG:${dg}` : ''].filter(Boolean).join(' / ');
+    });
+    return map;
+  },
+
+  parse604Asc(text) {
+    const lines = String(text || '').split(/\r?\n/);
+    let detectedVessel = '';
+    const mHdr = (lines[0] || '').match(/\$604([A-Z0-9]+)\/([^/]+)/);
+    if (mHdr) detectedVessel = `${mHdr[1]} / ${mHdr[2].trim()}`;
+    const items = [];
+    lines.forEach(line => {
+      if (!/^\d{6}\s+/.test(line)) return;
+      const pos = line.slice(0, 6).trim();
+      const cntr = line.slice(7, 20).trim().toUpperCase();
+      const iso = line.slice(44, 48).trim() || '45G0';
+      const cargoCode = line.slice(53, 66).trim();
+      let weight = 0;
+      const kgSlice = line.length >= 92 ? line.slice(86, 92) : '';
+      const mKg = kgSlice.match(/(\d{5})/);
+      if (mKg) weight = parseInt(mKg[1], 10) / 1000;
+      else {
+        const mFallback = line.slice(68, 110).match(/\s(\d{5})(?:\s|\d)/);
+        if (mFallback) weight = parseInt(mFallback[1], 10) / 1000;
+      }
+      const trimmed = line.trim();
+      const pod = trimmed.length >= 5 ? trimmed.slice(-5) : 'SGSIN';
+      if (cntr && pos) {
+        items.push({ pos, cntr, iso, weight, pod, inst: (cargoCode && cargoCode !== 'GP') ? cargoCode : '' });
+      }
+    });
+    return { detectedVessel, items };
+  },
+
+  parseBaplieEdi(text) {
+    const segments = String(text || '').split("'");
+    let detectedVessel = '';
+    const items = [];
+    let curPos = '', curWeight = 0, curPod = '', curInst = [], curIsLost = false;
+    segments.forEach(seg => {
+      const s = seg.trim();
+      if (s.startsWith('TDT+20+')) detectedVessel = s.split(':').pop() || '';
+      else if (s.startsWith('LOC+147+')) { curPos = s.split('+')[2].split(':')[0]; curWeight = 0; curInst = []; curIsLost = false; }
+      else if (s.startsWith('MEA+WT+')) { const m = s.match(/KGM:(\d+)/); if (m) curWeight = parseInt(m[1], 10) / 1000; }
+      else if (s.startsWith('LOC+11+')) curPod = s.split('+')[2].split(':')[0];
+      else if (s.startsWith('FTX+HAN+')) { const c = s.split('+').pop(); if (c) curInst.push(c); }
+      else if (s.startsWith('DGS+')) curInst.push('DG');
+      else if (s.startsWith('DIM+')) curInst.push('OH');
+      else if (s.startsWith('RFF+ET:')) { if (curWeight === 0) curIsLost = true; }
+      else if (s.startsWith('EQD+CN+')) {
+        const parts = s.split('+');
+        const cntr = (parts[2] || '').trim().toUpperCase();
+        const iso = (parts[3] || '').trim();
+        const p6 = this.parsePos6(curPos);
+        if (p6 && !curIsLost && cntr) {
+          items.push({ pos: p6.raw, cntr, iso, weight: curWeight, pod: curPod || 'SGSIN', inst: Array.from(new Set(curInst)).join('/') });
+        }
+      }
+    });
+    return { detectedVessel, items };
+  }
+};
+
+const UnifiedPoolBuilder = {
+  build(st, deckTierMin = 80) {
+    const map = new Map();
+    const ensure = (cntr) => {
+      if (!map.has(cntr)) {
+        map.set(cntr, {
+          cntr, plannedPos: '', actualPos: '', size: '40HC', iso: '', weight: 0,
+          pod: 'SGSIN', yardPos: '---', transferPort: 'TV', isOffDock: false,
+          customs: true, jobStatus: 'A', crane: '', inst: '', instFlags: DataAdapters.parseInstructionFlags('')
+        });
+      }
+      return map.get(cntr);
+    };
+
+    (st.preStowagePlan || []).forEach(p => {
+      const cur = ensure(p.cntr);
+      cur.plannedPos = p.pos || cur.plannedPos;
+      cur.iso = p.iso || cur.iso;
+      cur.size = String(p.iso || '').startsWith('2') ? '20DC' : '40HC';
+      if (p.weight > 0) cur.weight = p.weight;
+      if (p.pod) cur.pod = p.pod;
+      if (p.inst) cur.inst = p.inst;
+      cur.jobStatus = 'B';
+    });
+
+    (st.reservedExport || []).forEach(r => {
+      const cur = ensure(r.cntr);
+      if (r.size) cur.size = r.size;
+      if (r.iso) cur.iso = r.iso;
+      if (r.weight > 0) cur.weight = r.weight;
+      if (r.pod) cur.pod = r.pod;
+      if (r.yard_pos && r.yard_pos !== '---') cur.yardPos = r.yard_pos;
+      if (['KHM','HHH','SA','GFW'].includes(r.block)) { cur.transferPort = r.block; cur.isOffDock = true; }
+    });
+
+    (st.finalLoading || []).forEach(f => {
+      const cur = ensure(f.cntr);
+      if (f.size) cur.size = f.size;
+      if (f.iso) cur.iso = f.iso;
+      if (f.weight > 0) cur.weight = f.weight;
+      if (f.pod) cur.pod = f.pod;
+      if (f.yard_pos && f.yard_pos !== '---') cur.yardPos = f.yard_pos;
+      cur.transferPort = f.transfer_port || 'TV';
+      cur.isOffDock = Boolean(f.is_off_dock);
+      cur.customs = Boolean(f.customs);
+      if (f.ship_pos && f.ship_pos !== '--' && !cur.plannedPos) {
+        const p6 = DataAdapters.parsePos6(f.ship_pos, deckTierMin);
+        if (p6) cur.plannedPos = p6.raw;
+      }
+    });
+
+    Object.entries(st.stowageInstructions || {}).forEach(([cntr, inst]) => {
+      if (map.has(cntr)) {
+        const cur = map.get(cntr);
+        cur.inst = cur.inst && !cur.inst.includes(inst) ? `${cur.inst} / ${inst}` : inst;
+      }
+    });
+
+    (st.liveJobs || []).filter(j => j.io === 'Export' || j.job_type === 'Xếp tàu').forEach(j => {
+      const cur = ensure(j.cntr);
+      if (j.status) cur.jobStatus = j.status;
+      if (j.crane) cur.crane = j.crane;
+      if (j.pod && !cur.pod) cur.pod = j.pod;
+      if (j.status === 'C' && j.pos) cur.actualPos = j.pos;
+    });
+
+    const list = Array.from(map.values());
+    list.forEach(item => { item.instFlags = DataAdapters.parseInstructionFlags(item.inst); });
+    return list;
+  }
+};
+
+// =========================================================================
+// [PHẦN 3] CHIA HẦM ĐỘNG, MỚN NƯỚC-TRIỀU, ĐIỀU PHỐI & SỰ CỐ CẨU
+// =========================================================================
+const HoldLayoutEngine = {
+  collectKnownBays(st) {
+    const baySet = new Set();
+    const add = (p) => { const parsed = DataAdapters.parsePos6(p); if (parsed && parsed.bay) baySet.add(parsed.bay); };
+    (st.sbpImport || []).forEach(x => add(x.pos));
+    (st.preStowagePlan || []).forEach(x => add(x.pos));
+    (st.liveJobs || []).forEach(x => add(x.pos));
+    return Array.from(baySet).sort((a, b) => parseInt(a, 10) - parseInt(b, 10));
+  },
+
+  autoBuild(baysList, loaMeters = 172, desiredHoldCount = 0) {
+    let nums = Array.from(new Set((baysList || []).map(b => parseInt(b, 10)).filter(n => !isNaN(n) && n > 0))).sort((a, b) => a - b);
+    if (nums.length === 0) {
+      const est40 = Math.max(3, Math.min(18, Math.round((loaMeters - 35) / 15)));
+      for (let g = 0; g < est40; g++) {
+        const base = g * 4 + 1;
+        nums.push(base, base + 1, base + 2);
+      }
+    }
+    const blockMap = new Map();
+    nums.forEach(n => {
+      const blkIdx = Math.floor((n - 1) / 4);
+      if (!blockMap.has(blkIdx)) blockMap.set(blkIdx, []);
+      blockMap.get(blkIdx).push(String(n).padStart(2, '0'));
+    });
+    const orderedBlocks = Array.from(blockMap.keys()).sort((a, b) => a - b).map(k => blockMap.get(k));
+    const numBlocks = orderedBlocks.length;
+    const targetHolds = desiredHoldCount > 0
+      ? Math.min(numBlocks, Math.max(1, desiredHoldCount))
+      : (numBlocks <= 10 ? numBlocks : Math.max(5, Math.min(10, Math.round(loaMeters / 26))));
+
+    const holds = [];
+    for (let i = 0; i < targetHolds; i++) {
+      const start = Math.round((i * numBlocks) / targetHolds);
+      const end = Math.round(((i + 1) * numBlocks) / targetHolds);
+      const baysInHold = orderedBlocks.slice(start, end).flat();
+      if (baysInHold.length) {
+        const holdNo = holds.length + 1;
+        holds.push({ hold: holdNo, label: `HOLD ${String(holdNo).padStart(2, '0')}`, bays: baysInHold });
+      }
+    }
+    return holds;
+  },
+
+  syncHoldsForState(st, loaMeters, forceAuto = false, desiredCount = 0) {
+    const knownBays = this.collectKnownBays(st);
+    if (forceAuto || !st.isCustomHoldConfig || !Array.isArray(st.holdConfig) || st.holdConfig.length === 0) {
+      st.holdConfig = this.autoBuild(knownBays, loaMeters, desiredCount);
+      if (forceAuto) st.isCustomHoldConfig = desiredCount > 0;
+    }
+    if (!st.selectedBays || st.selectedBays.size === 0) {
+      st.selectedBays = new Set(st.holdConfig.flatMap(h => h.bays));
+    }
+    return st.holdConfig;
+  },
+
+  getHoldByBay(bay, holdConfig) {
+    const b = String(bay || '').padStart(2, '0');
+    const found = (holdConfig || []).find(h => (h.bays || []).includes(b));
+    return found ? found.hold : 1;
+  },
+
+  updateHoldBays(st, holdNo, bayInputStr) {
+    const cleanBays = Array.from(new Set(
+      String(bayInputStr || '').split(/[\s,;]+/).map(x => x.replace(/\D/g, '')).filter(Boolean).map(x => String(parseInt(x, 10)).padStart(2, '0'))
+    )).sort((a, b) => parseInt(a, 10) - parseInt(b, 10));
+    const target = st.holdConfig.find(h => h.hold === holdNo);
+    if (!target) return;
+    st.holdConfig.forEach(h => { if (h.hold !== holdNo) h.bays = h.bays.filter(b => !cleanBays.includes(b)); });
+    target.bays = cleanBays;
+    st.isCustomHoldConfig = true;
+    cleanBays.forEach(b => st.selectedBays.add(b));
+  },
+
+  addHold(st) {
+    const nextNo = st.holdConfig.length ? Math.max(...st.holdConfig.map(h => h.hold)) + 1 : 1;
+    st.holdConfig.push({ hold: nextNo, label: `HOLD ${String(nextNo).padStart(2, '0')}`, bays: [] });
+    st.isCustomHoldConfig = true;
+  },
+
+  removeHold(st, holdNo) {
+    if (st.holdConfig.length <= 1) return;
+    st.holdConfig = st.holdConfig
+      .filter(h => h.hold !== holdNo)
+      .map((h, i) => ({ ...h, hold: i + 1, label: `HOLD ${String(i + 1).padStart(2, '0')}` }));
+    st.isCustomHoldConfig = true;
+  }
+};
+
+const DraftAndTideEngine = {
+  estimateTpcAndRate(lengthM, beamM) {
+    const L = Math.max(60, parseFloat(lengthM) || 172);
+    const B = Math.max(12, parseFloat(beamM) || 27.6);
+    const tpc = (L * B * 0.82 * 1.025) / 100;
+    const contPer10cm = Math.max(8, Math.round((tpc * 10) / 14));
+    return { tpc, contPer10cm };
+  },
+
+  calculateLiveDraft(cfg, exportPool, holdConfig, tideRecord) {
+    const L = parseFloat(cfg.length_m) || 172;
+    const B = parseFloat(cfg.beam_m) || 27.6;
+    const { tpc } = this.estimateTpcAndRate(L, B);
+    const contPer10cm = Math.max(5, parseFloat(cfg.cont_per_10cm) || 28);
+
+    const allBays = (holdConfig || []).flatMap(h => h.bays).map(b => parseInt(b, 10)).filter(n => !isNaN(n));
+    const minBay = allBays.length ? Math.min(...allBays) : 1;
+    const maxBay = allBays.length ? Math.max(...allBays) : 33;
+    const midBay = (minBay + maxBay) / 2;
+    const halfSpan = Math.max(1, (maxBay - minBay) / 2);
+
+    const loadedC = (exportPool || []).filter(c => c.jobStatus === 'C');
+    const totalWeight = loadedC.reduce((s, c) => s + (c.weight || 14), 0);
+    const sinkFromCount = (loadedC.length / contPer10cm) * 0.10;
+    const sinkFromWeight = totalWeight / (tpc * 100);
+    const meanSinkM = totalWeight > 0 ? (sinkFromCount * 0.5 + sinkFromWeight * 0.5) : sinkFromCount;
+
+    let trimMoment = 0;
+    loadedC.forEach(c => {
+      const p = DataAdapters.parsePos6(c.actualPos || c.plannedPos);
+      if (p) {
+        const relPos = (parseInt(p.bay, 10) - midBay) / halfSpan;
+        trimMoment += (c.weight || 14) * relPos;
+      }
+    });
+    const mtc = Math.max(50, (tpc * L) / 12);
+    const trimDeltaM = (trimMoment * (L * 0.35)) / (mtc * 100);
+
+    const draftF = (parseFloat(cfg.draft_f) || 7.8) + meanSinkM - trimDeltaM / 2;
+    const draftA = (parseFloat(cfg.draft_a) || 8.2) + meanSinkM + trimDeltaM / 2;
+    const maxCurDraft = Math.max(draftF, draftA);
+    const trimVal = draftA - draftF;
+
+    const maxAllowed = parseFloat(cfg.max_draft) || 9.2;
+    const berthDepth = parseFloat(cfg.berth_depth) || 9.0;
+    const lowTide = tideRecord ? parseFloat(tideRecord.low_val) : 0.6;
+    const safeLowWaterDraft = (berthDepth + lowTide) - 0.5;
+
+    const remCm = (maxAllowed - maxCurDraft) * 100;
+    const remCont = Math.max(0, Math.floor((remCm / 10) * contPer10cm));
+
+    let level = 'SAFE';
+    let alertText = `An toàn · Còn ~${remCont} cont tới ${maxAllowed.toFixed(2)}m`;
+    if (maxCurDraft >= maxAllowed) {
+      level = 'DANGER';
+      alertText = `⛔ CHẠM MỚN GIỚI HẠN ${maxAllowed.toFixed(2)}m!`;
+    } else if (remCm <= 20 || maxCurDraft >= safeLowWaterDraft) {
+      level = 'WARNING';
+      alertText = maxCurDraft >= safeLowWaterDraft
+        ? `⚠️ Cảnh báo nước ròng (${lowTide}m): Ưu tiên hàng nhẹ!`
+        : `⚠️ Sắp chạm Tmax (còn ~${remCont} cont).`;
+    }
+    return {
+      draftF, draftA, trimVal, maxCurDraft, remCont, level, alertText,
+      bowHeavy: trimVal < -0.35, sternHeavy: trimVal > 1.20
+    };
+  }
+};
+
+const DispatchEngine = {
+  isBottomTierSatisfied(item, pool, deckTierMin) {
+    const p = DataAdapters.parsePos6(item.plannedPos, deckTierMin);
+    if (!p) return true;
+    if (p.tierNum <= 2 || p.tierNum === deckTierMin || p.tierNum === deckTierMin + 2) return true;
+    const belowPos = `${p.bay}${p.row}${String(p.tierNum - 2).padStart(2, '0')}`;
+    const belowCont = pool.find(x => x.plannedPos === belowPos || x.actualPos === belowPos);
+    if (!belowCont) return true;
+    return belowCont.jobStatus === 'C';
+  },
+
+  getRecommendationsByCrane(st, pool, opts, draftMetrics) {
+    const deckTierMin = parseInt(opts.deckTierMin, 10) || 80;
+    const holdConfig = st.holdConfig || [];
+    const totalHolds = Math.max(1, holdConfig.length);
+    const readyB = pool.filter(x => x.jobStatus === 'B' && !x.instFlags?.isStandby);
+    const podCounts = {};
+    readyB.forEach(c => { podCounts[c.pod] = (podCounts[c.pod] || 0) + 1; });
+
+    const scored = readyB.filter(c => {
+      if (opts.yardFilter === 'OFF_DOCK_ONLY' && !c.isOffDock) return false;
+      if (opts.yardFilter === 'TV_ONLY' && c.isOffDock) return false;
+      const p = DataAdapters.parsePos6(c.plannedPos, deckTierMin);
+      if (p && st.selectedBays.size > 0 && !st.selectedBays.has(p.bay)) return false;
+      return true;
+    }).map(c => {
+      let score = 100;
+      const reasons = [];
+      const p = DataAdapters.parsePos6(c.plannedPos, deckTierMin);
+      const holdNo = p ? HoldLayoutEngine.getHoldByBay(p.bay, holdConfig) : 0;
+
+      const bottomOk = this.isBottomTierSatisfied(c, pool, deckTierMin);
+      if (!bottomOk) { score -= 200; reasons.push('Chờ tầng dưới'); }
+      if (c.isOffDock) { score += 45; reasons.push(`Gọi sớm ${c.transferPort}`); }
+
+      const pCount = podCounts[c.pod] || 1;
+      if (opts.podStrategy === 'FEWEST_FIRST') {
+        score += Math.max(0, 40 - Math.min(40, pCount));
+        if (pCount <= 20) reasons.push('Cảng ít');
+      } else if (opts.podStrategy === 'MOST_FIRST') {
+        score += Math.min(30, pCount / 25);
+      }
+
+      const heavyFirst = opts.weightStrategy === 'HEAVY_FIRST' && !c.instFlags?.preferTopLight;
+      score += heavyFirst ? (c.weight || 0) * 1.2 : Math.max(0, 35 - (c.weight || 0)) * 1.1;
+
+      if (draftMetrics.level === 'DANGER' && c.weight >= 22) { score -= 150; reasons.push('Hãm cont nặng'); }
+      else if (draftMetrics.bowHeavy && holdNo > 0 && holdNo <= Math.ceil(totalHolds / 3) && c.weight >= 20) { score -= 40; reasons.push('Né chúi mũi'); }
+      else if (draftMetrics.sternHeavy && holdNo >= Math.floor((totalHolds * 2) / 3) && c.weight >= 20) { score -= 40; reasons.push('Né chúi lái'); }
+
+      return { ...c, holdNo, bottomOk, score, reasons };
+    }).sort((a, b) => b.score - a.score);
+
+    return (st.cranes || []).filter(c => c.active && c.mode !== 'IMPORT_ONLY').map(crane => {
+      const assigned = new Set(crane.holds || []);
+      const list = scored.filter(item => {
+        if (item.instFlags?.forcedBay) return assigned.has(HoldLayoutEngine.getHoldByBay(item.instFlags.forcedBay, holdConfig));
+        return item.holdNo === 0 || assigned.has(item.holdNo);
+      });
+      return { crane, totalReadyInHolds: list.length, topItems: list.slice(0, 6) };
+    });
+  },
+
+  getRollingChaseByHold(st, pool, deckTierMin = 80) {
+    const holdConfig = st.holdConfig || [];
+    const actualOccupied = new Set(pool.filter(c => c.jobStatus === 'C' && c.actualPos).map(c => c.actualPos));
+    const readyBAll = pool.filter(c => c.jobStatus === 'B' && !c.instFlags?.isStandby);
+    const missingSlots = pool.filter(c =>
+      c.plannedPos && !actualOccupied.has(c.plannedPos) &&
+      (c.jobStatus === 'A' || (c.jobStatus === 'C' && c.actualPos && c.actualPos !== c.plannedPos))
+    );
+
+    return holdConfig.map(h => {
+      const holdMissing = missingSlots.filter(m => {
+        const p = DataAdapters.parsePos6(m.plannedPos, deckTierMin);
+        return p && h.bays.includes(p.bay);
+      });
+      const items = holdMissing.map(m => {
+        const targetP = DataAdapters.parsePos6(m.plannedPos, deckTierMin);
+        const isUnderDeck = targetP ? !targetP.isDeck : true;
+        let belowWeight = Infinity;
+        if (targetP && targetP.tierNum > 2 && targetP.tierNum !== deckTierMin && targetP.tierNum !== deckTierMin + 2) {
+          const belowPos = `${targetP.bay}${targetP.row}${String(targetP.tierNum - 2).padStart(2, '0')}`;
+          const belowItem = pool.find(x => x.actualPos === belowPos || x.plannedPos === belowPos);
+          if (belowItem && belowItem.weight > 0) belowWeight = belowItem.weight;
+        }
+        const substitutes = readyBAll.filter(cand => {
+          if (cand.cntr === m.cntr) return false;
+          if (cand.pod !== m.pod || cand.size !== m.size) return false;
+          if (isUnderDeck && cand.instFlags?.mustOnDeck) return false;
+          if (!isUnderDeck && cand.instFlags?.mustUnderDeck) return false;
+          if (cand.weight > belowWeight + 2.0) return false;
+          return true;
+        }).map(cand => ({
+          ...cand, weightDiff: Math.abs((cand.weight || 0) - (m.weight || 0)), isFreeSlot: !cand.plannedPos
+        })).sort((a, b) => (a.isFreeSlot !== b.isFreeSlot ? (a.isFreeSlot ? -1 : 1) : a.weightDiff - b.weightDiff)).slice(0, 3);
+        return { missing: m, substitutes };
+      });
+      return { hold: h.hold, label: h.label, bays: h.bays, count: items.length, items };
+    }).filter(g => g.count > 0);
+  }
+};
+
+const CraneEngine = {
+  analyzeCraneBalance(st, pool, shiftMode = 'ALL') {
+    const completed = (st.liveJobs || []).filter(j => j.status === 'C');
+    const craneSet = new Set((st.cranes || []).filter(c => c.active).map(c => c.id));
+    completed.forEach(j => j.crane && craneSet.add(j.crane));
+    const craneIds = Array.from(craneSet);
+
+    const extractHour = (t) => { const m = String(t || '').match(/(\d{1,2}):\d{2}/); return m ? parseInt(m[1], 10) : null; };
+    let hours = shiftMode === 'DAY' ? [7,8,9,10,11,12,13,14,15,16,17,18]
+              : shiftMode === 'NIGHT' ? [19,20,21,22,23,0,1,2,3,4,5,6]
+              : [8,9,10,11,12,13,14,15,16,17,18,19];
+    if (completed.length > 0 && shiftMode === 'ALL') {
+      const validH = completed.map(j => extractHour(j.done_at)).filter(h => h !== null);
+      if (validH.length) {
+        const startH = Math.min(...validH);
+        hours = Array.from({ length: 12 }, (_, idx) => (startH + idx) % 24);
+      }
+    }
+
+    const hourlyMatrix = {};
+    hours.forEach(h => { hourlyMatrix[h] = {}; craneIds.forEach(id => hourlyMatrix[h][id] = 0); });
+    if (completed.length > 0) {
+      completed.forEach(j => {
+        const h = extractHour(j.done_at);
+        if (h !== null && hourlyMatrix[h]) hourlyMatrix[h][j.crane] = (hourlyMatrix[h][j.crane] || 0) + 1;
+      });
+    } else {
+      hours.forEach((h, idx) => craneIds.forEach((id, ci) => { hourlyMatrix[h][id] = 14 + ((idx * 5 + ci * 7) % 15); }));
+    }
+
+    const holdProgress = {};
+    (st.holdConfig || []).forEach(h => {
+      const inH = pool.filter(c => { const p = DataAdapters.parsePos6(c.actualPos || c.plannedPos); return p && h.bays.includes(p.bay); });
+      const doneC = inH.filter(c => c.jobStatus === 'C').length;
+      const readyB = inH.filter(c => c.jobStatus === 'B').length;
+      holdProgress[h.hold] = { total: inH.length, doneC, readyB, pct: inH.length ? Math.round((doneC / inH.length) * 100) : 0 };
+    });
+
+    const busiestHold = Object.entries(holdProgress).sort((a, b) => b[1].readyB - a[1].readyB)[0];
+    const reallocSuggestions = [];
+    (st.cranes || []).filter(c => c.active && !c.paused && c.mode !== 'IMPORT_ONLY').forEach(c => {
+      const remReady = (c.holds || []).reduce((s, hNo) => s + (holdProgress[hNo]?.readyB || 0), 0);
+      if (remReady === 0 && busiestHold && busiestHold[1].readyB > 0) {
+        reallocSuggestions.push({ craneId: c.id, targetHold: Number(busiestHold[0]), targetReadyB: busiestHold[1].readyB });
+      }
+    });
+
+    const totals = craneIds.map(id => ({
+      id,
+      moves: completed.length ? completed.filter(j => j.crane === id).length : hours.reduce((s, h) => s + (hourlyMatrix[h][id] || 0), 0)
+    })).sort((a, b) => a.moves - b.moves);
+
+    return { hours, craneIds, hourlyMatrix, totals, holdProgress, reallocSuggestions };
+  },
+
+  buildFailoverPlans(st, presetCranes) {
+    const paused = (st.cranes || []).filter(c => c.active && c.paused);
+    const healthy = (st.cranes || []).filter(c => c.active && !c.paused && c.mode !== 'IMPORT_ONLY');
+    const backups = presetCranes.filter(id => !st.cranes.some(c => c.id === id && c.active));
+
+    return paused.map(pc => {
+      const pausedSec = pc.pauseStart ? Math.max(0, Math.floor((Date.now() - pc.pauseStart) / 1000)) : 0;
+      const pausedMins = Math.max(1, Math.round(pausedSec / 60));
+      const lostMoves = Math.max(1, Math.round((pausedMins / 60) * (pc.rate || 25)));
+      const pcMid = pc.holds.length ? pc.holds.reduce((a, b) => a + b, 0) / pc.holds.length : 1;
+      const nearestHelper = [...healthy].sort((a, b) => {
+        const mA = a.holds.length ? a.holds.reduce((x, y) => x + y, 0) / a.holds.length : 99;
+        const mB = b.holds.length ? b.holds.reduce((x, y) => x + y, 0) / b.holds.length : 99;
+        return Math.abs(mA - pcMid) - Math.abs(mB - pcMid);
+      })[0] || null;
+      return { crane: pc, pausedSec, pausedMins, lostMoves, planA_helper: nearestHelper, planB_backups: backups };
+    });
+  }
+};
+
+// =========================================================================
+// [PHẦN 4] UI CONTROLLERS, ADMIN PIN MODAL, RESPONSIVE RENDERERS
+// =========================================================================
+function switchTab(tabId) {
+  document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('[data-tab]').forEach(b => b.classList.toggle('active', b.dataset.tab === tabId));
+  const pane = document.getElementById(tabId);
+  if (pane) pane.classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function toggleTheme() {
+  const cur = document.documentElement.getAttribute('data-theme');
+  document.documentElement.setAttribute('data-theme', cur === 'dark' ? 'light' : 'dark');
+}
+
+function closeModal(id) { document.getElementById(id)?.classList.remove('open'); }
+
 function setCardStatus(kind, msg, loaded) {
   const st = document.getElementById(`stat-${kind}`);
   const card = document.getElementById(`card-${kind}`);
@@ -1290,20 +2041,111 @@ function setCardStatus(kind, msg, loaded) {
   if (card) card.classList.toggle('loaded', Boolean(loaded));
 }
 
+function updateAdminPinHeaderBtn() {
+  const btn = document.getElementById('btnAdminPinHeader');
+  const lockBtn = document.getElementById('btnLockPinNow');
+  if (!btn) return;
+  if (AdminPinGuard.isUnlocked()) {
+    btn.textContent = '🔓 Admin';
+    btn.style.borderColor = '#10b981';
+    if (lockBtn) lockBtn.style.display = 'inline-flex';
+  } else {
+    btn.textContent = '🔒 PIN';
+    btn.style.borderColor = 'rgba(255,255,255,0.28)';
+    if (lockBtn) lockBtn.style.display = 'none';
+  }
+}
+
+function openAdminPinModal(actionName = 'thao tác quản trị', manageMode = false) {
+  switchPinTab('verify');
+  document.getElementById('pinActionPrompt').textContent = manageMode
+    ? 'Xác thực mã PIN quản trị, đổi PIN mới hoặc khôi phục PIN về mặc định (6868).'
+    : `🔒 Nhập mã PIN quản trị để thực hiện: ${actionName}.`;
+  ['inpVerifyPin','inpOldPin','inpNewPin','inpConfirmNewPin','inpRecoveryBank'].forEach(id => {
+    const el = document.getElementById(id); if (el) el.value = '';
+  });
+  ['msgVerifyPin','msgChangePin','msgResetPin'].forEach(id => {
+    const el = document.getElementById(id); if (el) el.textContent = '';
+  });
+  updateAdminPinHeaderBtn();
+  document.getElementById('adminPinModal').classList.add('open');
+  setTimeout(() => document.getElementById('inpVerifyPin')?.focus(), 80);
+
+  return new Promise(resolve => { AdminPinGuard.pendingResolve = resolve; });
+}
+
+function closeAdminPinModal(resultBool) {
+  document.getElementById('adminPinModal').classList.remove('open');
+  if (AdminPinGuard.pendingResolve) {
+    const fn = AdminPinGuard.pendingResolve;
+    AdminPinGuard.pendingResolve = null;
+    fn(Boolean(resultBool));
+  }
+}
+
+function switchPinTab(tab) {
+  ['verify','change','reset'].forEach(t => {
+    document.getElementById(`ptab-${t}`)?.classList.toggle('active', t === tab);
+    document.getElementById(`psec-${t}`)?.classList.toggle('active', t === tab);
+  });
+}
+
+function setPinMsg(elId, msg, isOk) {
+  const el = document.getElementById(elId);
+  if (!el) return;
+  el.textContent = msg;
+  el.style.color = isOk ? 'var(--green)' : 'var(--red)';
+}
+
+async function submitVerifyPin() {
+  const pin = document.getElementById('inpVerifyPin').value;
+  setPinMsg('msgVerifyPin', 'Đang xác thực trên Supabase...', true);
+  const res = await AdminPinGuard.verify(pin);
+  setPinMsg('msgVerifyPin', res.message || '', res.ok);
+  if (res.ok) setTimeout(() => closeAdminPinModal(true), 350);
+}
+
+async function submitChangePin() {
+  const oldPin = document.getElementById('inpOldPin').value.trim();
+  const newPin = document.getElementById('inpNewPin').value.trim();
+  const confirmPin = document.getElementById('inpConfirmNewPin').value.trim();
+  if (!oldPin || !newPin) { setPinMsg('msgChangePin', 'Vui lòng nhập đủ mã PIN cũ và PIN mới.', false); return; }
+  if (newPin !== confirmPin) { setPinMsg('msgChangePin', 'Xác nhận mã PIN mới không khớp!', false); return; }
+  setPinMsg('msgChangePin', 'Đang cập nhật mã PIN...', true);
+  const res = await AdminPinGuard.changePin(oldPin, newPin);
+  setPinMsg('msgChangePin', res.message || '', res.ok);
+  if (res.ok) {
+    document.getElementById('inpOldPin').value = '';
+    document.getElementById('inpNewPin').value = '';
+    document.getElementById('inpConfirmNewPin').value = '';
+  }
+}
+
+async function submitResetPin() {
+  const acc = document.getElementById('inpRecoveryBank').value.trim();
+  if (!acc) { setPinMsg('msgResetPin', 'Vui lòng nhập số tài khoản ngân hàng Admin.', false); return; }
+  setPinMsg('msgResetPin', 'Đang xác minh tài khoản trên Supabase...', true);
+  const res = await AdminPinGuard.resetPinByBankAccount(acc);
+  setPinMsg('msgResetPin', res.message || '', res.ok);
+  if (res.ok) document.getElementById('inpRecoveryBank').value = '';
+}
+
+function lockAdminSessionNow() {
+  AdminPinGuard.lockNow();
+  setPinMsg('msgVerifyPin', 'Đã khóa phiên quản trị.', true);
+}
+
 function updateStep1GuardUI() {
-  const isConfirmed = state.uploadConfirmedForSession === state.sessionId;
+  const isUnlocked = VesselUploadGuard.isUnlocked(state.sessionId);
   const box = document.getElementById('step1GuardBox');
   const title = document.getElementById('step1GuardTitle');
   const btn = document.getElementById('btnConfirmVesselLock');
   const banner = document.getElementById('uploadLockBanner');
   const cards = document.getElementById('uploadCardsContainer');
-  const lbl = document.getElementById('uploadVesselLabel');
-  const folder = document.getElementById('activeCloudFolder');
+  document.getElementById('uploadVesselLabel').textContent = state.sessionId;
+  document.getElementById('activeCloudFolder').textContent = `${APP_CONFIG.BUCKET_NAME}/${state.sessionId}/`;
 
-  if (lbl) lbl.textContent = state.sessionId;
-  if (folder) folder.textContent = `${APP_CONFIG.BUCKET_NAME}/${state.sessionId}/`;
-
-  if (isConfirmed) {
+  if (isUnlocked) {
     box.classList.add('confirmed');
     title.textContent = `✅ ĐÃ MỞ KHÓA NẠP FILE RIÊNG CHO TÀU: ${state.sessionId}`;
     btn.className = 'success';
@@ -1321,76 +2163,44 @@ function updateStep1GuardUI() {
 }
 
 function toggleVesselUploadConfirm() {
-  if (state.uploadConfirmedForSession === state.sessionId) {
-    state.uploadConfirmedForSession = null;
-  } else {
-    const ok = confirm(
-      `⚠️ XÁC NHẬN BƯỚC 1:\n\n` +
-      `Bạn đang chọn tàu: [ ${state.sessionId} ]\n` +
-      `Mọi file bạn tải lên ở Bước 2 sẽ được lưu riêng vào thư mục Cloud:\n` +
-      `→ ${APP_CONFIG.BUCKET_NAME}/${state.sessionId}/\n\n` +
-      `Vui lòng xác nhận ĐÚNG tên tàu trước khi mở khóa nạp file!`
-    );
-    if (!ok) return;
-    state.uploadConfirmedForSession = state.sessionId;
-  }
+  if (VesselUploadGuard.isUnlocked(state.sessionId)) VesselUploadGuard.lock();
+  else VesselUploadGuard.confirmUnlock(state.sessionId);
   updateStep1GuardUI();
 }
 
-function checkFileNameVesselMismatch(fileName, detectedHeaderVessel = '') {
-  const fUp = String(fileName || '').toUpperCase();
-  const sUp = state.sessionId.toUpperCase();
-  const vShort = sUp.split('_')[0]; // VD: KUO
-  if (detectedHeaderVessel) {
-    const detUp = detectedHeaderVessel.toUpperCase();
-    if (!detUp.includes(vShort) && !sUp.includes(detUp.split('/')[0].trim())) {
-      return confirm(
-        `🚨 CẢNH BÁO LỆCH TÊN TÀU TRONG NỘI DUNG FILE!\n\n` +
-        `• Tàu đang chọn trên web: ${state.sessionId}\n` +
-        `• Tên tàu đọc được trong file "${fileName}": ${detectedHeaderVessel}\n\n` +
-        `Bạn có CHẮC CHẮN muốn tiếp tục nạp file này vào ${state.sessionId} không?`
-      );
-    }
-  }
-  return true;
-}
-
 function syncCranesFromJobs(jobs) {
-  const jobCranes = new Set(jobs.map(j => j.crane).filter(Boolean));
+  const jobCranes = new Set((jobs || []).map(j => j.crane).filter(Boolean));
   jobCranes.forEach(cId => {
-    if (cId === 'QC05') return; // Bỏ qua mã mặc định khi chưa xếp xuất nếu chưa cần
+    if (cId === 'QC05') return;
     if (!state.cranes.some(c => c.id === cId)) {
-      state.cranes.push({ id: cId, active: true, mode: 'BOTH', holds: [1,2,3], paused: false, pauseStart: null, rate: 25 });
+      state.cranes.push({ id: cId, active: true, mode: 'BOTH', holds: [1,2], paused: false, pauseStart: null, rate: 25 });
     }
   });
 }
 
 function handleUploadExcel(evt, kind) {
-  if (state.uploadConfirmedForSession !== state.sessionId) {
+  if (!VesselUploadGuard.isUnlocked(state.sessionId)) {
     alert('⚠️ Vui lòng xác nhận đúng tàu ở Bước 1 trước khi nạp file!');
     evt.target.value = '';
     return;
   }
   const file = evt.target.files[0];
   if (!file) return;
-
+  const deckTier = parseInt(document.getElementById('cfgDeckTier')?.value, 10) || 80;
   const reader = new FileReader();
+
   if (kind === 'jobs' && file.name.toLowerCase().endsWith('.json')) {
     reader.onload = async (e) => {
       try {
-        const parsed = JSON.parse(e.target.result);
-        const norm = DataAdapters.normalizeJobsPayload(parsed);
-        state.liveJobs = norm.rows;
-        state.jobsSource = norm.source;
-        state.jobsUpdatedAt = norm.updated_at;
+        const norm = DataAdapters.normalizeJobsPayload(JSON.parse(e.target.result), state.sessionId);
+        state.liveJobs = norm.rows; state.jobsSource = norm.source; state.jobsUpdatedAt = norm.updated_at;
         syncCranesFromJobs(state.liveJobs);
+        HoldLayoutEngine.syncHoldsForState(state, parseFloat(document.getElementById('cfgLength').value) || 172, false);
         setCardStatus('jobs', `✓ ${norm.source}: ${state.liveJobs.length} job (JSON)`, true);
-        await CloudRepo.upsertVesselSession();
-        await CloudRepo.uploadBucketJson('jobs.json', norm);
+        await CloudRepo.saveSessionMeta();
+        await CloudRepo.uploadFile(state.sessionId, 'jobs.json', norm);
         renderAll();
-      } catch (err) {
-        alert('File JSON không hợp lệ: ' + err.message);
-      }
+      } catch (err) { alert('File JSON lỗi: ' + err.message); }
     };
     reader.readAsText(file);
     return;
@@ -1399,39 +2209,39 @@ function handleUploadExcel(evt, kind) {
   reader.onload = async (e) => {
     const wb = XLSX.read(new Uint8Array(e.target.result), { type: 'array' });
     const rows = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], { defval: '' });
-
-    let payloadToCloud = rows;
+    let payload = rows;
     if (kind === 'sbp') {
-      state.sbpImport = DataAdapters.normalizeSbp(rows);
-      payloadToCloud = { schema_version: APP_CONFIG.SCHEMA_VERSION, session_id: state.sessionId, updated_at: new Date().toISOString(), rows: state.sbpImport };
+      state.sbpImport = DataAdapters.normalizeSbp(rows, deckTier);
+      payload = { schema_version: APP_CONFIG.SCHEMA_VERSION, session_id: state.sessionId, updated_at: new Date().toISOString(), rows: state.sbpImport };
       setCardStatus('sbp', `✓ Đã nạp ${state.sbpImport.length} cont nhập`, true);
     } else if (kind === 'final') {
       state.finalLoading = DataAdapters.normalizeFinalLoading(rows);
-      payloadToCloud = { schema_version: APP_CONFIG.SCHEMA_VERSION, session_id: state.sessionId, updated_at: new Date().toISOString(), rows: state.finalLoading };
+      payload = { schema_version: APP_CONFIG.SCHEMA_VERSION, session_id: state.sessionId, updated_at: new Date().toISOString(), rows: state.finalLoading };
       setCardStatus('final', `✓ Đã nạp ${state.finalLoading.length} cont Final Loading`, true);
     } else if (kind === 'reserved') {
       state.reservedExport = DataAdapters.normalizeReserved(rows);
-      payloadToCloud = { schema_version: APP_CONFIG.SCHEMA_VERSION, session_id: state.sessionId, updated_at: new Date().toISOString(), rows: state.reservedExport };
+      payload = { schema_version: APP_CONFIG.SCHEMA_VERSION, session_id: state.sessionId, updated_at: new Date().toISOString(), rows: state.reservedExport };
       setCardStatus('reserved', `✓ Đã lọc ${state.reservedExport.length} cont (Chọn=1)`, true);
     } else if (kind === 'jobs') {
-      const norm = DataAdapters.normalizeJobsPayload(rows);
-      state.liveJobs = norm.rows;
-      state.jobsSource = 'EXCEL_WEB';
-      state.jobsUpdatedAt = norm.updated_at;
-      payloadToCloud = norm;
+      const norm = DataAdapters.normalizeJobsPayload(rows, state.sessionId);
+      state.liveJobs = norm.rows; state.jobsSource = 'EXCEL_WEB'; state.jobsUpdatedAt = norm.updated_at;
+      payload = norm;
       syncCranesFromJobs(state.liveJobs);
       setCardStatus('jobs', `✓ Đã chuẩn hóa ${state.liveJobs.length} job (A/B/C)`, true);
     }
 
-    await CloudRepo.upsertVesselSession();
-    await CloudRepo.uploadBucketJson(`${kind}.json`, payloadToCloud);
+    HoldLayoutEngine.syncHoldsForState(state, parseFloat(document.getElementById('cfgLength').value) || 172, false);
+    try {
+      await CloudRepo.saveSessionMeta();
+      await CloudRepo.uploadFile(state.sessionId, `${kind}.json`, payload);
+    } catch (err) {}
     renderAll();
   };
   reader.readAsArrayBuffer(file);
 }
 
 function handleUploadEdiOrStowage(evt) {
-  if (state.uploadConfirmedForSession !== state.sessionId) {
+  if (!VesselUploadGuard.isUnlocked(state.sessionId)) {
     alert('⚠️ Vui lòng xác nhận đúng tàu ở Bước 1 trước khi nạp file!');
     evt.target.value = '';
     return;
@@ -1443,13 +2253,9 @@ function handleUploadEdiOrStowage(evt) {
       reader.onload = async (e) => {
         const wb = XLSX.read(new Uint8Array(e.target.result), { type: 'array' });
         const rows = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], { defval: '' });
-        rows.forEach(r => {
-          const cntr = String(r['Số Container'] || '').trim().toUpperCase();
-          const inst = String(r['CntrJobType xếp dỡ'] || '').trim();
-          if (cntr && inst) state.stowageInstructions[cntr] = inst;
-        });
+        Object.assign(state.stowageInstructions, DataAdapters.normalizeStowageInstructions(rows));
         setCardStatus('edi', `✓ ${state.preStowagePlan.length} vị trí + ${Object.keys(state.stowageInstructions).length} chỉ dẫn`, true);
-        await CloudRepo.uploadBucketJson('edi_stowage.json', { instructions: state.stowageInstructions, preStowage: state.preStowagePlan });
+        await CloudRepo.uploadFile(state.sessionId, 'edi_stowage.json', { instructions: state.stowageInstructions, preStowage: state.preStowagePlan });
         renderAll();
       };
       reader.readAsArrayBuffer(file);
@@ -1457,14 +2263,13 @@ function handleUploadEdiOrStowage(evt) {
       reader.onload = async (e) => {
         const text = e.target.result;
         const res = (text.includes('UNH+') && text.includes('BAPLIE'))
-          ? DataAdapters.parseBaplieEdi(text)
-          : DataAdapters.parse604Asc(text);
-
-        if (!checkFileNameVesselMismatch(file.name, res.detectedVessel)) return;
+          ? DataAdapters.parseBaplieEdi(text) : DataAdapters.parse604Asc(text);
+        if (!VesselUploadGuard.verifyFileVesselMatch(state.sessionId, file.name, res.detectedVessel)) return;
         if (res.items.length) state.preStowagePlan = res.items;
+        HoldLayoutEngine.syncHoldsForState(state, parseFloat(document.getElementById('cfgLength').value) || 172, false);
         setCardStatus('edi', `✓ ${state.preStowagePlan.length} vị trí (${res.detectedVessel || file.name})`, true);
-        await CloudRepo.upsertVesselSession();
-        await CloudRepo.uploadBucketJson('edi_stowage.json', { instructions: state.stowageInstructions, preStowage: state.preStowagePlan });
+        await CloudRepo.saveSessionMeta();
+        await CloudRepo.uploadFile(state.sessionId, 'edi_stowage.json', { instructions: state.stowageInstructions, preStowage: state.preStowagePlan });
         renderAll();
       };
       reader.readAsText(file);
@@ -1472,103 +2277,61 @@ function handleUploadEdiOrStowage(evt) {
   });
 }
 
-// =========================================================================
-// MODULE 5: ĐỘNG CƠ HỢP NHẤT & KHUYẾN NGHỊ GỌI HÀNG / TRỪ ĐUỔI
-// =========================================================================
-function buildUnifiedExportPool() {
-  const map = new Map();
-
-  state.preStowagePlan.forEach(p => {
-    map.set(p.cntr, {
-      cntr: p.cntr,
-      plannedPos: p.pos,
-      actualPos: '',
-      size: String(p.iso || '').startsWith('2') ? '20DC' : '40HC',
-      weight: p.weight || 0,
-      pod: p.pod || 'SGSIN',
-      yardPos: '---',
-      transferPort: 'TV',
-      isOffDock: false,
-      customs: true,
-      jobStatus: 'B',
-      crane: '',
-      inst: state.stowageInstructions[p.cntr] || p.inst || ''
-    });
-  });
-
-  state.reservedExport.forEach(r => {
-    const cur = map.get(r.cntr) || {
-      cntr: r.cntr, plannedPos: '', actualPos: '', size: r.size, weight: r.weight,
-      pod: r.pod, yardPos: r.yard_pos, transferPort: 'TV', isOffDock: false, customs: true, jobStatus: 'A', crane: '', inst: ''
-    };
-    cur.size = r.size || cur.size;
-    if (r.weight > 0) cur.weight = r.weight;
-    cur.pod = r.pod || cur.pod;
-    if (r.yard_pos && r.yard_pos !== '---') cur.yardPos = r.yard_pos;
-    if (['KHM','HHH','SA','GFW'].includes(r.block)) {
-      cur.transferPort = r.block;
-      cur.isOffDock = true;
-    }
-    if (state.stowageInstructions[r.cntr]) cur.inst = state.stowageInstructions[r.cntr];
-    map.set(r.cntr, cur);
-  });
-
-  state.finalLoading.forEach(f => {
-    const cur = map.get(f.cntr) || {
-      cntr: f.cntr, plannedPos: '', actualPos: '', size: f.size, weight: f.weight,
-      pod: f.pod, yardPos: f.yard_pos, transferPort: f.transfer_port, isOffDock: f.is_off_dock,
-      customs: f.customs, jobStatus: f.customs ? 'B' : 'A', crane: '', inst: ''
-    };
-    if (f.weight > 0) cur.weight = f.weight;
-    cur.pod = f.pod || cur.pod;
-    if (f.yard_pos && f.yard_pos !== '---') cur.yardPos = f.yard_pos;
-    cur.transferPort = f.transfer_port;
-    cur.isOffDock = f.is_off_dock;
-    cur.customs = f.customs;
-    if (f.ship_pos && f.ship_pos !== '--') cur.plannedPos = cur.plannedPos || f.ship_pos;
-    if (state.stowageInstructions[f.cntr]) cur.inst = state.stowageInstructions[f.cntr];
-    map.set(f.cntr, cur);
-  });
-
-  state.liveJobs.filter(j => j.io === 'Export' || j.job_type === 'Xếp tàu').forEach(j => {
-    const cur = map.get(j.cntr);
-    if (cur) {
-      cur.jobStatus = j.status || cur.jobStatus;
-      cur.crane = j.crane || cur.crane;
-      if (j.status === 'C' && j.pos) cur.actualPos = j.pos;
-    }
-  });
-
-  return Array.from(map.values());
+// ==================== RENDER FUNCTIONS ====================
+function getLiveVesselCfg() {
+  return {
+    length_m: parseFloat(document.getElementById('cfgLength')?.value) || 172,
+    beam_m: parseFloat(document.getElementById('cfgBeam')?.value) || 27.6,
+    draft_f: parseFloat(document.getElementById('cfgDraftF')?.value) || 7.8,
+    draft_a: parseFloat(document.getElementById('cfgDraftA')?.value) || 8.2,
+    max_draft: parseFloat(document.getElementById('cfgMaxDraft')?.value) || 9.2,
+    cont_per_10cm: parseFloat(document.getElementById('cfgContPer10cm')?.value) || 28,
+    berth_depth: parseFloat(document.getElementById('cfgBerthDepth')?.value) || 9.0,
+    deck_tier_min: parseInt(document.getElementById('cfgDeckTier')?.value, 10) || 80
+  };
 }
 
-// =========================================================================
-// MODULE 6: RENDER GIAO DIỆN (DESKTOP + MOBILE)
-// =========================================================================
+function onLengthBeamChange() {
+  const L = parseFloat(document.getElementById('cfgLength').value) || 172;
+  const B = parseFloat(document.getElementById('cfgBeam').value) || 27.6;
+  const { contPer10cm } = DraftAndTideEngine.estimateTpcAndRate(L, B);
+  document.getElementById('cfgContPer10cm').value = contPer10cm;
+  if (!state.isCustomHoldConfig) HoldLayoutEngine.syncHoldsForState(state, L, true);
+  renderAll();
+}
+
+function recalcDraftLive() {
+  const cfg = getLiveVesselCfg();
+  const pool = UnifiedPoolBuilder.build(state, cfg.deck_tier_min);
+  const d = DraftAndTideEngine.calculateLiveDraft(cfg, pool, state.holdConfig, state.todayTide);
+  document.getElementById('kpiDraftLive').textContent = `${d.draftF.toFixed(2)}m / ${d.draftA.toFixed(2)}m (${d.trimVal >= 0 ? '+' : ''}${d.trimVal.toFixed(2)}m)`;
+  const stEl = document.getElementById('kpiDraftStatus');
+  stEl.textContent = d.alertText;
+  stEl.style.color = d.level === 'DANGER' ? 'var(--red)' : (d.level === 'WARNING' ? 'var(--amber)' : 'var(--green)');
+  return d;
+}
+
 function renderOffDockSummary(pool) {
-  const offDockItems = pool.filter(x => x.isOffDock && x.jobStatus !== 'C');
+  const offDock = pool.filter(x => x.isOffDock && x.jobStatus !== 'C');
   const groups = {};
-  offDockItems.forEach(item => {
-    const key = item.transferPort || 'KHÁC';
-    if (!groups[key]) groups[key] = { total: 0, readyB: 0, holdA: 0 };
-    groups[key].total++;
-    if (item.jobStatus === 'B') groups[key].readyB++;
-    else groups[key].holdA++;
+  offDock.forEach(item => {
+    const k = item.transferPort || 'KHÁC';
+    if (!groups[k]) groups[k] = { total: 0, readyB: 0, holdA: 0 };
+    groups[k].total++;
+    if (item.jobStatus === 'B') groups[k].readyB++;
+    else groups[k].holdA++;
   });
-
-  document.getElementById('offDockTotalBadge').textContent = `${offDockItems.length} Cont bãi ngoài`;
   const tvRemain = pool.filter(x => !x.isOffDock && x.jobStatus !== 'C').length;
-  document.getElementById('kpiOffDockSummary').textContent = `Bãi ngoài: ${offDockItems.length} · TV: ${tvRemain}`;
+  document.getElementById('offDockTotalBadge').textContent = `${offDock.length} Cont bãi ngoài`;
+  document.getElementById('kpiOffDockSummary').textContent = `Bãi ngoài: ${offDock.length} · TV: ${tvRemain}`;
 
-  const container = document.getElementById('offDockCards');
-  const keys = Object.keys(groups);
-  container.innerHTML = `
+  document.getElementById('offDockCards').innerHTML = `
     <div class="offdock-card tv">
-      <small>Nội bộ Cảng Tân Vũ (TV)</small>
+      <small>Nội bộ Tân Vũ (TV)</small>
       <strong>${tvRemain} Cont</strong>
       <span style="font-size:10.5px;color:var(--green)">Xe chạy 3–5 phút</span>
     </div>
-    ${keys.map(k => `
+    ${Object.keys(groups).map(k => `
       <div class="offdock-card">
         <small>${OFF_DOCK_LABELS[k] || ('Bãi ngoài ' + k)}</small>
         <strong>${groups[k].total} Cont</strong>
@@ -1579,71 +2342,30 @@ function renderOffDockSummary(pool) {
 }
 
 function renderCraneHourlyChart() {
-  const filter = document.getElementById('shiftFilter').value;
-  const completedJobs = state.liveJobs.filter(j => j.status === 'C');
-
-  // Lấy danh sách cẩu thực tế có sản lượng + cẩu đang kích hoạt
-  const craneSet = new Set(state.cranes.filter(c => c.active).map(c => c.id));
-  completedJobs.forEach(j => j.crane && craneSet.add(j.crane));
-  const craneIds = Array.from(craneSet);
+  const cfg = getLiveVesselCfg();
+  const pool = UnifiedPoolBuilder.build(state, cfg.deck_tier_min);
+  const shift = document.getElementById('shiftFilter').value;
+  const { hours, craneIds, hourlyMatrix, totals, reallocSuggestions } = CraneEngine.analyzeCraneBalance(state, pool, shift);
   const colors = ['#0284c7', '#059669', '#d97706', '#7c3aed', '#e11d48', '#0891b2'];
 
-  document.getElementById('craneChartLegend').innerHTML = craneIds.map((cId, i) => `
-    <span class="crane-legend-item"><i class="crane-legend-dot" style="background:${colors[i % colors.length]}"></i><span>${cId}</span></span>
+  document.getElementById('craneChartLegend').innerHTML = craneIds.map((id, i) => `
+    <span class="crane-legend-item"><i class="crane-legend-dot" style="background:${colors[i % colors.length]}"></i><span>${id}</span></span>
   `).join('');
-
-  const extractHour = (t) => {
-    const m = String(t || '').match(/(\d{1,2}):\d{2}/);
-    return m ? parseInt(m[1], 10) : null;
-  };
-
-  let hours = filter === 'DAY' ? [7,8,9,10,11,12,13,14,15,16,17,18]
-            : filter === 'NIGHT' ? [19,20,21,22,23,0,1,2,3,4,5,6]
-            : [8,9,10,11,12,13,14,15,16,17,18,19];
-
-  if (completedJobs.length > 0 && filter === 'ALL') {
-    const hrs = completedJobs.map(j => extractHour(j.done_at)).filter(h => h !== null);
-    if (hrs.length) {
-      const minH = Math.min(...hrs);
-      hours = Array.from({ length: 12 }, (_, idx) => (minH + idx) % 24);
-    }
-  }
-
-  const hourlyMap = {};
-  hours.forEach(h => {
-    hourlyMap[h] = {};
-    craneIds.forEach(cId => hourlyMap[h][cId] = 0);
-  });
-
-  if (completedJobs.length > 0) {
-    completedJobs.forEach(j => {
-      const h = extractHour(j.done_at);
-      if (h !== null && hourlyMap[h]) {
-        hourlyMap[h][j.crane] = (hourlyMap[h][j.crane] || 0) + 1;
-      }
-    });
-  } else {
-    hours.forEach((h, idx) => {
-      craneIds.forEach((cId, cIdx) => {
-        hourlyMap[h][cId] = 15 + ((idx * 5 + cIdx * 7) % 14);
-      });
-    });
-  }
 
   let maxTotal = 1;
   hours.forEach(h => {
-    const sum = Object.values(hourlyMap[h]).reduce((a, b) => a + b, 0);
-    if (sum > maxTotal) maxTotal = sum;
+    const s = Object.values(hourlyMatrix[h]).reduce((a, b) => a + b, 0);
+    if (s > maxTotal) maxTotal = s;
   });
 
   document.getElementById('craneHourlyBars').innerHTML = hours.map(h => {
-    const sumH = Object.values(hourlyMap[h]).reduce((a, b) => a + b, 0);
-    const segs = craneIds.map((cId, i) => {
-      const val = hourlyMap[h][cId] || 0;
+    const sumH = Object.values(hourlyMatrix[h]).reduce((a, b) => a + b, 0);
+    const segs = craneIds.map((id, i) => {
+      const val = hourlyMatrix[h][id] || 0;
       const pct = sumH > 0 ? Math.max(val > 0 ? 5 : 0, Math.round((val / maxTotal) * 100)) : 0;
       return `<div class="hbar-seg" style="height:${pct}%;background:${colors[i % colors.length]}"></div>`;
     }).join('');
-    const dataStr = JSON.stringify(hourlyMap[h]).replace(/"/g, '&quot;');
+    const dataStr = JSON.stringify(hourlyMatrix[h]).replace(/"/g, '&quot;');
     const isSel = state.selectedChartHour === h;
     return `
       <div class="hbar-col ${isSel ? 'selected-hour' : ''}"
@@ -1657,19 +2379,26 @@ function renderCraneHourlyChart() {
     `;
   }).join('');
 
-  const totals = craneIds.map(cId => {
-    const cnt = completedJobs.length ? completedJobs.filter(j => j.crane === cId).length : hours.reduce((s, h) => s + (hourlyMap[h][cId] || 0), 0);
-    return { id: cId, moves: cnt };
-  }).sort((a, b) => a.moves - b.moves);
-
+  let adviceHtml = '';
   if (totals.length >= 2) {
     const low = totals[0], high = totals[totals.length - 1];
     document.getElementById('craneImbalanceBadge').textContent = `Lệch nhịp: ${high.moves - low.moves} mv`;
-    document.getElementById('craneAdviceBox').innerHTML = `
-      💡 <b>Cân bằng cẩu:</b> <b>${low.id}</b> thấp nhất (<b>${low.moves} mv</b>) so với <b>${high.id}</b> (${high.moves} mv).
-      Ưu tiên cấp cont bãi gần <b>TV</b> cho <b>${low.id}</b> hoặc <button class="primary" style="padding:2px 8px;min-height:24px;font-size:11px;" onclick="switchTab('tab-cranes')">⚡ Đổi hầm</button>.
-    `;
+    adviceHtml += `💡 <b>Cân bằng cẩu:</b> <b>${low.id}</b> thấp nhất (<b>${low.moves} mv</b>) so với <b>${high.id}</b> (${high.moves} mv). Ưu tiên cấp hàng bãi gần <b>TV</b> cho <b>${low.id}</b>.`;
   }
+  if (reallocSuggestions.length) {
+    adviceHtml += reallocSuggestions.map(r => `
+      <div style="margin-top:5px;">⚡ Hầm của <b>${r.craneId}</b> đã hết hàng B →
+        <button class="primary sm" onclick="reassignCraneToHold('${r.craneId}', ${r.targetHold})">Chuyển ${r.craneId} sang HOLD ${String(r.targetHold).padStart(2,'0')} (${r.targetReadyB} B)</button>
+      </div>
+    `).join('');
+  }
+  document.getElementById('craneAdviceBox').innerHTML = adviceHtml || 'Nhịp cẩu ổn định.';
+}
+
+function reassignCraneToHold(craneId, holdNo) {
+  const c = state.cranes.find(x => x.id === craneId);
+  if (c && !c.holds.includes(holdNo)) c.holds = [...c.holds, holdNo].sort((a, b) => a - b);
+  renderAll();
 }
 
 function buildHourBreakdownHtml(hour, dataObj) {
@@ -1692,7 +2421,6 @@ function showCraneTooltip(evt, hour, dataObj) {
   tt.style.top = Math.min(evt.clientY + 12, window.innerHeight - 160) + 'px';
 }
 function hideCraneTooltip() { document.getElementById('craneTooltip').style.display = 'none'; }
-
 function pinMobileHourDetail(hour, dataObj) {
   state.selectedChartHour = hour;
   const bar = document.getElementById('mobileHourDetail');
@@ -1702,73 +2430,53 @@ function pinMobileHourDetail(hour, dataObj) {
 }
 
 function renderDispatchRecommendations() {
-  const pool = buildUnifiedExportPool();
-  const readyB = pool.filter(x => x.jobStatus === 'B');
-  const podStrat = document.getElementById('podStrategy').value;
-  const weightStrat = document.getElementById('weightStrategy').value;
-  const yardFilter = document.getElementById('yardFilter').value;
-
-  const podCounts = {};
-  readyB.forEach(c => podCounts[c.pod] = (podCounts[c.pod] || 0) + 1);
-
-  let candidates = readyB.filter(c => {
-    if (yardFilter === 'OFF_DOCK_ONLY') return c.isOffDock;
-    if (yardFilter === 'TV_ONLY') return !c.isOffDock;
-    return true;
-  });
-
-  candidates.sort((a, b) => {
-    if (a.isOffDock !== b.isOffDock) return a.isOffDock ? -1 : 1;
-    if (podStrat === 'FEWEST_FIRST' && podCounts[a.pod] !== podCounts[b.pod]) return podCounts[a.pod] - podCounts[b.pod];
-    if (podStrat === 'MOST_FIRST' && podCounts[a.pod] !== podCounts[b.pod]) return podCounts[b.pod] - podCounts[a.pod];
-    return weightStrat === 'HEAVY_FIRST' ? (b.weight - a.weight) : (a.weight - b.weight);
-  });
-
-  const exportCranes = state.cranes.filter(c => c.active && c.mode !== 'IMPORT_ONLY');
+  const cfg = getLiveVesselCfg();
+  const pool = UnifiedPoolBuilder.build(state, cfg.deck_tier_min);
+  const draftMetrics = DraftAndTideEngine.calculateLiveDraft(cfg, pool, state.holdConfig, state.todayTide);
+  const opts = {
+    podStrategy: document.getElementById('podStrategy').value,
+    weightStrategy: document.getElementById('weightStrategy').value,
+    yardFilter: document.getElementById('yardFilter').value,
+    deckTierMin: cfg.deck_tier_min
+  };
+  const recs = DispatchEngine.getRecommendationsByCrane(state, pool, opts, draftMetrics);
   const container = document.getElementById('craneDispatchColumns');
-  if (!exportCranes.length) {
-    container.innerHTML = `<div style="padding:12px;color:var(--amber);">Chưa có cẩu nào ở chế độ Làm Xuất. Vào Tab 3 để bật chế độ Xuất.</div>`;
+
+  if (!recs.length) {
+    container.innerHTML = `<div style="padding:10px;color:var(--amber);">Chưa có cẩu làm Xuất nào được bật. Vào Tab 3 để chọn chế độ Xuất.</div>`;
     return;
   }
 
-  container.innerHTML = exportCranes.map(crane => {
-    const holdSet = new Set(crane.holds);
-    const matched = candidates.filter(c => {
-      const p6 = DataAdapters.parsePos6(c.plannedPos);
-      if (!p6) return true;
-      return holdSet.has(DataAdapters.getHoldByBay(p6.bay));
-    }).slice(0, 6);
-
-    return `
-      <div class="panel" style="margin:0;border-top:3px solid ${crane.paused ? 'var(--red)' : 'var(--cyan)'}">
-        <div class="panel-head">
-          <div><strong>${crane.id}</strong> <span class="badge">Hầm ${crane.holds.join(', ')}</span> ${crane.paused ? '<span class="badge red">⏸ SỰ CỐ</span>' : ''}</div>
-          <span style="font-size:11px;color:var(--muted);">${matched.length} gợi ý</span>
-        </div>
-        <div class="panel-body" style="padding:8px;">
-          ${matched.length ? matched.map(item => `
-            <div style="border:1px solid var(--line);border-radius:8px;padding:8px 9px;margin-bottom:6px;background:var(--bg);display:flex;justify-content:space-between;align-items:center;gap:6px;">
-              <div style="min-width:0;">
-                <div style="font-weight:850;font-size:12px;display:flex;flex-wrap:wrap;gap:4px;align-items:center;">
-                  <span>${item.cntr}</span>
-                  <span class="badge">${item.size}</span>
-                  <span class="badge green">${item.pod}</span>
-                  ${item.inst ? `<span class="badge purple">${item.inst}</span>` : ''}
-                </div>
-                <div style="font-size:10.5px;color:var(--muted);margin-top:2px;">
-                  Tàu: <b>${item.plannedPos || 'Tự chọn'}</b> · <b>${item.weight.toFixed(1)}T</b> ·
-                  ${item.isOffDock ? `<b style="color:var(--amber)">🚛 Bãi ${item.transferPort} (Gọi sớm)</b>` : `Bãi TV (${item.yardPos})`}
-                </div>
-              </div>
-              <button class="primary" style="padding:5px 9px;font-size:11px;flex-shrink:0;" onclick="markContainerCalled('${item.cntr}', '${crane.id}', '${item.plannedPos}')">
-                ${state.calledContainers.has(item.cntr) ? '✓ Đã gọi' : 'Gọi xe'}
-              </button>
-            </div>
-          `).join('') : '<div style="font-size:11px;color:var(--muted);padding:8px;">Hết cont sẵn sàng B trong hầm phụ trách.</div>'}
-        </div>
+  container.innerHTML = recs.map(({ crane, totalReadyInHolds, topItems }) => `
+    <div class="panel" style="margin:0;border-top:3px solid ${crane.paused ? 'var(--red)' : 'var(--cyan)'}">
+      <div class="panel-head">
+        <div><strong>${crane.id}</strong> <span class="badge">Hầm ${crane.holds.join(', ') || '—'}</span> ${crane.paused ? '<span class="badge red">⏸ SỰ CỐ</span>' : ''}</div>
+        <span style="font-size:11px;color:var(--muted);">${totalReadyInHolds} sẵn sàng B</span>
       </div>
-    `;
-  }).join('');
+      <div class="panel-body" style="padding:8px;">
+        ${topItems.length ? topItems.map(item => `
+          <div style="border:1px solid var(--line);border-radius:8px;padding:7px 9px;margin-bottom:6px;background:var(--bg);display:flex;justify-content:space-between;align-items:center;gap:6px;">
+            <div style="min-width:0;">
+              <div style="font-weight:850;font-size:12px;display:flex;flex-wrap:wrap;gap:4px;align-items:center;">
+                <span>${item.cntr}</span>
+                <span class="badge">${item.size}</span>
+                <span class="badge green">${item.pod}</span>
+                ${item.inst ? `<span class="badge purple">${item.inst}</span>` : ''}
+                ${!item.bottomOk ? `<span class="badge red">Chờ tầng dưới</span>` : ''}
+              </div>
+              <div style="font-size:10.5px;color:var(--muted);margin-top:2px;">
+                Tàu: <b>${item.plannedPos || 'Tự chọn'}</b> (H${item.holdNo || '?'}) · <b>${item.weight.toFixed(1)}T</b> ·
+                ${item.isOffDock ? `<b style="color:var(--amber)">🚛 ${item.transferPort} (Gọi sớm)</b>` : `TV (${item.yardPos})`}
+              </div>
+            </div>
+            <button class="primary sm" style="flex-shrink:0;" onclick="markContainerCalled('${item.cntr}', '${crane.id}', '${item.plannedPos}')">
+              ${state.calledContainers.has(item.cntr) ? '✓ Đã gọi' : 'Gọi xe'}
+            </button>
+          </div>
+        `).join('') : '<div style="font-size:11px;color:var(--muted);padding:8px;">Hết cont sẵn sàng B trong hầm phụ trách.</div>'}
+      </div>
+    </div>
+  `).join('');
 }
 
 async function markContainerCalled(cntr, craneId, targetSlot) {
@@ -1776,60 +2484,54 @@ async function markContainerCalled(cntr, craneId, targetSlot) {
   renderDispatchRecommendations();
   try {
     await sb.from('dispatch_logs').upsert({
-      session_id: state.sessionId,
-      container_no: cntr,
-      action_type: 'CALLED',
-      crane_id: craneId,
-      target_slot: targetSlot || ''
+      session_id: state.sessionId, container_no: cntr, action_type: 'CALLED', crane_id: craneId, target_slot: targetSlot || ''
     }, { onConflict: 'session_id,container_no' });
   } catch (e) {}
 }
 
 function renderHoldsAndChase() {
-  const pool = buildUnifiedExportPool();
+  const cfg = getLiveVesselCfg();
+  const pool = UnifiedPoolBuilder.build(state, cfg.deck_tier_min);
   const impJobs = state.liveJobs.filter(j => j.io === 'Import' || j.job_type === 'Dỡ tàu');
-  const grid = document.getElementById('holdsOverviewGrid');
+  const holds = state.holdConfig || [];
+  document.getElementById('holdCountBadge').textContent = `${holds.length} Hầm (${state.isCustomHoldConfig ? 'Tùy chỉnh' : 'Tự động theo Bay & LOA'})`;
+
   const chaseFilter = document.getElementById('chaseHoldFilter');
+  const prevVal = chaseFilter.value || 'ALL';
+  chaseFilter.innerHTML = `<option value="ALL">Tất cả ${holds.length} Hầm</option>` +
+    holds.map(h => `<option value="${h.hold}">${h.label} (Bay ${h.bays.join(', ')})</option>`).join('');
+  chaseFilter.value = holds.some(h => String(h.hold) === prevVal) ? prevVal : 'ALL';
 
-  if (chaseFilter.options.length <= 1) {
-    HOLD_DEFS.forEach(h => {
-      const opt = document.createElement('option');
-      opt.value = h.hold;
-      opt.textContent = `HOLD 0${h.hold} (Bay ${h.bays.join(', ')})`;
-      chaseFilter.appendChild(opt);
-    });
-  }
+  document.getElementById('holdsOverviewGrid').innerHTML = holds.map(h => {
+    const expInH = pool.filter(c => { const p = DataAdapters.parsePos6(c.actualPos || c.plannedPos); return p && h.bays.includes(p.bay); });
+    const expDone = expInH.filter(c => c.jobStatus === 'C').length;
+    const expPct = expInH.length ? Math.round((expDone / expInH.length) * 100) : 0;
 
-  grid.innerHTML = HOLD_DEFS.map(h => {
-    const expInHold = pool.filter(c => {
-      const p = DataAdapters.parsePos6(c.actualPos || c.plannedPos);
-      return p && h.bays.includes(p.bay);
-    });
-    const expDone = expInHold.filter(c => c.jobStatus === 'C').length;
-    const expPct = expInHold.length ? Math.round((expDone / expInHold.length) * 100) : 0;
-
-    const impInHold = impJobs.filter(j => {
-      const p = DataAdapters.parsePos6(j.pos);
-      return p && h.bays.includes(p.bay);
-    });
-    const impDone = impInHold.filter(j => j.status === 'C').length;
-    const impRem = impInHold.length - impDone;
-    const impPct = impInHold.length ? Math.round((impDone / impInHold.length) * 100) : 100;
+    const impInH = impJobs.filter(j => { const p = DataAdapters.parsePos6(j.pos); return p && h.bays.includes(p.bay); });
+    const impDone = impInH.filter(j => j.status === 'C').length;
+    const impRem = impInH.length - impDone;
+    const impPct = impInH.length ? Math.round((impDone / impInH.length) * 100) : 100;
 
     return `
       <div class="hold-box">
         <div style="display:flex;justify-content:space-between;align-items:center;">
-          <strong>HOLD 0${h.hold}</strong>
-          <span class="badge ${impRem === 0 ? 'green' : 'amber'}">${impRem === 0 ? '✓ Sạch hàng nhập' : `Còn ${impRem} nhập`}</span>
+          <strong>${h.label}</strong>
+          <div style="display:flex;gap:4px;align-items:center;">
+            <span class="badge ${impRem === 0 ? 'green' : 'amber'}">${impRem === 0 ? '✓ Sạch nhập' : `Còn ${impRem} nhập`}</span>
+            ${holds.length > 1 ? `<button class="sm" style="padding:1px 6px;min-height:22px;" title="Xóa hầm này" onclick="removeManualHold(${h.hold})">✕</button>` : ''}
+          </div>
         </div>
         <div style="font-size:10.5px;color:var(--muted);margin-top:4px;display:flex;justify-content:space-between;">
-          <span>Dỡ nhập: ${impDone}/${impInHold.length} (${impPct}%)</span>
-          <span>Xếp xuất: ${expDone}/${expInHold.length} (${expPct}%)</span>
+          <span>Dỡ nhập: ${impDone}/${impInH.length} (${impPct}%)</span>
+          <span>Xếp xuất: ${expDone}/${expInH.length} (${expPct}%)</span>
         </div>
         <div class="prog-track"><div class="prog-fill imp" style="width:${impPct}%"></div></div>
         <div class="prog-track"><div class="prog-fill" style="width:${expPct}%"></div></div>
         <div class="bay-chips">
           ${h.bays.map(b => `<span class="bay-chip ${state.selectedBays.has(b) ? 'selected' : ''}" onclick="openBayPopup('${b}')">Bay ${b}</span>`).join('')}
+        </div>
+        <div class="hold-editor-row">
+          <input value="${h.bays.join(', ')}" placeholder="Nhập Bay (VD: 01, 02, 03)" onchange="onEditHoldBays(${h.hold}, this.value)">
         </div>
       </div>
     `;
@@ -1838,215 +2540,129 @@ function renderHoldsAndChase() {
   renderRollingChaseByHold();
 }
 
-function renderRollingChaseByHold() {
-  const pool = buildUnifiedExportPool();
-  const occupiedActual = new Set(pool.filter(c => c.jobStatus === 'C' && c.actualPos).map(c => c.actualPos));
-  const missingSlots = pool.filter(c => c.plannedPos && c.jobStatus === 'A' && !occupiedActual.has(c.plannedPos));
-  const readyBAll = pool.filter(c => c.jobStatus === 'B');
-  const deckTierMin = parseInt(document.getElementById('cfgDeckTier')?.value, 10) || 80;
-
-  document.getElementById('chaseMissingBadge').textContent = `${missingSlots.length} vị trí bị giữ A`;
-  const selectedHold = document.getElementById('chaseHoldFilter').value;
-  const holdsToShow = selectedHold === 'ALL' ? HOLD_DEFS : HOLD_DEFS.filter(h => String(h.hold) === selectedHold);
-
-  const container = document.getElementById('rollingChaseContainer');
-  container.innerHTML = holdsToShow.map(h => {
-    const holdMissing = missingSlots.filter(m => {
-      const p = DataAdapters.parsePos6(m.plannedPos);
-      return p && h.bays.includes(p.bay);
-    });
-    if (!holdMissing.length) return '';
-
-    return `
-      <div style="border:1px solid var(--line);border-radius:8px;padding:10px;margin-bottom:10px;background:var(--bg);">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
-          <strong style="color:var(--cyan);">HOLD 0${h.hold} (Bay ${h.bays.join(', ')})</strong>
-          <span class="badge red">${holdMissing.length} vị trí bị giữ A cần bù</span>
-        </div>
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th>Vị trí khuyết</th>
-                <th>Cont giữ A</th>
-                <th>POD / Size</th>
-                <th>Tấn mục tiêu</th>
-                <th>Top Cont Sẵn sàng B thay thế sát tấn nhất</th>
-              </tr>
-            </thead>
-            <tbody>
-              ${holdMissing.slice(0, 12).map(m => {
-                const targetP = DataAdapters.parsePos6(m.plannedPos);
-                const isTargetUnderDeck = targetP && targetP.tierNum < deckTierMin;
-                // Ưu tiên cont B chưa gắn vị trí; nếu hết thì lấy cont B tầng cao hơn/bay khác để đảo nhịp
-                const subs = readyBAll
-                  .filter(cand => {
-                    if (cand.cntr === m.cntr) return false;
-                    if (cand.pod !== m.pod || cand.size !== m.size) return false;
-                    if (isTargetUnderDeck && String(cand.inst).toUpperCase().includes('OD')) return false;
-                    if (!isTargetUnderDeck && String(cand.inst).toUpperCase().includes('UD')) return false;
-                    return true;
-                  })
-                  .map(cand => ({
-                    ...cand,
-                    diff: Math.abs(cand.weight - m.weight),
-                    isFree: !cand.plannedPos
-                  }))
-                  .sort((a, b) => (a.isFree !== b.isFree ? (a.isFree ? -1 : 1) : a.diff - b.diff))
-                  .slice(0, 2);
-
-                return `
-                  <tr>
-                    <td><b>${m.plannedPos}</b></td>
-                    <td>${m.cntr} <span class="badge red">A</span></td>
-                    <td>${m.pod} · ${m.size}</td>
-                    <td><b>${m.weight.toFixed(2)}T</b></td>
-                    <td>
-                      ${subs.map(s => `
-                        <span class="badge green" style="margin-right:4px;">
-                          ${s.cntr} (${s.weight.toFixed(1)}T, Δ${s.diff.toFixed(1)}T · ${s.isOffDock ? s.transferPort : 'TV'}${s.plannedPos ? ' · Đảo từ ' + s.plannedPos : ''})
-                        </span>
-                      `).join('') || '<span style="color:var(--muted)">Chưa có cont B cùng POD/Size</span>'}
-                    </td>
-                  </tr>
-                `;
-              }).join('')}
-            </tbody>
-          </table>
-        </div>
-      </div>
-    `;
-  }).join('') || '<div style="color:var(--muted);padding:8px;">Không có vị trí dự kiến nào bị chặn trạng thái A trong hầm đã chọn.</div>';
+function recalcHoldsAuto() {
+  const L = parseFloat(document.getElementById('cfgLength').value) || 172;
+  const desired = parseInt(document.getElementById('desiredHoldCountInput').value, 10) || 0;
+  HoldLayoutEngine.syncHoldsForState(state, L, true, desired);
+  state.selectedBays = new Set(state.holdConfig.flatMap(h => h.bays));
+  renderAll();
+}
+function onEditHoldBays(holdNo, str) {
+  HoldLayoutEngine.updateHoldBays(state, holdNo, str);
+  renderAll();
+}
+function addManualHold() {
+  HoldLayoutEngine.addHold(state);
+  renderAll();
+}
+function removeManualHold(holdNo) {
+  HoldLayoutEngine.removeHold(state, holdNo);
+  renderAll();
+}
+async function saveHoldConfigToCloud() {
+  if (!(await AdminPinGuard.requireAuth('lưu cấu hình chia Hầm - Bay lên Cloud'))) return;
+  try {
+    await CloudRepo.saveSessionMeta();
+    alert(`✓ Đã lưu cấu hình ${state.holdConfig.length} Hầm của tàu ${state.sessionId} lên Supabase!`);
+  } catch (e) { alert('Lỗi lưu: ' + e.message); }
 }
 
-function autoSelectDischargedBays() {
-  HOLD_DEFS.forEach(h => h.bays.forEach(b => state.selectedBays.add(b)));
-  renderHoldsAndChase();
-}
 function toggleAllBays(flag) {
-  if (flag) HOLD_DEFS.forEach(h => h.bays.forEach(b => state.selectedBays.add(b)));
+  if (flag) state.selectedBays = new Set(state.holdConfig.flatMap(h => h.bays));
   else state.selectedBays.clear();
-  renderHoldsAndChase();
+  renderAll();
+}
+
+function renderRollingChaseByHold() {
+  const cfg = getLiveVesselCfg();
+  const pool = UnifiedPoolBuilder.build(state, cfg.deck_tier_min);
+  const groups = DispatchEngine.getRollingChaseByHold(state, pool, cfg.deck_tier_min);
+  const totalMissing = groups.reduce((s, g) => s + g.count, 0);
+  document.getElementById('chaseMissingBadge').textContent = `${totalMissing} vị trí khuyết / bị giữ A`;
+
+  const selHold = document.getElementById('chaseHoldFilter').value;
+  const filtered = selHold === 'ALL' ? groups : groups.filter(g => String(g.hold) === selHold);
+  const container = document.getElementById('rollingChaseContainer');
+
+  container.innerHTML = filtered.map(g => `
+    <div style="border:1px solid var(--line);border-radius:8px;padding:10px;margin-bottom:10px;background:var(--bg);">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+        <strong style="color:var(--cyan);">${g.label} (Bay ${g.bays.join(', ')})</strong>
+        <span class="badge red">${g.count} vị trí cần gọi đuổi</span>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Vị trí khuyết</th><th>Cont dự kiến</th><th>POD / Size</th><th>Tấn mục tiêu</th><th>Top Cont B thay thế gần tấn nhất (Đúng UD/OD & Tải tầng)</th></tr>
+          </thead>
+          <tbody>
+            ${g.items.slice(0, 12).map(({ missing, substitutes }) => `
+              <tr>
+                <td><b>${missing.plannedPos}</b></td>
+                <td>${missing.cntr} <span class="badge red">${missing.jobStatus}</span></td>
+                <td>${missing.pod} · ${missing.size}</td>
+                <td><b>${missing.weight.toFixed(2)}T</b></td>
+                <td>
+                  ${substitutes.map(s => `
+                    <span class="badge green" style="margin-right:4px;">
+                      ${s.cntr} (${s.weight.toFixed(1)}T, Δ${s.weightDiff.toFixed(1)}T · ${s.isOffDock ? s.transferPort : 'TV'}${s.plannedPos ? ' · Đảo ' + s.plannedPos : ''})
+                    </span>
+                  `).join('') || '<span style="color:var(--muted)">Chờ mở B hoặc chưa có cont thay phù hợp</span>'}
+                </td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  `).join('') || '<div style="color:var(--muted);padding:8px;">Không có vị trí dự kiến nào bị khuyết trong hầm đã chọn.</div>';
 }
 
 function openBayPopup(bay) {
-  const pool = buildUnifiedExportPool();
-  const inBay = pool.filter(c => {
-    const p = DataAdapters.parsePos6(c.actualPos || c.plannedPos);
-    return p && p.bay === bay;
-  });
-  document.getElementById('bayModalTitle').textContent = `Sơ đồ Bay ${bay} (HOLD 0${DataAdapters.getHoldByBay(bay)}) · ${inBay.length} cont`;
+  const cfg = getLiveVesselCfg();
+  const pool = UnifiedPoolBuilder.build(state, cfg.deck_tier_min);
+  const inBay = pool.filter(c => { const p = DataAdapters.parsePos6(c.actualPos || c.plannedPos); return p && p.bay === bay; });
+  const holdNo = HoldLayoutEngine.getHoldByBay(bay, state.holdConfig);
+  document.getElementById('bayModalTitle').textContent = `Sơ đồ Bay ${bay} (HOLD ${String(holdNo).padStart(2,'0')}) · ${inBay.length} cont`;
 
   const rows = ['10','08','06','04','02','00','01','03','05','07','09'];
-  const tiers = ['90','88','86','84','82','10','08','06','04','02'];
+  const deckTiers = ['90','88','86','84','82'];
+  const holdTiers = ['10','08','06','04','02'];
   const slotMap = {};
   inBay.forEach(c => {
     const p = DataAdapters.parsePos6(c.actualPos || c.plannedPos);
     if (p) slotMap[`${p.row}_${p.tier}`] = c;
   });
 
-  let html = `<div class="table-wrap"><table class="bay-matrix"><thead><tr><th>Tier \\ Row</th>${rows.map(r => `<th>${r}</th>`).join('')}</tr></thead><tbody>`;
-  tiers.forEach(t => {
-    html += `<tr><th>${t}</th>`;
-    rows.forEach(r => {
-      const item = slotMap[`${r}_${t}`];
-      if (!item) {
-        html += `<td class="slot-EMPTY">-</td>`;
-      } else {
-        const cls = state.calledContainers.has(item.cntr) ? 'slot-CALLED' : `slot-${item.jobStatus}`;
-        html += `<td class="${cls}" title="${item.cntr} | ${item.weight}T | ${item.transferPort} | ${item.inst}">
-          <div>${item.pod}</div>
-          <div>${item.weight.toFixed(1)}T</div>
-          <div style="font-size:9px;">${item.cntr.slice(-4)}</div>
-        </td>`;
-      }
-    });
-    html += `</tr>`;
-  });
-  html += `</tbody></table></div>`;
-  document.getElementById('bayModalBody').innerHTML = html;
+  const renderTierRow = (t) => `<tr><th>${t}</th>${rows.map(r => {
+    const item = slotMap[`${r}_${t}`];
+    if (!item) return `<td class="slot-EMPTY">-</td>`;
+    const cls = state.calledContainers.has(item.cntr) ? 'slot-CALLED' : `slot-${item.jobStatus}`;
+    const clickAttr = item.jobStatus === 'B' ? `onclick="markContainerCalled('${item.cntr}','BAY${bay}','${item.plannedPos}');openBayPopup('${bay}');"` : '';
+    return `<td class="${cls}" ${clickAttr} title="${item.cntr} | ${item.weight}T | ${item.transferPort} | ${item.inst}">
+      <div>${item.pod}</div><div>${item.weight.toFixed(1)}T</div><div style="font-size:9px;">${item.cntr.slice(-4)}</div>
+    </td>`;
+  }).join('')}</tr>`;
+
+  document.getElementById('bayModalBody').innerHTML = `
+    <div class="table-wrap">
+      <table class="bay-matrix">
+        <thead><tr><th>Tier \\ Row</th>${rows.map(r => `<th>${r}</th>`).join('')}</tr></thead>
+        <tbody>
+          ${deckTiers.map(renderTierRow).join('')}
+          <tr class="deck-divider"><td colspan="${rows.length + 1}">MẶT BOONG (TIER >= ${cfg.deck_tier_min}) ▲ | ▼ DƯỚI HẦM</td></tr>
+          ${holdTiers.map(renderTierRow).join('')}
+        </tbody>
+      </table>
+    </div>
+  `;
   document.getElementById('bayModal').classList.add('open');
-}
-
-function closeModal(id) { document.getElementById(id).classList.remove('open'); }
-
-function openBotSchemaModal() {
-  const sample = {
-    schema_version: "1.0",
-    session_id: state.sessionId,
-    source: "OM_AUTO_BOT",
-    updated_at: new Date().toISOString(),
-    rows: [
-      {
-        cntr: "OOCU1084060",
-        io: "Export",
-        job_type: "Xếp tàu",
-        status: "B",
-        crane: "QC11",
-        truck: "15",
-        pos: "210702",
-        pod: "SGSIN",
-        fpod: "SGSIN",
-        done_at: ""
-      },
-      {
-        cntr: "AMCU9370652",
-        io: "Import",
-        job_type: "Dỡ tàu",
-        status: "C",
-        crane: "TK10",
-        truck: "62",
-        pos: "260882",
-        pod: "VNTVP",
-        fpod: "VNTVP",
-        done_at: "26/11/2026 12:43:17"
-      }
-    ]
-  };
-  document.getElementById('botSchemaPreview').textContent = JSON.stringify(sample, null, 2);
-  document.getElementById('botSchemaModal').classList.add('open');
-}
-
-function copyBotSchema() {
-  const txt = document.getElementById('botSchemaPreview').textContent;
-  navigator.clipboard.writeText(txt).then(() => alert('✓ Đã copy chuẩn JSON cho Bot OM!'));
-}
-
-// =========================================================================
-// MODULE 7: CẨU, SỰ CỐ GIÁN ĐOẠN, MỚN NƯỚC & ĐIỀU HƯỚNG
-// =========================================================================
-function switchTab(tabId) {
-  document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('[data-tab]').forEach(b => b.classList.toggle('active', b.dataset.tab === tabId));
-  const pane = document.getElementById(tabId);
-  if (pane) pane.classList.add('active');
-  window.scrollTo({ top: 0, behavior: 'smooth' });
-}
-
-function toggleTheme() {
-  const cur = document.documentElement.getAttribute('data-theme');
-  document.documentElement.setAttribute('data-theme', cur === 'dark' ? 'light' : 'dark');
-}
-
-function toggleBotAutoPoll() {
-  state.autoPollEnabled = !state.autoPollEnabled;
-  const btn = document.getElementById('btnAutoPoll');
-  if (state.autoPollEnabled) {
-    btn.textContent = '🤖 Bot: Đang bật (60s)';
-    btn.classList.add('success');
-    CloudRepo.pollLatestJobsOnly();
-    state.autoPollTimer = setInterval(() => CloudRepo.pollLatestJobsOnly(), APP_CONFIG.AUTO_POLL_MS);
-  } else {
-    btn.textContent = '🤖 Bot: Tắt';
-    btn.classList.remove('success');
-    if (state.autoPollTimer) clearInterval(state.autoPollTimer);
-  }
 }
 
 function renderCranesSetup() {
   document.getElementById('craneRosterList').innerHTML = PRESET_CRANES.map(cId => {
-    const exists = state.cranes.some(c => c.id === cId && c.active);
-    return `<button class="${exists ? 'primary' : ''}" onclick="togglePresetCrane('${cId}')">${exists ? '✓ ' : '+ '}${cId}</button>`;
+    const act = state.cranes.some(c => c.id === cId && c.active);
+    return `<button class="sm ${act ? 'primary' : ''}" onclick="togglePresetCrane('${cId}')">${act ? '✓ ' : '+ '}${cId}</button>`;
   }).join('');
 
   document.getElementById('craneAssignmentTable').innerHTML = `
@@ -2068,9 +2684,9 @@ function renderCranesSetup() {
                     <option value="EXPORT_ONLY" ${c.mode === 'EXPORT_ONLY' ? 'selected' : ''}>Chỉ làm Xuất</option>
                   </select>
                 </td>
-                <td><input value="${c.holds.join(',')}" style="width:86px" onchange="updateCraneHolds(${idx}, this.value)"></td>
+                <td><input value="${c.holds.join(',')}" style="width:88px" onchange="updateCraneHolds(${idx}, this.value)"></td>
                 <td>
-                  <button class="${c.paused ? 'danger' : 'warning'}" onclick="toggleCranePause(${idx})">
+                  <button class="sm ${c.paused ? 'danger' : 'warning'}" onclick="toggleCranePause(${idx})">
                     ${c.paused ? `▶ Tiếp (${mm}:${ss})` : '⏸ Tạm dừng'}
                   </button>
                 </td>
@@ -2081,14 +2697,31 @@ function renderCranesSetup() {
       </table>
     </div>
   `;
-  renderFailoverAdvice();
+
+  const plans = CraneEngine.buildFailoverPlans(state, PRESET_CRANES);
+  document.getElementById('failoverAdvicePanel').innerHTML = plans.map(p => `
+    <div style="border:1px solid var(--red);background:rgba(220,38,38,0.08);border-radius:8px;padding:10px;margin-top:8px;">
+      <strong style="color:var(--red);">⚠️ Sự cố ${p.crane.id} (Gián đoạn ${p.pausedMins}p · Hụt ~${p.lostMoves} moves):</strong>
+      <div style="margin-top:6px;font-size:11.5px;display:flex;flex-direction:column;gap:6px;">
+        <div>• <b>PA A (Không bổ sung thiết bị):</b> Chuyển Hầm <b>${p.crane.holds.join(', ')}</b> sang cẩu gần nhất <b>${p.planA_helper ? p.planA_helper.id : 'kế cận'}</b>
+          ${p.planA_helper ? `<button class="primary sm" onclick="transferHolds('${p.crane.id}','${p.planA_helper.id}')">⚡ Chuyển sang ${p.planA_helper.id}</button>` : ''}
+        </div>
+        <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
+          <span>• <b>PA B (Bổ sung thiết bị dự phòng):</b></span>
+          <select id="backupSel_${p.crane.id}" style="min-height:26px;padding:2px 6px;">
+            ${p.planB_backups.map(b => `<option value="${b}">${b}</option>`).join('')}
+          </select>
+          <button class="success sm" onclick="swapBackupCrane('${p.crane.id}')">🔄 Thay thế 1 chạm</button>
+        </div>
+      </div>
+    </div>
+  `).join('');
 }
 
 function togglePresetCrane(cId) {
   const f = state.cranes.find(c => c.id === cId);
   if (f) f.active = !f.active;
   else state.cranes.push({ id: cId, active: true, mode: 'BOTH', holds: [1,2], paused: false, pauseStart: null, rate: 25 });
-  CloudRepo.upsertVesselSession();
   renderAll();
 }
 function addCustomCrane() {
@@ -2096,19 +2729,17 @@ function addCustomCrane() {
   if (!val) return;
   if (!state.cranes.some(c => c.id === val)) state.cranes.push({ id: val, active: true, mode: 'BOTH', holds: [1,2], paused: false, pauseStart: null, rate: 25 });
   document.getElementById('customCraneInput').value = '';
-  CloudRepo.upsertVesselSession();
   renderAll();
 }
 function updateCraneMode(idx, mode) {
   const act = state.cranes.filter(c => c.active);
   if (act[idx]) act[idx].mode = mode;
-  CloudRepo.upsertVesselSession();
   renderAll();
 }
 function updateCraneHolds(idx, str) {
   const act = state.cranes.filter(c => c.active);
-  if (act[idx]) act[idx].holds = str.split(',').map(x => parseInt(x.trim(), 10)).filter(n => n >= 1 && n <= 9);
-  CloudRepo.upsertVesselSession();
+  const maxH = Math.max(1, state.holdConfig.length);
+  if (act[idx]) act[idx].holds = str.split(',').map(x => parseInt(x.trim(), 10)).filter(n => n >= 1 && n <= maxH);
   renderAll();
 }
 function toggleCranePause(idx) {
@@ -2117,170 +2748,52 @@ function toggleCranePause(idx) {
   if (!c) return;
   c.paused = !c.paused;
   c.pauseStart = c.paused ? Date.now() : null;
-  CloudRepo.upsertVesselSession();
   renderAll();
 }
-
-function renderFailoverAdvice() {
-  const paused = state.cranes.filter(c => c.active && c.paused);
-  const panel = document.getElementById('failoverAdvicePanel');
-  if (!paused.length) { panel.innerHTML = ''; return; }
-  const healthy = state.cranes.filter(c => c.active && !c.paused && c.mode !== 'IMPORT_ONLY');
-  const backup = PRESET_CRANES.find(id => !state.cranes.some(c => c.id === id && c.active)) || 'QC09';
-
-  panel.innerHTML = paused.map(pc => {
-    const mins = pc.pauseStart ? Math.max(1, Math.round((Date.now() - pc.pauseStart) / 60000)) : 1;
-    const lost = Math.max(1, Math.round((mins / 60) * pc.rate));
-    const helper = healthy[0];
-    return `
-      <div style="border:1px solid var(--red);background:rgba(220,38,38,0.08);border-radius:8px;padding:10px;margin-top:8px;">
-        <strong style="color:var(--red);">⚠️ Sự cố ${pc.id} (Gián đoạn ${mins}p · Hụt ~${lost} moves):</strong>
-        <div style="margin-top:6px;font-size:11.5px;display:flex;flex-direction:column;gap:6px;">
-          <div>• <b>PA A (Không thêm thiết bị):</b> Chuyển Hầm <b>${pc.holds.join(', ')}</b> sang <b>${helper ? helper.id : 'cẩu kế cận'}</b>
-            ${helper ? `<button class="primary" style="padding:2px 8px;min-height:26px;" onclick="transferHolds('${pc.id}','${helper.id}')">⚡ Chuyển sang ${helper.id}</button>` : ''}
-          </div>
-          <div>• <b>PA B (Bổ sung thiết bị dự phòng):</b> Đưa <b>${backup}</b> vào thay thế <b>${pc.id}</b>
-            <button class="success" style="padding:2px 8px;min-height:26px;" onclick="swapBackupCrane('${pc.id}','${backup}')">🔄 Thay bằng ${backup}</button>
-          </div>
-        </div>
-      </div>
-    `;
-  }).join('');
-}
-
 function transferHolds(fromId, toId) {
   const f = state.cranes.find(c => c.id === fromId), t = state.cranes.find(c => c.id === toId);
-  if (f && t) { t.holds = Array.from(new Set([...t.holds, ...f.holds])).sort(); f.holds = []; }
-  CloudRepo.upsertVesselSession();
+  if (f && t) { t.holds = Array.from(new Set([...t.holds, ...f.holds])).sort((a, b) => a - b); f.holds = []; }
   renderAll();
 }
-function swapBackupCrane(oldId, newId) {
+function swapBackupCrane(oldId) {
+  const sel = document.getElementById(`backupSel_${oldId}`);
+  const newId = sel ? sel.value : 'QC09';
   const o = state.cranes.find(c => c.id === oldId);
-  if (o) {
+  if (o && newId) {
     state.cranes.push({ id: newId, active: true, mode: o.mode, holds: [...o.holds], paused: false, pauseStart: null, rate: o.rate });
     o.active = false;
   }
-  CloudRepo.upsertVesselSession();
   renderAll();
 }
 
-function recalcDraftLive(fromDim = false) {
-  const L = parseFloat(document.getElementById('cfgLength').value) || 172;
-  const B = parseFloat(document.getElementById('cfgBeam').value) || 27.6;
-  if (fromDim) {
-    const tpc = (L * B * 0.82 * 1.025) / 100;
-    document.getElementById('cfgContPer10cm').value = Math.max(10, Math.round((tpc * 10) / 14));
-  }
-  const contPer10 = parseFloat(document.getElementById('cfgContPer10cm').value) || 28;
-  const dF = parseFloat(document.getElementById('cfgDraftF').value) || 7.80;
-  const dA = parseFloat(document.getElementById('cfgDraftA').value) || 8.20;
-  const maxD = parseFloat(document.getElementById('cfgMaxDraft').value) || 9.20;
-
-  const doneExport = buildUnifiedExportPool().filter(c => c.jobStatus === 'C').length;
-  const sinkM = (doneExport / contPer10) * 0.10;
-  const curF = dF + sinkM * 0.95;
-  const curA = dA + sinkM * 1.05;
-  const maxCur = Math.max(curF, curA);
-  const remCont = Math.floor((Math.max(0, (maxD - maxCur) * 100) / 10) * contPer10);
-
-  document.getElementById('kpiDraftLive').textContent = `${curF.toFixed(2)}m / ${curA.toFixed(2)}m`;
-  const st = document.getElementById('kpiDraftStatus');
-  if (maxCur >= maxD) { st.textContent = `⛔ CHẠM MỚN ${maxD.toFixed(2)}m!`; st.style.color = 'var(--red)'; }
-  else { st.textContent = `An toàn (~${remCont} cont tới ${maxD.toFixed(2)}m)`; st.style.color = 'var(--green)'; }
+// ==================== PROTECTED ADMIN ACTIONS ====================
+async function saveVesselSessionToCloud() {
+  if (!(await AdminPinGuard.requireAuth('lưu cấu hình Tàu, Mớn & Cẩu lên Supabase'))) return;
+  const vName = document.getElementById('cfgVesselName').value.trim().toUpperCase() || 'KUO LUNG';
+  const voy = document.getElementById('cfgVoyage').value.trim().toUpperCase() || '1009S';
+  state.sessionId = `${vName.replace(/\s+/g, '_')}_${voy}`;
+  try {
+    await CloudRepo.saveSessionMeta();
+    alert(`✓ Đã lưu cấu hình tàu ${state.sessionId} lên Supabase!`);
+  } catch (e) { alert('Lỗi lưu: ' + e.message); }
 }
 
 async function clearExportDataOnly() {
-  if (!confirm(`Xóa riêng dữ liệu HÀNG XUẤT của tàu [${state.sessionId}] trên Cloud để nạp lại?\n(Sơ đồ nhập SBP và thông số tàu giữ nguyên)`)) return;
+  if (!(await AdminPinGuard.requireAuth(`xóa toàn bộ dữ liệu Hàng xuất của tàu ${state.sessionId}`))) return;
+  if (!confirm(`Xác nhận XÓA dữ liệu Hàng xuất của tàu [${state.sessionId}] trên Cloud để nạp lại?\n(Sơ đồ nhập SBP & thông số tàu giữ nguyên)`)) return;
   state.finalLoading = [];
   state.reservedExport = [];
   state.preStowagePlan = [];
   state.stowageInstructions = {};
   state.liveJobs = state.liveJobs.filter(j => j.io === 'Import');
   state.calledContainers.clear();
-
   ['final','reserved','jobs','edi'].forEach(k => setCardStatus(k, 'Đã xóa trên Cloud · Sẵn sàng nạp lại', false));
-  try {
-    await sb.from('dispatch_logs').delete().eq('session_id', state.sessionId);
-    await sb.storage.from(APP_CONFIG.BUCKET_NAME).remove([
-      `${state.sessionId}/final.json`,
-      `${state.sessionId}/reserved.json`,
-      `${state.sessionId}/jobs.json`,
-      `${state.sessionId}/edi_stowage.json`
-    ]);
-  } catch (e) {}
+  try { await CloudRepo.clearExportFiles(state.sessionId); } catch (e) {}
   renderAll();
 }
 
-async function saveVesselSessionToCloud() {
-  const vName = document.getElementById('cfgVesselName').value.trim().toUpperCase() || 'KUO LUNG';
-  const voy = document.getElementById('cfgVoyage').value.trim().toUpperCase() || '1009S';
-  state.sessionId = `${vName.replace(/\s+/g, '_')}_${voy}`;
-  await CloudRepo.upsertVesselSession();
-  alert(`✓ Đã lưu cấu hình tàu ${state.sessionId} lên Supabase!`);
-}
-
-async function syncAllCloudData() {
-  try {
-    const sel = document.getElementById('vesselSelect');
-    const existing = new Set(Array.from(sel.options).map(o => o.value));
-
-    const { data: dbSessions } = await sb.from('vessel_sessions').select('session_id, vessel_name, voyage, berth').order('updated_at', { ascending: false }).limit(30);
-    if (Array.isArray(dbSessions)) {
-      dbSessions.forEach(s => {
-        if (s.session_id && !existing.has(s.session_id)) {
-          existing.add(s.session_id);
-          const opt = document.createElement('option');
-          opt.value = s.session_id;
-          opt.textContent = `${s.vessel_name} (${s.voyage || ''}) - ${s.berth || 'TV'}`;
-          sel.appendChild(opt);
-        }
-      });
-    }
-
-    const { data: eportBlob } = await sbBot.storage.from('port-documents').download('eport_tanvu_jobs.json');
-    if (eportBlob) {
-      state.eportJobs = JSON.parse(await eportBlob.text());
-      Object.keys(state.eportJobs).forEach(vKey => {
-        const sid = vKey.replace(/\s+/g, '_');
-        if (!existing.has(sid)) {
-          existing.add(sid);
-          const opt = document.createElement('option');
-          opt.value = sid;
-          opt.textContent = `${vKey} (${state.eportJobs[vKey].berth}) · ePort ${state.eportJobs[vKey].pct}%`;
-          sel.appendChild(opt);
-        }
-      });
-      updateEportBanner(sel.value);
-    }
-
-    const today = new Date().toISOString().split('T')[0];
-    const { data: tideRows } = await sbBot.from('tide_readings').select('*').eq('date_key', today).limit(1);
-    if (tideRows && tideRows.length) {
-      const t = tideRows[0];
-      document.getElementById('kpiTideLive').textContent = `Đỉnh ${t.high_val}m (${t.high_time}) · Ròng ${t.low_val}m (${t.low_time})`;
-    }
-
-    await CloudRepo.loadSessionFromCloud(sel.value || state.sessionId);
-  } catch (e) {
-    CloudRepo.setStatus('⚠ Lỗi đồng bộ', true);
-  }
-}
-
-function updateEportBanner(sessionId) {
-  const foundKey = Object.keys(state.eportJobs).find(k => sessionId.includes(k.replace(/\s+/g, '_')) || k.includes(sessionId.split('_')[0]));
-  if (foundKey && state.eportJobs[foundKey]) {
-    const ej = state.eportJobs[foundKey];
-    document.getElementById('kpiEportProgress').textContent = `${ej.doneCont} / ${ej.totalCont} ${ej.cargoUnit} (${ej.pct}%)`;
-    document.getElementById('kpiEportSub').textContent = `Cầu ${ej.berth} · Còn lại: ${ej.remCont} ${ej.cargoUnit}`;
-  }
-}
-
-async function onSelectVesselSession(val) {
-  updateEportBanner(val);
-  await CloudRepo.loadSessionFromCloud(val);
-}
-
 async function createNewVesselSession() {
+  if (!(await AdminPinGuard.requireAuth('tạo chuyến tàu mới trên Cloud'))) return;
   const name = prompt('Nhập tên tàu mới (VD: SITC HAI PHONG):');
   if (!name) return;
   const voy = prompt('Nhập số chuyến (VD: 2612S):') || '001S';
@@ -2289,32 +2802,125 @@ async function createNewVesselSession() {
   const sel = document.getElementById('vesselSelect');
   if (!Array.from(sel.options).some(o => o.value === id)) {
     const opt = document.createElement('option');
-    opt.value = id;
-    opt.textContent = `${cName} (${cVoy})`;
+    opt.value = id; opt.textContent = `${cName} (${cVoy})`;
     sel.appendChild(opt);
   }
   sel.value = id;
   document.getElementById('cfgVesselName').value = cName;
   document.getElementById('cfgVoyage').value = cVoy;
   state.sessionId = id;
-  await CloudRepo.upsertVesselSession();
+  state.isCustomHoldConfig = false;
+  HoldLayoutEngine.syncHoldsForState(state, parseFloat(document.getElementById('cfgLength').value) || 172, true);
+  await CloudRepo.saveSessionMeta();
   await CloudRepo.loadSessionFromCloud(id);
 }
 
-// Bộ dữ liệu mẫu bám sát 100% thực tế KUO LUNG 1009S vừa kiểm thử
+async function syncAllCloudData() {
+  try {
+    const sel = document.getElementById('vesselSelect');
+    const existing = new Set(Array.from(sel.options).map(o => o.value));
+    const { sessions, eportMap } = await CloudRepo.listAllVessels();
+    state.eportJobs = eportMap;
+
+    sessions.forEach(s => {
+      if (s.session_id && !existing.has(s.session_id)) {
+        existing.add(s.session_id);
+        const opt = document.createElement('option');
+        opt.value = s.session_id;
+        opt.textContent = `${s.vessel_name} (${s.voyage || ''}) - ${s.berth || 'TV'}`;
+        sel.appendChild(opt);
+      }
+    });
+    Object.keys(eportMap).forEach(vKey => {
+      const sid = vKey.replace(/\s+/g, '_');
+      if (!existing.has(sid)) {
+        existing.add(sid);
+        const opt = document.createElement('option');
+        opt.value = sid;
+        opt.textContent = `${vKey} (${eportMap[vKey].berth}) · ePort ${eportMap[vKey].pct}%`;
+        sel.appendChild(opt);
+      }
+    });
+    updateEportBanner(sel.value);
+
+    const tide = await CloudRepo.fetchTodayTide();
+    if (tide) {
+      state.todayTide = tide;
+      document.getElementById('kpiTideLive').textContent = `Đỉnh ${tide.high_val}m (${tide.high_time}) · Ròng ${tide.low_val}m (${tide.low_time})`;
+    }
+    await CloudRepo.loadSessionFromCloud(sel.value || state.sessionId);
+  } catch (e) {
+    CloudRepo.setStatus('⚠ Lỗi đồng bộ', true);
+  }
+}
+
+function updateEportBanner(sessionId) {
+  const key = Object.keys(state.eportJobs).find(k => sessionId.includes(k.replace(/\s+/g, '_')) || k.includes(sessionId.split('_')[0]));
+  if (key && state.eportJobs[key]) {
+    const ej = state.eportJobs[key];
+    document.getElementById('kpiEportProgress').textContent = `${ej.doneCont} / ${ej.totalCont} ${ej.cargoUnit} (${ej.pct}%)`;
+    document.getElementById('kpiEportSub').textContent = `Cầu ${ej.berth} · Còn lại: ${ej.remCont} ${ej.cargoUnit}`;
+  }
+}
+
+async function onSelectVesselSession(val) {
+  updateEportBanner(val);
+  await CloudRepo.loadSessionFromCloud(val);
+  await refreshBotCommandStatus(false);
+}
+
+function toggleBotAutoPoll() {
+  state.autoPollEnabled = !state.autoPollEnabled;
+  const btnM = document.getElementById('btnToggleWebPollModal');
+  if (state.autoPollEnabled) {
+    if (btnM) { btnM.textContent = '🔄 Tự tải Web (60s): Đang bật'; btnM.classList.add('success'); }
+    refreshBotCommandStatus(true);
+    state.autoPollTimer = setInterval(() => refreshBotCommandStatus(true), APP_CONFIG.AUTO_POLL_MS);
+  } else {
+    if (btnM) { btnM.textContent = '🔄 Tự tải Web (60s): Tắt'; btnM.classList.remove('success'); }
+    if (state.autoPollTimer) clearInterval(state.autoPollTimer);
+  }
+}
+
+function openBotSchemaModal() {
+  document.getElementById('botEndpointUrl').textContent =
+    `POST ${APP_CONFIG.SUPABASE_URL}/storage/v1/object/${APP_CONFIG.BUCKET_NAME}/${state.sessionId}/jobs.json`;
+  const sample = {
+    schema_version: APP_CONFIG.SCHEMA_VERSION,
+    session_id: state.sessionId,
+    source: 'OM_AUTO_BOT',
+    updated_at: new Date().toISOString(),
+    rows: [
+      { cntr: 'OOCU1084060', io: 'Export', job_type: 'Xếp tàu', status: 'B', crane: 'QC11', truck: '15', pos: '210702', pod: 'SGSIN', fpod: 'SGSIN', done_at: '' },
+      { cntr: 'AMCU9370652', io: 'Import', job_type: 'Dỡ tàu', status: 'C', crane: 'TK10', truck: '62', pos: '260882', pod: 'VNTVP', fpod: 'VNTVP', done_at: '26/11/2026 12:43:17' }
+    ]
+  };
+  document.getElementById('botSchemaPreview').textContent = JSON.stringify(sample, null, 2);
+  document.getElementById('botSchemaModal').classList.add('open');
+}
+
+function copyBotSchema() {
+  navigator.clipboard.writeText(document.getElementById('botSchemaPreview').textContent)
+    .then(() => alert('✓ Đã copy chuẩn JSON cho Bot OM!'));
+}
+
 function loadSampleKuoLung1009S(pushCloud = false) {
   state.stowageInstructions = { 'BMOU1103807': 'UD', 'TCLU3726021': 'UD', 'DFSU1954440': 'UD' };
   state.preStowagePlan = [
-    { pos: '210702', cntr: 'OOCU1084060', iso: '22G0', weight: 30.085, pod: 'SGSIN', inst: '' },
-    { pos: '310206', cntr: 'OOLU0198104', iso: '22G0', weight: 29.300, pod: 'SGSIN', inst: '' },
-    { pos: '180806', cntr: 'BEAU5533885', iso: '45G0', weight: 30.892, pod: 'SGSIN', inst: '' },
-    { pos: '180706', cntr: 'DRYU9464480', iso: '45G0', weight: 31.012, pod: 'SGSIN', inst: '' },
-    { pos: '210204', cntr: 'BMOU1103807', iso: '22G0', weight: 27.300, pod: 'SGSIN', inst: 'UD' },
-    { pos: '190504', cntr: 'TCLU3726021', iso: '22G0', weight: 27.400, pod: 'SGSIN', inst: 'UD' },
-    { pos: '180586', cntr: 'BEAU6182656', iso: '45G0', weight: 11.218, pod: 'SGSIN', inst: '' },
     { pos: '010282', cntr: 'SIKU2240254', iso: '22G0', weight: 29.208, pod: 'SGSIN', inst: 'DG 0001' },
+    { pos: '021088', cntr: 'OOCU5341103', iso: '45G0', weight: 5.352, pod: 'IDJKT', inst: '' },
+    { pos: '060404', cntr: 'CSNU7690910', iso: '45G0', weight: 31.800, pod: 'SGSIN', inst: '' },
+    { pos: '100204', cntr: 'CSNU6760823', iso: '45G0', weight: 32.065, pod: 'SGSIN', inst: '' },
     { pos: '140682', cntr: 'OERU4197263', iso: '45R0', weight: 25.520, pod: 'SGSIN', inst: 'RF-200C' },
-    { pos: '021088', cntr: 'OOCU5341103', iso: '45G0', weight: 5.352, pod: 'IDJKT', inst: '' }
+    { pos: '180706', cntr: 'DRYU9464480', iso: '45G0', weight: 31.012, pod: 'SGSIN', inst: '' },
+    { pos: '180806', cntr: 'BEAU5533885', iso: '45G0', weight: 30.892, pod: 'SGSIN', inst: '' },
+    { pos: '180586', cntr: 'BEAU6182656', iso: '45G0', weight: 11.218, pod: 'SGSIN', inst: '' },
+    { pos: '190504', cntr: 'TCLU3726021', iso: '22G0', weight: 27.400, pod: 'SGSIN', inst: 'UD' },
+    { pos: '210204', cntr: 'BMOU1103807', iso: '22G0', weight: 27.300, pod: 'SGSIN', inst: 'UD' },
+    { pos: '210702', cntr: 'OOCU1084060', iso: '22G0', weight: 30.085, pod: 'SGSIN', inst: '' },
+    { pos: '260206', cntr: 'CSGU6681659', iso: '45G0', weight: 30.400, pod: 'SGSIN', inst: '' },
+    { pos: '310206', cntr: 'OOLU0198104', iso: '22G0', weight: 29.300, pod: 'SGSIN', inst: '' },
+    { pos: '330882', cntr: 'TCKU1831057', iso: '22G0', weight: 4.580, pod: 'CNXMN', inst: '' }
   ];
   state.finalLoading = [
     { cntr: 'OOCU1084060', size: '20DC', weight: 30.085, yard_pos: '---', pod: 'SGSIN', customs: true, ship_pos: '210702', transfer_port: 'GFW', is_off_dock: true },
@@ -2326,7 +2932,8 @@ function loadSampleKuoLung1009S(pushCloud = false) {
     { cntr: 'BEAU6182656', size: '40HC', weight: 11.218, yard_pos: 'DA-04-01', pod: 'SGSIN', customs: false, ship_pos: '180586', transfer_port: 'TV', is_off_dock: false },
     { cntr: 'SIKU2240254', size: '20DC', weight: 29.208, yard_pos: '---', pod: 'SGSIN', customs: true, ship_pos: '010282', transfer_port: 'SA', is_off_dock: true },
     { cntr: 'OERU4197263', size: '40RF', weight: 25.520, yard_pos: 'RF-02-01', pod: 'SGSIN', customs: true, ship_pos: '140682', transfer_port: 'VNB DV', is_off_dock: true },
-    { cntr: 'OOCU5341103', size: '40HC', weight: 5.352, yard_pos: '---', pod: 'IDJKT', customs: true, ship_pos: '021088', transfer_port: 'SI', is_off_dock: true }
+    { cntr: 'OOCU5341103', size: '40HC', weight: 5.352, yard_pos: '---', pod: 'IDJKT', customs: true, ship_pos: '021088', transfer_port: 'SI', is_off_dock: true },
+    { cntr: 'TCKU1831057', size: '20DC', weight: 4.580, yard_pos: 'CB-05-01', pod: 'CNXMN', customs: true, ship_pos: '330882', transfer_port: 'TV', is_off_dock: false }
   ];
   state.liveJobs = [
     { cntr: 'AMCU9370652', io: 'Import', job_type: 'Dỡ tàu', status: 'C', crane: 'TK10', pos: '260882', pod: 'VNTVP', done_at: '26/11/2026 12:43:17' },
@@ -2335,46 +2942,250 @@ function loadSampleKuoLung1009S(pushCloud = false) {
     { cntr: 'IMP_DEMO_1', io: 'Import', job_type: 'Dỡ tàu', status: 'C', crane: 'QC11', pos: '100404', pod: 'VNTVP', done_at: '26/11/2026 13:15:00' },
     { cntr: 'IMP_DEMO_2', io: 'Import', job_type: 'Dỡ tàu', status: 'C', crane: 'QC11', pos: '100406', pod: 'VNTVP', done_at: '26/11/2026 14:25:00' },
     { cntr: 'IMP_DEMO_3', io: 'Import', job_type: 'Dỡ tàu', status: 'C', crane: 'QC12', pos: '140206', pod: 'VNTVP', done_at: '26/11/2026 15:10:00' },
-    { cntr: 'OOCU1084060', io: 'Export', job_type: 'Xếp tàu', status: 'B', crane: 'QC11', pos: '', pod: 'SGSIN', done_at: '' },
-    { cntr: 'BEAU5533885', io: 'Export', job_type: 'Xếp tàu', status: 'B', crane: 'QC12', pos: '', pod: 'SGSIN', done_at: '' },
-    { cntr: 'DRYU9464480', io: 'Export', job_type: 'Xếp tàu', status: 'B', crane: 'QC12', pos: '', pod: 'SGSIN', done_at: '' },
-    { cntr: 'BMOU1103807', io: 'Export', job_type: 'Xếp tàu', status: 'B', crane: 'TK07', pos: '', pod: 'SGSIN', done_at: '' },
-    { cntr: 'BEAU6182656', io: 'Export', job_type: 'Xếp tàu', status: 'A', crane: 'QC12', pos: '', pod: 'SGSIN', done_at: '' },
-    { cntr: 'OOCU5341103', io: 'Export', job_type: 'Xếp tàu', status: 'B', crane: 'QC11', pos: '', pod: 'IDJKT', done_at: '' }
+    { cntr: 'BEAU6182656', io: 'Export', job_type: 'Xếp tàu', status: 'A', crane: 'QC12', pos: '', pod: 'SGSIN', done_at: '' }
   ];
-  setCardStatus('final', '✓ Mẫu thực tế KUO LUNG 1009S (GFW, HHH, SA, VNB DV, SI, TV)', true);
-  setCardStatus('jobs', '✓ Mẫu thực tế KUO LUNG 1009S (Nhập C + Xuất A/B)', true);
-  setCardStatus('edi', '✓ Mẫu thực tế $604 (DG, RF, UD)', true);
-  if (pushCloud) {
-    CloudRepo.uploadBucketJson('final.json', { rows: state.finalLoading });
-    CloudRepo.uploadBucketJson('jobs.json', DataAdapters.normalizeJobsPayload(state.liveJobs));
-  }
+  state.isCustomHoldConfig = false;
+  HoldLayoutEngine.syncHoldsForState(state, parseFloat(document.getElementById('cfgLength').value) || 172, true);
+  setCardStatus('final', '✓ Mẫu KUO LUNG 1009S (GFW, HHH, SA, VNB DV, SI, TV)', true);
+  setCardStatus('jobs', '✓ Mẫu KUO LUNG 1009S (Nhập C + Xuất A/B)', true);
+  setCardStatus('edi', '✓ Mẫu $604 (14 vị trí mẫu · DG, RF, UD)', true);
   renderAll();
 }
 
 function renderAll() {
-  const pool = buildUnifiedExportPool();
+  const cfg = getLiveVesselCfg();
+  HoldLayoutEngine.syncHoldsForState(state, cfg.length_m, false);
+  const pool = UnifiedPoolBuilder.build(state, cfg.deck_tier_min);
   const cDone = pool.filter(c => c.jobStatus === 'C').length;
   const bReady = pool.filter(c => c.jobStatus === 'B').length;
   const aHold = pool.filter(c => c.jobStatus === 'A').length;
   document.getElementById('kpiExportPool').textContent = `${bReady} B / ${aHold} A (${cDone} C)`;
 
+  recalcDraftLive();
   renderOffDockSummary(pool);
   renderCraneHourlyChart();
   renderDispatchRecommendations();
   renderHoldsAndChase();
   renderCranesSetup();
-  recalcDraftLive();
   updateStep1GuardUI();
+  updateAdminPinHeaderBtn();
 }
 
 setInterval(() => {
   if (state.cranes.some(c => c.active && c.paused)) renderCranesSetup();
 }, 1000);
 
+
+// ==================== ĐIỀU KHIỂN BOT OM WINDOWS TỪ XA & XÓA TÀU ====================
+let botStatusTimer = null;
+
+async function openBotControlModal() {
+  document.getElementById('botModalSessionId').textContent = state.sessionId;
+  document.getElementById('botModalActionMsg').textContent = '';
+  document.getElementById('botTosPass').value = '';
+  // Gợi ý nhanh mã tàu từ tên tàu
+  const curCode = document.getElementById('botVesselCode').value.trim();
+  if (!curCode) {
+    const vName = (document.getElementById('cfgVesselName')?.value || '').trim().toUpperCase();
+    if (vName.includes('KUO LUNG')) document.getElementById('botVesselCode').value = 'KULU';
+  }
+  document.getElementById('botControlModal').classList.add('open');
+  await refreshBotCommandStatus(false);
+}
+
+function renderBotStatusUI(rec) {
+  const status = rec?.status || 'IDLE';
+  const badgeColor = status === 'RUNNING' ? 'green'
+    : (status === 'START' ? 'amber'
+    : (status === 'COMPLETED_100' ? 'purple'
+    : (status === 'ERROR' ? 'red' : '')));
+
+  const badge1 = document.getElementById('botLiveBadge');
+  const badge2 = document.getElementById('botModalStatusBadge');
+  const btnHeader = document.getElementById('btnAutoPoll');
+  const btnQuickStop = document.getElementById('btnQuickStopBot');
+  const summaryEl = document.getElementById('botLiveSummaryText');
+  const modalMsgEl = document.getElementById('botModalLastMsg');
+
+  [badge1, badge2].forEach(b => {
+    if (!b) return;
+    b.textContent = status;
+    b.className = `badge ${badgeColor}`;
+  });
+
+  if (btnQuickStop) btnQuickStop.style.display = (status === 'START' || status === 'RUNNING') ? 'inline-flex' : 'none';
+  if (btnHeader) {
+    if (status === 'RUNNING') {
+      const pct = rec?.last_stats?.pct ?? 0;
+      btnHeader.textContent = `🤖 Bot: ${pct}%`;
+      btnHeader.style.borderColor = '#10b981';
+    } else if (status === 'START') {
+      btnHeader.textContent = '🤖 Bot: Đang gọi...';
+      btnHeader.style.borderColor = '#f59e0b';
+    } else if (status === 'COMPLETED_100') {
+      btnHeader.textContent = '🤖 Bot: 100%';
+      btnHeader.style.borderColor = '#a78bfa';
+    } else {
+      btnHeader.textContent = '🤖 Bot OM';
+      btnHeader.style.borderColor = 'rgba(255,255,255,0.28)';
+    }
+  }
+
+  if (rec) {
+    const syncTime = rec.last_sync_at ? new Date(rec.last_sync_at).toLocaleTimeString('vi-VN') : 'chưa đồng bộ';
+    const st = rec.last_stats || {};
+    const statsLine = st.total
+      ? `Tiến độ: <b>${st.doneC}/${st.total} (${st.pct}%)</b> · Nhập ${st.importC}/${st.importTotal} · Xuất ${st.exportC}/${st.exportTotal} · `
+      : '';
+    const htmlMsg = `${statsLine}Cập nhật: <b>${syncTime}</b><br><span>${rec.last_message || ''}</span>`;
+    if (summaryEl) summaryEl.innerHTML = htmlMsg;
+    if (modalMsgEl) modalMsgEl.innerHTML = htmlMsg;
+
+    // Điền lại thông số cấu hình đã lưu (không điền mật khẩu vì đã xóa NULL)
+    if (rec.tos_user && !document.getElementById('botTosUser').value) document.getElementById('botTosUser').value = rec.tos_user;
+    if (rec.vessel_code) document.getElementById('botVesselCode').value = rec.vessel_code;
+    if (rec.vessel_year) document.getElementById('botVesselYear').value = rec.vessel_year;
+    if (rec.vessel_seq) document.getElementById('botVesselSeq').value = rec.vessel_seq;
+    if (rec.exe_path) document.getElementById('botExePath').value = rec.exe_path;
+    if (rec.extract_mode) document.getElementById('botExtractMode').value = rec.extract_mode;
+    if (rec.interval_minutes) document.getElementById('botIntervalMin').value = rec.interval_minutes;
+  } else {
+    const idleText = `Tàu <b>${state.sessionId}</b> chưa có lệnh Bot OM. Bấm <b>"Nhập TK/MK & Khởi động Bot"</b> để chạy tự động mỗi 5 phút.`;
+    if (summaryEl) summaryEl.innerHTML = idleText;
+  }
+}
+
+async function refreshBotCommandStatus(alsoPullJobs = false) {
+  try {
+    const { data, error } = await sb
+      .from('bot_commands')
+      .select('*')
+      .eq('session_id', state.sessionId)
+      .limit(1);
+    if (!error && data && data.length) {
+      renderBotStatusUI(data[0]);
+      if (alsoPullJobs || data[0].status === 'RUNNING' || data[0].status === 'COMPLETED_100') {
+        await CloudRepo.pollLatestJobsOnly();
+      }
+    } else {
+      renderBotStatusUI(null);
+    }
+  } catch (e) {}
+}
+
+async function startRemoteBot() {
+  const user = document.getElementById('botTosUser').value.trim();
+  const pass = document.getElementById('botTosPass').value;
+  const vCode = document.getElementById('botVesselCode').value.trim().toUpperCase();
+  const vYear = document.getElementById('botVesselYear').value.trim();
+  const vSeq = document.getElementById('botVesselSeq').value.trim();
+  const exePath = document.getElementById('botExePath').value.trim();
+  const mode = document.getElementById('botExtractMode').value;
+  const intervalMin = Math.max(1, parseInt(document.getElementById('botIntervalMin').value, 10) || 5);
+  const msgEl = document.getElementById('botModalActionMsg');
+
+  if (!user || !pass) {
+    msgEl.style.color = 'var(--red)';
+    msgEl.textContent = 'Vui lòng nhập đầy đủ Tài khoản và Mật khẩu PL-TOS!';
+    return;
+  }
+
+  if (!(await AdminPinGuard.requireAuth(`khởi động Bot OM tự động cho tàu ${state.sessionId}`))) return;
+
+  msgEl.style.color = 'var(--cyan)';
+  msgEl.textContent = 'Đang gửi lệnh khởi động lên Supabase...';
+
+  try {
+    // Đảm bảo chuyến tàu tồn tại trong vessel_sessions (để Bot không tưởng tàu bị xóa)
+    await CloudRepo.saveSessionMeta();
+
+    const { error } = await sb.from('bot_commands').upsert({
+      session_id: state.sessionId,
+      status: 'START',
+      tos_user: user,
+      tos_pass: pass,
+      vessel_code: vCode,
+      vessel_year: vYear,
+      vessel_seq: vSeq,
+      exe_path: exePath,
+      extract_mode: mode,
+      interval_minutes: intervalMin,
+      last_message: `Lệnh START gửi từ Web lúc ${new Date().toLocaleTimeString('vi-VN')}. Đang chờ máy Windows nhận...`,
+      updated_at: new Date().toISOString()
+    }, { onConflict: 'session_id' });
+
+    if (error) throw error;
+
+    // Xóa mật khẩu ngay khỏi ô input trên trình duyệt
+    document.getElementById('botTosPass').value = '';
+    msgEl.style.color = 'var(--green)';
+    msgEl.textContent = '✓ Đã gửi lệnh START! Bot Windows sẽ tự mở PL-TOS, điền TK/MK và đồng bộ mỗi ' + intervalMin + ' phút.';
+
+    // Tự động bật chế độ Web tự tải dữ liệu từ Bot mỗi 60s
+    if (!state.autoPollEnabled) toggleBotAutoPoll();
+    await refreshBotCommandStatus(false);
+  } catch (err) {
+    msgEl.style.color = 'var(--red)';
+    msgEl.textContent = 'Lỗi gửi lệnh: ' + err.message;
+  }
+}
+
+async function stopRemoteBot() {
+  if (!(await AdminPinGuard.requireAuth(`dừng Bot OM cho tàu ${state.sessionId}`))) return;
+  try {
+    await sb.from('bot_commands').upsert({
+      session_id: state.sessionId,
+      status: 'STOPPED',
+      tos_pass: null,
+      last_message: `Đã gửi lệnh DỪNG từ Web lúc ${new Date().toLocaleTimeString('vi-VN')}.`,
+      updated_at: new Date().toISOString()
+    }, { onConflict: 'session_id' });
+    document.getElementById('botModalActionMsg').style.color = 'var(--amber)';
+    document.getElementById('botModalActionMsg').textContent = '✓ Đã gửi lệnh DỪNG Bot.';
+    await refreshBotCommandStatus(false);
+  } catch (err) {
+    alert('Lỗi dừng Bot: ' + err.message);
+  }
+}
+
+async function deleteCurrentVesselSession() {
+  const sid = state.sessionId;
+  if (!(await AdminPinGuard.requireAuth(`XÓA VĨNH VIỄN tàu ${sid} (và tự động dừng Bot OM)`))) return;
+  if (!confirm(`⚠️ XÁC NHẬN XÓA TÀU [ ${sid} ]?\n\n• Xóa toàn bộ dữ liệu tàu này trên Cloud Supabase\n• Tự động gửi lệnh DỪNG Bot Windows đang cào tàu này\n\nBạn chắc chắn muốn xóa?`)) return;
+
+  try {
+    // 1. Ra lệnh dừng Bot & xóa khỏi vessel_sessions
+    await sb.from('bot_commands').update({
+      status: 'STOPPED',
+      tos_pass: null,
+      last_message: `Tàu ${sid} đã bị xóa. Bot dừng ngay lập tức.`,
+      updated_at: new Date().toISOString()
+    }).eq('session_id', sid);
+
+    await sb.from('dispatch_logs').delete().eq('session_id', sid);
+    await sb.from('vessel_sessions').delete().eq('session_id', sid);
+    await sb.storage.from(APP_CONFIG.BUCKET_NAME).remove([
+      `${sid}/sbp.json`, `${sid}/final.json`, `${sid}/reserved.json`,
+      `${sid}/jobs.json`, `${sid}/edi_stowage.json`
+    ]);
+
+    // 2. Xóa khỏi dropdown và tải lại danh sách tàu
+    const sel = document.getElementById('vesselSelect');
+    const opt = Array.from(sel.options).find(o => o.value === sid);
+    if (opt && sel.options.length > 1) opt.remove();
+    alert(`✓ Đã xóa tàu ${sid} khỏi Cloud và dừng Bot OM!`);
+    await syncAllCloudData();
+  } catch (err) {
+    alert('Lỗi khi xóa tàu: ' + err.message);
+  }
+}
+
 window.addEventListener('DOMContentLoaded', () => {
   updateStep1GuardUI();
-  syncAllCloudData();
+  updateAdminPinHeaderBtn();
+  syncAllCloudData().then(() => refreshBotCommandStatus(false));
+  // Kiểm tra trạng thái Bot mỗi 15 giây để hiển thị live % hoàn thành
+  botStatusTimer = setInterval(() => refreshBotCommandStatus(false), 15000);
 });
 </script>
 </body>
