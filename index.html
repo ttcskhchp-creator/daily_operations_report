@@ -552,6 +552,219 @@ pre.schema-box {
   line-height: 1.5;
 }
 
+
+/* ==================== FULL-WIDTH SHIP & QUAY-RAIL VISUAL CARD ==================== */
+.ship-rail-panel {
+  border-top: 3px solid var(--cyan);
+}
+.quay-axis-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 10px;
+  border-radius: 7px;
+  background: linear-gradient(90deg, rgba(2,132,199,0.14), rgba(148,163,184,0.08), rgba(5,150,105,0.14));
+  border: 1px solid var(--line);
+  font-size: 11px;
+  font-weight: 850;
+  margin-bottom: 10px;
+}
+.quay-scroll-wrap {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: 4px;
+}
+.quay-scene {
+  min-width: 780px;
+}
+.rail-cranes-track {
+  display: flex;
+  align-items: stretch;
+  gap: 6px;
+  padding: 6px 8px 10px;
+  position: relative;
+  border-bottom: 4px double var(--muted);
+  margin-bottom: 10px;
+}
+.rail-crane-node {
+  flex: 1 1 0;
+  min-width: 145px;
+  border: 1.5px solid var(--line);
+  border-top: 4px solid var(--cyan);
+  border-radius: 9px;
+  padding: 7px 9px;
+  background: var(--bg);
+  position: relative;
+}
+.rail-crane-node.paused {
+  border-color: var(--red);
+  border-top-color: var(--red);
+  background: rgba(220,38,38,0.07);
+}
+.rail-crane-node.crossing-err {
+  outline: 2px dashed var(--red);
+}
+.rail-barrier {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: var(--muted);
+  font-size: 10px;
+  font-weight: 900;
+  padding: 0 2px;
+  user-select: none;
+  opacity: 0.75;
+}
+.ship-hull-row {
+  display: flex;
+  align-items: stretch;
+  gap: 0;
+  margin-bottom: 8px;
+}
+.ship-bow {
+  width: 76px;
+  flex: 0 0 76px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, var(--navy), var(--navy2));
+  color: #fff;
+  font-weight: 900;
+  font-size: 10px;
+  text-align: center;
+  padding: 6px 4px;
+  border: 2px solid var(--cyan);
+}
+.ship-bow.left-bow {
+  border-radius: 48px 0 0 48px;
+  border-right: 0;
+}
+.ship-bow.right-bow {
+  border-radius: 0 48px 48px 0;
+  border-left: 0;
+}
+.ship-stern {
+  width: 68px;
+  flex: 0 0 68px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: #334155;
+  color: #f8fafc;
+  font-weight: 850;
+  font-size: 9.5px;
+  text-align: center;
+  padding: 6px 4px;
+  border: 2px solid var(--line);
+}
+.ship-stern.left-stern {
+  border-radius: 8px 0 0 8px;
+  border-right: 0;
+}
+.ship-stern.right-stern {
+  border-radius: 0 8px 8px 0;
+  border-left: 0;
+}
+.ship-holds-strip {
+  flex: 1;
+  display: flex;
+  align-items: stretch;
+  gap: 3px;
+  padding: 5px;
+  background: rgba(15,23,42,0.06);
+  border-top: 2px solid var(--navy2);
+  border-bottom: 2px solid var(--navy2);
+}
+:root[data-theme="dark"] .ship-holds-strip {
+  background: rgba(56,189,248,0.06);
+  border-color: var(--cyan);
+}
+.ship-hold-cell {
+  flex: 1 1 0;
+  min-width: 64px;
+  border: 1px solid var(--line);
+  border-top: 4px solid var(--line);
+  border-radius: 6px;
+  padding: 5px 5px 4px;
+  background: var(--card);
+  cursor: pointer;
+  transition: transform 0.12s, box-shadow 0.12s;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 3px;
+}
+.ship-hold-cell:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(2,132,199,0.18);
+}
+.quay-apron-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 6px 12px;
+  border-radius: 7px;
+  background: repeating-linear-gradient(
+    -45deg,
+    rgba(100,116,139,0.12),
+    rgba(100,116,139,0.12) 8px,
+    rgba(100,116,139,0.05) 8px,
+    rgba(100,116,139,0.05) 16px
+  );
+  border: 1.5px solid var(--line);
+  font-size: 11px;
+  font-weight: 800;
+}
+.side-choice-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-top: 4px;
+}
+.side-choice-btn {
+  flex-direction: column;
+  align-items: flex-start;
+  text-align: left;
+  padding: 8px 10px;
+  border: 2px solid var(--line);
+  background: var(--bg);
+  min-height: 62px;
+}
+.side-choice-btn.active {
+  border-color: var(--cyan);
+  background: rgba(2,132,199,0.12);
+}
+.vessel-suggest-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 8px;
+  max-height: 205px;
+  overflow-y: auto;
+  padding: 2px;
+}
+.vessel-suggest-card {
+  border: 1px solid var(--line);
+  border-left: 4px solid var(--cyan);
+  border-radius: 8px;
+  padding: 8px 10px;
+  background: var(--bg);
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+}
+.vessel-suggest-card:hover {
+  border-color: var(--cyan);
+  background: rgba(2,132,199,0.08);
+}
+.vessel-suggest-card.upcoming {
+  border-left-color: var(--amber);
+}
+
 /* ==================== RESPONSIVE BREAKPOINTS ==================== */
 @media (max-width: 1100px) {
   .grid-2, .grid-3 { grid-template-columns: 1fr; }
@@ -719,6 +932,32 @@ pre.schema-box {
 
   <!-- ==================== TAB 1: KHUYẾN NGHỊ GỌI HÀNG & CẨU ==================== -->
   <div id="tab-dispatch" class="tab-pane active">
+    <!-- THẺ DÀI NGANG TOÀN MÀN HÌNH: MÔ PHỎNG HÌNH CON TÀU, HƯỚNG CẬP MẠN & TIẾN ĐỘ THIẾT BỊ DỌC RAY CẦU TÀU -->
+    <div class="panel ship-rail-panel">
+      <div class="panel-head">
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+          <h3>🚢 Mô phỏng Cầu tàu, Hướng cập Mạn & Tiến độ Thiết bị dọc Ray (Thượng lưu ➔ Hạ lưu / Cửa biển)</h3>
+          <span class="badge" id="shipBerthSideBadge">⬅️ Cập Mạn Trái (Port)</span>
+          <span class="badge red" id="railCrossingAlertBadge" style="display:none;">⚠️ Chéo ray cẩu!</span>
+        </div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;">
+          <button class="sm" onclick="toggleBerthingSideQuick()" title="Đổi nhanh hướng cập Mạn Trái / Mạn Phải">🔄 Đổi Mạn Trái / Phải</button>
+          <button class="primary sm" onclick="autoDistributeHoldsByRail()" title="Tự động chia lại Hầm cho các Cẩu theo đúng thứ tự vật lý trên ray không vượt mặt">⚡ Tự chia Hầm đúng ray</button>
+        </div>
+      </div>
+      <div class="panel-body" style="padding:10px 12px;">
+        <div class="quay-axis-bar">
+          <span style="color:var(--cyan);">⬅️ THƯỢNG LƯU (TRONG SÔNG)</span>
+          <span style="color:var(--muted);font-size:10.5px;">═══ RAY CẨU CẦU TÀU TÂN VŨ (THỨ TỰ CỐ ĐỊNH · KHÔNG CHẠY VƯỢT MẶT) ═══</span>
+          <span style="color:var(--green);">HẠ LƯU (RA CỬA BIỂN) ➡️</span>
+        </div>
+        <div class="quay-scroll-wrap">
+          <div class="quay-scene" id="horizontalShipRailScene"></div>
+        </div>
+        <div id="railConstraintNote" style="margin-top:7px;font-size:11px;color:var(--muted);"></div>
+      </div>
+    </div>
+
     <div class="grid-2">
       <div class="panel">
         <div class="panel-head">
@@ -850,6 +1089,12 @@ pre.schema-box {
             <div><label>Mớn Giới hạn Tmax (m)<br><input id="cfgMaxDraft" type="number" step="0.01" value="9.20" style="width:100%" oninput="recalcDraftLive()"></label></div>
             <div><label>Độ sâu đáy bến (m)<br><input id="cfgBerthDepth" type="number" step="0.1" value="9.0" style="width:100%" oninput="recalcDraftLive()"></label></div>
             <div><label>Ngưỡng Tier Boong (>=)<br><input id="cfgDeckTier" type="number" value="80" style="width:100%" oninput="renderAll()"></label></div>
+            <div><label>Hướng cập mạn tàu<br>
+              <select id="cfgBerthSide" style="width:100%" onchange="onBerthingSideChanged(this.value)">
+                <option value="PORT">⬅️ Mạn Trái (Port · Mũi hướng Thượng lưu)</option>
+                <option value="STARBOARD">➡️ Mạn Phải (Starboard · Mũi ra Cửa biển)</option>
+              </select>
+            </label></div>
           </div>
         </div>
       </div>
@@ -863,8 +1108,9 @@ pre.schema-box {
           </div>
         </div>
         <div class="panel-body">
-          <div style="font-size:11px;color:var(--muted);margin-bottom:8px;">
-            Tích chọn thiết bị, phân loại <b>Chỉ làm Nhập (Xong nghỉ)</b> hoặc <b>Nhập + Xuất</b>, và bấm <b>⏸ Tạm dừng</b> khi sự cố để tính giờ gián đoạn & 2 phương án bổ khuyết:
+          <div style="font-size:11px;color:var(--muted);margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;gap:6px;flex-wrap:wrap;">
+            <span>Thứ tự cẩu cố định dọc ray <b>Thượng lưu ➔ Hạ lưu (Cửa biển)</b>: <code>QC10 ➔ QC09 ➔ QC08 ➔ QC07 ➔ QC11 ➔ QC12 ➔ TK07 ➔ TK10 ➔ QC06 ➔ QC05 ➔ TK11 ➔ TK12</code> (không thể vượt qua nhau).</span>
+            <button class="primary sm" onclick="autoDistributeHoldsByRail()">⚡ Tự chia Hầm khớp ray & hướng mạn</button>
           </div>
           <div id="craneRosterList" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px;"></div>
           <div id="craneAssignmentTable"></div>
@@ -1182,6 +1428,94 @@ pre.schema-box {
   </div>
 </div>
 
+<!-- MODAL 5: CHỌN TÀU ĐANG Ở CẦU / SẮP CẬP HOẶC THÊM MỚI GÕ TAY + HƯỚNG CẬP MẠN -->
+<div class="modal-shade" id="newVesselModal" onclick="if(event.target===this) closeModal('newVesselModal')">
+  <div class="modal-card" style="width:min(760px, 100%);">
+    <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--line);padding-bottom:8px;margin-bottom:10px;gap:8px;">
+      <h3 style="margin:0;">🚢 Chọn Tàu Đang ở Cầu / Chuẩn bị Cập hoặc Thêm Mới Gõ Tay</h3>
+      <button class="sm" onclick="closeModal('newVesselModal')">✕ Đóng</button>
+    </div>
+
+    <!-- NHÓM 1: TÀU ĐANG Ở CẦU & CHUẨN BỊ CẬP -->
+    <div style="margin-bottom:12px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;flex-wrap:wrap;gap:6px;">
+        <span style="font-weight:850;font-size:12px;color:var(--cyan);">1. Gợi ý Tàu đang ở cầu (ePort Tân Vũ) & Tàu chuẩn bị cập (Kế hoạch Cảng vụ)</span>
+        <button class="sm" onclick="refreshNewVesselSuggestions(true)">🔄 Quét lại danh sách</button>
+      </div>
+      <div id="nvAtBerthWrap" style="margin-bottom:8px;">
+        <div style="font-size:11px;font-weight:800;color:var(--green);margin-bottom:4px;">🟢 Đang làm hàng tại cầu (ePort Live):</div>
+        <div class="vessel-suggest-list" id="nvAtBerthList"><div style="font-size:11px;color:var(--muted);">Đang tải...</div></div>
+      </div>
+      <div id="nvUpcomingWrap">
+        <div style="font-size:11px;font-weight:800;color:var(--amber);margin-bottom:4px;">🟡 Chuẩn bị cập cầu / Kế hoạch tàu di chuyển (Cảng vụ HP):</div>
+        <div class="vessel-suggest-list" id="nvUpcomingList"><div style="font-size:11px;color:var(--muted);">Đang tải...</div></div>
+      </div>
+    </div>
+
+    <!-- NHÓM 2: THÊM MỚI GÕ TAY & CHỌN HƯỚNG CẬP MẠN -->
+    <div style="border-top:2px dashed var(--line);padding-top:11px;">
+      <div style="font-weight:850;font-size:12px;margin-bottom:8px;">2. Thông tin Tàu mới (Bấm gợi ý ở trên để điền nhanh hoặc gõ tay trực tiếp)</div>
+      <div class="grid-form" style="grid-template-columns:repeat(3, minmax(0, 1fr));gap:8px;">
+        <div class="form-field" style="margin:0;">
+          <label>Tên tàu (*)</label>
+          <input id="nvVesselName" placeholder="VD: SITC HAI PHONG" autocomplete="off">
+        </div>
+        <div class="form-field" style="margin:0;">
+          <label>Số chuyến / Voyage (*)</label>
+          <input id="nvVoyage" placeholder="VD: 2612S" value="001S" autocomplete="off">
+        </div>
+        <div class="form-field" style="margin:0;">
+          <label>Cầu bến dự kiến</label>
+          <select id="nvBerth" style="width:100%;">
+            <option value="TV1">Cầu TV1 (Thượng lưu)</option>
+            <option value="TV2">Cầu TV2</option>
+            <option value="TV3" selected>Cầu TV3</option>
+            <option value="TV4">Cầu TV4</option>
+            <option value="TV5">Cầu TV5 (Hạ lưu / Cửa biển)</option>
+          </select>
+        </div>
+        <div class="form-field" style="margin:0;">
+          <label>Chiều dài LOA (m)</label>
+          <input id="nvLength" type="number" value="172">
+        </div>
+        <div class="form-field" style="margin:0;">
+          <label>Chiều rộng Beam (m)</label>
+          <input id="nvBeam" type="number" step="0.1" value="27.6">
+        </div>
+        <div class="form-field" style="margin:0;">
+          <label>Tự chia Hầm cho Cẩu theo ray</label>
+          <select id="nvAutoAssignCranes" style="width:100%;">
+            <option value="YES" selected>Có — Tự xếp khớp thứ tự ray</option>
+            <option value="NO">Giữ cấu hình cẩu hiện tại</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-field" style="margin-top:10px;margin-bottom:4px;">
+        <label>Hướng cập mạn tàu (Bắt buộc để bố trí Hầm khớp chiều thiết bị Thượng lưu ➔ Hạ lưu)</label>
+        <input type="hidden" id="nvBerthSide" value="PORT">
+        <div class="side-choice-grid">
+          <button type="button" class="side-choice-btn active" id="btnNvSidePort" onclick="selectNvBerthSide('PORT')">
+            <span style="font-weight:900;color:var(--cyan);">⬅️ CẬP MẠN TRÁI (Port Side)</span>
+            <span style="font-size:10.5px;color:var(--muted);font-weight:600;">Mũi tàu (Hold 01) hướng <b>Thượng lưu</b> · Lái (Hold N) hướng <b>Cửa biển</b></span>
+          </button>
+          <button type="button" class="side-choice-btn" id="btnNvSideStarboard" onclick="selectNvBerthSide('STARBOARD')">
+            <span style="font-weight:900;color:var(--green);">➡️ CẬP MẠN PHẢI (Starboard Side)</span>
+            <span style="font-size:10.5px;color:var(--muted);font-weight:600;">Lái (Hold N) hướng <b>Thượng lưu</b> · Mũi tàu (Hold 01) hướng <b>Cửa biển</b></span>
+          </button>
+        </div>
+      </div>
+
+      <div id="nvModalMsg" class="pin-msg"></div>
+
+      <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:10px;padding-top:9px;border-top:1px solid var(--line);">
+        <button onclick="closeModal('newVesselModal')">Hủy</button>
+        <button class="success" onclick="submitNewVesselModal()">✅ Khởi tạo & Mở tàu này</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <script>
 // =========================================================================
 // [PHẦN 1] CONFIG, SUPABASE CLOUD REPO, BƯỚC 1 GUARD & ADMIN PIN RPC
@@ -1227,10 +1561,12 @@ const state = {
   cranes: [
     { id: 'QC11', active: true, mode: 'BOTH', holds: [1,2,3], paused: false, pauseStart: null, rate: 28 },
     { id: 'QC12', active: true, mode: 'BOTH', holds: [4,5,6], paused: false, pauseStart: null, rate: 28 },
-    { id: 'TK07', active: true, mode: 'BOTH', holds: [7,8,9], paused: false, pauseStart: null, rate: 24 },
-    { id: 'TK10', active: true, mode: 'IMPORT_ONLY', holds: [1,2], paused: false, pauseStart: null, rate: 22 }
+    { id: 'TK07', active: true, mode: 'BOTH', holds: [7,8], paused: false, pauseStart: null, rate: 24 },
+    { id: 'TK10', active: true, mode: 'IMPORT_ONLY', holds: [9], paused: false, pauseStart: null, rate: 22 }
   ],
+  berthingSide: 'PORT', // 'PORT' (Mạn Trái - Mũi hướng Thượng lưu) | 'STARBOARD' (Mạn Phải - Mũi ra Cửa biển)
   eportJobs: {},
+  upcomingVessels: [],
   todayTide: null,
   selectedChartHour: null
 };
@@ -1286,7 +1622,7 @@ const AdminPinGuard = {
       }
     } else {
       // Đóng mọi modal đang mở (kể cả Bot OM) khi hết phiên 60 phút
-      ['bayModal','botSchemaModal','botControlModal','adminPinModal'].forEach(id => closeModal(id));
+      ['bayModal','botSchemaModal','botControlModal','adminPinModal','newVesselModal'].forEach(id => closeModal(id));
       document.body.classList.add('app-locked-blur');
       gate.classList.add('open');
       if (reasonText) {
@@ -1431,7 +1767,11 @@ const CloudRepo = {
       deck_tier_min: parseInt(document.getElementById('cfgDeckTier')?.value, 10) || 80,
       crane_config: state.cranes,
       hold_config: state.holdConfig,
-      stats_summary: { isCustomHoldConfig: state.isCustomHoldConfig, berth_depth: parseFloat(document.getElementById('cfgBerthDepth')?.value) || 9.0 },
+      stats_summary: {
+        isCustomHoldConfig: state.isCustomHoldConfig,
+        berth_depth: parseFloat(document.getElementById('cfgBerthDepth')?.value) || 9.0,
+        berthingSide: state.berthingSide || 'PORT'
+      },
       updated_at: new Date().toISOString()
     }, { onConflict: 'session_id' });
     if (error) throw error;
@@ -1448,6 +1788,70 @@ const CloudRepo = {
       try { eportMap = JSON.parse(await eportRes.value.data.text()); } catch (e) {}
     }
     return { sessions, eportMap };
+  },
+
+  async fetchUpcomingVessels() {
+    const upcoming = [];
+    const seen = new Set();
+    const pushItem = (raw) => {
+      const name = String(raw.vessel_name || raw.vessel || raw.ship_name || raw.name || raw.ten_tau || '').trim().toUpperCase();
+      if (!name) return;
+      const berth = String(raw.berth || raw.to_berth || raw.cau_ben || raw.vi_tri || 'TV').trim().toUpperCase();
+      const action = String(raw.action || raw.move_type || raw.status || raw.loai || 'Chuẩn bị cập').trim();
+      const eta = String(raw.eta || raw.time || raw.move_time || raw.thoi_gian || '').trim();
+      const voyage = String(raw.voyage || raw.chuyen || '').trim().toUpperCase();
+      const loa = parseFloat(raw.loa || raw.length_m || 0) || 0;
+      const key = `${name}_${berth}`;
+      if (seen.has(key)) return;
+      seen.add(key);
+      upcoming.push({ vessel_name: name, voyage, berth, action, eta, loa });
+    };
+
+    // Thử tải từ các file/bảng kế hoạch tàu di chuyển Cảng vụ (Bot --shifting) trên sbBot
+    const [f1, f2, t1, t2] = await Promise.allSettled([
+      sbBot.storage.from('port-documents').download('shifting_plan.json'),
+      sbBot.storage.from('port-documents').download('cangvu_shifting.json'),
+      sbBot.from('vessel_movements').select('*').order('created_at', { ascending: false }).limit(40),
+      sbBot.from('shifting_plans').select('*').order('created_at', { ascending: false }).limit(40)
+    ]);
+
+    for (const fRes of [f1, f2]) {
+      if (fRes.status === 'fulfilled' && fRes.value.data) {
+        try {
+          const parsed = JSON.parse(await fRes.value.data.text());
+          const arr = Array.isArray(parsed) ? parsed : (parsed.rows || parsed.vessels || parsed.items || Object.values(parsed));
+          if (Array.isArray(arr)) {
+            arr.forEach(item => {
+              const txt = JSON.stringify(item).toUpperCase();
+              if (/TAN VU|TÂN VŨ|\bTV\d|\bTV\b|CHUẨN BỊ|CẬP/.test(txt)) pushItem(item);
+            });
+          }
+        } catch (e) {}
+      }
+    }
+    for (const tRes of [t1, t2]) {
+      if (tRes.status === 'fulfilled' && Array.isArray(tRes.value.data)) {
+        tRes.value.data.forEach(item => {
+          const txt = JSON.stringify(item).toUpperCase();
+          if (/TAN VU|TÂN VŨ|\bTV\d|\bTV\b/.test(txt)) pushItem(item);
+        });
+      }
+    }
+
+    // Bổ sung các tàu từ ePort Tân Vũ đang có tiến độ = 0% (mới cập hoặc chuẩn bị làm hàng)
+    Object.entries(state.eportJobs || {}).forEach(([vKey, ej]) => {
+      if ((ej.pct || 0) === 0 || (ej.doneCont || 0) === 0) {
+        pushItem({
+          vessel_name: vKey,
+          berth: ej.berth || 'TV',
+          action: 'Chuẩn bị làm hàng (ePort 0%)',
+          eta: ej.eta || ''
+        });
+      }
+    });
+
+    state.upcomingVessels = upcoming;
+    return upcoming;
   },
 
   async fetchTodayTide() {
@@ -1493,6 +1897,9 @@ const CloudRepo = {
         if (s.stats_summary && s.stats_summary.berth_depth) {
           document.getElementById('cfgBerthDepth').value = s.stats_summary.berth_depth;
         }
+        state.berthingSide = (s.stats_summary && s.stats_summary.berthingSide === 'STARBOARD') ? 'STARBOARD' : 'PORT';
+        const sideSel = document.getElementById('cfgBerthSide');
+        if (sideSel) sideSel.value = state.berthingSide;
         if (Array.isArray(s.crane_config) && s.crane_config.length) state.cranes = s.crane_config;
         if (Array.isArray(s.hold_config) && s.hold_config.length) {
           state.holdConfig = s.hold_config;
@@ -2167,7 +2574,7 @@ const DispatchEngine = {
       return { ...c, holdNo, bottomOk, score, reasons };
     }).sort((a, b) => b.score - a.score);
 
-    return (st.cranes || []).filter(c => c.active && c.mode !== 'IMPORT_ONLY').map(crane => {
+    return CraneRailOrder.sortCranesOnRail((st.cranes || []).filter(c => c.active && c.mode !== 'IMPORT_ONLY')).map(crane => {
       const assigned = new Set(crane.holds || []);
       const list = scored.filter(item => {
         if (item.instFlags?.forcedBay) return assigned.has(HoldLayoutEngine.getHoldByBay(item.instFlags.forcedBay, holdConfig));
@@ -2214,6 +2621,97 @@ const DispatchEngine = {
       });
       return { hold: h.hold, label: h.label, bays: h.bays, count: items.length, items };
     }).filter(g => g.count > 0);
+  }
+};
+
+
+// ==================== [PHẦN 3.3B] RÀNG BUỘC RAY CẨU THƯỢNG LƯU -> HẠ LƯU (KHÔNG VƯỢT MẶT) ====================
+const CraneRailOrder = {
+  // Thứ tự ray vật lý cố định tại cầu tàu Tân Vũ: Thượng lưu (Trái) -> Hạ lưu / Cửa biển (Phải)
+  getRailIndex(craneId) {
+    const id = String(craneId || '').trim().toUpperCase();
+    const idx = PRESET_CRANES.indexOf(id);
+    if (idx >= 0) return idx;
+    // Thiết bị tùy chỉnh thêm tay: xếp sau danh sách chuẩn theo thứ tự chữ cái
+    let hash = 0;
+    for (let i = 0; i < id.length; i++) hash = (hash * 31 + id.charCodeAt(i)) % 900;
+    return 100 + hash;
+  },
+
+  sortCranesOnRail(cranesList) {
+    return [...(cranesList || [])].sort((a, b) => {
+      const idA = typeof a === 'string' ? a : a.id;
+      const idB = typeof b === 'string' ? b : b.id;
+      return this.getRailIndex(idA) - this.getRailIndex(idB);
+    });
+  },
+
+  // Trả về danh sách số Hầm theo đúng chiều vật lý từ Thượng lưu -> Hạ lưu dựa vào hướng cập mạn
+  // PORT (Cập Mạn Trái): Mũi (Hold 1) ở Thượng lưu -> Lái (Hold N) ở Hạ lưu => [1, 2, ..., N]
+  // STARBOARD (Cập Mạn Phải): Lái (Hold N) ở Thượng lưu -> Mũi (Hold 1) ở Hạ lưu => [N, ..., 2, 1]
+  getOrderedHoldsAlongQuay(holdConfig, berthingSide = 'PORT') {
+    const sortedAsc = [...(holdConfig || [])].sort((a, b) => a.hold - b.hold);
+    return berthingSide === 'STARBOARD' ? sortedAsc.reverse() : sortedAsc;
+  },
+
+  getHoldQuayPos(holdNo, holdConfig, berthingSide = 'PORT') {
+    const ordered = this.getOrderedHoldsAlongQuay(holdConfig, berthingSide);
+    return ordered.findIndex(h => h.hold === holdNo);
+  },
+
+  // Tự động chia đều các Hầm dọc thân tàu cho các Cẩu đang hoạt động theo ĐÚNG THỨ TỰ RAY (không bao giờ chéo ray!)
+  autoDistributeHolds(st) {
+    const orderedHolds = this.getOrderedHoldsAlongQuay(st.holdConfig, st.berthingSide);
+    if (!orderedHolds.length) return;
+    const activeAll = this.sortCranesOnRail((st.cranes || []).filter(c => c.active));
+    if (!activeAll.length) return;
+
+    const exportCranes = activeAll.filter(c => c.mode !== 'IMPORT_ONLY');
+    const targetList = exportCranes.length ? exportCranes : activeAll;
+    const totalH = orderedHolds.length;
+    const k = targetList.length;
+
+    targetList.forEach((crane, idx) => {
+      const start = Math.floor((idx * totalH) / k);
+      const end = Math.floor(((idx + 1) * totalH) / k);
+      const slice = orderedHolds.slice(start, Math.max(start + 1, end));
+      crane.holds = slice.map(h => h.hold);
+    });
+
+    // Cẩu chỉ làm nhập (IMPORT_ONLY): gán vào vùng hầm đúng vị trí tương đối trên ray của nó (không chéo cẩu khác)
+    activeAll.filter(c => c.mode === 'IMPORT_ONLY').forEach(impCrane => {
+      const rIdx = activeAll.findIndex(x => x.id === impCrane.id);
+      const approxPos = Math.min(totalH - 1, Math.floor((rIdx / activeAll.length) * totalH));
+      const hObj = orderedHolds[approxPos];
+      if (hObj) impCrane.holds = [hObj.hold];
+    });
+  },
+
+  // Kiểm tra xem có 2 cẩu nào đang được gán Hầm bị chéo / ngược thứ tự vật lý trên ray hay không
+  detectCrossingConflicts(st) {
+    const orderedHolds = this.getOrderedHoldsAlongQuay(st.holdConfig, st.berthingSide);
+    const posOf = (hNo) => orderedHolds.findIndex(h => h.hold === hNo);
+    const activeExport = this.sortCranesOnRail((st.cranes || []).filter(c => c.active && !c.paused && c.mode !== 'IMPORT_ONLY'));
+    const conflicts = [];
+
+    for (let i = 0; i < activeExport.length - 1; i++) {
+      const up = activeExport[i];
+      const down = activeExport[i + 1];
+      const upPositions = (up.holds || []).map(posOf).filter(p => p >= 0);
+      const downPositions = (down.holds || []).map(posOf).filter(p => p >= 0);
+      if (upPositions.length && downPositions.length) {
+        const upMax = Math.max(...upPositions);
+        const downMin = Math.min(...downPositions);
+        if (upMax > downMin) {
+          conflicts.push({
+            upstreamCrane: up.id,
+            downstreamCrane: down.id,
+            message: `${up.id} (Thượng lưu) đang gán hầm vượt sang phía Hạ lưu của ${down.id}`
+          });
+        }
+      }
+    }
+    return conflicts;
   }
 };
 
@@ -2367,44 +2865,150 @@ const CraneEngine = {
       holdProgress[h.hold] = { total: inH.length, doneC, readyB, pct: inH.length ? Math.round((doneC / inH.length) * 100) : 0 };
     });
 
-    const busiestHold = Object.entries(holdProgress).sort((a, b) => b[1].readyB - a[1].readyB)[0];
+    // ===== GỢI Ý CHUYỂN HẦM TUÂN THỦ LUẬT RAY VẬT LÝ (THƯỢNG LƯU -> HẠ LƯU, KHÔNG VƯỢT MẶT CẨU KHÁC) =====
+    const orderedHolds = CraneRailOrder.getOrderedHoldsAlongQuay(st.holdConfig, st.berthingSide);
+    const posOfHold = (hNo) => orderedHolds.findIndex(h => h.hold === hNo);
+    const railActiveCranes = CraneRailOrder.sortCranesOnRail((st.cranes || []).filter(c => c.active));
+    const railCrossingConflicts = CraneRailOrder.detectCrossingConflicts(st);
+
     const reallocSuggestions = [];
-    (st.cranes || []).filter(c => c.active && !c.paused && c.mode !== 'IMPORT_ONLY').forEach(c => {
+    railActiveCranes.forEach((c, rIdx) => {
+      if (c.paused || c.mode === 'IMPORT_ONLY') return;
       const remReady = (c.holds || []).reduce((s, hNo) => s + (holdProgress[hNo]?.readyB || 0), 0);
-      if (remReady === 0 && busiestHold && busiestHold[1].readyB > 0) {
-        reallocSuggestions.push({ craneId: c.id, targetHold: Number(busiestHold[0]), targetReadyB: busiestHold[1].readyB });
+      if (remReady > 0) return; // Cẩu vẫn còn hàng sẵn sàng B trong vùng hầm của mình
+
+      const leftNeighbor = rIdx > 0 ? railActiveCranes[rIdx - 1] : null;
+      const rightNeighbor = rIdx < railActiveCranes.length - 1 ? railActiveCranes[rIdx + 1] : null;
+
+      // Xác định vùng hầm vật lý [minFreePos .. maxFreePos] mà cẩu c có thể chạy tới MÀ KHÔNG VƯỢT QUA cẩu kề bên
+      const leftPositions = leftNeighbor ? (leftNeighbor.holds || []).map(posOfHold).filter(p => p >= 0) : [];
+      const rightPositions = rightNeighbor ? (rightNeighbor.holds || []).map(posOfHold).filter(p => p >= 0) : [];
+
+      const leftBarrierPos = leftPositions.length ? Math.max(...leftPositions) : -1;
+      const rightBarrierPos = rightPositions.length ? Math.min(...rightPositions) : orderedHolds.length;
+
+      // 1. Tìm hầm TRỐNG nằm ngay trong khe ray hợp lệ (không vướng cẩu nào) còn sẵn sàng B
+      let bestDirect = null;
+      for (let p = leftBarrierPos + 1; p < rightBarrierPos; p++) {
+        const hObj = orderedHolds[p];
+        if (!hObj) continue;
+        const rb = holdProgress[hObj.hold]?.readyB || 0;
+        if (rb > 0 && (!bestDirect || rb > bestDirect.readyB)) {
+          bestDirect = { hold: hObj.hold, readyB: rb };
+        }
+      }
+
+      if (bestDirect) {
+        reallocSuggestions.push({
+          type: 'DIRECT',
+          craneId: c.id,
+          targetHold: bestDirect.hold,
+          targetReadyB: bestDirect.readyB,
+          note: `Hầm ${c.id} đã xong → dịch trực tiếp trong hành lang ray tới HOLD ${String(bestDirect.hold).padStart(2,'0')} (${bestDirect.readyB} B)`
+        });
+        return;
+      }
+
+      // 2. Không có hầm trống trong khe ray -> CHỈ xét san tải hầm RÌA TIẾP GIÁP với cẩu kề bên (không bao giờ nhảy cóc qua cẩu khác!)
+      const adjacentOptions = [];
+      if (leftNeighbor && leftPositions.length) {
+        // Hầm ngoài cùng về phía Hạ lưu của cẩu bên Thượng lưu (giáp mặt trực tiếp với cẩu c)
+        const edgeHoldObj = orderedHolds[Math.max(...leftPositions)];
+        const rb = edgeHoldObj ? (holdProgress[edgeHoldObj.hold]?.readyB || 0) : 0;
+        if (edgeHoldObj && rb > 0) {
+          adjacentOptions.push({ hold: edgeHoldObj.hold, readyB: rb, fromCrane: leftNeighbor.id, dir: 'Thượng lưu' });
+        }
+      }
+      if (rightNeighbor && rightPositions.length) {
+        // Hầm ngoài cùng về phía Thượng lưu của cẩu bên Hạ lưu (giáp mặt trực tiếp với cẩu c)
+        const edgeHoldObj = orderedHolds[Math.min(...rightPositions)];
+        const rb = edgeHoldObj ? (holdProgress[edgeHoldObj.hold]?.readyB || 0) : 0;
+        if (edgeHoldObj && rb > 0) {
+          adjacentOptions.push({ hold: edgeHoldObj.hold, readyB: rb, fromCrane: rightNeighbor.id, dir: 'Hạ lưu' });
+        }
+      }
+
+      if (adjacentOptions.length) {
+        adjacentOptions.sort((a, b) => b.readyB - a.readyB);
+        const pick = adjacentOptions[0];
+        reallocSuggestions.push({
+          type: 'ADJACENT_SHARE',
+          craneId: c.id,
+          fromCrane: pick.fromCrane,
+          targetHold: pick.hold,
+          targetReadyB: pick.readyB,
+          note: `${c.id} đã hết hàng vùng mình → chỉ có thể san tải hầm giáp ranh HOLD ${String(pick.hold).padStart(2,'0')} (${pick.readyB} B) từ cẩu kề bên ${pick.fromCrane} (dồn biên, không vượt ray)`
+        });
+        return;
+      }
+
+      // 3. Kiểm tra xem ở đầu tàu bên kia vẫn còn hàng nhưng bị chắn ray bởi cẩu kề bên không
+      const totalShipReadyB = Object.values(holdProgress).reduce((s, hp) => s + (hp.readyB || 0), 0);
+      if (totalShipReadyB > 0) {
+        const blockers = [leftNeighbor?.id, rightNeighbor?.id].filter(Boolean).join(' / ');
+        reallocSuggestions.push({
+          type: 'BLOCKED_BY_RAIL',
+          craneId: c.id,
+          targetHold: null,
+          targetReadyB: 0,
+          note: `🔒 ${c.id} đã hoàn thành vùng hầm của mình nhưng bị chắn ray bởi ${blockers || 'cẩu kề bên'} — KHÔNG thể chạy vượt lên đầu tàu (đề xuất kết thúc ca ${c.id} hoặc dồn dây chuyền từng cẩu kề bên).`
+        });
       }
     });
 
     return {
       slots,
-      craneIds,
+      craneIds: CraneRailOrder.sortCranesOnRail(craneIds),
       hourlyMatrix,
       craneMetrics,
       totals: activeTotals,
       totalCompletedValid: completedValid.length,
       completedMissingTime,
       holdProgress,
-      reallocSuggestions
+      reallocSuggestions,
+      railCrossingConflicts
     };
   },
 
+  // Phương án sự cố gián đoạn tuân thủ thứ tự ray (CHỈ chọn cẩu liền kề hoặc dự phòng cùng khe ray)
   buildFailoverPlans(st, presetCranes) {
-    const paused = (st.cranes || []).filter(c => c.active && c.paused);
-    const healthy = (st.cranes || []).filter(c => c.active && !c.paused && c.mode !== 'IMPORT_ONLY');
-    const backups = presetCranes.filter(id => !st.cranes.some(c => c.id === id && c.active));
+    const railActive = CraneRailOrder.sortCranesOnRail((st.cranes || []).filter(c => c.active));
+    const activeIds = new Set(railActive.map(c => c.id));
+    const paused = railActive.filter(c => c.paused);
 
     return paused.map(pc => {
+      const rIdx = railActive.findIndex(c => c.id === pc.id);
       const pausedSec = pc.pauseStart ? Math.max(0, Math.floor((Date.now() - pc.pauseStart) / 1000)) : 0;
       const pausedMins = Math.max(1, Math.round(pausedSec / 60));
       const lostMoves = Math.max(1, Math.round((pausedMins / 60) * (pc.rate || 25)));
-      const pcMid = pc.holds.length ? pc.holds.reduce((a, b) => a + b, 0) / pc.holds.length : 1;
-      const nearestHelper = [...healthy].sort((a, b) => {
-        const mA = a.holds.length ? a.holds.reduce((x, y) => x + y, 0) / a.holds.length : 99;
-        const mB = b.holds.length ? b.holds.reduce((x, y) => x + y, 0) / b.holds.length : 99;
-        return Math.abs(mA - pcMid) - Math.abs(mB - pcMid);
-      })[0] || null;
-      return { crane: pc, pausedSec, pausedMins, lostMoves, planA_helper: nearestHelper, planB_backups: backups };
+
+      // PA A: CHỈ cho phép cẩu LIỀN KỀ NGAY TRÊN RAY (bên Thượng lưu hoặc Hạ lưu) tiếp ứng
+      const leftAdj = rIdx > 0 ? railActive[rIdx - 1] : null;
+      const rightAdj = rIdx < railActive.length - 1 ? railActive[rIdx + 1] : null;
+      const validNeighbors = [leftAdj, rightAdj].filter(n => n && !n.paused && n.mode !== 'IMPORT_ONLY');
+
+      // PA B: Phân loại cẩu dự phòng theo khe ray vật lý (nằm giữa leftAdj và rightAdj = không bị chắn!)
+      const leftRailIdx = leftAdj ? CraneRailOrder.getRailIndex(leftAdj.id) : -1;
+      const rightRailIdx = rightAdj ? CraneRailOrder.getRailIndex(rightAdj.id) : 999;
+
+      const allBackups = presetCranes.filter(id => !activeIds.has(id));
+      const directBackups = allBackups.filter(id => {
+        const idx = CraneRailOrder.getRailIndex(id);
+        return idx > leftRailIdx && idx < rightRailIdx;
+      });
+      const cascadeBackups = allBackups.filter(id => !directBackups.includes(id));
+
+      return {
+        crane: pc,
+        pausedSec,
+        pausedMins,
+        lostMoves,
+        planA_neighbors: validNeighbors,
+        planA_helper: validNeighbors[0] || null,
+        planB_directBackups: directBackups,
+        planB_cascadeBackups: cascadeBackups,
+        planB_backups: [...directBackups, ...cascadeBackups]
+      };
     });
   }
 };
@@ -2937,13 +3541,192 @@ function renderCraneHourlyChart() {
   }
 
   if (reallocSuggestions.length) {
-    adviceHtml += reallocSuggestions.map(r => `
-      <div style="margin-top:5px;">⚡ Hầm của <b>${r.craneId}</b> đã hết hàng B →
-        <button class="primary sm" onclick="reassignCraneToHold('${r.craneId}', ${r.targetHold})">Chuyển ${r.craneId} sang HOLD ${String(r.targetHold).padStart(2,'0')} (${r.targetReadyB} B)</button>
-      </div>
-    `).join('');
+    adviceHtml += reallocSuggestions.map(r => {
+      if (r.type === 'BLOCKED_BY_RAIL') {
+        return `<div style="margin-top:5px;color:var(--amber);font-weight:700;">${r.note}</div>`;
+      }
+      if (r.type === 'ADJACENT_SHARE') {
+        return `<div style="margin-top:5px;">↔️ ${r.note}
+          <button class="primary sm" onclick="shareBoundaryHold('${r.craneId}', '${r.fromCrane}', ${r.targetHold})">San HOLD ${String(r.targetHold).padStart(2,'0')} sang ${r.craneId}</button>
+        </div>`;
+      }
+      return `<div style="margin-top:5px;">⚡ ${r.note}
+        <button class="primary sm" onclick="reassignCraneToHold('${r.craneId}', ${r.targetHold})">Dịch ${r.craneId} tới HOLD ${String(r.targetHold).padStart(2,'0')}</button>
+      </div>`;
+    }).join('');
   }
   document.getElementById('craneAdviceBox').innerHTML = adviceHtml;
+}
+
+
+function renderHorizontalShipRailCard() {
+  const scene = document.getElementById('horizontalShipRailScene');
+  if (!scene) return;
+  const cfg = getLiveVesselCfg();
+  const pool = UnifiedPoolBuilder.build(state, cfg.deck_tier_min);
+  const shift = document.getElementById('shiftFilter')?.value || 'ALL';
+  const { craneMetrics, holdProgress, railCrossingConflicts } = CraneEngine.analyzeCraneBalance(state, pool, shift);
+
+  const isPort = state.berthingSide !== 'STARBOARD';
+  const badge = document.getElementById('shipBerthSideBadge');
+  if (badge) {
+    badge.textContent = isPort ? '⬅️ Cập Mạn Trái (Port · Mũi hướng Thượng lưu)' : '➡️ Cập Mạn Phải (Starboard · Mũi ra Cửa biển)';
+    badge.className = `badge ${isPort ? '' : 'green'}`;
+  }
+  const crossBadge = document.getElementById('railCrossingAlertBadge');
+  if (crossBadge) {
+    crossBadge.style.display = railCrossingConflicts.length ? 'inline-flex' : 'none';
+    crossBadge.textContent = `⚠️ ${railCrossingConflicts.length} lỗi chéo ray!`;
+  }
+
+  // Sắp xếp toàn bộ cẩu đang bật theo ĐÚNG THỨ TỰ RAY từ Thượng lưu -> Hạ lưu
+  const railCranes = CraneRailOrder.sortCranesOnRail((state.cranes || []).filter(c => c.active));
+  const colors = ['#0284c7', '#059669', '#d97706', '#7c3aed', '#e11d48', '#0891b2', '#65a30d', '#ea580c'];
+  const colorMap = {};
+  railCranes.forEach((c, i) => { colorMap[c.id] = colors[i % colors.length]; });
+
+  const conflictCraneIds = new Set();
+  railCrossingConflicts.forEach(cf => { conflictCraneIds.add(cf.upstreamCrane); conflictCraneIds.add(cf.downstreamCrane); });
+
+  const impJobs = state.liveJobs.filter(j => j.io === 'Import' || j.job_type === 'Dỡ tàu');
+  const orderedHolds = CraneRailOrder.getOrderedHoldsAlongQuay(state.holdConfig, state.berthingSide);
+
+  // 1. HÀNG CẨU TRÊN RAY (THƯỢNG LƯU -> HẠ LƯU)
+  const cranesRowHtml = railCranes.length ? railCranes.map((c, idx) => {
+    const m = craneMetrics.find(x => x.id === c.id) || { moves: 0, impMoves: 0, expMoves: 0, avgRate: 0, lastHourMoves: 0, lastHourLabel: '' };
+    const col = colorMap[c.id] || 'var(--cyan)';
+    // Tính tiến độ hoàn thành trên các hầm cẩu này phụ trách
+    let hTotal = 0, hDone = 0, hReadyB = 0;
+    (c.holds || []).forEach(hNo => {
+      const hp = holdProgress[hNo];
+      if (hp) { hTotal += hp.total; hDone += hp.doneC; hReadyB += hp.readyB; }
+    });
+    const pct = hTotal > 0 ? Math.round((hDone / hTotal) * 100) : 0;
+    const modeLbl = c.paused ? '<span class="badge red">⏸ Sự cố</span>'
+      : (c.mode === 'IMPORT_ONLY' ? '<span class="badge amber">Chỉ nhập</span>'
+      : (c.mode === 'EXPORT_ONLY' ? '<span class="badge purple">Chỉ xuất</span>' : '<span class="badge green">Nhập+Xuất</span>'));
+
+    const barrierHtml = idx < railCranes.length - 1
+      ? `<div class="rail-barrier" title="Ràng buộc ray: ${c.id} và ${railCranes[idx+1].id} không thể chạy vượt qua nhau"><span>║</span><span style="font-size:8px;">CHẮN</span><span>║</span></div>`
+      : '';
+
+    return `
+      <div class="rail-crane-node ${c.paused ? 'paused' : ''} ${conflictCraneIds.has(c.id) ? 'crossing-err' : ''}" style="border-top-color:${c.paused ? 'var(--red)' : col};">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:4px;">
+          <strong style="font-size:12.5px;color:${col};">🏗️ #${idx + 1} ${c.id}</strong>
+          ${modeLbl}
+        </div>
+        <div style="font-size:10.5px;color:var(--muted);margin-top:3px;display:flex;justify-content:space-between;">
+          <span>Hầm: <b style="color:var(--ink);">${c.holds.length ? c.holds.map(n => 'H' + n).join(', ') : 'Chưa gán'}</b></span>
+          <span style="font-weight:850;color:var(--cyan);">${m.avgRate} mv/h</span>
+        </div>
+        <div class="prog-track" style="margin:4px 0;"><div class="prog-fill" style="width:${pct}%;background:${col};"></div></div>
+        <div style="font-size:10px;display:flex;justify-content:space-between;color:var(--muted);">
+          <span>C: <b style="color:var(--ink);">${m.moves}</b> (N:${m.impMoves}/X:${m.expMoves})</span>
+          <span>Còn B: <b style="color:${hReadyB > 0 ? 'var(--cyan)' : 'var(--green)'};">${hReadyB}</b></span>
+        </div>
+      </div>
+      ${barrierHtml}
+    `;
+  }).join('') : '<div style="padding:10px;color:var(--muted);">Chưa kích hoạt cẩu nào (Vào Tab 3 để chọn thiết bị).</div>';
+
+  // 2. HÌNH CON TÀU NẰM NGANG (MŨI HƯỚNG TRÁI KHI CẬP MẠN TRÁI | MŨI HƯỚNG PHẢI KHI CẬP MẠN PHẢI)
+  const bowHtml = (sideCls) => `
+    <div class="ship-bow ${sideCls}">
+      <div style="font-size:15px;line-height:1;">${sideCls === 'left-bow' ? '◀' : '▶'}</div>
+      <div>MŨI TÀU</div>
+      <div style="font-size:8.5px;opacity:0.85;">BOW (H01)</div>
+    </div>`;
+  const sternHtml = (sideCls) => `
+    <div class="ship-stern ${sideCls}">
+      <div style="font-size:13px;line-height:1;">🏢</div>
+      <div>LÁI / CABIN</div>
+      <div style="font-size:8.5px;opacity:0.8;">STERN</div>
+    </div>`;
+
+  const holdsStripHtml = orderedHolds.map(h => {
+    const owners = railCranes.filter(c => (c.holds || []).includes(h.hold));
+    const topCol = owners.length ? (colorMap[owners[0].id] || 'var(--cyan)') : 'var(--line)';
+    const hp = holdProgress[h.hold] || { total: 0, doneC: 0, readyB: 0, pct: 0 };
+    const impInH = impJobs.filter(j => { const p = DataAdapters.parsePos6(j.pos); return p && h.bays.includes(p.bay); });
+    const impDone = impInH.filter(j => j.status === 'C').length;
+    const impPct = impInH.length ? Math.round((impDone / impInH.length) * 100) : 100;
+    const bayRange = h.bays.length > 1 ? `${h.bays[0]}–${h.bays[h.bays.length - 1]}` : (h.bays[0] || '--');
+    const firstBay = h.bays[0] || '01';
+
+    return `
+      <div class="ship-hold-cell" style="border-top-color:${topCol};" onclick="openBayPopup('${firstBay}')" title="Bấm xem sơ đồ Bay ${firstBay} (${h.label})">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:2px;">
+          <b style="font-size:11px;">H${String(h.hold).padStart(2,'0')}</b>
+          <span style="font-size:9px;color:var(--muted);">B${bayRange}</span>
+        </div>
+        <div style="display:flex;flex-wrap:wrap;gap:2px;min-height:16px;">
+          ${owners.length ? owners.map(o => `<span class="badge" style="padding:1px 5px;font-size:9px;background:${colorMap[o.id]}22;color:${colorMap[o.id]};">${o.id}</span>`).join('') : '<span style="font-size:9px;color:var(--muted);">Trống cẩu</span>'}
+        </div>
+        <div>
+          <div class="prog-track" style="height:5px;margin:2px 0;" title="Tiến độ dỡ nhập ${impPct}%"><div class="prog-fill imp" style="width:${impPct}%;"></div></div>
+          <div class="prog-track" style="height:5px;margin:2px 0;" title="Tiến độ xếp xuất ${hp.pct}%"><div class="prog-fill" style="width:${hp.pct}%;"></div></div>
+        </div>
+        <div style="font-size:9.5px;display:flex;justify-content:space-between;color:var(--muted);">
+          <span>X:${hp.pct}%</span>
+          <b style="color:${hp.readyB > 0 ? 'var(--cyan)' : 'var(--green)'};">${hp.readyB}B</b>
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  const vName = (document.getElementById('cfgVesselName')?.value || state.sessionId).trim();
+  const berth = (document.getElementById('cfgBerth')?.value || 'TV3').trim();
+  const totalJobs = state.liveJobs.length;
+  const totalDoneC = state.liveJobs.filter(j => j.status === 'C').length;
+  const overallPct = totalJobs ? Math.round((totalDoneC / totalJobs) * 100) : 0;
+
+  scene.innerHTML = `
+    <div class="rail-cranes-track">${cranesRowHtml}</div>
+    <div class="ship-hull-row">
+      ${isPort ? bowHtml('left-bow') : sternHtml('left-stern')}
+      <div class="ship-holds-strip">${holdsStripHtml}</div>
+      ${isPort ? sternHtml('right-stern') : bowHtml('right-bow')}
+    </div>
+    <div class="quay-apron-bar">
+      <span>⚓ CẦU ${berth} · TÀU <b>${vName}</b> (${cfg.length_m}m × ${cfg.beam_m}m) · ${isPort ? 'MẠN TRÁI ÁP CẦU (Mũi ⬅️ Thượng lưu)' : 'MẠN PHẢI ÁP CẦU (Mũi ➡️ Cửa biển)'}</span>
+      <span>Tiến độ Job List: <b style="color:var(--cyan);">${totalDoneC}/${totalJobs} (${overallPct}%)</b> · Thứ tự ray: <code>${railCranes.map(c => c.id).join(' ➔ ') || '—'}</code></span>
+    </div>
+  `;
+
+  const noteEl = document.getElementById('railConstraintNote');
+  if (noteEl) {
+    if (railCrossingConflicts.length) {
+      noteEl.innerHTML = `<span style="color:var(--red);font-weight:800;">⚠️ Phát hiện gán hầm ngược thứ tự ray: ${railCrossingConflicts.map(x => x.message).join('; ')}. Bấm <b>"⚡ Tự chia Hầm đúng ray"</b> ở góc trên để sửa ngay!</span>`;
+    } else {
+      noteEl.innerHTML = `✅ Thứ tự thiết bị khớp đúng ray cầu tàu (<b>Thượng lưu ➔ Hạ lưu</b>). Bấm trực tiếp vào từng ô Hầm trên thân tàu để mở sơ đồ Bay chi tiết.`;
+    }
+  }
+}
+
+function toggleBerthingSideQuick() {
+  state.berthingSide = state.berthingSide === 'STARBOARD' ? 'PORT' : 'STARBOARD';
+  const sel = document.getElementById('cfgBerthSide');
+  if (sel) sel.value = state.berthingSide;
+  renderAll();
+}
+
+function onBerthingSideChanged(val) {
+  state.berthingSide = val === 'STARBOARD' ? 'STARBOARD' : 'PORT';
+  renderAll();
+}
+
+function autoDistributeHoldsByRail() {
+  CraneRailOrder.autoDistributeHolds(state);
+  renderAll();
+}
+
+function shareBoundaryHold(toCraneId, fromCraneId, holdNo) {
+  const toC = state.cranes.find(x => x.id === toCraneId);
+  const fromC = state.cranes.find(x => x.id === fromCraneId);
+  if (toC && !toC.holds.includes(holdNo)) toC.holds = [...toC.holds, holdNo].sort((a, b) => a - b);
+  if (fromC && fromC.holds.length > 1) fromC.holds = fromC.holds.filter(h => h !== holdNo);
+  renderAll();
 }
 
 function reassignCraneToHold(craneId, holdNo) {
@@ -3222,23 +4005,23 @@ function renderCranesSetup() {
       <table>
         <thead><tr><th>Thiết bị</th><th>Chế độ</th><th>Hầm phụ trách</th><th>Sự cố / Gián đoạn</th></tr></thead>
         <tbody>
-          ${state.cranes.filter(c => c.active).map((c, idx) => {
+          ${CraneRailOrder.sortCranesOnRail(state.cranes.filter(c => c.active)).map((c, idx) => {
             const sec = c.paused && c.pauseStart ? Math.floor((Date.now() - c.pauseStart) / 1000) : 0;
             const mm = String(Math.floor(sec / 60)).padStart(2, '0');
             const ss = String(sec % 60).padStart(2, '0');
             return `
               <tr>
-                <td><b>${c.id}</b></td>
+                <td><b>#${idx + 1} ${c.id}</b></td>
                 <td>
-                  <select onchange="updateCraneMode(${idx}, this.value)">
+                  <select onchange="updateCraneMode('${c.id}', this.value)">
                     <option value="BOTH" ${c.mode === 'BOTH' ? 'selected' : ''}>Nhập + Xuất</option>
                     <option value="IMPORT_ONLY" ${c.mode === 'IMPORT_ONLY' ? 'selected' : ''}>Chỉ làm Nhập</option>
                     <option value="EXPORT_ONLY" ${c.mode === 'EXPORT_ONLY' ? 'selected' : ''}>Chỉ làm Xuất</option>
                   </select>
                 </td>
-                <td><input value="${c.holds.join(',')}" style="width:88px" onchange="updateCraneHolds(${idx}, this.value)"></td>
+                <td><input value="${c.holds.join(',')}" style="width:88px" onchange="updateCraneHolds('${c.id}', this.value)"></td>
                 <td>
-                  <button class="sm ${c.paused ? 'danger' : 'warning'}" onclick="toggleCranePause(${idx})">
+                  <button class="sm ${c.paused ? 'danger' : 'warning'}" onclick="toggleCranePause('${c.id}')">
                     ${c.paused ? `▶ Tiếp (${mm}:${ss})` : '⏸ Tạm dừng'}
                   </button>
                 </td>
@@ -3253,15 +4036,18 @@ function renderCranesSetup() {
   const plans = CraneEngine.buildFailoverPlans(state, PRESET_CRANES);
   document.getElementById('failoverAdvicePanel').innerHTML = plans.map(p => `
     <div style="border:1px solid var(--red);background:rgba(220,38,38,0.08);border-radius:8px;padding:10px;margin-top:8px;">
-      <strong style="color:var(--red);">⚠️ Sự cố ${p.crane.id} (Gián đoạn ${p.pausedMins}p · Hụt ~${p.lostMoves} moves):</strong>
+      <strong style="color:var(--red);">⚠️ Sự cố ${p.crane.id} (Gián đoạn ${p.pausedMins}p · Hụt ~${p.lostMoves} moves · Ràng buộc ray):</strong>
       <div style="margin-top:6px;font-size:11.5px;display:flex;flex-direction:column;gap:6px;">
-        <div>• <b>PA A (Không bổ sung thiết bị):</b> Chuyển Hầm <b>${p.crane.holds.join(', ')}</b> sang cẩu gần nhất <b>${p.planA_helper ? p.planA_helper.id : 'kế cận'}</b>
-          ${p.planA_helper ? `<button class="primary sm" onclick="transferHolds('${p.crane.id}','${p.planA_helper.id}')">⚡ Chuyển sang ${p.planA_helper.id}</button>` : ''}
+        <div>• <b>PA A (Chỉ cẩu liền kề trên ray — không vượt mặt):</b>
+          ${p.planA_neighbors.length ? p.planA_neighbors.map(n => `
+            <button class="primary sm" style="margin-right:4px;" onclick="transferHolds('${p.crane.id}','${n.id}')">⚡ Chuyển Hầm [${p.crane.holds.join(',')}] sang ${n.id}</button>
+          `).join('') : '<span style="color:var(--muted)">Không có cẩu liền kề khỏe nào sẵn sàng trên ray.</span>'}
         </div>
         <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
-          <span>• <b>PA B (Bổ sung thiết bị dự phòng):</b></span>
+          <span>• <b>PA B (Thiết bị dự phòng):</b></span>
           <select id="backupSel_${p.crane.id}" style="min-height:26px;padding:2px 6px;">
-            ${p.planB_backups.map(b => `<option value="${b}">${b}</option>`).join('')}
+            ${p.planB_directBackups.map(b => `<option value="${b}">✅ ${b} (Cùng khe ray · Không bị chắn)</option>`).join('')}
+            ${p.planB_cascadeBackups.map(b => `<option value="${b}">↪ ${b} (Ngoài khe ray · Cần dồn dây chuyền)</option>`).join('')}
           </select>
           <button class="success sm" onclick="swapBackupCrane('${p.crane.id}')">🔄 Thay thế 1 chạm</button>
         </div>
@@ -3283,20 +4069,19 @@ function addCustomCrane() {
   document.getElementById('customCraneInput').value = '';
   renderAll();
 }
-function updateCraneMode(idx, mode) {
-  const act = state.cranes.filter(c => c.active);
-  if (act[idx]) act[idx].mode = mode;
+function updateCraneMode(craneId, mode) {
+  const c = state.cranes.find(x => x.id === craneId);
+  if (c) c.mode = mode;
   renderAll();
 }
-function updateCraneHolds(idx, str) {
-  const act = state.cranes.filter(c => c.active);
+function updateCraneHolds(craneId, str) {
+  const c = state.cranes.find(x => x.id === craneId);
   const maxH = Math.max(1, state.holdConfig.length);
-  if (act[idx]) act[idx].holds = str.split(',').map(x => parseInt(x.trim(), 10)).filter(n => n >= 1 && n <= maxH);
+  if (c) c.holds = str.split(',').map(x => parseInt(x.trim(), 10)).filter(n => n >= 1 && n <= maxH);
   renderAll();
 }
-function toggleCranePause(idx) {
-  const act = state.cranes.filter(c => c.active);
-  const c = act[idx];
+function toggleCranePause(craneId) {
+  const c = state.cranes.find(x => x.id === craneId);
   if (!c) return;
   c.paused = !c.paused;
   c.pauseStart = c.paused ? Date.now() : null;
@@ -3345,30 +4130,151 @@ async function clearExportDataOnly() {
 }
 
 async function createNewVesselSession() {
-  if (!(await AdminPinGuard.requireAuth('tạo chuyến tàu mới trên Cloud'))) return;
-  const name = prompt('Nhập tên tàu mới (VD: SITC HAI PHONG):');
-  if (!name) return;
-  const voy = prompt('Nhập số chuyến (VD: 2612S):') || '001S';
-  const cName = name.trim().toUpperCase(), cVoy = voy.trim().toUpperCase();
-  const id = `${cName.replace(/\s+/g, '_')}_${cVoy}`;
+  if (!(await AdminPinGuard.requireAuth('chọn hoặc tạo chuyến tàu mới'))) return;
+  document.getElementById('nvModalMsg').textContent = '';
+  document.getElementById('nvVesselName').value = '';
+  document.getElementById('nvVoyage').value = '001S';
+  selectNvBerthSide(state.berthingSide || 'PORT');
+  document.getElementById('newVesselModal').classList.add('open');
+  await refreshNewVesselSuggestions(false);
+}
+
+function selectNvBerthSide(side) {
+  const clean = side === 'STARBOARD' ? 'STARBOARD' : 'PORT';
+  document.getElementById('nvBerthSide').value = clean;
+  document.getElementById('btnNvSidePort')?.classList.toggle('active', clean === 'PORT');
+  document.getElementById('btnNvSideStarboard')?.classList.toggle('active', clean === 'STARBOARD');
+}
+
+function pickSuggestedVessel(vName, voyage, berth, loa) {
+  document.getElementById('nvVesselName').value = String(vName || '').trim().toUpperCase();
+  document.getElementById('nvVoyage').value = String(voyage || '001S').trim().toUpperCase();
+  const bSel = document.getElementById('nvBerth');
+  if (bSel && berth) {
+    const normB = String(berth).toUpperCase().replace(/[^A-Z0-9]/g, '');
+    const matchOpt = Array.from(bSel.options).find(o => normB.includes(o.value));
+    if (matchOpt) bSel.value = matchOpt.value;
+  }
+  if (loa && loa >= 60) document.getElementById('nvLength').value = Math.round(loa);
+  const msg = document.getElementById('nvModalMsg');
+  msg.style.color = 'var(--cyan)';
+  msg.textContent = `Đã điền tàu [${vName}] — hãy kiểm tra số chuyến, chọn Hướng cập mạn Trái/Phải rồi bấm "Khởi tạo & Mở tàu này".`;
+}
+
+async function refreshNewVesselSuggestions(forceFetch = false) {
+  const atBerthEl = document.getElementById('nvAtBerthList');
+  const upcomingEl = document.getElementById('nvUpcomingList');
+  if (forceFetch || !Object.keys(state.eportJobs || {}).length) {
+    try {
+      const { eportMap } = await CloudRepo.listAllVessels();
+      state.eportJobs = eportMap || {};
+    } catch (e) {}
+  }
+
+  // 1. Danh sách tàu đang làm hàng tại cầu từ ePort Tân Vũ
+  const atBerthEntries = Object.entries(state.eportJobs || {});
+  if (atBerthEl) {
+    atBerthEl.innerHTML = atBerthEntries.length ? atBerthEntries.map(([vKey, ej]) => {
+      const safeName = vKey.replace(/'/g, "\'");
+      const safeBerth = String(ej.berth || 'TV3').replace(/'/g, "\'");
+      return `
+        <div class="vessel-suggest-card" onclick="pickSuggestedVessel('${safeName}', '${ej.voyage || '001S'}', '${safeBerth}', ${ej.loa || 172})">
+          <div style="display:flex;justify-content:space-between;align-items:center;gap:4px;">
+            <strong style="font-size:12px;">🚢 ${vKey}</strong>
+            <span class="badge green">${ej.berth || 'TV'}</span>
+          </div>
+          <div style="font-size:10.5px;color:var(--muted);margin-top:3px;">
+            Tiến độ ePort: <b>${ej.doneCont || 0}/${ej.totalCont || 0} ${ej.cargoUnit || 'cont'} (${ej.pct || 0}%)</b>
+          </div>
+        </div>
+      `;
+    }).join('') : '<div style="font-size:11px;color:var(--muted);">Chưa lấy được danh sách tàu từ ePort Tân Vũ (bạn có thể gõ tay tên tàu bên dưới).</div>';
+  }
+
+  // 2. Danh sách tàu đang chuẩn bị cập cầu (Cảng vụ / Shifting Plan)
+  const upcomingList = await CloudRepo.fetchUpcomingVessels();
+  if (upcomingEl) {
+    upcomingEl.innerHTML = upcomingList.length ? upcomingList.map(u => {
+      const safeName = String(u.vessel_name || '').replace(/'/g, "\'");
+      const safeVoy = String(u.voyage || '001S').replace(/'/g, "\'");
+      const safeBerth = String(u.berth || 'TV3').replace(/'/g, "\'");
+      return `
+        <div class="vessel-suggest-card upcoming" onclick="pickSuggestedVessel('${safeName}', '${safeVoy}', '${safeBerth}', ${u.loa || 172})">
+          <div style="display:flex;justify-content:space-between;align-items:center;gap:4px;">
+            <strong style="font-size:12px;">⚓ ${u.vessel_name}</strong>
+            <span class="badge amber">${u.berth || 'TV'}</span>
+          </div>
+          <div style="font-size:10.5px;color:var(--muted);margin-top:3px;">
+            ${u.action}${u.eta ? ` · ETA: <b>${u.eta}</b>` : ''}
+          </div>
+        </div>
+      `;
+    }).join('') : '<div style="font-size:11px;color:var(--muted);">Chưa có tàu sắp cập trong dữ liệu Cảng vụ (có thể bấm gõ tay tên tàu mới ở mục 2 bên dưới).</div>';
+  }
+}
+
+async function submitNewVesselModal() {
+  if (!(await AdminPinGuard.requireAuth('khởi tạo chuyến tàu mới trên Cloud'))) return;
+  const rawName = (document.getElementById('nvVesselName').value || '').trim().toUpperCase();
+  const rawVoy = (document.getElementById('nvVoyage').value || '').trim().toUpperCase() || '001S';
+  const berth = document.getElementById('nvBerth').value || 'TV3';
+  const loa = parseFloat(document.getElementById('nvLength').value) || 172;
+  const beam = parseFloat(document.getElementById('nvBeam').value) || 27.6;
+  const side = document.getElementById('nvBerthSide').value === 'STARBOARD' ? 'STARBOARD' : 'PORT';
+  const autoAssign = document.getElementById('nvAutoAssignCranes').value === 'YES';
+  const msgEl = document.getElementById('nvModalMsg');
+
+  if (!rawName) {
+    msgEl.style.color = 'var(--red)';
+    msgEl.textContent = 'Vui lòng chọn 1 tàu gợi ý hoặc gõ tay Tên tàu!';
+    return;
+  }
+
+  const id = `${rawName.replace(/\s+/g, '_')}_${rawVoy}`;
   const sel = document.getElementById('vesselSelect');
   if (!Array.from(sel.options).some(o => o.value === id)) {
     const opt = document.createElement('option');
-    opt.value = id; opt.textContent = `${cName} (${cVoy})`;
+    opt.value = id;
+    opt.textContent = `${rawName} (${rawVoy}) - ${berth}`;
     sel.appendChild(opt);
   }
   sel.value = id;
-  document.getElementById('cfgVesselName').value = cName;
-  document.getElementById('cfgVoyage').value = cVoy;
+
+  document.getElementById('cfgVesselName').value = rawName;
+  document.getElementById('cfgVoyage').value = rawVoy;
+  document.getElementById('cfgBerth').value = berth;
+  document.getElementById('cfgLength').value = loa;
+  document.getElementById('cfgBeam').value = beam;
+  document.getElementById('cfgBerthSide').value = side;
+  const { contPer10cm } = DraftAndTideEngine.estimateTpcAndRate(loa, beam);
+  document.getElementById('cfgContPer10cm').value = contPer10cm;
+
   try {
     const hidden = JSON.parse(localStorage.getItem('tos_deleted_vessels_v1') || '[]').filter(x => x !== id);
     localStorage.setItem('tos_deleted_vessels_v1', JSON.stringify(hidden));
   } catch (e) {}
+
   state.sessionId = id;
+  state.berthingSide = side;
   state.isCustomHoldConfig = false;
-  HoldLayoutEngine.syncHoldsForState(state, parseFloat(document.getElementById('cfgLength').value) || 172, true);
-  await CloudRepo.saveSessionMeta();
-  await CloudRepo.loadSessionFromCloud(id);
+  HoldLayoutEngine.syncHoldsForState(state, loa, true);
+  if (autoAssign) CraneRailOrder.autoDistributeHolds(state);
+
+  msgEl.style.color = 'var(--cyan)';
+  msgEl.textContent = 'Đang khởi tạo chuyến tàu trên Supabase...';
+  try {
+    await CloudRepo.saveSessionMeta();
+    closeModal('newVesselModal');
+    await CloudRepo.loadSessionFromCloud(id);
+    // Đảm bảo giữ đúng hướng cập mạn & chia hầm vừa chọn nếu tàu mới chưa có file nào
+    state.berthingSide = side;
+    document.getElementById('cfgBerthSide').value = side;
+    if (autoAssign) CraneRailOrder.autoDistributeHolds(state);
+    renderAll();
+  } catch (err) {
+    msgEl.style.color = 'var(--red)';
+    msgEl.textContent = 'Lỗi khởi tạo: ' + err.message;
+  }
 }
 
 async function syncAllCloudData() {
@@ -3520,6 +4426,7 @@ function renderAll() {
   document.getElementById('kpiExportPool').textContent = `${bReady} B / ${aHold} A (${cDone} C)`;
 
   recalcDraftLive();
+  renderHorizontalShipRailCard();
   renderOffDockSummary(pool);
   renderCraneHourlyChart();
   renderDispatchRecommendations();
