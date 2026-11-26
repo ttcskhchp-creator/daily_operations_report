@@ -738,6 +738,10 @@ pre.schema-box {
           <div class="hourly-bars" id="craneHourlyBars"></div>
           <div class="hour-detail-bar" id="mobileHourDetail"></div>
           <div class="crane-prod-strip" id="craneProdStrip"></div>
+          <details style="margin-top:8px;" open>
+            <summary style="cursor:pointer;font-size:11.5px;font-weight:800;color:var(--cyan);">📋 Bảng Sản lượng theo Giờ từng thiết bị TK / QC (Tính theo Cột 9: Ngày hoàn tất · Trạng thái C)</summary>
+            <div class="table-wrap" style="max-height:210px;margin-top:6px;" id="craneHourlyMatrixTable"></div>
+          </details>
           <div id="craneAdviceBox" style="margin-top:9px;padding:8px 10px;border-radius:7px;background:rgba(2,132,199,0.08);font-size:11.5px;"></div>
         </div>
       </div>
@@ -1149,7 +1153,7 @@ pre.schema-box {
         <label>Chế độ trích xuất dữ liệu</label>
         <select id="botExtractMode" style="width:100%;">
           <option value="EXCEL">EXCEL (Bấm nút xuất Excel - Chuẩn 100%)</option>
-          <option value="CLIPBOARD">CLIPBOARD (Ctrl+A / Ctrl+C trực tiếp lưới)</option>
+          <option value="CLIPBOARD">CLIPBOARD (Ctrl+Shift+End → Ctrl+C trực tiếp lưới)</option>
         </select>
       </div>
       <div class="form-field" style="margin:0;">
@@ -2606,7 +2610,6 @@ function toggleVesselUploadConfirm() {
 function syncCranesFromJobs(jobs) {
   const jobCranes = new Set((jobs || []).map(j => j.crane).filter(Boolean));
   jobCranes.forEach(cId => {
-    if (cId === 'QC05') return;
     if (!state.cranes.some(c => c.id === cId)) {
       state.cranes.push({ id: cId, active: true, mode: 'BOTH', holds: [1,2], paused: false, pauseStart: null, rate: 25 });
     }
@@ -2658,11 +2661,31 @@ function handleUploadExcel(evt, kind) {
       payload = { schema_version: APP_CONFIG.SCHEMA_VERSION, session_id: state.sessionId, updated_at: new Date().toISOString(), rows: state.reservedExport };
       setCardStatus('reserved', `✓ Đã lọc ${state.reservedExport.length} cont (Chọn=1)`, true);
     } else if (kind === 'jobs') {
-      const norm = DataAdapters.normalizeJobsPayload(rows, state.sessionId);
+      // Đọc thêm theo vị trí cột để khóa chắc Cột 9 = Ngày hoàn tất, Cột 10 = Mã thiết bị (TK/QC)
+      const matrix = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], { header: 1, defval: '', raw: false });
+      const enrichedRows = [];
+      if (matrix.length >= 2) {
+        const hdr = matrix[0].map(h => String(h || '').trim());
+        let baseIdx = hdr.findIndex(h => /Số Container/i.test(h));
+        if (baseIdx < 0) baseIdx = (hdr[0] === 'No.' || hdr[0] === 'STT') ? 1 : 0;
+        for (let i = 1; i < matrix.length; i++) {
+          const line = matrix[i];
+          if (!line || line.length === 0) continue;
+          const obj = {};
+          hdr.forEach((h, cIdx) => { if (h) obj[h] = line[cIdx] !== undefined ? line[cIdx] : ''; });
+          if (!obj['Số Container'] && line[baseIdx] !== undefined) obj['Số Container'] = line[baseIdx];
+          if (line[baseIdx + 8] !== undefined && String(line[baseIdx + 8]).trim() !== '') obj['Ngày hoàn tất'] = line[baseIdx + 8];
+          if (!obj['Mã thiết bị'] && line[baseIdx + 9] !== undefined) obj['Mã thiết bị'] = line[baseIdx + 9];
+          if (!obj['Vị trí'] && line[baseIdx + 17] !== undefined) obj['Vị trí'] = line[baseIdx + 17];
+          if (!obj['Trạng thái công việc'] && line[baseIdx + 18] !== undefined) obj['Trạng thái công việc'] = line[baseIdx + 18];
+          enrichedRows.push(obj);
+        }
+      }
+      const norm = DataAdapters.normalizeJobsPayload(enrichedRows.length ? enrichedRows : rows, state.sessionId);
       state.liveJobs = norm.rows; state.jobsSource = 'EXCEL_WEB'; state.jobsUpdatedAt = norm.updated_at;
       payload = norm;
       syncCranesFromJobs(state.liveJobs);
-      setCardStatus('jobs', `✓ Đã chuẩn hóa ${state.liveJobs.length} job (A/B/C)`, true);
+      setCardStatus('jobs', `✓ Đã chuẩn hóa ${state.liveJobs.length} job (Cột 9 = Ngày HT)`, true);
     }
 
     HoldLayoutEngine.syncHoldsForState(state, parseFloat(document.getElementById('cfgLength').value) || 172, false);
@@ -2852,6 +2875,51 @@ function renderCraneHourlyChart() {
         <div style="color:var(--muted);font-size:10px;">Nhập ${m.impMoves} · Xuất ${m.expMoves}</div>
       </div>
     `).join('') : '';
+  }
+
+  // Render Bảng Sản lượng chi tiết theo từng khung giờ x thiết bị TK/QC
+  const matrixWrap = document.getElementById('craneHourlyMatrixTable');
+  if (matrixWrap) {
+    const activeCranes = craneIds.filter(id => slots.some(sl => (hourlyMatrix[sl.key]?.[id] || 0) > 0)).sort();
+    if (activeCranes.length && totalCompletedValid > 0) {
+      matrixWrap.innerHTML = `
+        <table>
+          <thead>
+            <tr>
+              <th>Thiết bị</th>
+              ${slots.map(sl => `<th style="text-align:center;">${sl.hourLabel}</th>`).join('')}
+              <th style="text-align:right;">Tổng C</th>
+              <th style="text-align:right;">TB mv/h</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${activeCranes.map(id => {
+              const m = craneMetrics.find(x => x.id === id) || { moves: 0, avgRate: 0 };
+              return `<tr>
+                <td><b style="color:${colorMap[id] || 'var(--ink)'}">${id}</b></td>
+                ${slots.map(sl => {
+                  const v = hourlyMatrix[sl.key]?.[id] || 0;
+                  return `<td style="text-align:center;${v > 0 ? 'font-weight:800;' : 'color:var(--muted);'}">${v || '·'}</td>`;
+                }).join('')}
+                <td style="text-align:right;font-weight:900;">${m.moves}</td>
+                <td style="text-align:right;font-weight:900;color:var(--cyan);">${m.avgRate}</td>
+              </tr>`;
+            }).join('')}
+            <tr style="background:var(--bg);font-weight:900;">
+              <td>TỔNG CẨU</td>
+              ${slots.map(sl => {
+                const s = activeCranes.reduce((a, id) => a + (hourlyMatrix[sl.key]?.[id] || 0), 0);
+                return `<td style="text-align:center;color:var(--cyan);">${s || '·'}</td>`;
+              }).join('')}
+              <td style="text-align:right;">${activeCranes.reduce((a, id) => a + ((craneMetrics.find(x => x.id === id)?.moves) || 0), 0)}</td>
+              <td style="text-align:right;">—</td>
+            </tr>
+          </tbody>
+        </table>
+      `;
+    } else {
+      matrixWrap.innerHTML = '<div style="font-size:11px;color:var(--muted);padding:6px;">Chưa có dữ liệu trạng thái C có Ngày hoàn tất (Cột 9).</div>';
+    }
   }
 
   let adviceHtml = '';
