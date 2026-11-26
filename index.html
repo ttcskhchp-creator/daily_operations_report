@@ -1398,8 +1398,10 @@ pre.schema-box {
       <div class="form-field" style="margin:0;">
         <label>Chế độ trích xuất dữ liệu</label>
         <select id="botExtractMode" style="width:100%;">
-          <option value="EXCEL">EXCEL (Bấm nút xuất Excel - Chuẩn 100%)</option>
-          <option value="CLIPBOARD">CLIPBOARD (Ctrl+Shift+End → Ctrl+C trực tiếp lưới)</option>
+          <option value="EXCEL_ALL">TRỌN BỘ 3 MÀN HÌNH: Công việc tàu + Reserved + Final Loading</option>
+          <option value="EXCEL">EXCEL: Công việc tàu (+ Reserved/Final nếu đã căn chỉnh)</option>
+          <option value="EXCEL_EXPORT_ONLY">CHỈ XUẤT TÀU: Reserved + Final Loading List (Xuất Excel)</option>
+          <option value="CLIPBOARD">CLIPBOARD NHANH: Chỉ Công việc tàu (Ctrl+Shift+End → Ctrl+C)</option>
         </select>
       </div>
       <div class="form-field" style="margin:0;">
@@ -1548,6 +1550,8 @@ const state = {
   autoPollTimer: null,
   jobsSource: 'EXCEL_WEB',
   jobsUpdatedAt: '',
+  reservedUpdatedAt: '',
+  finalUpdatedAt: '',
   sbpImport: [],
   finalLoading: [],
   reservedExport: [],
@@ -1926,15 +1930,17 @@ const CloudRepo = {
 
       if (finalJson) {
         state.finalLoading = DataAdapters.normalizeFinalLoading(finalJson);
-        setCardStatus('final', `✓ Cloud: ${state.finalLoading.length} cont Final Loading`, true);
+        state.finalUpdatedAt = finalJson.updated_at || '';
+        setCardStatus('final', `✓ ${finalJson.source || 'Cloud'}: ${state.finalLoading.length} cont Final Loading`, true);
         foundCount++;
-      } else setCardStatus('final', 'Chưa nạp cho tàu này', false);
+      } else { state.finalUpdatedAt = ''; setCardStatus('final', 'Chưa nạp cho tàu này', false); }
 
       if (resJson) {
         state.reservedExport = DataAdapters.normalizeReserved(resJson);
-        setCardStatus('reserved', `✓ Cloud: ${state.reservedExport.length} cont Reserved`, true);
+        state.reservedUpdatedAt = resJson.updated_at || '';
+        setCardStatus('reserved', `✓ ${resJson.source || 'Cloud'}: ${state.reservedExport.length} cont Reserved`, true);
         foundCount++;
-      } else setCardStatus('reserved', 'Chưa nạp cho tàu này', false);
+      } else { state.reservedUpdatedAt = ''; setCardStatus('reserved', 'Chưa nạp cho tàu này', false); }
 
       if (jobsJson) {
         const norm = DataAdapters.normalizeJobsPayload(jobsJson, sessionId);
@@ -1975,16 +1981,40 @@ const CloudRepo = {
   },
 
   async pollLatestJobsOnly() {
-    const jobsJson = await this.downloadFile(state.sessionId, 'jobs.json');
-    if (!jobsJson) return;
-    const norm = DataAdapters.normalizeJobsPayload(jobsJson, state.sessionId);
-    if (norm.updated_at && norm.updated_at !== state.jobsUpdatedAt) {
-      state.liveJobs = norm.rows;
-      state.jobsSource = norm.source;
-      state.jobsUpdatedAt = norm.updated_at;
-      syncCranesFromJobs(state.liveJobs);
-      setCardStatus('jobs', `✓ ${norm.source}: ${state.liveJobs.length} job (${new Date().toLocaleTimeString('vi-VN')})`, true);
-      this.setSub(`Bot OM đồng bộ lúc ${new Date().toLocaleTimeString('vi-VN')}`);
+    const [jobsJson, resJson, finalJson] = await Promise.all([
+      this.downloadFile(state.sessionId, 'jobs.json'),
+      this.downloadFile(state.sessionId, 'reserved.json'),
+      this.downloadFile(state.sessionId, 'final.json')
+    ]);
+    let changed = false;
+    const nowStr = new Date().toLocaleTimeString('vi-VN');
+
+    if (jobsJson) {
+      const norm = DataAdapters.normalizeJobsPayload(jobsJson, state.sessionId);
+      if (norm.updated_at && norm.updated_at !== state.jobsUpdatedAt) {
+        state.liveJobs = norm.rows;
+        state.jobsSource = norm.source;
+        state.jobsUpdatedAt = norm.updated_at;
+        syncCranesFromJobs(state.liveJobs);
+        setCardStatus('jobs', `✓ ${norm.source}: ${state.liveJobs.length} job (${nowStr})`, true);
+        changed = true;
+      }
+    }
+    if (resJson && resJson.updated_at && resJson.updated_at !== state.reservedUpdatedAt) {
+      state.reservedExport = DataAdapters.normalizeReserved(resJson);
+      state.reservedUpdatedAt = resJson.updated_at;
+      setCardStatus('reserved', `✓ ${resJson.source || 'OM_AUTO_BOT'}: ${state.reservedExport.length} Reserved (${nowStr})`, true);
+      changed = true;
+    }
+    if (finalJson && finalJson.updated_at && finalJson.updated_at !== state.finalUpdatedAt) {
+      state.finalLoading = DataAdapters.normalizeFinalLoading(finalJson);
+      state.finalUpdatedAt = finalJson.updated_at;
+      setCardStatus('final', `✓ ${finalJson.source || 'OM_AUTO_BOT'}: ${state.finalLoading.length} Final (${nowStr})`, true);
+      changed = true;
+    }
+
+    if (changed) {
+      this.setSub(`Bot OM đồng bộ lúc ${nowStr}`);
       renderAll();
     }
   }
@@ -2161,10 +2191,11 @@ const DataAdapters = {
 
   normalizeReserved(rawPayload) {
     const rows = Array.isArray(rawPayload) ? rawPayload : (rawPayload?.rows || []);
+    const hasChon = rows.some(r => r['Chọn'] !== undefined);
     return rows.filter(r => {
-      if (r.cntr && r['Chọn'] === undefined) return true;
-      const sel = r['Chọn'];
-      return sel === 1 || sel === '1' || sel === 1.0 || sel === true;
+      if (!hasChon || (r.cntr && r['Chọn'] === undefined)) return true;
+      const sel = String(r['Chọn'] ?? '').trim().toLowerCase();
+      return sel === '1' || sel === '1.0' || sel === 'true' || sel === 'x';
     }).map(r => {
       const blk = String(r.block || r['Block'] || '').trim().toUpperCase();
       const bay = r['Bay'] !== undefined && r['Bay'] !== '' ? String(parseInt(r['Bay'], 10)).padStart(2, '0') : '';
