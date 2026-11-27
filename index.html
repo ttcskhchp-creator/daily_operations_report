@@ -540,6 +540,11 @@ input, select {
 table { width: 100%; border-collapse: collapse; font-size: 11.5px; }
 th, td { padding: 7px 8px; border-bottom: 1px solid var(--line); text-align: left; white-space: nowrap; }
 th { background: var(--bg); font-weight: 800; position: sticky; top: 0; z-index: 4; }
+th.sortable-th { cursor: pointer; user-select: none; transition: background 0.12s, color 0.12s; }
+th.sortable-th:hover { background: rgba(2,132,199,0.12); color: var(--cyan); }
+th.sortable-th.sort-active { color: var(--cyan); background: rgba(2,132,199,0.10); }
+th.sortable-th .sort-ico { font-size: 10px; margin-left: 3px; opacity: 0.7; }
+th.sortable-th.sort-active .sort-ico { opacity: 1; font-weight: 900; }
 
 /* ==================== MODALS (BAY PLAN, BOT SCHEMA, ADMIN PIN) ==================== */
 .modal-shade {
@@ -1845,6 +1850,17 @@ pre.schema-box {
               <option value="DG">☣️ DG (Nguy hiểm)</option>
               <option value="OOG">📐 OOG (Quá khổ)</option>
               <option value="OT">🔓 OT (Mở nóc)</option>
+            </select>
+            <select id="sortCallableTable" onchange="onCallableSortDropdownChange(this.value)" style="min-height:30px;font-size:11.5px;border-color:var(--cyan);font-weight:700;">
+              <option value="YARD_ASC">↕️ Vị trí bãi: A→Z & Số Bay tăng</option>
+              <option value="YARD_DESC">↕️ Vị trí bãi: Z→A & Số Bay giảm</option>
+              <option value="SHIP_BAY_ASC">↕️ Bay tàu (.ASC): Nhỏ → Lớn</option>
+              <option value="SHIP_BAY_DESC">↕️ Bay tàu (.ASC): Lớn → Nhỏ</option>
+              <option value="WEIGHT_DESC">↕️ Trọng lượng: Nặng → Nhẹ</option>
+              <option value="WEIGHT_ASC">↕️ Trọng lượng: Nhẹ → Nặng</option>
+              <option value="POD_ASC">↕️ Cảng dỡ (POD): A→Z</option>
+              <option value="CNTR_ASC">↕️ Số Container: A→Z</option>
+              <option value="HOLD_WEIGHT">↕️ Mặc định: Hầm .ASC + Tấn to</option>
             </select>
             <button type="button" class="sm" onclick="resetCallableFilters()">↺ Xóa lọc</button>
             <span class="badge green" id="callableFilteredCountBadge" style="margin-left:auto;">0 cont đủ điều kiện</span>
@@ -7534,11 +7550,84 @@ function renderCallableCargoSummary(poolArg) {
   renderCallableFilteredTable(pool);
 }
 
+function parseYardPosSortKey(x) {
+  if (x.isOffDock) {
+    return { isOff: 1, block: String(x.transferPort || 'ZZZ').toUpperCase(), bay: 9999, row: 9999, tier: 9999, raw: String(x.yardPos || '') };
+  }
+  const raw = String(x.yardPos || '').trim().toUpperCase();
+  if (!raw || raw === '---') {
+    return { isOff: 0, block: 'ZZZ', bay: 9999, row: 9999, tier: 9999, raw: '' };
+  }
+  const parts = raw.split(/[-\s\/]+/).filter(Boolean);
+  const block = parts[0] || 'ZZZ';
+  const bay = parts[1] !== undefined && /^\d+$/.test(parts[1]) ? parseInt(parts[1], 10) : 9999;
+  const row = parts[2] !== undefined && /^\d+$/.test(parts[2]) ? parseInt(parts[2], 10) : 9999;
+  const tier = parts[3] !== undefined && /^\d+$/.test(parts[3]) ? parseInt(parts[3], 10) : 9999;
+  return { isOff: 0, block, bay, row, tier, raw };
+}
+
+function parseShipBaySortKey(x, deckTierMin) {
+  const p = DataAdapters.parsePos6(x.actualPos || x.plannedPos, deckTierMin);
+  if (p) {
+    return { bay: parseInt(p.bay, 10) || 999, row: parseInt(p.row, 10) || 999, tier: p.tierNum || 999, hold: x.ascRec?.holdNo || 99 };
+  }
+  return { bay: 999, row: 999, tier: 999, hold: x.ascRec?.holdNo || 99 };
+}
+
+function compareYardPos(a, b) {
+  const ka = parseYardPosSortKey(a);
+  const kb = parseYardPosSortKey(b);
+  if (ka.isOff !== kb.isOff) return ka.isOff - kb.isOff;
+  const blkCmp = ka.block.localeCompare(kb.block, undefined, { numeric: true, sensitivity: 'base' });
+  if (blkCmp !== 0) return blkCmp;
+  if (ka.bay !== kb.bay) return ka.bay - kb.bay;
+  if (ka.row !== kb.row) return ka.row - kb.row;
+  if (ka.tier !== kb.tier) return ka.tier - kb.tier;
+  return String(a.cntr || '').localeCompare(String(b.cntr || ''));
+}
+
+function compareShipBay(a, b, deckTierMin) {
+  const sa = parseShipBaySortKey(a, deckTierMin);
+  const sb = parseShipBaySortKey(b, deckTierMin);
+  if (sa.bay !== sb.bay) return sa.bay - sb.bay;
+  if (sa.hold !== sb.hold) return sa.hold - sb.hold;
+  if (sa.row !== sb.row) return sa.row - sb.row;
+  if (sa.tier !== sb.tier) return sa.tier - sb.tier;
+  return (Number(b.weight) || 0) - (Number(a.weight) || 0);
+}
+
+function onCallableSortDropdownChange(val) {
+  state.callableSortMode = val || 'YARD_ASC';
+  renderCallableFilteredTable();
+}
+
+function toggleCallableColSort(colKey) {
+  const cur = document.getElementById('sortCallableTable')?.value || state.callableSortMode || 'YARD_ASC';
+  const toggleMap = {
+    YARD: cur === 'YARD_ASC' ? 'YARD_DESC' : 'YARD_ASC',
+    SHIP_BAY: cur === 'SHIP_BAY_ASC' ? 'SHIP_BAY_DESC' : 'SHIP_BAY_ASC',
+    WEIGHT: cur === 'WEIGHT_DESC' ? 'WEIGHT_ASC' : 'WEIGHT_DESC',
+    POD: cur === 'POD_ASC' ? 'POD_DESC' : 'POD_ASC',
+    CNTR: cur === 'CNTR_ASC' ? 'CNTR_DESC' : 'CNTR_ASC',
+    SIZE: cur === 'SIZE_ASC' ? 'SIZE_DESC' : 'SIZE_ASC',
+    STATUS: cur === 'STATUS_ASC' ? 'STATUS_DESC' : 'STATUS_ASC'
+  };
+  const next = toggleMap[colKey] || 'YARD_ASC';
+  state.callableSortMode = next;
+  const sel = document.getElementById('sortCallableTable');
+  if (sel) {
+    if (Array.from(sel.options).some(o => o.value === next)) sel.value = next;
+  }
+  renderCallableFilteredTable();
+}
+
 function resetCallableFilters() {
   if (document.getElementById('filterCallablePod')) document.getElementById('filterCallablePod').value = 'ALL';
   if (document.getElementById('filterCallableWeight')) document.getElementById('filterCallableWeight').value = 'ALL';
   if (document.getElementById('filterCallableYard')) document.getElementById('filterCallableYard').value = 'ALL';
   if (document.getElementById('filterCallableType')) document.getElementById('filterCallableType').value = 'ALL';
+  if (document.getElementById('sortCallableTable')) document.getElementById('sortCallableTable').value = 'YARD_ASC';
+  state.callableSortMode = 'YARD_ASC';
   renderCallableFilteredTable();
 }
 
@@ -7554,6 +7643,7 @@ function renderCallableFilteredTable(poolArg) {
   const wVal = document.getElementById('filterCallableWeight')?.value || 'ALL';
   const yVal = document.getElementById('filterCallableYard')?.value || 'ALL';
   const tVal = document.getElementById('filterCallableType')?.value || 'ALL';
+  const sortMode = state.callableSortMode || document.getElementById('sortCallableTable')?.value || 'YARD_ASC';
   const band = WEIGHT_BANDS.find(b => b.id === wVal);
 
   const filtered = baseList.filter(c => {
@@ -7583,25 +7673,50 @@ function renderCallableFilteredTable(poolArg) {
     ...c,
     ascRec: getAscHoldRecommendation(c, ascPodHoldMap, state.holdConfig, cfg.deck_tier_min),
     cargoTypes: classifyCargoTypes(c)
-  })).sort((a, b) => (a.ascRec.holdNo || 99) - (b.ascRec.holdNo || 99) || (b.weight - a.weight));
+  })).sort((a, b) => {
+    switch (sortMode) {
+      case 'YARD_ASC': return compareYardPos(a, b);
+      case 'YARD_DESC': return compareYardPos(b, a);
+      case 'SHIP_BAY_ASC': return compareShipBay(a, b, cfg.deck_tier_min);
+      case 'SHIP_BAY_DESC': return compareShipBay(b, a, cfg.deck_tier_min);
+      case 'WEIGHT_DESC': return (Number(b.weight) || 0) - (Number(a.weight) || 0) || compareYardPos(a, b);
+      case 'WEIGHT_ASC': return (Number(a.weight) || 0) - (Number(b.weight) || 0) || compareYardPos(a, b);
+      case 'POD_ASC': return String(a.pod || '').localeCompare(String(b.pod || '')) || compareYardPos(a, b);
+      case 'POD_DESC': return String(b.pod || '').localeCompare(String(a.pod || '')) || compareYardPos(a, b);
+      case 'CNTR_ASC': return String(a.cntr || '').localeCompare(String(b.cntr || ''));
+      case 'CNTR_DESC': return String(b.cntr || '').localeCompare(String(a.cntr || ''));
+      case 'SIZE_ASC': return String(a.size || '').localeCompare(String(b.size || '')) || compareYardPos(a, b);
+      case 'SIZE_DESC': return String(b.size || '').localeCompare(String(a.size || '')) || compareYardPos(a, b);
+      case 'STATUS_ASC': return String(a.jobStatus || '').localeCompare(String(b.jobStatus || '')) || compareYardPos(a, b);
+      case 'STATUS_DESC': return String(b.jobStatus || '').localeCompare(String(a.jobStatus || '')) || compareYardPos(a, b);
+      default: return (a.ascRec.holdNo || 99) - (b.ascRec.holdNo || 99) || ((Number(b.weight) || 0) - (Number(a.weight) || 0));
+    }
+  });
+
+  const ico = (prefix) => {
+    if (sortMode === prefix + '_ASC') return '<span class="sort-ico">▲</span>';
+    if (sortMode === prefix + '_DESC') return '<span class="sort-ico">▼</span>';
+    return '<span class="sort-ico">⇅</span>';
+  };
+  const cls = (prefix) => sortMode.startsWith(prefix + '_') ? 'sortable-th sort-active' : 'sortable-th';
 
   wrap.innerHTML = `
     <table>
       <thead>
         <tr>
           <th>#</th>
-          <th>Số Container</th>
-          <th>Size / Loại</th>
-          <th>POD</th>
-          <th>TL (T)</th>
-          <th>Khu bãi / Vị trí</th>
-          <th>TT</th>
-          <th>Khuyến nghị Hầm (.ASC)</th>
+          <th class="${cls('CNTR')}" onclick="toggleCallableColSort('CNTR')" title="Bấm để sắp xếp theo Số Container">Số Container ${ico('CNTR')}</th>
+          <th class="${cls('SIZE')}" onclick="toggleCallableColSort('SIZE')" title="Bấm để sắp xếp theo Size">Size / Loại ${ico('SIZE')}</th>
+          <th class="${cls('POD')}" onclick="toggleCallableColSort('POD')" title="Bấm để sắp xếp theo POD">POD ${ico('POD')}</th>
+          <th class="${cls('WEIGHT')}" onclick="toggleCallableColSort('WEIGHT')" title="Bấm để sắp xếp theo Trọng lượng">TL (T) ${ico('WEIGHT')}</th>
+          <th class="${cls('YARD')}" onclick="toggleCallableColSort('YARD')" title="Bấm để sắp xếp Vị trí bãi A→Z & số Bay">Khu bãi / Vị trí ${ico('YARD')}</th>
+          <th class="${cls('STATUS')}" onclick="toggleCallableColSort('STATUS')" title="Bấm để sắp xếp theo Trạng thái">TT ${ico('STATUS')}</th>
+          <th class="${cls('SHIP_BAY')}" onclick="toggleCallableColSort('SHIP_BAY')" title="Bấm để sắp xếp theo số Bay trên tàu (.ASC)">Khuyến nghị Hầm (.ASC) ${ico('SHIP_BAY')}</th>
           <th>Thao tác</th>
         </tr>
       </thead>
       <tbody>
-        ${enriched.slice(0, 150).map((x, i) => `
+        ${enriched.slice(0, 300).map((x, i) => `
           <tr>
             <td>${i + 1}</td>
             <td><b>${x.cntr}</b></td>
