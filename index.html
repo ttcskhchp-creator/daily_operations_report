@@ -2443,9 +2443,27 @@ pre.schema-box {
       <button class="sm" onclick="closeModal('botControlModal')">✕ Đóng</button>
     </div>
 
-    <div style="background:rgba(2,132,199,0.08);border:1px solid var(--cyan);border-radius:8px;padding:9px 11px;margin-bottom:12px;font-size:11.5px;">
-      <div><b>Tàu đang chọn:</b> <span id="botModalSessionId" style="color:var(--cyan);font-weight:900;"></span> · <b>Trạng thái Bot:</b> <span class="badge" id="botModalStatusBadge">IDLE</span></div>
-      <div id="botModalLastMsg" style="margin-top:4px;color:var(--muted);">Bot Windows tự xóa mật khẩu về NULL trên Supabase ngay sau khi đọc vào RAM, tự dừng khi tàu đạt 100% hoặc khi có người xóa tàu.</div>
+    <div style="background:rgba(2,132,199,0.08);border:1px solid var(--cyan);border-radius:8px;padding:9px 11px;margin-bottom:10px;font-size:11.5px;">
+      <div><b>Tàu đang chọn:</b> <span id="botModalSessionId" style="color:var(--cyan);font-weight:900;"></span> · <b>Trạng thái:</b> <span class="badge" id="botModalStatusBadge">IDLE</span></div>
+      <div id="botModalLastMsg" style="margin-top:4px;color:var(--muted);">1 Bot đa tàu (FIFO): Job List <b>5p/lần</b> · Reserved &amp; Final <b>20p/lần</b>. Nếu OM đã mở &amp; đăng nhập sẵn thì <b>có thể bỏ trống MK</b> để xếp thẳng vào hàng đợi!</div>
+    </div>
+
+    <div id="botModalQueueWrap" style="background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:9px 10px;margin-bottom:12px;font-size:11.5px;">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;">
+        <div style="padding:7px 9px;border-radius:7px;background:var(--card);border:1px solid var(--line);">
+          <div style="font-size:10px;color:var(--muted);font-weight:800;text-transform:uppercase;">🤖 Robot đang thực hiện lệnh</div>
+          <div id="botCurrentExecutingText" style="font-weight:900;color:var(--green);margin-top:2px;">Đang rảnh / Chờ lệnh</div>
+        </div>
+        <div style="padding:7px 9px;border-radius:7px;background:var(--card);border:1px solid var(--line);">
+          <div style="font-size:10px;color:var(--muted);font-weight:800;text-transform:uppercase;">⏳ Thứ tự hàng chờ của tàu này</div>
+          <div id="botCurrentVesselRankText" style="font-weight:900;color:var(--cyan);margin-top:2px;">Chưa vào hàng chờ</div>
+        </div>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;">
+        <b style="color:var(--cyan);">📋 Hàng chờ lệnh quét (Ưu tiên Lệnh mới → Sau đó mới tới Chu kỳ 5p/20p):</b>
+        <span class="badge" id="botQueueCountBadge">0 tàu</span>
+      </div>
+      <div id="botModalQueueList" style="color:var(--muted);">Chưa có tàu nào trong hàng đợi.</div>
     </div>
 
     <div class="grid-form" style="grid-template-columns:repeat(2, minmax(0, 1fr));gap:10px;">
@@ -2454,8 +2472,8 @@ pre.schema-box {
         <input id="botTosUser" placeholder="VD: dungvt" autocomplete="off">
       </div>
       <div class="form-field" style="margin:0;">
-        <label>Mật khẩu PL-TOS (*)</label>
-        <input type="password" id="botTosPass" placeholder="Tự xóa khỏi Cloud ngay khi Bot đọc" autocomplete="new-password">
+        <label>Mật khẩu PL-TOS (Bỏ trống nếu OM đã đăng nhập)</label>
+        <input type="password" id="botTosPass" placeholder="Bỏ trống nếu OM đã mở & đăng nhập sẵn" autocomplete="new-password">
       </div>
       <div class="form-field" style="margin:0;">
         <label>Mã tàu trong OM (Vessel Code)</label>
@@ -2492,12 +2510,13 @@ pre.schema-box {
 
     <div style="display:flex;gap:8px;justify-content:space-between;flex-wrap:wrap;margin-top:12px;padding-top:10px;border-top:1px solid var(--line);">
       <div style="display:flex;gap:6px;flex-wrap:wrap;">
-        <button class="danger" onclick="stopRemoteBot()">🛑 Dừng Bot</button>
+        <button class="danger" onclick="stopRemoteBot(false)" title="Chỉ dừng riêng tàu đang chọn, các tàu khác trong hàng đợi vẫn chạy tiếp">🛑 Dừng tàu này</button>
+        <button class="warning" onclick="stopRemoteBot(true)" title="Dừng toàn bộ hàng đợi tất cả các tàu">⛔ Dừng tất cả</button>
         <button onclick="toggleBotAutoPoll()" id="btnToggleWebPollModal">🔄 Tự tải Web (60s): Tắt</button>
       </div>
       <div style="display:flex;gap:6px;">
         <button onclick="closeModal('botControlModal')">Đóng</button>
-        <button class="success" onclick="startRemoteBot()">🚀 Khởi động Bot ngay (PIN)</button>
+        <button class="success" onclick="startRemoteBot()">🚀 Xếp hàng đợi Bot ngay</button>
       </div>
     </div>
   </div>
@@ -9555,16 +9574,127 @@ function renderBotStatusUI(rec) {
   }
 }
 
+function renderBotQueueListUI(activeList) {
+  const rawList = Array.isArray(activeList) ? activeList : [];
+  window._activeBotQueue = rawList;
+  const cntBadge = document.getElementById('botQueueCountBadge');
+  const qListEl = document.getElementById('botModalQueueList');
+  const execEl = document.getElementById('botCurrentExecutingText');
+  const rankEl = document.getElementById('botCurrentVesselRankText');
+
+  const isScanning = (item) => /\[ĐANG QUÉT\]|Đang quét \[/i.test(item.last_message || '');
+  const isManualPriority = (item) => item.status === 'START' || /Lệnh mới ưu tiên/i.test(item.last_message || '');
+
+  // Sắp xếp đúng thứ tự thực thi: 0 = Đang quét, 1 = Lệnh mới ưu tiên (chạy trước chu kỳ), 2 = Lệnh chu kỳ 5p/20p
+  const sorted = [...rawList].sort((a, b) => {
+    const pa = isScanning(a) ? 0 : (isManualPriority(a) ? 1 : 2);
+    const pb = isScanning(b) ? 0 : (isManualPriority(b) ? 1 : 2);
+    if (pa !== pb) return pa - pb;
+    return String(a.updated_at || '').localeCompare(String(b.updated_at || ''));
+  });
+
+  const scanningItem = sorted.find(isScanning) || null;
+  const waitingList = sorted.filter(x => !scanningItem || x.session_id !== scanningItem.session_id);
+
+  if (execEl) {
+    if (scanningItem) {
+      execEl.style.color = 'var(--green)';
+      execEl.textContent = `🔄 Đang quét: ${scanningItem.session_id}`;
+    } else if (sorted.length > 0) {
+      execEl.style.color = 'var(--amber)';
+      execEl.textContent = `🕒 Rảnh · Đang chờ chu kỳ (${sorted.length} tàu)`;
+    } else {
+      execEl.style.color = 'var(--muted)';
+      execEl.textContent = 'Đang rảnh / Chưa có lệnh';
+    }
+  }
+
+  if (rankEl) {
+    if (scanningItem && scanningItem.session_id === state.sessionId) {
+      rankEl.style.color = 'var(--green)';
+      rankEl.textContent = '✅ Đang quét ngay bây giờ!';
+    } else {
+      const wIdx = waitingList.findIndex(x => x.session_id === state.sessionId);
+      if (wIdx >= 0) {
+        const it = waitingList[wIdx];
+        const kindTxt = isManualPriority(it) ? 'Lệnh mới ưu tiên' : 'Chu kỳ 5p/20p';
+        rankEl.style.color = isManualPriority(it) ? 'var(--amber)' : 'var(--cyan)';
+        rankEl.textContent = `⏳ Hàng chờ thứ #${wIdx + 1} (${kindTxt})`;
+      } else {
+        rankEl.style.color = 'var(--muted)';
+        rankEl.textContent = 'Chưa có trong hàng chờ';
+      }
+    }
+  }
+
+  if (cntBadge) {
+    cntBadge.textContent = `${sorted.length} tàu`;
+    cntBadge.className = `badge ${sorted.length > 0 ? 'green' : ''}`;
+  }
+  if (!qListEl) return;
+  if (!sorted.length) {
+    qListEl.innerHTML = '<span style="color:var(--muted);">Chưa có tàu nào trong hàng đợi Bot OM.</span>';
+    return;
+  }
+
+  let waitNo = 0;
+  qListEl.innerHTML = sorted.map((item) => {
+    const isCur = item.session_id === state.sessionId;
+    const safeSid = String(item.session_id || '').replace(/'/g, "\\'");
+    const scanning = scanningItem && item.session_id === scanningItem.session_id;
+    const manual = !scanning && isManualPriority(item);
+    if (!scanning) waitNo += 1;
+
+    const posTag = scanning
+      ? '<span class="badge green">🔄 ĐANG QUÉT</span>'
+      : (manual
+          ? `<span class="badge amber">⚡ Chờ #${waitNo} · Ưu tiên</span>`
+          : `<span class="badge">🕒 Chờ #${waitNo} · Chu kỳ</span>`);
+
+    return `
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:6px;padding:5px 7px;border-radius:6px;margin-bottom:4px;border:1px solid ${isCur ? 'var(--cyan)' : 'var(--line)'};background:${scanning ? 'rgba(5,150,105,0.08)' : (isCur ? 'rgba(2,132,199,0.08)' : 'var(--card)')};">
+        <div style="min-width:0;flex:1;">
+          <div style="display:flex;align-items:center;gap:5px;flex-wrap:wrap;">
+            <b>${item.session_id}</b>
+            ${posTag}
+          </div>
+          <div style="font-size:10px;color:var(--muted);white-space:normal;margin-top:2px;">${item.last_message || 'Đang chờ lượt...'}</div>
+        </div>
+        <button class="sm danger" style="min-height:22px;padding:2px 7px;" onclick="stopSpecificBotSession('${safeSid}')">✕ Dừng</button>
+      </div>`;
+  }).join('');
+}
+
+async function stopSpecificBotSession(sid) {
+  if (!sid) return;
+  if (!(await AdminPinGuard.requireAuth(`dừng Bot OM cho tàu ${sid}`))) return;
+  const nowStr = new Date().toLocaleTimeString('vi-VN');
+  const nowIso = new Date().toISOString();
+  try {
+    const { error } = await sb.from('bot_commands').upsert({
+      session_id: sid,
+      status: 'STOPPED',
+      tos_pass: null,
+      last_message: `🛑 Đã dừng riêng tàu ${sid} lúc ${nowStr}.`,
+      updated_at: nowIso
+    }, { onConflict: 'session_id' });
+    if (error) throw error;
+    await refreshBotCommandStatus(false);
+  } catch (err) {
+    alert('Lỗi dừng tàu ' + sid + ': ' + err.message);
+  }
+}
+
 async function refreshBotCommandStatus(alsoPullJobs = false) {
   try {
     if (!state.sessionId) { renderBotStatusUI(null); return; }
     const [curRes, activeRes] = await Promise.all([
       sb.from('bot_commands').select('*').eq('session_id', state.sessionId).limit(1),
-      sb.from('bot_commands').select('session_id, status, last_message').in('status', ['START', 'RUNNING']).limit(1)
+      sb.from('bot_commands').select('session_id, status, last_message, updated_at').in('status', ['START', 'RUNNING']).order('updated_at', { ascending: true }).limit(20)
     ]);
     const rec = (!curRes.error && curRes.data && curRes.data.length) ? curRes.data[0] : null;
-    const otherActive = (!activeRes.error && activeRes.data && activeRes.data.length && activeRes.data[0].session_id !== state.sessionId)
-      ? activeRes.data[0] : null;
+    const activeList = (!activeRes.error && Array.isArray(activeRes.data)) ? activeRes.data : [];
+    renderBotQueueListUI(activeList);
 
     if (rec) {
       renderBotStatusUI(rec);
@@ -9575,12 +9705,18 @@ async function refreshBotCommandStatus(alsoPullJobs = false) {
       renderBotStatusUI(null);
     }
 
-    if (otherActive) {
-      const btnQuickStop = document.getElementById('btnQuickStopBot');
-      if (btnQuickStop) btnQuickStop.style.display = 'inline-flex';
+    // Tự điền lại tài khoản đã lưu gần nhất nếu ô TK đang trống
+    const uEl = document.getElementById('botTosUser');
+    if (uEl && !uEl.value.trim()) {
+      try { const savedU = localStorage.getItem('tos_bot_last_user'); if (savedU) uEl.value = savedU; } catch (_) {}
+    }
+
+    const otherCount = activeList.filter(x => x.session_id !== state.sessionId).length;
+    if (activeList.length > 0) {
       const summaryEl = document.getElementById('botLiveSummaryText');
-      if (summaryEl && (!rec || (rec.status !== 'RUNNING' && rec.status !== 'START'))) {
-        summaryEl.innerHTML += `<div style="margin-top:4px;color:var(--amber);font-weight:700;">⚠️ Bot hiện đang chạy (${otherActive.status}) cho tàu khác: <b>${otherActive.session_id}</b>. Bấm <b>🛑 Dừng Bot</b> để ngắt ngay!</div>`;
+      if (summaryEl && otherCount > 0) {
+        const names = activeList.map((x, i) => `#${i + 1} <b>${x.session_id}</b>`).join(' → ');
+        summaryEl.innerHTML += `<div style="margin-top:4px;color:var(--cyan);font-size:11.5px;">📋 <b>Hàng đợi chung 1 Bot (${activeList.length} tàu · FIFO):</b> ${names}</div>`;
       }
     }
   } catch (e) {}
@@ -9597,25 +9733,35 @@ async function startRemoteBot() {
   const intervalMin = Math.max(1, parseInt(document.getElementById('botIntervalMin').value, 10) || 5);
   const msgEl = document.getElementById('botModalActionMsg');
 
-  if (!user || !pass) {
+  const botAlreadyActive = Array.isArray(window._activeBotQueue) && window._activeBotQueue.length > 0;
+  if (!user && !botAlreadyActive) {
     msgEl.style.color = 'var(--red)';
-    msgEl.textContent = 'Vui lòng nhập đầy đủ Tài khoản và Mật khẩu PL-TOS!';
+    msgEl.textContent = 'Vui lòng nhập Tài khoản PL-TOS (hoặc để trống Mật khẩu nếu OM trên máy Windows đã đăng nhập sẵn)!';
+    return;
+  }
+  if (!vCode) {
+    msgEl.style.color = 'var(--red)';
+    msgEl.textContent = 'Vui lòng nhập Mã tàu trong OM (Vessel Code)!';
     return;
   }
 
   if (!hasVesselEdiOrAscData()) {
     msgEl.style.color = 'var(--red)';
-    msgEl.innerHTML = '🚨 Tàu <b>' + state.sessionId + '</b> chưa có file <b>.EDI hoặc .ASC</b>! Bắt buộc nạp file EDI/ASC đầu tiên ở <b>Tab 4 → Ô 5</b> trước khi chạy Bot OM.';
-    alert('🚨 BẮT BUỘC NẠP FILE EDI / ASC ĐẦU TIÊN!\n\nTàu [' + state.sessionId + '] chưa có dữ liệu sơ đồ .ASC ($604) hoặc .EDI (BAPLIE) trên Cloud.\nHệ thống sẽ chuyển bạn tới Ô 5 để nạp file EDI/ASC trước.');
+    msgEl.innerHTML = '🚨 Tàu <b>' + state.sessionId + '</b> chưa có file <b>.EDI hoặc .ASC</b>! Bắt buộc nạp file EDI/ASC đầu tiên ở <b>Cài đặt → Ô 1</b> trước khi chạy Bot OM.';
+    alert('🚨 BẮT BUỘC NẠP FILE EDI / ASC ĐẦU TIÊN!\n\nTàu [' + state.sessionId + '] chưa có dữ liệu sơ đồ .ASC ($604) hoặc .EDI (BAPLIE) trên Cloud.\nHệ thống sẽ chuyển bạn tới Ô 1 để nạp file EDI/ASC trước.');
     closeModal('botControlModal');
     jumpToMandatoryEdiUpload();
     return;
   }
 
-  if (!(await AdminPinGuard.requireAuth(`khởi động Bot OM tự động cho tàu ${state.sessionId}`))) return;
+  if (!(await AdminPinGuard.requireAuth(`xếp tàu ${state.sessionId} vào hàng đợi Bot OM`))) return;
+
+  if (user) {
+    try { localStorage.setItem('tos_bot_last_user', user); } catch (_) {}
+  }
 
   msgEl.style.color = 'var(--cyan)';
-  msgEl.textContent = 'Đang gửi lệnh khởi động lên Supabase...';
+  msgEl.textContent = 'Đang xếp lệnh vào hàng đợi Bot trên Supabase...';
 
   try {
     // Đảm bảo chuyến tàu tồn tại trong vessel_sessions (để Bot không tưởng tàu bị xóa)
@@ -9624,15 +9770,15 @@ async function startRemoteBot() {
     const { error } = await sb.from('bot_commands').upsert({
       session_id: state.sessionId,
       status: 'START',
-      tos_user: user,
-      tos_pass: pass,
+      tos_user: user || null,
+      tos_pass: pass || null,
       vessel_code: vCode,
       vessel_year: vYear,
       vessel_seq: vSeq,
       exe_path: exePath,
       extract_mode: mode,
       interval_minutes: intervalMin,
-      last_message: `Lệnh START gửi từ Web lúc ${new Date().toLocaleTimeString('vi-VN')}. Đang chờ máy Windows nhận...`,
+      last_message: `📥 Đã gửi lệnh xếp hàng đợi FIFO lúc ${new Date().toLocaleTimeString('vi-VN')} (Job ${intervalMin}p · Res/Final 20p). Chờ Bot nhận...`,
       updated_at: new Date().toISOString()
     }, { onConflict: 'session_id' });
 
@@ -9641,7 +9787,7 @@ async function startRemoteBot() {
     // Xóa mật khẩu ngay khỏi ô input trên trình duyệt
     document.getElementById('botTosPass').value = '';
     msgEl.style.color = 'var(--green)';
-    msgEl.textContent = '✓ Đã gửi lệnh START! Bot Windows sẽ tự mở PL-TOS, điền TK/MK và đồng bộ mỗi ' + intervalMin + ' phút.';
+    msgEl.textContent = `✓ Đã xếp [${state.sessionId}] vào hàng đợi FIFO! Job List quét ${intervalMin}p/lần · Reserved & Final 20p/lần.`;
 
     // Tự động bật chế độ Web tự tải dữ liệu từ Bot mỗi 60s
     if (!state.autoPollEnabled) toggleBotAutoPoll();
@@ -9652,29 +9798,30 @@ async function startRemoteBot() {
   }
 }
 
-async function stopRemoteBot() {
-  if (!(await AdminPinGuard.requireAuth(`dừng Bot OM ngay lập tức`))) return;
+async function stopRemoteBot(stopAll = false) {
+  const label = stopAll ? 'DỪNG TẤT CẢ các tàu trong hàng đợi Bot OM' : `dừng riêng Bot OM cho tàu ${state.sessionId}`;
+  if (!(await AdminPinGuard.requireAuth(label))) return;
   const nowStr = new Date().toLocaleTimeString('vi-VN');
   const nowIso = new Date().toISOString();
   try {
-    // 1. Dừng TẤT CẢ các lệnh Bot đang START hoặc RUNNING trên Supabase (tránh trường hợp chọn nhầm tàu khác rồi bấm Dừng không ăn!)
-    const { error: errAll } = await sb.from('bot_commands')
-      .update({
-        status: 'STOPPED',
-        tos_pass: null,
-        last_message: `🛑 Đã gửi lệnh DỪNG TỨC THÌ từ Web lúc ${nowStr}.`,
-        updated_at: nowIso
-      })
-      .in('status', ['START', 'RUNNING']);
-    if (errAll) throw errAll;
+    if (stopAll) {
+      const { error: errAll } = await sb.from('bot_commands')
+        .update({
+          status: 'STOPPED',
+          tos_pass: null,
+          last_message: `⛔ Đã gửi lệnh DỪNG TẤT CẢ hàng đợi từ Web lúc ${nowStr}.`,
+          updated_at: nowIso
+        })
+        .in('status', ['START', 'RUNNING']);
+      if (errAll) throw errAll;
+    }
 
-    // 2. Đồng thời ép trạng thái STOPPED cho tàu hiện tại nếu đang chọn tàu
     if (state.sessionId) {
       const { error: errCur } = await sb.from('bot_commands').upsert({
         session_id: state.sessionId,
         status: 'STOPPED',
         tos_pass: null,
-        last_message: `🛑 Đã gửi lệnh DỪNG TỨC THÌ từ Web lúc ${nowStr}.`,
+        last_message: `🛑 Đã gửi lệnh DỪNG từ Web lúc ${nowStr}.`,
         updated_at: nowIso
       }, { onConflict: 'session_id' });
       if (errCur) throw errCur;
@@ -9683,7 +9830,9 @@ async function stopRemoteBot() {
     const msgEl = document.getElementById('botModalActionMsg');
     if (msgEl) {
       msgEl.style.color = 'var(--amber)';
-      msgEl.textContent = `✓ Đã ghi lệnh DỪNG (STOPPED) lên CSDL lúc ${nowStr}. Bot Windows sẽ ngắt ngay trong vòng 3 giây!`;
+      msgEl.textContent = stopAll
+        ? `✓ Đã dừng TOÀN BỘ hàng đợi Bot lúc ${nowStr}.`
+        : `✓ Đã dừng riêng tàu [${state.sessionId}] lúc ${nowStr} (các tàu khác trong hàng đợi vẫn chạy bình thường).`;
     }
     await refreshBotCommandStatus(false);
   } catch (err) {
