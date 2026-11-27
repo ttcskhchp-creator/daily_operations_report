@@ -287,6 +287,29 @@ input, select {
 .step1-guard-title { font-weight: 900; font-size: 13px; color: var(--amber); margin-bottom: 3px; }
 .step1-guard.confirmed .step1-guard-title { color: var(--green); }
 .upload-zone-locked { opacity: 0.5; pointer-events: none; filter: grayscale(0.35); }
+.edi-required-banner {
+  border: 2px solid var(--red);
+  background: rgba(220, 38, 38, 0.10);
+  border-radius: 10px;
+  padding: 11px 14px;
+  margin-bottom: 12px;
+  display: none;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.edi-required-banner.show { display: flex; }
+.upload-card.edi-first-highlight {
+  border: 2.5px solid var(--red) !important;
+  background: rgba(220, 38, 38, 0.06) !important;
+  box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.16);
+}
+.upload-card.sub-locked-by-edi {
+  opacity: 0.48;
+  pointer-events: none;
+  filter: grayscale(0.4);
+}
 .upload-lock-notice {
   background: rgba(220,38,38,0.09);
   border: 1px dashed var(--red);
@@ -932,6 +955,15 @@ pre.schema-box {
 
   <!-- ==================== TAB 1: KHUYẾN NGHỊ GỌI HÀNG & CẨU ==================== -->
   <div id="tab-dispatch" class="tab-pane active">
+    <div class="edi-required-banner" id="globalEdiRequiredBanner">
+      <div style="flex:1;min-width:240px;">
+        <div style="font-weight:900;font-size:13px;color:var(--red);">🚨 YÊU CẦU BẮT BUỘC: TÀU NÀY CHƯA CÓ DỮ LIỆU SƠ ĐỒ .ASC ($604) HOẶC .EDI (BAPLIE)</div>
+        <div style="font-size:11.5px;margin-top:2px;">
+          Tàu <b id="ediBannerVesselName" style="color:var(--cyan);">—</b> chưa từng được ai nạp file <b>.ASC / .EDI</b> trên Cloud. Hệ thống yêu cầu <b>nạp file EDI / ASC đầu tiên</b> để dựng sơ đồ hầm – bay – vị trí dự kiến trước khi gọi hàng hoặc chạy Bot OM.
+        </div>
+      </div>
+      <button class="danger" onclick="jumpToMandatoryEdiUpload()">📂 Nạp file EDI / ASC ngay</button>
+    </div>
     <!-- THẺ DÀI NGANG TOÀN MÀN HÌNH: MÔ PHỎNG HÌNH CON TÀU, HƯỚNG CẬP MẠN & TIẾN ĐỘ THIẾT BỊ DỌC RAY CẦU TÀU -->
     <div class="panel ship-rail-panel">
       <div class="panel-head">
@@ -1165,6 +1197,9 @@ pre.schema-box {
       <div class="panel-body">
         <div id="uploadLockBanner" class="upload-lock-notice">
           🔒 Các ô nạp file đang KHÓA AN TOÀN. Hãy bấm nút "Xác nhận đúng tàu này để mở nạp file" ở Bước 1 phía trên!
+        </div>
+        <div id="ediFirstStepNotice" class="upload-lock-notice" style="display:none;background:rgba(217,119,6,0.12);border-color:var(--amber);color:var(--amber);">
+          ⚠️ <b>BƯỚC 2A (BẮT BUỘC ĐẦU TIÊN):</b> Tàu này chưa có dữ liệu <b>EDI / ASC</b> trên Cloud. Hãy nạp file <b>.ASC ($604)</b> hoặc <b>.EDI (BAPLIE)</b> ở <b>Ô 5 (viền đỏ)</b> trước; sau khi nạp xong, Ô 1–4 sẽ tự động mở khóa!
         </div>
 
         <div class="upload-grid upload-zone-locked" id="uploadCardsContainer">
@@ -1970,6 +2005,9 @@ const CloudRepo = {
       } else {
         HoldLayoutEngine.syncHoldsForState(state, parseFloat(document.getElementById('cfgLength').value) || 172, false);
         renderAll();
+        if (!hasVesselEdiOrAscData()) {
+          switchTab('tab-upload');
+        }
       }
 
       this.setStatus('● Đã đồng bộ Cloud');
@@ -3209,6 +3247,42 @@ function lockAdminSessionNow() {
   setPinMsg('msgVerifyPin', 'Đã khóa phiên quản trị.', true);
 }
 
+function hasVesselEdiOrAscData() {
+  return (Array.isArray(state.preStowagePlan) && state.preStowagePlan.length > 0)
+    || (state.stowageInstructions && Object.keys(state.stowageInstructions).length > 0);
+}
+
+function jumpToMandatoryEdiUpload() {
+  switchTab('tab-upload');
+  const cardEdi = document.getElementById('card-edi');
+  if (cardEdi) {
+    cardEdi.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+}
+
+function updateEdiFirstRequirementUI() {
+  const missingEdi = !hasVesselEdiOrAscData();
+  const globalBanner = document.getElementById('globalEdiRequiredBanner');
+  const bannerVessel = document.getElementById('ediBannerVesselName');
+  const ediNotice = document.getElementById('ediFirstStepNotice');
+  const cardEdi = document.getElementById('card-edi');
+  const otherCards = ['card-sbp', 'card-final', 'card-reserved', 'card-jobs'].map(id => document.getElementById(id)).filter(Boolean);
+  const vesselUnlocked = VesselUploadGuard.isUnlocked(state.sessionId);
+
+  if (bannerVessel) bannerVessel.textContent = state.sessionId;
+  if (globalBanner) globalBanner.classList.toggle('show', missingEdi);
+
+  if (cardEdi) {
+    cardEdi.classList.toggle('edi-first-highlight', missingEdi);
+  }
+  if (ediNotice) {
+    ediNotice.style.display = (vesselUnlocked && missingEdi) ? 'block' : 'none';
+  }
+  otherCards.forEach(c => {
+    c.classList.toggle('sub-locked-by-edi', vesselUnlocked && missingEdi);
+  });
+}
+
 function updateStep1GuardUI() {
   const isUnlocked = VesselUploadGuard.isUnlocked(state.sessionId);
   const box = document.getElementById('step1GuardBox');
@@ -3234,6 +3308,7 @@ function updateStep1GuardUI() {
     banner.style.display = 'block';
     cards.classList.add('upload-zone-locked');
   }
+  updateEdiFirstRequirementUI();
 }
 
 function toggleVesselUploadConfirm() {
@@ -3255,6 +3330,12 @@ function handleUploadExcel(evt, kind) {
   if (!VesselUploadGuard.isUnlocked(state.sessionId)) {
     alert('⚠️ Vui lòng xác nhận đúng tàu ở Bước 1 trước khi nạp file!');
     evt.target.value = '';
+    return;
+  }
+  if (!hasVesselEdiOrAscData()) {
+    alert('🚨 BẮT BUỘC NẠP FILE EDI HOẶC ASC ĐẦU TIÊN!\n\nTàu [' + state.sessionId + '] chưa có dữ liệu .ASC ($604) hoặc .EDI (BAPLIE).\nVui lòng nạp file EDI/ASC ở Ô 5 trước rồi mới nạp các danh sách khác!');
+    evt.target.value = '';
+    jumpToMandatoryEdiUpload();
     return;
   }
   const file = evt.target.files[0];
@@ -3360,9 +3441,14 @@ function handleUploadEdiOrStowage(evt) {
         if (!VesselUploadGuard.verifyFileVesselMatch(state.sessionId, file.name, res.detectedVessel)) return;
         if (res.items.length) state.preStowagePlan = res.items;
         HoldLayoutEngine.syncHoldsForState(state, parseFloat(document.getElementById('cfgLength').value) || 172, false);
+        if (res.items.length === 0 && Object.keys(state.stowageInstructions).length === 0) {
+          alert('⚠️ File "' + file.name + '" không đọc được vị trí container EDI/ASC nào. Vui lòng kiểm tra lại đúng định dạng .ASC ($604) hoặc .EDI (BAPLIE)!');
+          return;
+        }
         setCardStatus('edi', `✓ ${state.preStowagePlan.length} vị trí (${res.detectedVessel || file.name})`, true);
         await CloudRepo.saveSessionMeta();
         await CloudRepo.uploadFile(state.sessionId, 'edi_stowage.json', { instructions: state.stowageInstructions, preStowage: state.preStowagePlan });
+        updateEdiFirstRequirementUI();
         renderAll();
       };
       reader.readAsText(file);
@@ -4464,6 +4550,7 @@ function renderAll() {
   renderHoldsAndChase();
   renderCranesSetup();
   updateStep1GuardUI();
+  updateEdiFirstRequirementUI();
   updateAdminPinHeaderBtn();
 }
 
@@ -4584,6 +4671,15 @@ async function startRemoteBot() {
   if (!user || !pass) {
     msgEl.style.color = 'var(--red)';
     msgEl.textContent = 'Vui lòng nhập đầy đủ Tài khoản và Mật khẩu PL-TOS!';
+    return;
+  }
+
+  if (!hasVesselEdiOrAscData()) {
+    msgEl.style.color = 'var(--red)';
+    msgEl.innerHTML = '🚨 Tàu <b>' + state.sessionId + '</b> chưa có file <b>.EDI hoặc .ASC</b>! Bắt buộc nạp file EDI/ASC đầu tiên ở <b>Tab 4 → Ô 5</b> trước khi chạy Bot OM.';
+    alert('🚨 BẮT BUỘC NẠP FILE EDI / ASC ĐẦU TIÊN!\n\nTàu [' + state.sessionId + '] chưa có dữ liệu sơ đồ .ASC ($604) hoặc .EDI (BAPLIE) trên Cloud.\nHệ thống sẽ chuyển bạn tới Ô 5 để nạp file EDI/ASC trước.');
+    closeModal('botControlModal');
+    jumpToMandatoryEdiUpload();
     return;
   }
 
