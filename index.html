@@ -1756,6 +1756,7 @@ const CloudRepo = {
   },
 
   async uploadFile(sessionId, fileName, payloadObj) {
+    delete this._folderFilesCache[sessionId];
     const path = `${sessionId}/${fileName}`;
     const blob = new Blob([JSON.stringify(payloadObj)], { type: 'application/json' });
     const { error } = await sb.storage.from(APP_CONFIG.BUCKET_NAME).upload(path, blob, { upsert: true, cacheControl: '0' });
@@ -1769,8 +1770,26 @@ const CloudRepo = {
     return path;
   },
 
-  async downloadFile(sessionId, fileName) {
+  _folderFilesCache: {},
+
+  async listExistingSessionFiles(sessionId, forceRefresh = false) {
+    if (!forceRefresh && Array.isArray(this._folderFilesCache[sessionId])) {
+      return new Set(this._folderFilesCache[sessionId]);
+    }
     try {
+      const { data, error } = await sb.storage.from(APP_CONFIG.BUCKET_NAME).list(sessionId, { limit: 50 });
+      if (error || !Array.isArray(data)) return null;
+      const names = data.map(item => item.name).filter(Boolean);
+      this._folderFilesCache[sessionId] = names;
+      return new Set(names);
+    } catch (e) {
+      return null;
+    }
+  },
+
+  async downloadFile(sessionId, fileName, knownFilesSet = null) {
+    try {
+      if (knownFilesSet && !knownFilesSet.has(fileName)) return null;
       const { data, error } = await sb.storage.from(APP_CONFIG.BUCKET_NAME).download(`${sessionId}/${fileName}`);
       if (error || !data) return null;
       return JSON.parse(await data.text());
@@ -1780,6 +1799,7 @@ const CloudRepo = {
   },
 
   async clearExportFiles(sessionId) {
+    delete this._folderFilesCache[sessionId];
     await sb.from('dispatch_logs').delete().eq('session_id', sessionId);
     await sb.storage.from(APP_CONFIG.BUCKET_NAME).remove([
       `${sessionId}/final.json`,
@@ -1846,18 +1866,15 @@ const CloudRepo = {
       upcoming.push({ vessel_name: name, voyage, berth, action, eta, loa });
     };
 
-    // Thử tải từ các file/bảng kế hoạch tàu di chuyển Cảng vụ (Bot --shifting) trên sbBot
-    const [f1, f2, t1, t2] = await Promise.allSettled([
-      sbBot.storage.from('port-documents').download('shifting_plan.json'),
-      sbBot.storage.from('port-documents').download('cangvu_shifting.json'),
-      sbBot.from('vessel_movements').select('*').order('created_at', { ascending: false }).limit(40),
-      sbBot.from('shifting_plans').select('*').order('created_at', { ascending: false }).limit(40)
-    ]);
-
-    for (const fRes of [f1, f2]) {
-      if (fRes.status === 'fulfilled' && fRes.value.data) {
-        try {
-          const parsed = JSON.parse(await fRes.value.data.text());
+    // Quét danh sách file hiện có trong bucket port-documents trên sbBot trước khi tải (tránh lỗi 400/404 Console)
+    try {
+      const { data: docList } = await sbBot.storage.from('port-documents').list('', { limit: 50 });
+      const availableNames = new Set((docList || []).map(x => x.name));
+      const candidateFiles = ['shifting_plan.json', 'cangvu_shifting.json'].filter(fn => availableNames.has(fn));
+      for (const fn of candidateFiles) {
+        const { data: fData } = await sbBot.storage.from('port-documents').download(fn);
+        if (fData) {
+          const parsed = JSON.parse(await fData.text());
           const arr = Array.isArray(parsed) ? parsed : (parsed.rows || parsed.vessels || parsed.items || Object.values(parsed));
           if (Array.isArray(arr)) {
             arr.forEach(item => {
@@ -1865,17 +1882,9 @@ const CloudRepo = {
               if (/TAN VU|TÂN VŨ|\bTV\d|\bTV\b|CHUẨN BỊ|CẬP/.test(txt)) pushItem(item);
             });
           }
-        } catch (e) {}
+        }
       }
-    }
-    for (const tRes of [t1, t2]) {
-      if (tRes.status === 'fulfilled' && Array.isArray(tRes.value.data)) {
-        tRes.value.data.forEach(item => {
-          const txt = JSON.stringify(item).toUpperCase();
-          if (/TAN VU|TÂN VŨ|\bTV\d|\bTV\b/.test(txt)) pushItem(item);
-        });
-      }
-    }
+    } catch (e) {}
 
     // Bổ sung các tàu từ ePort Tân Vũ đang có tiến độ = 0% (mới cập hoặc chuẩn bị làm hàng)
     Object.entries(state.eportJobs || {}).forEach(([vKey, ej]) => {
@@ -1947,12 +1956,13 @@ const CloudRepo = {
       }
 
       const deckTier = parseInt(document.getElementById('cfgDeckTier')?.value, 10) || 80;
+      const existingFiles = await this.listExistingSessionFiles(sessionId, true);
       const [sbpJson, finalJson, resJson, jobsJson, ediJson, logsRes] = await Promise.all([
-        this.downloadFile(sessionId, 'sbp.json'),
-        this.downloadFile(sessionId, 'final.json'),
-        this.downloadFile(sessionId, 'reserved.json'),
-        this.downloadFile(sessionId, 'jobs.json'),
-        this.downloadFile(sessionId, 'edi_stowage.json'),
+        this.downloadFile(sessionId, 'sbp.json', existingFiles),
+        this.downloadFile(sessionId, 'final.json', existingFiles),
+        this.downloadFile(sessionId, 'reserved.json', existingFiles),
+        this.downloadFile(sessionId, 'jobs.json', existingFiles),
+        this.downloadFile(sessionId, 'edi_stowage.json', existingFiles),
         sb.from('dispatch_logs').select('container_no').eq('session_id', sessionId)
       ]);
 
@@ -2019,10 +2029,12 @@ const CloudRepo = {
   },
 
   async pollLatestJobsOnly() {
+    const existingFiles = await this.listExistingSessionFiles(state.sessionId, true);
+    if (existingFiles && existingFiles.size === 0) return;
     const [jobsJson, resJson, finalJson] = await Promise.all([
-      this.downloadFile(state.sessionId, 'jobs.json'),
-      this.downloadFile(state.sessionId, 'reserved.json'),
-      this.downloadFile(state.sessionId, 'final.json')
+      this.downloadFile(state.sessionId, 'jobs.json', existingFiles),
+      this.downloadFile(state.sessionId, 'reserved.json', existingFiles),
+      this.downloadFile(state.sessionId, 'final.json', existingFiles)
     ]);
     let changed = false;
     const nowStr = new Date().toLocaleTimeString('vi-VN');
