@@ -1125,6 +1125,127 @@ pre.schema-box {
 @media (max-width: 440px) {
   .grid-form { grid-template-columns: 1fr; }
 }
+
+/* ==================== VESSEL ATTITUDE (HEEL / TRIM) BAR & WIZARD ==================== */
+.attitude-bar {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-left: 4px solid var(--cyan);
+  border-radius: 10px;
+  padding: 9px 12px;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.attitude-bar.alert-active {
+  border-left-color: var(--red);
+  background: rgba(220,38,38,0.05);
+}
+.attitude-group {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  flex-wrap: wrap;
+}
+.att-btn {
+  padding: 4px 9px;
+  min-height: 29px;
+  font-size: 11px;
+  border-radius: 7px;
+  border: 1.5px solid var(--line);
+  background: var(--bg);
+  color: var(--ink);
+}
+.att-btn.active-ok {
+  background: rgba(5,150,105,0.14);
+  border-color: var(--green);
+  color: var(--green);
+}
+.att-btn.active-warn {
+  background: var(--red);
+  border-color: var(--red);
+  color: #fff;
+}
+.wizard-stepper {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 5px;
+  margin-bottom: 12px;
+}
+.wiz-step-pill {
+  padding: 6px 5px;
+  border-radius: 8px;
+  border: 1.5px solid var(--line);
+  background: var(--bg);
+  font-size: 10.5px;
+  font-weight: 800;
+  text-align: center;
+  cursor: pointer;
+  color: var(--muted);
+}
+.wiz-step-pill.active {
+  border-color: var(--cyan);
+  background: rgba(2,132,199,0.14);
+  color: var(--cyan);
+}
+.wiz-step-pill.done {
+  border-color: var(--green);
+  background: rgba(5,150,105,0.12);
+  color: var(--green);
+}
+.wiz-pane { display: none; }
+.wiz-pane.active { display: block; }
+.welcome-safe-box {
+  text-align: center;
+  padding: 20px 14px;
+  background: linear-gradient(135deg, rgba(5,150,105,0.12), rgba(2,132,199,0.12));
+  border: 2px solid var(--green);
+  border-radius: 12px;
+}
+@media (max-width: 640px) {
+  .wizard-stepper { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+
+
+/* ==================== FLEET BALANCE, TV HATCH RESERVE & TK/QC 11-ROW ==================== */
+.ops-tri-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+@media (max-width: 1100px) { .ops-tri-grid { grid-template-columns: 1fr; } }
+.ops-sub-box {
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  padding: 9px 11px;
+  background: var(--bg);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.ops-sub-title {
+  font-size: 11.5px;
+  font-weight: 850;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.fleet-row-card {
+  border: 1px solid var(--line);
+  border-left: 3.5px solid var(--amber);
+  border-radius: 7px;
+  padding: 6px 8px;
+  background: var(--card);
+  font-size: 11px;
+}
+.fleet-row-card.tv-prio { border-left-color: var(--green); }
+.fleet-row-card.urgent { border-left-color: var(--red); background: rgba(220,38,38,0.06); }
+
 </style>
 </head>
 <body>
@@ -1242,10 +1363,10 @@ pre.schema-box {
     <strong id="kpiEportProgress" style="color:var(--cyan)">Đang đồng bộ...</strong>
     <div class="kpi-sub" id="kpiEportSub">Bot ePort Live</div>
   </div>
-  <div class="kpi-card">
-    <small>Mớn Mũi / Lái & Trim</small>
-    <strong id="kpiDraftLive">7.80m / 8.20m</strong>
-    <div class="kpi-sub" id="kpiDraftStatus" style="color:var(--green)">An toàn (28 cont / 10cm)</div>
+  <div class="kpi-card" style="cursor:pointer;" onclick="expandAndScrollTo('vesselAttitudeBar')" title="Bấm để báo trạng thái Nghiêng / Chúi tàu">
+    <small>Cân bằng Tàu (Nghiêng / Chúi)</small>
+    <strong id="kpiAttitudeLive" style="color:var(--green)">⚖️ Cân bằng tốt</strong>
+    <div class="kpi-sub" id="kpiAttitudeSub">Mạn cân · Mũi/Lái cân</div>
   </div>
   <div class="kpi-card">
     <small>Thủy Triều Hòn Dáu</small>
@@ -1285,6 +1406,26 @@ pre.schema-box {
       </div>
       <button class="danger" onclick="jumpToMandatoryEdiUpload()">📂 Nạp file EDI / ASC ngay</button>
     </div>
+    <!-- THANH BÁO TRẠNG THÁI NGHIÊNG MẠN / MŨI CHÌM - VẾCH ĐỂ KHUYẾN NGHỊ GỌI HÀNG XỬ LÝ -->
+    <div class="attitude-bar" id="vesselAttitudeBar">
+      <div class="attitude-group">
+        <span style="font-weight:850;font-size:11.5px;">⚖️ Báo Nghiêng mạn:</span>
+        <button class="att-btn active-ok" id="btnHeelEven" onclick="setVesselAttitude('heel','EVEN')">✓ Cân mạn</button>
+        <button class="att-btn" id="btnHeelPort" onclick="setVesselAttitude('heel','LIST_PORT')">↙️ Nghiêng Trái (Port)</button>
+        <button class="att-btn" id="btnHeelStbd" onclick="setVesselAttitude('heel','LIST_STARBOARD')">↘️ Nghiêng Phải (Stbd)</button>
+      </div>
+      <div class="attitude-group">
+        <span style="font-weight:850;font-size:11.5px;">🚢 Báo Mũi / Lái:</span>
+        <button class="att-btn active-ok" id="btnTrimEven" onclick="setVesselAttitude('trim','EVEN')">✓ Thăng bằng</button>
+        <button class="att-btn" id="btnTrimBowDown" onclick="setVesselAttitude('trim','BOW_DOWN')">⏬ Mũi đang chìm</button>
+        <button class="att-btn" id="btnTrimBowUp" onclick="setVesselAttitude('trim','BOW_UP')">⏫ Mũi đang vếch</button>
+      </div>
+      <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
+        <span id="attitudeAdviceInline" style="font-size:11px;font-weight:750;color:var(--green);">✅ Tàu đang cân bằng tốt</span>
+        <button class="primary sm" onclick="openVesselSetupWizard(1)" title="Mở trình hướng dẫn 5 bước thiết lập tàu">🧭 Thiết lập 5 bước</button>
+      </div>
+    </div>
+
     <!-- BẢNG ĐIỀU HÀNH NHANH 4 TRỌNG TÂM (TỐI ƯU ĐT/MTB & TÓM TẮT PC: CHỖ KHÔNG ỔN · CẦN HÀNG GÌ NHẤT · KHU VỰC · CÒN BAO NHIÊU) -->
     <div class="ops-cockpit" id="mobileOpsCockpit">
       <div class="cockpit-card c-alert">
@@ -1385,8 +1526,12 @@ pre.schema-box {
       <div class="panel" id="panel-yard-recon">
         <div class="panel-head">
           <h3>🚛 Đối chiếu Vị trí Bãi (TV vs Bãi ngoài) & Job OM</h3>
-          <div style="display:flex;gap:5px;align-items:center;">
+          <div style="display:flex;gap:5px;align-items:center;flex-wrap:wrap;">
             <span class="badge amber" id="offDockTotalBadge">0 Cont bãi ngoài</span>
+            <label class="badge green" style="cursor:pointer;padding:4px 8px;" title="Đẩy nhanh file Excel/CSV cập nhật vị trí bãi thực tế (đảo chuyển)">
+              📍 Đẩy vị trí bãi
+              <input type="file" accept=".xlsx,.xls,.csv" style="display:none;" onchange="handleUploadYardPositions(event, true)">
+            </label>
             <button class="panel-collapse-btn" onclick="togglePanelCollapse('panel-yard-recon', this)">▼ Thu gọn</button>
           </div>
         </div>
@@ -1401,6 +1546,7 @@ pre.schema-box {
             <div style="display:flex;gap:6px;flex-wrap:wrap;margin:6px 0;">
               <select id="yardReconFilter" onchange="renderYardReconcileTable()" style="min-height:28px;font-size:11px;">
                 <option value="NO_JOB">Chưa bắn Job trên OM</option>
+                <option value="SHIFTED">🔄 Đã cập nhật / Đảo chuyển vị trí</option>
                 <option value="OFF_DOCK">Chỉ Bãi ngoài</option>
                 <option value="TV">Nội bộ Tân Vũ (TV)</option>
                 <option value="ALL">Tất cả cont Xuất</option>
@@ -1409,6 +1555,44 @@ pre.schema-box {
             </div>
             <div class="table-wrap" style="max-height:220px;" id="yardReconTableWrap"></div>
           </details>
+        </div>
+      </div>
+    </div>
+
+    <!-- CÂN ĐỐI XE BÃI NGOÀI (ƯU TIÊN HÀNG TV) · GIỮ CONT TV ĐÓNG HẦM · TẦM VỚI TK/QC (>=11 ROW) & DI CHUYỂN QC 10-15P -->
+    <div class="panel" id="panel-fleet-qc-balance" style="border-top:3px solid var(--purple);">
+      <div class="panel-head">
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+          <h3>⚖️ Cân đối Xe Bãi ngoài (Ưu tiên TV) · 🔒 Giữ Cont TV đóng hầm · 🏗️ TK/QC (≥11 Row) & Chuyển hầm QC (10–15p)</h3>
+          <span class="badge purple" id="fleetQcSummaryBadge">Đang tính toán...</span>
+        </div>
+        <button class="panel-collapse-btn" onclick="togglePanelCollapse('panel-fleet-qc-balance', this)">▼ Thu gọn</button>
+      </div>
+      <div class="panel-body">
+        <div class="ops-tri-grid">
+          <div class="ops-sub-box">
+            <div class="ops-sub-title">
+              <span>🚛 Cân đối số Xe Bãi ngoài (Ưu tiên xếp tối đa hàng TV)</span>
+              <span class="badge amber" id="offDockTrucksTotalBadge">0 xe ngoài</span>
+            </div>
+            <div id="offDockFleetBalanceBox" style="display:flex;flex-direction:column;gap:5px;"></div>
+          </div>
+
+          <div class="ops-sub-box">
+            <div class="ops-sub-title">
+              <span>🔒 Cont TV để dành đóng nắp hầm nhanh (~4p)</span>
+              <span class="badge green" id="tvHatchReserveBadge">0 cont giữ</span>
+            </div>
+            <div id="tvHatchReserveBox" style="display:flex;flex-direction:column;gap:5px;"></div>
+          </div>
+
+          <div class="ops-sub-box">
+            <div class="ops-sub-title">
+              <span>🏗️ Tầm với TK/QC (≥11 Row) & Chi phí chuyển QC (10–15p)</span>
+              <span class="badge" id="vesselRowWidthBadge">Đo Row...</span>
+            </div>
+            <div id="tkQcReachAndShiftBox" style="display:flex;flex-direction:column;gap:5px;"></div>
+          </div>
         </div>
       </div>
     </div>
@@ -1539,32 +1723,31 @@ pre.schema-box {
     <div class="grid-2">
       <div class="panel">
         <div class="panel-head">
-          <h3>📐 Thông số Tàu, Mớn nước (~28 cont/10cm) & Ngưỡng Boong</h3>
+          <h3>📐 Thông số Tàu, Nắp hầm & Trạng thái Cân bằng</h3>
           <div style="display:flex;gap:6px;flex-wrap:wrap;">
-            <button class="success sm" onclick="saveVesselSessionToCloud()">💾 Lưu Cloud (PIN)</button>
-            <button class="danger sm" onclick="deleteCurrentVesselSession()">🗑️ Xóa tàu (Dừng Bot)</button>
+            <button class="primary sm" onclick="openVesselSetupWizard(1)">🧭 Thiết lập 5 bước</button>
+            <button class="success sm" onclick="saveVesselSessionToCloud()">💾 Lưu Cloud</button>
+            <button class="danger sm" onclick="deleteCurrentVesselSession()">🗑️ Xóa tàu</button>
           </div>
         </div>
         <div class="panel-body">
           <div class="grid-form">
-            <div><label>Tên tàu<br><input id="cfgVesselName" value="KUO LUNG" style="width:100%" oninput="recalcDraftLive()"></label></div>
+            <div><label>Tên tàu<br><input id="cfgVesselName" value="KUO LUNG" style="width:100%" oninput="renderHorizontalShipRailCard()"></label></div>
             <div><label>Chuyến (Voyage)<br><input id="cfgVoyage" value="1009S" style="width:100%"></label></div>
             <div><label>Cầu bến<br><input id="cfgBerth" value="TV3" style="width:100%"></label></div>
             <div><label>Chiều dài L (m)<br><input id="cfgLength" type="number" value="172" style="width:100%" oninput="onLengthBeamChange()"></label></div>
             <div><label>Chiều rộng B (m)<br><input id="cfgBeam" type="number" step="0.1" value="27.6" style="width:100%" oninput="onLengthBeamChange()"></label></div>
-            <div><label>Định mức Cont / 10cm<br><input id="cfgContPer10cm" type="number" value="28" style="width:100%" oninput="recalcDraftLive()"></label></div>
-            <div><label>Mớn Mũi ban đầu (m)<br><input id="cfgDraftF" type="number" step="0.01" value="7.80" style="width:100%" oninput="recalcDraftLive()"></label></div>
-            <div><label>Mớn Lái ban đầu (m)<br><input id="cfgDraftA" type="number" step="0.01" value="8.20" style="width:100%" oninput="recalcDraftLive()"></label></div>
-            <div><label>Mớn Giới hạn Tmax (m)<br><input id="cfgMaxDraft" type="number" step="0.01" value="9.20" style="width:100%" oninput="recalcDraftLive()"></label></div>
-            <div><label>Độ sâu đáy bến (m)<br><input id="cfgBerthDepth" type="number" step="0.1" value="9.0" style="width:100%" oninput="recalcDraftLive()"></label></div>
-            <div><label>Tier đầu tiên trên Boong<br><input id="cfgDeckTier" type="number" value="80" style="width:100%" oninput="renderAll()"></label></div>
-            <div><label>Tier cao nhất dưới Hầm<br><input id="cfgHoldMaxTier" type="number" value="12" style="width:100%" oninput="renderAll()"></label></div>
+            <div><label>Tier đầu tiên trên Boong<br><input id="cfgDeckTier" type="number" value="80" style="width:100%" onchange="saveCraneAndVesselConfigPersist();renderAll()"></label></div>
+            <div><label>Tier cao nhất dưới Hầm<br><input id="cfgHoldMaxTier" type="number" value="12" style="width:100%" onchange="saveCraneAndVesselConfigPersist();renderAll()"></label></div>
             <div><label>Hướng cập mạn tàu<br>
               <select id="cfgBerthSide" style="width:100%" onchange="onBerthingSideChanged(this.value)">
                 <option value="PORT">⬅️ Mạn Trái (Port · Mũi hướng Thượng lưu)</option>
                 <option value="STARBOARD">➡️ Mạn Phải (Starboard · Mũi ra Cửa biển)</option>
               </select>
             </label></div>
+          </div>
+          <div style="margin-top:10px;padding-top:9px;border-top:1px dashed var(--line);font-size:11.5px;color:var(--muted);">
+            💡 Hệ thống đã bỏ cảnh báo mớn nước cố định. Hãy dùng các nút <b>Báo Nghiêng mạn (Trái/Phải)</b> và <b>Báo Mũi (Chìm/Vếch)</b> ngay trên Tab 1 để nhận khuyến nghị gọi hàng cân bằng tàu theo thực tế hiện trường.
           </div>
         </div>
       </div>
@@ -1580,7 +1763,10 @@ pre.schema-box {
         <div class="panel-body">
           <div style="font-size:11px;color:var(--muted);margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;gap:6px;flex-wrap:wrap;">
             <span>Thứ tự cẩu cố định dọc ray <b>Thượng lưu ➔ Hạ lưu (Cửa biển)</b>: <code>QC10 ➔ QC09 ➔ QC08 ➔ QC07 ➔ QC11 ➔ QC12 ➔ TK07 ➔ TK10 ➔ QC06 ➔ QC05 ➔ TK06 ➔ TK05 ➔ TK11 ➔ TK12</code> (không thể vượt qua nhau).</span>
-            <button class="primary sm" onclick="autoDistributeHoldsByRail()">⚡ Tự chia Hầm khớp ray & hướng mạn</button>
+            <div style="display:flex;gap:5px;flex-wrap:wrap;">
+              <button class="primary sm" onclick="autoDistributeHoldsByRail()">⚡ Tự chia Hầm khớp ray</button>
+              <button class="success sm" onclick="saveCraneAndVesselConfigPersist(true)">💾 Lưu chia Cẩu lên Cloud</button>
+            </div>
           </div>
           <div id="craneRosterList" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px;"></div>
           <div id="craneAssignmentTable"></div>
@@ -1744,6 +1930,23 @@ pre.schema-box {
               <div id="stat-edi" style="font-size:11px;font-weight:700;margin-top:4px;color:var(--muted);">Chưa nạp</div>
             </div>
           </div>
+
+          <div class="upload-card optional" id="card-yardpos" style="border-color:var(--green);">
+            <div>
+              <span class="badge green">Ô 6 · Cập nhật đảo chuyển bãi</span>
+              <h4 style="margin:6px 0 4px;">6. Vị trí Bãi thực tế (Đảo chuyển)</h4>
+              <div style="font-size:11px;color:var(--muted);">
+                Đẩy file Excel/CSV gồm: <b>Số Container, Kích cỡ / ISO</b> và <b>Block-Bay-Row-Tier</b> (hoặc <b>Vùng thực tế</b>) để ghi đè vị trí mới nhất khi bãi đảo chuyển nhiều.
+              </div>
+            </div>
+            <div>
+              <div style="display:flex;gap:6px;align-items:center;margin-bottom:4px;">
+                <input type="file" accept=".xlsx,.xls,.csv" onchange="handleUploadYardPositions(event, false)" style="flex:1;min-width:0;">
+                <button type="button" class="sm" onclick="downloadYardPositionTemplate()" title="Tải file Excel mẫu chuẩn cột">⬇️ Mẫu</button>
+              </div>
+              <div id="stat-yardpos" style="font-size:11px;font-weight:700;margin-top:4px;color:var(--muted);">Chưa cập nhật</div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -1755,7 +1958,7 @@ pre.schema-box {
 <nav class="mobile-bottom-nav">
   <button class="active" data-tab="tab-dispatch" onclick="switchTab('tab-dispatch')"><span class="m-ico">🎯</span><span>Gọi hàng</span></button>
   <button data-tab="tab-holds" onclick="switchTab('tab-holds')"><span class="m-ico">🚢</span><span>Hầm & Bay</span></button>
-  <button data-tab="tab-cranes" onclick="switchTab('tab-cranes')"><span class="m-ico">🏗️</span><span>Cẩu & Mớn</span></button>
+  <button data-tab="tab-cranes" onclick="switchTab('tab-cranes')"><span class="m-ico">🏗️</span><span>Cẩu & Tàu</span></button>
   <button data-tab="tab-upload" onclick="switchTab('tab-upload')"><span class="m-ico">📂</span><span>Nạp File</span></button>
 </nav>
 
@@ -1946,36 +2149,148 @@ pre.schema-box {
   </div>
 </div>
 
-<!-- MODAL 7: THIẾT LẬP NHANH SAU KHI NẠP FILE .ASC / .EDI (THIẾT BỊ + TIER BOONG + TIER HẦM) -->
-<div class="modal-shade" id="postAscSetupModal" onclick="if(event.target===this) closeModal('postAscSetupModal')">
-  <div class="modal-card" style="width:min(640px, 100%);">
-    <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--line);padding-bottom:8px;margin-bottom:10px;gap:8px;">
-      <h3 style="margin:0;">⚙️ Thiết lập Khai thác & Nắp hầm sau khi nạp .ASC / .EDI</h3>
-      <button class="sm" onclick="closeModal('postAscSetupModal')">✕ Đóng</button>
+<!-- MODAL 7: TRÌNH HƯỚNG DẪN THIẾT LẬP TÀU 5 BƯỚC (ASC -> BOT MÁY TRẠM -> CHIA THIẾT BỊ -> THÔNG SỐ TÀU -> SETUP BÃI -> CHÀO MỪNG) -->
+<div class="modal-shade" id="vesselSetupWizardModal" onclick="if(event.target===this) closeModal('vesselSetupWizardModal')">
+  <div class="modal-card" style="width:min(760px, 100%);">
+    <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--line);padding-bottom:8px;margin-bottom:10px;gap:8px;flex-wrap:wrap;">
+      <h3 style="margin:0;">🧭 Trình Thiết lập Tàu chuẩn 5 Bước — <span id="wizSessionTitle" style="color:var(--cyan);">—</span></h3>
+      <button class="sm" onclick="closeModal('vesselSetupWizardModal')">✕ Đóng</button>
     </div>
-    <div id="postAscDetectedInfo" style="background:rgba(2,132,199,0.08);border:1px solid var(--cyan);border-radius:8px;padding:9px 11px;margin-bottom:12px;font-size:11.5px;"></div>
 
-    <div class="grid-form" style="grid-template-columns:repeat(2, minmax(0, 1fr));gap:10px;margin-bottom:12px;">
-      <div class="form-field" style="margin:0;">
-        <label>Số Tier ĐẦU TIÊN trên Boong (*)</label>
-        <input type="number" id="ascFirstDeckTierInput" value="80" placeholder="VD: 72, 80, 82">
-        <div style="font-size:10.5px;color:var(--muted);margin-top:2px;">Container có Tier ≥ số này tính là trên boong (trên nắp hầm).</div>
+    <div class="wizard-stepper" id="wizStepperBar">
+      <div class="wiz-step-pill active" id="wstep-1" onclick="goWizardStep(1)">1. Nạp ASC/EDI</div>
+      <div class="wiz-step-pill" id="wstep-2" onclick="goWizardStep(2)">2. Chạy Bot OM</div>
+      <div class="wiz-step-pill" id="wstep-3" onclick="goWizardStep(3)">3. Chia Thiết bị</div>
+      <div class="wiz-step-pill" id="wstep-4" onclick="goWizardStep(4)">4. Thông số Tàu</div>
+      <div class="wiz-step-pill" id="wstep-5" onclick="goWizardStep(5)">5. Setup Bãi</div>
+    </div>
+
+    <!-- BƯỚC 1: NẠP FILE ASC / EDI -->
+    <div class="wiz-pane active" id="wpane-1">
+      <div style="background:rgba(2,132,199,0.08);border:1px solid var(--cyan);border-radius:8px;padding:10px 12px;margin-bottom:10px;font-size:12px;">
+        <b>Bước 1/5 — Nạp sơ đồ dự kiến .ASC ($604) hoặc .EDI (BAPLIE):</b><br>
+        Hệ thống tự động đọc số vị trí container, số Bay/Hầm và nhận diện sơ bộ Tier trên boong / dưới hầm.
       </div>
-      <div class="form-field" style="margin:0;">
-        <label>Số Tier CAO NHẤT dưới Hầm (*)</label>
-        <input type="number" id="ascMaxHoldTierInput" value="12" placeholder="VD: 08, 10, 12, 14">
-        <div style="font-size:10.5px;color:var(--muted);margin-top:2px;">Dùng để xác định chính xác nắp hầm & báo hầm sắp đầy cần đóng nắp.</div>
+      <div class="form-field">
+        <label>Chọn file .ASC ($604), .EDI (BAPLIE) hoặc Chỉ dẫn xếp (.xlsx):</label>
+        <input type="file" multiple accept=".xlsx,.xls,.edi,.asc,.txt,.bap" onchange="handleWizardAscUpload(event)">
+      </div>
+      <div id="wizAscStatusBox" style="font-size:12px;font-weight:700;padding:8px 10px;border-radius:7px;background:var(--bg);border:1px dashed var(--line);margin-bottom:10px;">
+        Chưa nạp file .ASC / .EDI.
+      </div>
+      <div style="display:flex;justify-content:flex-end;gap:8px;">
+        <button class="primary" onclick="goWizardStep(2)">Tiếp theo: Bước 2 (Chạy Bot OM) ➔</button>
       </div>
     </div>
 
-    <div class="form-field">
-      <label>Chọn Thiết bị khai thác tàu này (Thứ tự cố định dọc ray Thượng lưu ➔ Hạ lưu):</label>
-      <div id="ascCranePickerList" style="display:flex;flex-wrap:wrap;gap:6px;margin-top:4px;"></div>
+    <!-- BƯỚC 2: CHẠY BOT OM (YÊU CẦU CÀI ĐẶT MÁY TRẠM) -->
+    <div class="wiz-pane" id="wpane-2">
+      <div style="background:rgba(217,119,6,0.10);border:1.5px solid var(--amber);border-radius:8px;padding:10px 12px;margin-bottom:10px;font-size:12px;">
+        <b>Bước 2/5 — Chạy Bot OM tự động (⚠️ Yêu cầu đã cài đặt Bot trên máy trạm Windows):</b><br>
+        • Máy trạm Windows phải đang mở <b>PL-TOS Operation Management</b> & chạy sẵn script Bot đồng bộ.<br>
+        • Nếu máy trạm chưa cài Bot, bạn có thể bấm <b>"Bỏ qua bước này"</b> để nạp Excel thủ công sau.
+      </div>
+      <div class="grid-form" style="grid-template-columns:repeat(2, minmax(0, 1fr));gap:9px;">
+        <div class="form-field" style="margin:0;"><label>Tài khoản PL-TOS</label><input id="wizBotUser" placeholder="VD: dungvt" autocomplete="off"></div>
+        <div class="form-field" style="margin:0;"><label>Mật khẩu PL-TOS</label><input type="password" id="wizBotPass" placeholder="Tự xóa sau khi Bot đọc" autocomplete="new-password"></div>
+        <div class="form-field" style="margin:0;"><label>Mã tàu OM (Vessel Code)</label><input id="wizBotCode" placeholder="VD: KULU"></div>
+        <div class="form-field" style="margin:0;"><label>Năm / Lượt</label>
+          <div style="display:flex;gap:6px;"><input id="wizBotYear" value="2026" style="width:48%;"><input id="wizBotSeq" value="0006" style="width:52%;"></div>
+        </div>
+      </div>
+      <div id="wizBotMsg" class="pin-msg"></div>
+      <div style="display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;margin-top:10px;">
+        <button onclick="goWizardStep(1)">⬅ Quay lại</button>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;">
+          <button class="success" onclick="startBotFromWizard()">🚀 Gửi lệnh chạy Bot ngay</button>
+          <button class="primary" onclick="goWizardStep(3)">Tiếp: Bước 3 (Chia Thiết bị) ➔</button>
+        </div>
+      </div>
     </div>
 
-    <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:12px;padding-top:10px;border-top:1px solid var(--line);">
-      <button onclick="closeModal('postAscSetupModal')">Để sau</button>
-      <button class="success" onclick="applyPostAscSetup()">✅ Xác nhận, tự chia Hầm & Lưu Cloud</button>
+    <!-- BƯỚC 3: CHIA THIẾT BỊ KHAI THÁC -->
+    <div class="wiz-pane" id="wpane-3">
+      <div style="background:rgba(2,132,199,0.08);border:1px solid var(--cyan);border-radius:8px;padding:9px 11px;margin-bottom:10px;font-size:11.5px;">
+        <b>Bước 3/5 — Chọn Thiết bị khai thác & Chia Hầm (Tự lưu cấu hình, reload không bị mất):</b><br>
+        Thứ tự dọc ray Thượng lưu ➔ Hạ lưu: <code>QC10 ➔ QC09 ➔ QC08 ➔ QC07 ➔ QC11 ➔ QC12 ➔ TK07 ➔ TK10 ➔ QC06 ➔ QC05 ➔ TK06 ➔ TK05 ➔ TK11 ➔ TK12</code>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;flex-wrap:wrap;gap:6px;">
+        <strong style="font-size:11.5px;">Chọn các cẩu tham gia làm tàu:</strong>
+        <button class="primary sm" onclick="autoDistributeHoldsByRail();renderWizardCranes()">⚡ Tự chia Hầm khớp ray</button>
+      </div>
+      <div id="wizCranePickerList" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px;"></div>
+      <div id="wizCraneAssignTable" class="table-wrap" style="max-height:210px;"></div>
+      <div style="display:flex;justify-content:space-between;gap:8px;margin-top:10px;">
+        <button onclick="goWizardStep(2)">⬅ Quay lại</button>
+        <button class="primary" onclick="saveCraneAndVesselConfigPersist();goWizardStep(4)">Lưu chia Cẩu & Tiếp: Bước 4 ➔</button>
+      </div>
+    </div>
+
+    <!-- BƯỚC 4: THÔNG SỐ TÀU & NẮP HẦM -->
+    <div class="wiz-pane" id="wpane-4">
+      <div style="background:rgba(2,132,199,0.08);border:1px solid var(--cyan);border-radius:8px;padding:9px 11px;margin-bottom:10px;font-size:11.5px;">
+        <b>Bước 4/5 — Xác nhận Thông số Tàu, Hướng cập Mạn & Ngưỡng Nắp hầm (Tier Boong / Tier Hầm):</b>
+      </div>
+      <div class="grid-form" style="grid-template-columns:repeat(2, minmax(0, 1fr));gap:9px;">
+        <div class="form-field" style="margin:0;"><label>Tên tàu</label><input id="wizVesselName"></div>
+        <div class="form-field" style="margin:0;"><label>Chuyến (Voyage)</label><input id="wizVoyage"></div>
+        <div class="form-field" style="margin:0;"><label>Cầu bến</label><input id="wizBerth"></div>
+        <div class="form-field" style="margin:0;"><label>Hướng cập mạn</label>
+          <select id="wizBerthSide" style="width:100%;">
+            <option value="PORT">⬅️ Mạn Trái (Port · Mũi hướng Thượng lưu)</option>
+            <option value="STARBOARD">➡️ Mạn Phải (Starboard · Mũi ra Cửa biển)</option>
+          </select>
+        </div>
+        <div class="form-field" style="margin:0;"><label>Chiều dài LOA (m)</label><input type="number" id="wizLength"></div>
+        <div class="form-field" style="margin:0;"><label>Chiều rộng Beam (m)</label><input type="number" step="0.1" id="wizBeam"></div>
+        <div class="form-field" style="margin:0;">
+          <label>Số Tier ĐẦU TIÊN trên Boong (*)</label>
+          <input type="number" id="wizFirstDeckTier" value="80">
+        </div>
+        <div class="form-field" style="margin:0;">
+          <label>Số Tier CAO NHẤT dưới Hầm (*)</label>
+          <input type="number" id="wizMaxHoldTier" value="12">
+        </div>
+      </div>
+      <div style="display:flex;justify-content:space-between;gap:8px;margin-top:12px;">
+        <button onclick="goWizardStep(3)">⬅ Quay lại</button>
+        <button class="primary" onclick="applyWizardStep4();goWizardStep(5)">Lưu Thông số & Tiếp: Bước 5 ➔</button>
+      </div>
+    </div>
+
+    <!-- BƯỚC 5: SETUP CÁC BÃI NGOÀI & GIỜ CAO ĐIỂM -->
+    <div class="wiz-pane" id="wpane-5">
+      <div style="background:rgba(2,132,199,0.08);border:1px solid var(--cyan);border-radius:8px;padding:9px 11px;margin-bottom:10px;font-size:11.5px;">
+        <b>Bước 5/5 — Kiểm tra & Setup các Bãi ngoài (km) và Khung giờ Cao điểm giao thông:</b>
+      </div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px;">
+        <input id="wizNewYardCode" placeholder="Mã bãi (VD: GFW)" style="width:120px;min-height:30px;">
+        <input id="wizNewYardName" placeholder="Tên bãi ngoài" style="flex:1;min-width:130px;min-height:30px;">
+        <input id="wizNewYardKm" type="number" step="0.5" min="0.5" value="6" style="width:70px;min-height:30px;">
+        <button class="primary sm" onclick="addYardFromWizard()">+ Thêm bãi</button>
+      </div>
+      <div id="wizYardsTable" class="table-wrap" style="max-height:170px;margin-bottom:10px;"></div>
+      <div style="font-size:11px;font-weight:800;margin-bottom:4px;">Khung giờ Cao điểm giao thông (bấm để bật/tắt):</div>
+      <div class="peak-hours-grid" id="wizPeakHours"></div>
+      <div style="display:flex;justify-content:space-between;gap:8px;margin-top:12px;padding-top:10px;border-top:1px solid var(--line);">
+        <button onclick="goWizardStep(4)">⬅ Quay lại</button>
+        <button class="success" style="font-size:13px;padding:7px 14px;" onclick="finishVesselSetupWizard()">🎉 Hoàn tất & Mời vào Khai thác</button>
+      </div>
+    </div>
+
+    <!-- BƯỚC 6: MỜI VÀO SỬ DỤNG & CHÚC KHAI THÁC TỐT VÀ AN TOÀN -->
+    <div class="wiz-pane" id="wpane-6">
+      <div class="welcome-safe-box">
+        <div style="font-size:38px;line-height:1.1;margin-bottom:8px;">🚢✅🛡️</div>
+        <h2 style="margin:0 0 8px;color:var(--green);font-size:18px;">THIẾT LẬP HOÀN TẤT — MỜI BẠN VÀO SỬ DỤNG!</h2>
+        <div id="wizWelcomeSummary" style="font-size:13px;line-height:1.6;margin-bottom:14px;"></div>
+        <div style="font-size:14px;font-weight:900;color:var(--cyan);margin-bottom:16px;">
+          🌟 Chúc bạn và tập thể ca sản xuất khai thác hiệu quả, năng suất cao và TUYỆT ĐỐI AN TOÀN! 🌟
+        </div>
+        <button class="success" style="min-height:40px;padding:8px 22px;font-size:13.5px;" onclick="enterOperationsAfterWizard()">
+          🚀 Bắt đầu Điều hành Khai thác ngay
+        </button>
+      </div>
     </div>
   </div>
 </div>
@@ -2176,6 +2491,8 @@ const state = {
   sbpImport: [],
   finalLoading: [],
   reservedExport: [],
+  yardPositionOverrides: [],
+  yardOverridesUpdatedAt: '',
   liveJobs: [],
   stowageInstructions: {},
   preStowagePlan: [],
@@ -2195,6 +2512,8 @@ const state = {
   todayTide: null,
   selectedChartHour: null,
   viewMode: 'AUTO', // 'AUTO' | 'MOBILE' | 'PC'
+  vesselAttitude: { heel: 'EVEN', trim: 'EVEN' }, // heel: EVEN | LIST_PORT | LIST_STARBOARD ; trim: EVEN | BOW_DOWN | BOW_UP
+  setupCompleted: false,
   shiftHistory: { recommendations: [], actions: [], notes: [] }
 };
 
@@ -2401,7 +2720,8 @@ const CloudRepo = {
       `${sessionId}/final.json`,
       `${sessionId}/reserved.json`,
       `${sessionId}/jobs.json`,
-      `${sessionId}/edi_stowage.json`
+      `${sessionId}/edi_stowage.json`,
+      `${sessionId}/yard_positions.json`
     ]);
   },
 
@@ -2415,18 +2735,15 @@ const CloudRepo = {
       berth: document.getElementById('cfgBerth')?.value || 'TV3',
       length_m: parseFloat(document.getElementById('cfgLength')?.value) || 172,
       beam_m: parseFloat(document.getElementById('cfgBeam')?.value) || 27.6,
-      draft_f: parseFloat(document.getElementById('cfgDraftF')?.value) || 7.8,
-      draft_a: parseFloat(document.getElementById('cfgDraftA')?.value) || 8.2,
-      max_draft: parseFloat(document.getElementById('cfgMaxDraft')?.value) || 9.2,
-      cont_per_10cm: parseFloat(document.getElementById('cfgContPer10cm')?.value) || 28,
       deck_tier_min: parseInt(document.getElementById('cfgDeckTier')?.value, 10) || 80,
       crane_config: state.cranes,
       hold_config: state.holdConfig,
       stats_summary: {
         isCustomHoldConfig: state.isCustomHoldConfig,
-        berth_depth: parseFloat(document.getElementById('cfgBerthDepth')?.value) || 9.0,
         berthingSide: state.berthingSide || 'PORT',
         hold_max_tier: parseInt(document.getElementById('cfgHoldMaxTier')?.value, 10) || 12,
+        vesselAttitude: state.vesselAttitude || { heel: 'EVEN', trim: 'EVEN' },
+        setupCompleted: Boolean(state.setupCompleted),
         offDockCatalog: state.offDockCatalog,
         peakHours: state.peakHours
       },
@@ -2572,6 +2889,8 @@ const CloudRepo = {
     state.sbpImport = [];
     state.finalLoading = [];
     state.reservedExport = [];
+    state.yardPositionOverrides = [];
+    state.yardOverridesUpdatedAt = '';
     state.liveJobs = [];
     state.stowageInstructions = {};
     state.preStowagePlan = [];
@@ -2581,7 +2900,7 @@ const CloudRepo = {
     state.calledContainers.clear();
 
     if (!state.sessionId) {
-      ['sbp','final','reserved','jobs','edi'].forEach(k => setCardStatus(k, 'Chưa chọn tàu', false));
+      ['sbp','final','reserved','jobs','edi','yardpos'].forEach(k => setCardStatus(k, 'Chưa chọn tàu', false));
       this.setStatus('● Chưa có tàu');
       this.setSub('Bấm "+ Tàu mới" để khởi tạo chuyến tàu');
       renderAll();
@@ -2601,19 +2920,16 @@ const CloudRepo = {
         document.getElementById('cfgBerth').value = s.berth || 'TV3';
         document.getElementById('cfgLength').value = s.length_m || 172;
         document.getElementById('cfgBeam').value = s.beam_m || 27.6;
-        document.getElementById('cfgDraftF').value = s.draft_f || 7.8;
-        document.getElementById('cfgDraftA').value = s.draft_a || 8.2;
-        document.getElementById('cfgMaxDraft').value = s.max_draft || 9.2;
-        document.getElementById('cfgContPer10cm').value = s.cont_per_10cm || 28;
         document.getElementById('cfgDeckTier').value = s.deck_tier_min || 80;
-        if (s.stats_summary && s.stats_summary.berth_depth) {
-          document.getElementById('cfgBerthDepth').value = s.stats_summary.berth_depth;
-        }
         if (s.stats_summary && s.stats_summary.hold_max_tier) {
           const hmEl = document.getElementById('cfgHoldMaxTier');
           if (hmEl) hmEl.value = s.stats_summary.hold_max_tier;
         }
         state.berthingSide = (s.stats_summary && s.stats_summary.berthingSide === 'STARBOARD') ? 'STARBOARD' : 'PORT';
+        state.vesselAttitude = (s.stats_summary && s.stats_summary.vesselAttitude)
+          ? { heel: s.stats_summary.vesselAttitude.heel || 'EVEN', trim: s.stats_summary.vesselAttitude.trim || 'EVEN' }
+          : { heel: 'EVEN', trim: 'EVEN' };
+        state.setupCompleted = Boolean(s.stats_summary && s.stats_summary.setupCompleted);
         if (s.stats_summary && Array.isArray(s.stats_summary.offDockCatalog) && s.stats_summary.offDockCatalog.length) {
           state.offDockCatalog = s.stats_summary.offDockCatalog;
         }
@@ -2630,16 +2946,21 @@ const CloudRepo = {
       } else {
         document.getElementById('cfgVesselName').value = parsedFromSid.name;
         document.getElementById('cfgVoyage').value = parsedFromSid.voyage || '';
+        state.vesselAttitude = { heel: 'EVEN', trim: 'EVEN' };
+        state.setupCompleted = false;
       }
+      // Khôi phục bản lưu cục bộ mới hơn (nếu có) để F5/reload KHÔNG BAO GIỜ bị reset chia hầm phương tiện
+      restoreLocalCraneAndAttitudeIfNewer(sessionId, sessRows && sessRows.length ? sessRows[0].updated_at : '');
 
       const deckTier = parseInt(document.getElementById('cfgDeckTier')?.value, 10) || 80;
       const existingFiles = await this.listExistingSessionFiles(sessionId, true);
-      const [sbpJson, finalJson, resJson, jobsJson, ediJson, histJson, logsRes] = await Promise.all([
+      const [sbpJson, finalJson, resJson, jobsJson, ediJson, yardPosJson, histJson, logsRes] = await Promise.all([
         this.downloadFile(sessionId, 'sbp.json', existingFiles),
         this.downloadFile(sessionId, 'final.json', existingFiles),
         this.downloadFile(sessionId, 'reserved.json', existingFiles),
         this.downloadFile(sessionId, 'jobs.json', existingFiles),
         this.downloadFile(sessionId, 'edi_stowage.json', existingFiles),
+        this.downloadFile(sessionId, 'yard_positions.json', existingFiles),
         this.downloadFile(sessionId, 'shift_history.json', existingFiles),
         sb.from('dispatch_logs').select('container_no').eq('session_id', sessionId)
       ]);
@@ -2683,6 +3004,16 @@ const CloudRepo = {
           setCardStatus('edi', `✓ Cloud: ${state.preStowagePlan.length} vị trí + ${Object.keys(state.stowageInstructions).length} chỉ dẫn`, true);
           foundCount++;
         } else setCardStatus('edi', 'Chưa nạp', false);
+
+      if (yardPosJson) {
+        state.yardPositionOverrides = DataAdapters.normalizeYardPositions(yardPosJson);
+        state.yardOverridesUpdatedAt = yardPosJson.updated_at || '';
+        setCardStatus('yardpos', `✓ Cloud: ${state.yardPositionOverrides.length} vị trí bãi thực tế`, true);
+      } else {
+        state.yardPositionOverrides = [];
+        state.yardOverridesUpdatedAt = '';
+        setCardStatus('yardpos', 'Chưa cập nhật', false);
+      }
       } else setCardStatus('edi', 'Chưa nạp', false);
 
       if (logsRes && Array.isArray(logsRes.data)) {
@@ -2944,6 +3275,58 @@ const DataAdapters = {
         barge_code: String(r.barge_code || r['Mã Sà lan'] || '').trim()
       };
     }).filter(x => x.cntr);
+  },
+
+  normalizeYardPositions(rawPayload) {
+    const rows = Array.isArray(rawPayload) ? rawPayload : (rawPayload?.rows || []);
+    const pick = (r, keys) => {
+      for (const k of keys) {
+        if (r[k] !== undefined && r[k] !== null && String(r[k]).trim() !== '') return String(r[k]).trim();
+      }
+      // Fallback: match case-insensitively
+      const rKeys = Object.keys(r || {});
+      for (const k of keys) {
+        const kl = k.toLowerCase();
+        const found = rKeys.find(rk => rk.trim().toLowerCase() === kl);
+        if (found && r[found] !== undefined && r[found] !== null && String(r[found]).trim() !== '') {
+          return String(r[found]).trim();
+        }
+      }
+      return '';
+    };
+    return rows.map(r => {
+      const cntr = pick(r, ['cntr', 'Số Container', 'Số cont', 'Container', 'Container No', 'CNTR_NO', 'Cntr No']).toUpperCase().replace(/[^A-Z0-9]/g, '');
+      if (!cntr) return null;
+      const size = pick(r, ['size', 'Kích cỡ', 'Kích Cỡ', 'Size', 'SZ']);
+      const iso = pick(r, ['iso', 'Kích cỡ ISO', 'Kích Cỡ ISO', 'ISO', 'SZTP', 'Size/Type']).toUpperCase();
+      const rawBlock = pick(r, ['block', 'Block', 'Vùng', 'Vùng thực tế', 'Khu vực', 'Area', 'Zone', 'Bãi']).toUpperCase();
+      const rawBay = pick(r, ['bay', 'Bay', 'Y_Bay']);
+      const rawRow = pick(r, ['row', 'Row', 'Y_Row']);
+      const rawTier = pick(r, ['tier', 'Tier', 'Y_Tier']);
+      const rawCombined = pick(r, ['yard_pos', 'Vị trí bãi / Vùng thực tế', 'Vị trí bãi', 'Vị trí thực tế', 'Vị trí', 'Location', 'Position', 'Yard Pos']).toUpperCase();
+
+      const fmt2 = (v) => /^\d+$/.test(v) ? String(parseInt(v, 10)).padStart(2, '0') : v;
+      const fmtTier = (v) => /^\d+$/.test(v) ? String(parseInt(v, 10)) : v;
+
+      let yardPos = '';
+      if (rawBlock && (rawBay || rawRow || rawTier)) {
+        yardPos = [rawBlock, rawBay ? fmt2(rawBay) : '', rawRow ? fmt2(rawRow) : '', rawTier ? fmtTier(rawTier) : ''].filter(Boolean).join('-');
+      } else if (rawCombined && rawCombined !== '---') {
+        yardPos = rawCombined;
+      } else if (rawBlock) {
+        yardPos = rawBlock;
+      }
+
+      const block = rawBlock || (yardPos ? yardPos.split(/[-\s\/]+/)[0].trim().toUpperCase() : '');
+      if (!yardPos && !block) return null;
+      return {
+        cntr,
+        size,
+        iso,
+        block,
+        yard_pos: yardPos || block
+      };
+    }).filter(Boolean);
   },
 
   normalizeJobsPayload(rawPayload, sessionId) {
@@ -3208,6 +3591,34 @@ const UnifiedPoolBuilder = {
       }
     });
 
+    // 5. Ghi đè vị trí bãi thực tế mới nhất (trường hợp bãi đảo chuyển nhiều)
+    (st.yardPositionOverrides || []).forEach(yp => {
+      const key = this.normCntr(yp.cntr);
+      if (!key || cancelledSet.has(key)) return;
+      const cur = map.get(key);
+      if (!cur) return;
+      const newPos = String(yp.yard_pos || yp.block || '').trim().toUpperCase();
+      if (!newPos) return;
+      const prevPos = cur.yardPos || '---';
+      if (prevPos !== newPos) {
+        cur.oldYardPos = prevPos;
+        cur.yardPosUpdated = true;
+      }
+      cur.yardPos = newPos;
+      const newBlk = String(yp.block || newPos.split(/[-\s\/]+/)[0] || '').trim().toUpperCase();
+      if (newBlk) cur.yardBlock = newBlk;
+      if (yp.size && (!cur.size || cur.size === '40HC')) cur.size = yp.size;
+      if (yp.iso && !cur.iso) cur.iso = yp.iso;
+      // Cập nhật lại trạng thái nội bộ TV hay bãi ngoài theo vùng thực tế mới
+      if (offDockCodes.has(newBlk)) {
+        cur.isOffDock = true;
+        cur.transferPort = newBlk;
+      } else if (newBlk && newBlk !== '---') {
+        cur.isOffDock = false;
+        cur.transferPort = 'TV';
+      }
+    });
+
     const list = Array.from(map.values());
     list.forEach(item => {
       item.instFlags = DataAdapters.parseInstructionFlags(item.inst);
@@ -3429,11 +3840,23 @@ const DispatchEngine = {
       if (!bottomOk) { score -= 200; reasons.push('Chờ tầng dưới'); }
       const etaMins = OffDockTrafficEngine.estimateTransitMins(c.transferPort, c.isOffDock);
       const isPeak = OffDockTrafficEngine.isPeakHour();
+      const holdMaxTierCfg = parseInt(document.getElementById('cfgHoldMaxTier')?.value, 10) || 12;
+      const isUnderDeckSlot = p && p.tierNum <= holdMaxTierCfg && p.tierNum < deckTierMin;
       if (c.isOffDock) {
         const yardMeta = OffDockTrafficEngine.getYardMeta(c.transferPort);
-        const preCallBoost = Math.round(25 + Math.min(85, etaMins * 1.45));
+        // Chỉ đẩy điểm gọi sớm mạnh cho cont bãi ngoài chặn dưới hầm/nắp hầm; cont trên boong giữ cân đối để ưu tiên TV xếp nhiều nhất
+        const preCallBoost = isUnderDeckSlot
+          ? Math.round(45 + Math.min(85, etaMins * 1.5))
+          : Math.round(12 + Math.min(35, etaMins * 0.7));
         score += preCallBoost;
-        reasons.push(`Gọi sớm ${c.transferPort} (${yardMeta.distanceKm}km · ~${etaMins}p${isPeak ? ' cao điểm' : ''})`);
+        reasons.push(`${isUnderDeckSlot ? '🚨 Gọi sớm khép hầm' : 'Cân đối'} ${c.transferPort} (${yardMeta.distanceKm}km · ~${etaMins}p${isPeak ? ' cao điểm' : ''})`);
+      } else {
+        // Luôn ưu tiên hàng nội bộ Tân Vũ (TV) xếp được nhiều nhất
+        score += 22;
+        if (st._tvHatchReserveSet && st._tvHatchReserveSet.has(c.cntr)) {
+          score -= 36;
+          reasons.push('🔒 Giữ đóng hầm (TV)');
+        }
       }
       // Ưu tiên hầm đã sạch nhập hoặc sắp sạch nhập
       const impRemInHold = (st._holdImportStats && holdNo > 0) ? (st._holdImportStats[holdNo]?.remain ?? 0) : 0;
@@ -3451,9 +3874,53 @@ const DispatchEngine = {
       const heavyFirst = opts.weightStrategy === 'HEAVY_FIRST' && !c.instFlags?.preferTopLight;
       score += heavyFirst ? (c.weight || 0) * 1.2 : Math.max(0, 35 - (c.weight || 0)) * 1.1;
 
-      if (draftMetrics.level === 'DANGER' && c.weight >= 22) { score -= 150; reasons.push('Hãm cont nặng'); }
-      else if (draftMetrics.bowHeavy && holdNo > 0 && holdNo <= Math.ceil(totalHolds / 3) && c.weight >= 20) { score -= 40; reasons.push('Né chúi mũi'); }
-      else if (draftMetrics.sternHeavy && holdNo >= Math.floor((totalHolds * 2) / 3) && c.weight >= 20) { score -= 40; reasons.push('Né chúi lái'); }
+      // Xử lý khuyến nghị theo báo cáo thực tế Nghiêng mạn (Heel) & Mũi chìm/vếch (Trim)
+      const att = st.vesselAttitude || { heel: 'EVEN', trim: 'EVEN' };
+      const wVal = Number(c.weight) || 14;
+      const bowCutoff = Math.max(1, Math.ceil(totalHolds / 3));
+      const sternCutoff = Math.max(bowCutoff + 1, Math.floor((totalHolds * 2) / 3) + 1);
+
+      if (att.trim === 'BOW_DOWN' && holdNo > 0) {
+        if (holdNo >= sternCutoff && wVal >= 16) {
+          score += 55 + wVal;
+          reasons.push('⚖️ Kéo lái (chống chìm mũi)');
+        } else if (holdNo <= bowCutoff && wVal >= 18) {
+          score -= 70;
+          reasons.push('Hãm nặng mũi');
+        }
+      } else if (att.trim === 'BOW_UP' && holdNo > 0) {
+        if (holdNo <= bowCutoff && wVal >= 16) {
+          score += 55 + wVal;
+          reasons.push('⚖️ Đè mũi (chống vếch mũi)');
+        } else if (holdNo >= sternCutoff && wVal >= 18) {
+          score -= 70;
+          reasons.push('Hãm nặng lái');
+        }
+      }
+
+      if ((att.heel === 'LIST_PORT' || att.heel === 'LIST_STARBOARD') && p && p.row) {
+        const rowNum = parseInt(p.row, 10);
+        if (!isNaN(rowNum) && rowNum > 0) {
+          const isPortSide = (rowNum % 2 === 0); // Quy chuẩn ISO: Row chẵn = Mạn Trái (Port), Row lẻ = Mạn Phải (Starboard)
+          if (att.heel === 'LIST_PORT') {
+            if (!isPortSide && wVal >= 14) {
+              score += 50 + wVal;
+              reasons.push('⚖️ Cân mạn Phải (Row lẻ)');
+            } else if (isPortSide && wVal >= 16) {
+              score -= 65;
+              reasons.push('Tránh thêm nặng Trái');
+            }
+          } else if (att.heel === 'LIST_STARBOARD') {
+            if (isPortSide && wVal >= 14) {
+              score += 50 + wVal;
+              reasons.push('⚖️ Cân mạn Trái (Row chẵn)');
+            } else if (!isPortSide && wVal >= 16) {
+              score -= 65;
+              reasons.push('Tránh thêm nặng Phải');
+            }
+          }
+        }
+      }
 
       return { ...c, holdNo, bottomOk, score, reasons };
     }).sort((a, b) => b.score - a.score);
@@ -4218,6 +4685,198 @@ const HatchContinuityEngine = {
   }
 };
 
+const OffDockFleetAndQcEngine = {
+  // 1. Tính toán cân đối số xe đầu kéo cho từng bãi ngoài (luôn ưu tiên xếp tối đa hàng TV) + để dành cont TV đóng hầm nhanh
+  analyzeFleetAndTvReserve(st, pool, analysis, deckTierMin = 80, holdMaxTier = 12) {
+    const isRemAB = x => x.jobStatus === 'A' || x.jobStatus === 'B';
+    const tvRem = (pool || []).filter(x => !x.isOffDock && isRemAB(x));
+    const offRem = (pool || []).filter(x => x.isOffDock && isRemAB(x));
+    const totalRem = tvRem.length + offRem.length;
+
+    const activeExportCranes = (st.cranes || []).filter(c => c.active && !c.paused && c.mode !== 'IMPORT_ONLY');
+    const totalVesselRate = activeExportCranes.reduce((s, c) => {
+      const m = (analysis.craneMetrics || []).find(x => x.id === c.id);
+      return s + ((m && m.avgRate > 0) ? m.avgRate : (c.rate || 24));
+    }, 0) || 26;
+
+    // Luôn ưu tiên hàng Tân Vũ (TV) chiếm 65-75% công suất cẩu nếu TV còn hàng; bãi ngoài giữ 25-35% để không tắc cầu mà vẫn kịp cont chặn tầng
+    const tvSharePct = tvRem.length === 0 ? 0 : (offRem.length === 0 ? 100 : Math.max(65, Math.min(80, Math.round((tvRem.length / Math.max(1, totalRem)) * 100))));
+    const offDockTargetRate = Math.max(2, Math.round(totalVesselRate * ((100 - tvSharePct) / 100)));
+
+    // Gom theo từng bãi ngoài & đếm số cont đang chặn dưới hầm (cần gọi sớm trước)
+    const yardGroups = {};
+    offRem.forEach(c => {
+      const y = c.transferPort || 'KHÁC';
+      if (!yardGroups[y]) yardGroups[y] = { code: y, total: 0, readyB: 0, holdA: 0, blockingUnderDeck: 0 };
+      yardGroups[y].total++;
+      if (c.jobStatus === 'B') yardGroups[y].readyB++;
+      else yardGroups[y].holdA++;
+      const p = DataAdapters.parsePos6(c.actualPos || c.plannedPos, deckTierMin);
+      if (p && p.tierNum <= holdMaxTier && p.tierNum < deckTierMin) yardGroups[y].blockingUnderDeck++;
+    });
+
+    const isPeak = OffDockTrafficEngine.isPeakHour();
+    const yards = Object.values(yardGroups).sort((a, b) => b.blockingUnderDeck - a.blockingUnderDeck || b.total - a.total).map(g => {
+      const meta = OffDockTrafficEngine.getYardMeta(g.code);
+      const oneWayMins = OffDockTrafficEngine.estimateTransitMins(g.code, true);
+      const roundTripMins = oneWayMins * 2 + 16; // 2 chiều + thời gian gắp bãi & chờ cầu
+      const shareRatio = g.total / Math.max(1, offRem.length);
+      const yardMovesPerHr = Math.max(1.5, offDockTargetRate * shareRatio);
+      let trucks = Math.max(1, Math.ceil((yardMovesPerHr * roundTripMins) / 60));
+      // Nếu có nhiều cont bãi ngoài nằm dưới hầm (chặn đóng nắp) -> tăng thêm 1 xe kéo ưu tiên
+      if (g.blockingUnderDeck >= 4 && trucks < 5) trucks += 1;
+      const capPerHr = +((trucks * 60) / roundTripMins).toFixed(1);
+      return {
+        ...g,
+        name: meta.name,
+        distanceKm: meta.distanceKm,
+        oneWayMins,
+        roundTripMins,
+        trucks,
+        capPerHr,
+        isPeak
+      };
+    });
+
+    const totalOffDockTrucks = yards.reduce((s, y) => s + y.trucks, 0);
+
+    // 2. Xác định danh sách Cont nội bộ Tân Vũ (TV) để dành đóng nắp hầm nhanh nhất
+    const reserveSet = new Set();
+    const holdReserves = [];
+    (st.holdConfig || []).forEach(h => {
+      const baySet = new Set(h.bays || []);
+      const expInH = (pool || []).filter(c => {
+        const p = DataAdapters.parsePos6(c.actualPos || c.plannedPos, deckTierMin);
+        return p && baySet.has(p.bay);
+      });
+      const underDeckRem = expInH.filter(c => {
+        const p = DataAdapters.parsePos6(c.actualPos || c.plannedPos, deckTierMin);
+        return p && p.tierNum <= holdMaxTier && p.tierNum < deckTierMin && isRemAB(c);
+      });
+      const underDeckOffDock = underDeckRem.filter(c => c.isOffDock);
+      const underDeckTvReady = underDeckRem.filter(c => !c.isOffDock && c.jobStatus === 'B');
+      if (!underDeckTvReady.length) return;
+
+      // Ưu tiên giữ lại 2-3 cont TV nằm ở tầng cao nhất dưới hầm (gần nắp hầm nhất) để chốt đóng hầm trong 4 phút
+      const sortedTopUnderDeck = [...underDeckTvReady].sort((a, b) => {
+        const pa = DataAdapters.parsePos6(a.actualPos || a.plannedPos, deckTierMin);
+        const pb = DataAdapters.parsePos6(b.actualPos || b.plannedPos, deckTierMin);
+        return (pb?.tierNum || 0) - (pa?.tierNum || 0);
+      });
+      const pickCount = underDeckOffDock.length > 0 ? Math.min(3, sortedTopUnderDeck.length) : Math.min(2, sortedTopUnderDeck.length);
+      const picked = sortedTopUnderDeck.slice(0, pickCount);
+      // Chỉ giữ (reserve) khi hầm vẫn còn các cont khác đang làm (không khóa khi chỉ còn đúng mấy cont chốt này)
+      const readyToCloseNow = underDeckOffDock.length === 0 && underDeckRem.length <= pickCount + 2;
+      if (!readyToCloseNow) {
+        picked.forEach(c => reserveSet.add(c.cntr));
+      }
+      holdReserves.push({
+        hold: h.hold,
+        label: h.label,
+        readyToCloseNow,
+        underDeckOffDockCount: underDeckOffDock.length,
+        underDeckRemCount: underDeckRem.length,
+        picked
+      });
+    });
+
+    st._tvHatchReserveSet = reserveSet;
+    return {
+      tvRemCount: tvRem.length,
+      offRemCount: offRem.length,
+      tvSharePct,
+      totalVesselRate,
+      totalOffDockTrucks,
+      yards,
+      holdReserves,
+      totalReservedTv: reserveSet.size
+    };
+  },
+
+  // 3. Kiểm tra tàu >= 11 Row (TK không làm được, bắt buộc QC) & tính chi phí di chuyển QC qua hầm (10-15 phút/lần)
+  analyzeTkReachAndQcShift(st, pool, analysis) {
+    const beam = parseFloat(document.getElementById('cfgBeam')?.value) || 27.6;
+    const allRowsGlobal = new Set();
+    const holdRowMap = {};
+
+    const registerPos = (posStr) => {
+      const p = DataAdapters.parsePos6(posStr);
+      if (!p || !p.row) return;
+      const rn = parseInt(p.row, 10);
+      if (isNaN(rn)) return;
+      allRowsGlobal.add(rn);
+      // Suy diễn đối xứng row lẻ/chẵn
+      if (rn > 0) allRowsGlobal.add(rn % 2 === 1 ? rn + 1 : rn - 1);
+      const hNo = HoldLayoutEngine.getHoldByBay(p.bay, st.holdConfig);
+      if (!holdRowMap[hNo]) holdRowMap[hNo] = new Set();
+      holdRowMap[hNo].add(rn);
+      if (rn > 0) holdRowMap[hNo].add(rn % 2 === 1 ? rn + 1 : rn - 1);
+    };
+
+    (st.sbpImport || []).forEach(x => registerPos(x.pos));
+    (st.preStowagePlan || []).forEach(x => registerPos(x.pos));
+    (st.liveJobs || []).forEach(x => registerPos(x.pos));
+
+    const detectedRowCount = allRowsGlobal.size > 0
+      ? allRowsGlobal.size
+      : (beam >= 27.0 ? 11 : (beam >= 24.5 ? 10 : 8));
+    const isWide11Plus = detectedRowCount >= 11;
+
+    const activeCranes = CraneRailOrder.sortCranesOnRail((st.cranes || []).filter(c => c.active));
+    const tkWarnings = [];
+    const qcShiftAdvices = [];
+
+    activeCranes.forEach(c => {
+      const isTK = /^TK/i.test(c.id);
+      if (isTK) {
+        const wideHolds = (c.holds || []).filter(hNo => {
+          const cnt = holdRowMap[hNo] ? holdRowMap[hNo].size : (isWide11Plus ? detectedRowCount : 0);
+          return cnt >= 11;
+        });
+        if (wideHolds.length > 0 || (isWide11Plus && (c.holds || []).length > 0)) {
+          tkWarnings.push({
+            craneId: c.id,
+            holds: wideHolds.length ? wideHolds : c.holds,
+            rowCount: detectedRowCount,
+            message: `🚫 ${c.id} KHÔNG làm được tàu ≥11 Row (Hầm ${(wideHolds.length ? wideHolds : c.holds).join(', ')} có ${detectedRowCount} Row) → Bắt buộc bố trí QC thay thế hoặc chỉ để TK làm hầm mũi/lái hẹp (<11 Row).`
+          });
+        }
+      }
+    });
+
+    // Đánh giá chi phí di chuyển QC qua hầm (10-15 phút/lần, trung bình 12.5 phút -> mất ~5-6 moves/lần)
+    const qcMoveMinsMin = 10;
+    const qcMoveMinsMax = 15;
+    const qcAvgMoveMins = 12.5;
+    (analysis.reallocSuggestions || []).forEach(r => {
+      if (!/^QC/i.test(r.craneId) || !r.targetHold) return;
+      const cObj = activeCranes.find(x => x.id === r.craneId);
+      const rate = cObj?.rate || 26;
+      const lostMoves = Math.round((qcAvgMoveMins / 60) * rate);
+      const worthMoving = (r.targetReadyB || 0) >= 15;
+      qcShiftAdvices.push({
+        craneId: r.craneId,
+        targetHold: r.targetHold,
+        targetReadyB: r.targetReadyB,
+        lostMoves,
+        worthMoving,
+        text: worthMoving
+          ? `✅ Chuyển ${r.craneId} sang HOLD ${String(r.targetHold).padStart(2,'0')} (${r.targetReadyB} cont B): mất ${qcMoveMinsMin}–${qcMoveMinsMax}p (~${lostMoves} moves) → ĐÁNG CHUYỂN để san tải.`
+          : `⚠️ Cân nhắc giữ ${r.craneId}: HOLD ${String(r.targetHold).padStart(2,'0')} chỉ còn ${r.targetReadyB} cont B, nếu QC chạy qua hầm mất ${qcMoveMinsMin}–${qcMoveMinsMax}p (~${lostMoves} moves) sẽ kém hiệu quả.`
+      });
+    });
+
+    return {
+      detectedRowCount,
+      isWide11Plus,
+      tkWarnings,
+      qcShiftAdvices,
+      qcMoveMinsMin,
+      qcMoveMinsMax
+    };
+  }
+};
+
 // =========================================================================
 // [PHẦN 4] UI CONTROLLERS, ADMIN PIN MODAL, RESPONSIVE RENDERERS
 // =========================================================================
@@ -4596,39 +5255,98 @@ function handleUploadEdiOrStowage(evt) {
   });
 }
 
+function handleUploadYardPositions(evt, quickFromTab1 = false) {
+  if (!state.sessionId) {
+    alert('⚠️ Vui lòng chọn một chuyến tàu trước khi cập nhật vị trí bãi!');
+    evt.target.value = '';
+    return;
+  }
+  if (!quickFromTab1 && !VesselUploadGuard.isUnlocked(state.sessionId)) {
+    alert('⚠️ Vui lòng xác nhận đúng tàu ở Bước 1 trước khi nạp file!');
+    evt.target.value = '';
+    return;
+  }
+  const file = evt.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = async (e) => {
+    try {
+      const wb = XLSX.read(new Uint8Array(e.target.result), { type: 'array' });
+      const rows = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], { defval: '', raw: false });
+      const normalized = DataAdapters.normalizeYardPositions(rows);
+      if (!normalized.length) {
+        alert('⚠️ Không đọc được dòng dữ liệu hợp lệ nào! Vui lòng kiểm tra file có cột "Số Container" và cột "Block / Bay / Row / Tier" hoặc "Vị trí bãi / Vùng thực tế".');
+        evt.target.value = '';
+        return;
+      }
+
+      // Gộp (merge) vào danh sách vị trí hiện có để có thể đẩy bổ sung nhiều lần trong ca
+      const mergedMap = new Map();
+      (state.yardPositionOverrides || []).forEach(x => mergedMap.set(x.cntr, x));
+      normalized.forEach(x => mergedMap.set(x.cntr, x));
+      state.yardPositionOverrides = Array.from(mergedMap.values());
+      state.yardOverridesUpdatedAt = new Date().toISOString();
+
+      const payload = {
+        schema_version: APP_CONFIG.SCHEMA_VERSION,
+        session_id: state.sessionId,
+        source: 'YARD_POS_UPDATE',
+        updated_at: state.yardOverridesUpdatedAt,
+        rows: state.yardPositionOverrides
+      };
+
+      setCardStatus('yardpos', `✓ Đã cập nhật ${state.yardPositionOverrides.length} vị trí bãi (${new Date().toLocaleTimeString('vi-VN')})`, true);
+      ShiftHistoryManager.logAction('VỊ TRÍ BÃI', `Cập nhật ${normalized.length} vị trí bãi thực tế từ file ${file.name}`, `Tổng đang ghi đè: ${state.yardPositionOverrides.length} cont`);
+      try {
+        await CloudRepo.uploadFile(state.sessionId, 'yard_positions.json', payload);
+      } catch (err) {}
+      renderAll();
+      alert(`✅ Đã cập nhật ${normalized.length} vị trí container thực tế tại bãi (tổng ${state.yardPositionOverrides.length} cont đã đồng bộ Cloud)!`);
+    } catch (err) {
+      alert('❌ Lỗi đọc file vị trí bãi: ' + err.message);
+    }
+    evt.target.value = '';
+  };
+  reader.readAsArrayBuffer(file);
+}
+
+function downloadYardPositionTemplate() {
+  const sampleRows = [
+    { 'Số Container': 'BMOU1103807', 'Kích cỡ': '20DC', 'ISO': '22G0', 'Block': 'AI', 'Bay': '12', 'Row': '03', 'Tier': '2', 'Vị trí bãi / Vùng thực tế': '' },
+    { 'Số Container': 'TCLU3726021', 'Kích cỡ': '20DC', 'ISO': '22G0', 'Block': '', 'Bay': '', 'Row': '', 'Tier': '', 'Vị trí bãi / Vùng thực tế': 'AK-08-02-1' },
+    { 'Số Container': 'OOCU1084060', 'Kích cỡ': '40HC', 'ISO': '45G0', 'Block': '', 'Bay': '', 'Row': '', 'Tier': '', 'Vị trí bãi / Vùng thực tế': 'VÙNG KHU A' }
+  ];
+  const ws = XLSX.utils.json_to_sheet(sampleRows);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'ViTriBaiThucTe');
+  XLSX.writeFile(wb, `Mau_CapNhat_ViTriBai_${state.sessionId || 'TanVu'}.xlsx`);
+}
+
 // ==================== RENDER FUNCTIONS ====================
 function getLiveVesselCfg() {
   return {
     length_m: parseFloat(document.getElementById('cfgLength')?.value) || 172,
     beam_m: parseFloat(document.getElementById('cfgBeam')?.value) || 27.6,
-    draft_f: parseFloat(document.getElementById('cfgDraftF')?.value) || 7.8,
-    draft_a: parseFloat(document.getElementById('cfgDraftA')?.value) || 8.2,
-    max_draft: parseFloat(document.getElementById('cfgMaxDraft')?.value) || 9.2,
-    cont_per_10cm: parseFloat(document.getElementById('cfgContPer10cm')?.value) || 28,
-    berth_depth: parseFloat(document.getElementById('cfgBerthDepth')?.value) || 9.0,
+    draft_f: 7.8,
+    draft_a: 8.2,
+    max_draft: 9.2,
+    cont_per_10cm: 28,
+    berth_depth: 9.0,
     deck_tier_min: parseInt(document.getElementById('cfgDeckTier')?.value, 10) || 80,
     hold_max_tier: parseInt(document.getElementById('cfgHoldMaxTier')?.value, 10) || 12
   };
 }
 
 function onLengthBeamChange() {
-  const L = parseFloat(document.getElementById('cfgLength').value) || 172;
-  const B = parseFloat(document.getElementById('cfgBeam').value) || 27.6;
-  const { contPer10cm } = DraftAndTideEngine.estimateTpcAndRate(L, B);
-  document.getElementById('cfgContPer10cm').value = contPer10cm;
+  const L = parseFloat(document.getElementById('cfgLength')?.value) || 172;
   if (!state.isCustomHoldConfig) HoldLayoutEngine.syncHoldsForState(state, L, true);
+  saveCraneAndVesselConfigPersist();
   renderAll();
 }
 
 function recalcDraftLive() {
-  const cfg = getLiveVesselCfg();
-  const pool = UnifiedPoolBuilder.build(state, cfg.deck_tier_min);
-  const d = DraftAndTideEngine.calculateLiveDraft(cfg, pool, state.holdConfig, state.todayTide);
-  document.getElementById('kpiDraftLive').textContent = `${d.draftF.toFixed(2)}m / ${d.draftA.toFixed(2)}m (${d.trimVal >= 0 ? '+' : ''}${d.trimVal.toFixed(2)}m)`;
-  const stEl = document.getElementById('kpiDraftStatus');
-  stEl.textContent = d.alertText;
-  stEl.style.color = d.level === 'DANGER' ? 'var(--red)' : (d.level === 'WARNING' ? 'var(--amber)' : 'var(--green)');
-  return d;
+  renderVesselAttitudeUI();
+  return { level: 'SAFE', bowHeavy: false, sternHeavy: false };
 }
 
 function renderOffDockSummary(pool) {
@@ -4765,7 +5483,7 @@ function openExceptionModal(kind) {
                 <td><span class="badge">${x.pod}</span></td>
                 <td>${(Number(x.weight) || 0).toFixed(2)}</td>
                 <td>${x.isOffDock ? `<span class="badge amber">Ngoài: ${x.transferPort}</span>` : '<span class="badge green">Tân Vũ (TV)</span>'}</td>
-                <td><b>${x.yardPos || '---'}</b></td>
+                <td><b>${x.yardPos || '---'}</b>${x.yardPosUpdated ? ` <span class="badge green" title="Vị trí cũ: ${x.oldYardPos || '---'}">🔄 Mới</span>` : ''}</td>
                 <td>${x.plannedPos || '---'}</td>
                 <td>${x.customs ? '<span class="badge green">Đã TL</span>' : '<span class="badge red">Chưa TL</span>'}</td>
               </tr>`).join('')}
@@ -4786,6 +5504,7 @@ function renderYardReconcileTable() {
 
   let list = pool.filter(x => {
     if (mode === 'NO_JOB' && x.jobStatus !== 'NO_JOB') return false;
+    if (mode === 'SHIFTED' && !x.yardPosUpdated) return false;
     if (mode === 'OFF_DOCK' && !x.isOffDock) return false;
     if (mode === 'TV' && x.isOffDock) return false;
     if (q) {
@@ -5147,17 +5866,20 @@ function toggleBerthingSideQuick() {
   ShiftHistoryManager.logAction('HƯỚNG MẠN', `Đổi hướng cập mạn sang ${state.berthingSide === 'STARBOARD' ? 'Mạn Phải (Starboard)' : 'Mạn Trái (Port)'}`);
   const sel = document.getElementById('cfgBerthSide');
   if (sel) sel.value = state.berthingSide;
+  saveCraneAndVesselConfigPersist();
   renderAll();
 }
 
 function onBerthingSideChanged(val) {
   state.berthingSide = val === 'STARBOARD' ? 'STARBOARD' : 'PORT';
+  saveCraneAndVesselConfigPersist();
   renderAll();
 }
 
 function autoDistributeHoldsByRail() {
   CraneRailOrder.autoDistributeHolds(state);
   ShiftHistoryManager.logAction('CHIA CẨU', 'Tự động chia lại Hầm cho các cẩu khớp thứ tự ray');
+  saveCraneAndVesselConfigPersist();
   renderAll();
 }
 
@@ -5166,12 +5888,14 @@ function shareBoundaryHold(toCraneId, fromCraneId, holdNo) {
   const fromC = state.cranes.find(x => x.id === fromCraneId);
   if (toC && !toC.holds.includes(holdNo)) toC.holds = [...toC.holds, holdNo].sort((a, b) => a - b);
   if (fromC && fromC.holds.length > 1) fromC.holds = fromC.holds.filter(h => h !== holdNo);
+  saveCraneAndVesselConfigPersist();
   renderAll();
 }
 
 function reassignCraneToHold(craneId, holdNo) {
   const c = state.cranes.find(x => x.id === craneId);
   if (c && !c.holds.includes(holdNo)) c.holds = [...c.holds, holdNo].sort((a, b) => a - b);
+  saveCraneAndVesselConfigPersist();
   renderAll();
 }
 
@@ -5237,11 +5961,13 @@ function renderDispatchRecommendations() {
                 <span class="badge">${item.size}</span>
                 <span class="badge green">${item.pod}</span>
                 ${item.inst ? `<span class="badge purple">${item.inst}</span>` : ''}
+                ${(item.reasons || []).filter(r => r.startsWith('⚖️')).map(r => `<span class="badge red">${r}</span>`).join('')}
+                ${(item.reasons || []).some(r => r.includes('Giữ đóng hầm')) ? `<span class="badge green">🔒 Giữ đóng hầm TV</span>` : ''}
                 ${!item.bottomOk ? `<span class="badge red">Chờ tầng dưới</span>` : ''}
               </div>
               <div style="font-size:10.5px;color:var(--muted);margin-top:2px;">
                 Tàu: <b>${item.plannedPos || 'Tự chọn'}</b> (H${item.holdNo || '?'}) · <b>${item.weight.toFixed(1)}T</b> ·
-                ${item.isOffDock ? `<b style="color:var(--amber)">🚛 ${item.transferPort} (Gọi sớm)</b>` : `TV (${item.yardPos})`}
+                ${item.isOffDock ? `<b style="color:var(--amber)">🚛 ${item.transferPort} (Gọi sớm)</b>` : `TV (${item.yardPos}${item.yardPosUpdated ? ' 🔄' : ''})`}
               </div>
             </div>
             <button class="primary sm" style="flex-shrink:0;" onclick="markContainerCalled('${item.cntr}', '${crane.id}', '${item.plannedPos}')">
@@ -5742,6 +6468,7 @@ function togglePresetCrane(cId) {
   const f = state.cranes.find(c => c.id === cId);
   if (f) f.active = !f.active;
   else state.cranes.push({ id: cId, active: true, mode: 'BOTH', holds: [1,2], paused: false, pauseStart: null, rate: 25 });
+  saveCraneAndVesselConfigPersist();
   renderAll();
 }
 function addCustomCrane() {
@@ -5749,17 +6476,20 @@ function addCustomCrane() {
   if (!val) return;
   if (!state.cranes.some(c => c.id === val)) state.cranes.push({ id: val, active: true, mode: 'BOTH', holds: [1,2], paused: false, pauseStart: null, rate: 25 });
   document.getElementById('customCraneInput').value = '';
+  saveCraneAndVesselConfigPersist();
   renderAll();
 }
 function updateCraneMode(craneId, mode) {
   const c = state.cranes.find(x => x.id === craneId);
   if (c) c.mode = mode;
+  saveCraneAndVesselConfigPersist();
   renderAll();
 }
 function updateCraneHolds(craneId, str) {
   const c = state.cranes.find(x => x.id === craneId);
   const maxH = Math.max(1, state.holdConfig.length);
   if (c) c.holds = str.split(',').map(x => parseInt(x.trim(), 10)).filter(n => n >= 1 && n <= maxH);
+  saveCraneAndVesselConfigPersist();
   renderAll();
 }
 function toggleCranePause(craneId) {
@@ -5768,12 +6498,14 @@ function toggleCranePause(craneId) {
   c.paused = !c.paused;
   ShiftHistoryManager.logAction('SỰ CỐ CẨU', `${c.paused ? 'Tạm dừng sự cố' : 'Chạy lại'} thiết bị ${craneId}`);
   c.pauseStart = c.paused ? Date.now() : null;
+  saveCraneAndVesselConfigPersist();
   renderAll();
 }
 function transferHolds(fromId, toId) {
   const f = state.cranes.find(c => c.id === fromId), t = state.cranes.find(c => c.id === toId);
   ShiftHistoryManager.logAction('CHUYỂN HẦM', `Chuyển hầm của ${fromId} sang ${toId}`);
   if (f && t) { t.holds = Array.from(new Set([...t.holds, ...f.holds])).sort((a, b) => a - b); f.holds = []; }
+  saveCraneAndVesselConfigPersist();
   renderAll();
 }
 function swapBackupCrane(oldId) {
@@ -5784,6 +6516,7 @@ function swapBackupCrane(oldId) {
     state.cranes.push({ id: newId, active: true, mode: o.mode, holds: [...o.holds], paused: false, pauseStart: null, rate: o.rate });
     o.active = false;
   }
+  saveCraneAndVesselConfigPersist();
   renderAll();
 }
 
@@ -5804,11 +6537,13 @@ async function clearExportDataOnly() {
   if (!confirm(`Xác nhận XÓA dữ liệu Hàng xuất của tàu [${state.sessionId}] trên Cloud để nạp lại?\n(Sơ đồ nhập SBP & thông số tàu giữ nguyên)`)) return;
   state.finalLoading = [];
   state.reservedExport = [];
+  state.yardPositionOverrides = [];
+  state.yardOverridesUpdatedAt = '';
   state.preStowagePlan = [];
   state.stowageInstructions = {};
   state.liveJobs = state.liveJobs.filter(j => j.io === 'Import');
   state.calledContainers.clear();
-  ['final','reserved','jobs','edi'].forEach(k => setCardStatus(k, 'Đã xóa trên Cloud · Sẵn sàng nạp lại', false));
+  ['final','reserved','jobs','edi','yardpos'].forEach(k => setCardStatus(k, 'Đã xóa trên Cloud · Sẵn sàng nạp lại', false));
   try { await CloudRepo.clearExportFiles(state.sessionId); } catch (e) {}
   renderAll();
 }
@@ -5930,8 +6665,7 @@ async function submitNewVesselModal() {
   document.getElementById('cfgLength').value = loa;
   document.getElementById('cfgBeam').value = beam;
   document.getElementById('cfgBerthSide').value = side;
-  const { contPer10cm } = DraftAndTideEngine.estimateTpcAndRate(loa, beam);
-  document.getElementById('cfgContPer10cm').value = contPer10cm;
+
 
   await CloudRepo.unmarkVesselDeleted(id);
 
@@ -5951,7 +6685,9 @@ async function submitNewVesselModal() {
     state.berthingSide = side;
     document.getElementById('cfgBerthSide').value = side;
     if (autoAssign) CraneRailOrder.autoDistributeHolds(state);
+    saveCraneAndVesselConfigPersist();
     renderAll();
+    openVesselSetupWizard(1);
   } catch (err) {
     msgEl.style.color = 'var(--red)';
     msgEl.textContent = 'Lỗi khởi tạo: ' + err.message;
@@ -6610,6 +7346,7 @@ function cutCraneFromWork(craneId) {
   const c = state.cranes.find(x => x.id === craneId);
   if (c) c.active = false;
   ShiftHistoryManager.logAction('CẮT CẨU', `Cắt làm việc thiết bị ${craneId}`);
+  saveCraneAndVesselConfigPersist();
   renderAll();
 }
 
@@ -6929,8 +7666,21 @@ function renderOpsCockpitAndTicker(pool) {
 
   // 1. CHỖ NÀO ĐANG KHÔNG ỔN?
   const issues = [];
-  if (draft.level === 'DANGER' || draft.level === 'WARNING') {
-    issues.push({ severity: draft.level === 'DANGER' ? 'urgent' : 'warn', title: `Mớn nước: ${draft.alertText}`, detail: `Mũi ${draft.draftF.toFixed(2)}m / Lái ${draft.draftA.toFixed(2)}m (Trim ${draft.trimVal.toFixed(2)}m).`, action: "switchTab('tab-cranes')" });
+  const att = state.vesselAttitude || { heel: 'EVEN', trim: 'EVEN' };
+  if (att.heel === 'LIST_PORT') {
+    issues.push({ severity: 'urgent', title: '↙️ Tàu đang NGHIÊNG TRÁI (Port) → Ưu tiên gọi hàng nặng Row lẻ (Mạn Phải)', detail: 'Thuật toán đã tự cộng điểm ưu tiên cho container nặng xếp bên Mạn Phải (Row lẻ) để cân tàu.', action: "expandAndScrollTo('panel-smart-dispatch')" });
+  } else if (att.heel === 'LIST_STARBOARD') {
+    issues.push({ severity: 'urgent', title: '↘️ Tàu đang NGHIÊNG PHẢI (Stbd) → Ưu tiên gọi hàng nặng Row chẵn (Mạn Trái)', detail: 'Thuật toán đã tự cộng điểm ưu tiên cho container nặng xếp bên Mạn Trái (Row chẵn) để cân tàu.', action: "expandAndScrollTo('panel-smart-dispatch')" });
+  }
+  if (att.trim === 'BOW_DOWN') {
+    issues.push({ severity: 'urgent', title: '⏬ Mũi đang CHÌM (Chúi mũi) → Ưu tiên gọi hàng nặng về các Hầm Lái', detail: 'Thuật toán đã ưu tiên gọi cont nặng ở nhóm Hầm sau (Lái) và hãm cont nặng đầu Mũi.', action: "expandAndScrollTo('panel-smart-dispatch')" });
+  } else if (att.trim === 'BOW_UP') {
+    issues.push({ severity: 'urgent', title: '⏫ Mũi đang VẾCH (Chìm lái) → Ưu tiên gọi hàng nặng lên các Hầm Mũi', detail: 'Thuật toán đã ưu tiên gọi cont nặng ở nhóm Hầm đầu (Mũi) và hãm cont nặng đuôi Lái.', action: "expandAndScrollTo('panel-smart-dispatch')" });
+  }
+  if (window._latestTkQcInfo && window._latestTkQcInfo.tkWarnings.length) {
+    window._latestTkQcInfo.tkWarnings.forEach(w => {
+      issues.push({ severity: 'urgent', title: `${w.craneId} không làm được tàu ${w.rowCount} Row (Hầm ${w.holds.join(',')})`, detail: w.message, action: "expandAndScrollTo('panel-fleet-qc-balance')" });
+    });
   }
   (analysis.railCrossingConflicts || []).forEach(cf => {
     issues.push({ severity: 'urgent', title: `Chéo ray cẩu: ${cf.message}`, detail: 'Bấm "Tự chia Hầm đúng ray" để chỉnh lại thứ tự vật lý.', action: "expandAndScrollTo('panel-ship-rail')" });
@@ -7069,59 +7819,407 @@ function renderOpsCockpitAndTicker(pool) {
 }
 
 
+let _craneSaveDebounce = null;
+function localCraneCfgKey(sid) { return `tos_crane_vessel_cfg_v1_${sid || 'DEFAULT'}`; }
+
+function saveCraneAndVesselConfigPersist(showToast = false) {
+  const sid = state.sessionId;
+  if (!sid) return;
+  const snap = {
+    updated_at: new Date().toISOString(),
+    cranes: state.cranes,
+    holdConfig: state.holdConfig,
+    isCustomHoldConfig: state.isCustomHoldConfig,
+    berthingSide: state.berthingSide,
+    vesselAttitude: state.vesselAttitude,
+    setupCompleted: state.setupCompleted,
+    deckTier: parseInt(document.getElementById('cfgDeckTier')?.value, 10) || 80,
+    holdMaxTier: parseInt(document.getElementById('cfgHoldMaxTier')?.value, 10) || 12
+  };
+  try { localStorage.setItem(localCraneCfgKey(sid), JSON.stringify(snap)); } catch (e) {}
+
+  if (_craneSaveDebounce) clearTimeout(_craneSaveDebounce);
+  _craneSaveDebounce = setTimeout(async () => {
+    try {
+      await CloudRepo.saveSessionMeta();
+      if (showToast) alert(`✓ Đã lưu cấu hình chia Cẩu & Thông số tàu [${sid}] lên Supabase Cloud!`);
+    } catch (e) {
+      if (showToast) alert('⚠️ Đã lưu trên thiết bị, nhưng lỗi lưu Cloud: ' + e.message);
+    }
+  }, showToast ? 10 : 900);
+}
+
+function restoreLocalCraneAndAttitudeIfNewer(sessionId, dbUpdatedAt) {
+  try {
+    const raw = JSON.parse(localStorage.getItem(localCraneCfgKey(sessionId)) || 'null');
+    if (!raw || !raw.updated_at) return;
+    const localTs = Date.parse(raw.updated_at) || 0;
+    const dbTs = dbUpdatedAt ? (Date.parse(dbUpdatedAt) || 0) : 0;
+    if (localTs > dbTs) {
+      if (Array.isArray(raw.cranes) && raw.cranes.length) state.cranes = raw.cranes;
+      if (Array.isArray(raw.holdConfig) && raw.holdConfig.length) {
+        state.holdConfig = raw.holdConfig;
+        state.isCustomHoldConfig = Boolean(raw.isCustomHoldConfig);
+      }
+      if (raw.berthingSide) {
+        state.berthingSide = raw.berthingSide;
+        const sideSel = document.getElementById('cfgBerthSide');
+        if (sideSel) sideSel.value = state.berthingSide;
+      }
+      if (raw.vesselAttitude) state.vesselAttitude = raw.vesselAttitude;
+      if (raw.deckTier) { const el = document.getElementById('cfgDeckTier'); if (el) el.value = raw.deckTier; }
+      if (raw.holdMaxTier) { const el = document.getElementById('cfgHoldMaxTier'); if (el) el.value = raw.holdMaxTier; }
+      if (raw.setupCompleted !== undefined) state.setupCompleted = Boolean(raw.setupCompleted);
+    }
+  } catch (e) {}
+}
+
+function setVesselAttitude(kind, val) {
+  if (!state.vesselAttitude) state.vesselAttitude = { heel: 'EVEN', trim: 'EVEN' };
+  state.vesselAttitude[kind] = val;
+  const labelMap = {
+    EVEN: 'Cân bằng', LIST_PORT: 'Nghiêng Trái (Port)', LIST_STARBOARD: 'Nghiêng Phải (Stbd)',
+    BOW_DOWN: 'Mũi đang chìm (Chúi mũi)', BOW_UP: 'Mũi đang vếch (Chìm lái)'
+  };
+  ShiftHistoryManager.logAction('CÂN BẰNG TÀU', `Báo ${kind === 'heel' ? 'Nghiêng mạn' : 'Mũi/Lái'}: ${labelMap[val] || val}`);
+  saveCraneAndVesselConfigPersist();
+  renderAll();
+}
+
+function renderVesselAttitudeUI() {
+  const att = state.vesselAttitude || { heel: 'EVEN', trim: 'EVEN' };
+  const bar = document.getElementById('vesselAttitudeBar');
+  const setCls = (id, active, isWarn) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.className = 'att-btn' + (active ? (isWarn ? ' active-warn' : ' active-ok') : '');
+  };
+  setCls('btnHeelEven', att.heel === 'EVEN', false);
+  setCls('btnHeelPort', att.heel === 'LIST_PORT', true);
+  setCls('btnHeelStbd', att.heel === 'LIST_STARBOARD', true);
+  setCls('btnTrimEven', att.trim === 'EVEN', false);
+  setCls('btnTrimBowDown', att.trim === 'BOW_DOWN', true);
+  setCls('btnTrimBowUp', att.trim === 'BOW_UP', true);
+
+  const hasIssue = att.heel !== 'EVEN' || att.trim !== 'EVEN';
+  if (bar) bar.classList.toggle('alert-active', hasIssue);
+
+  const parts = [];
+  const advices = [];
+  if (att.heel === 'LIST_PORT') { parts.push('↙️ Nghiêng Trái'); advices.push('Ưu tiên nặng Row lẻ (Mạn Phải)'); }
+  else if (att.heel === 'LIST_STARBOARD') { parts.push('↘️ Nghiêng Phải'); advices.push('Ưu tiên nặng Row chẵn (Mạn Trái)'); }
+  if (att.trim === 'BOW_DOWN') { parts.push('⏬ Mũi chìm'); advices.push('Ưu tiên nặng Hầm Lái'); }
+  else if (att.trim === 'BOW_UP') { parts.push('⏫ Mũi vếch'); advices.push('Ưu tiên nặng Hầm Mũi'); }
+
+  const inl = document.getElementById('attitudeAdviceInline');
+  if (inl) {
+    inl.textContent = hasIssue ? `⚡ Xử lý: ${advices.join(' + ')}` : '✅ Tàu đang cân bằng tốt';
+    inl.style.color = hasIssue ? 'var(--red)' : 'var(--green)';
+  }
+  const kpiMain = document.getElementById('kpiAttitudeLive');
+  const kpiSub = document.getElementById('kpiAttitudeSub');
+  if (kpiMain) {
+    kpiMain.textContent = hasIssue ? parts.join(' · ') : '⚖️ Cân bằng tốt';
+    kpiMain.style.color = hasIssue ? 'var(--red)' : 'var(--green)';
+  }
+  if (kpiSub) {
+    kpiSub.textContent = hasIssue ? advices.join(' · ') : 'Mạn cân · Mũi/Lái cân';
+  }
+}
+
+// ==================== TRÌNH THIẾT LẬP 5 BƯỚC CHUẨN ====================
 function openPostAscSetupModal(items) {
-  // Tự động quét file ASC vừa nạp để gợi ý Tier đầu tiên trên Boong & Tier cao nhất dưới Hầm
-  const holdTiers = [];
-  const deckTiers = [];
+  // Sau khi nạp ASC ở Tab 4, mở luôn Wizard ở Bước 2 (Chạy Bot) hoặc Bước 3 nếu đã phát hiện Tier
+  const holdTiers = [], deckTiers = [];
   (items || state.preStowagePlan || []).forEach(it => {
     const p = DataAdapters.parsePos6(it.pos);
     if (!p) return;
     if (p.tierNum >= 60) deckTiers.push(p.tierNum);
     else if (p.tierNum > 0) holdTiers.push(p.tierNum);
   });
-  const suggestedDeckMin = deckTiers.length ? Math.min(...deckTiers) : (parseInt(document.getElementById('cfgDeckTier')?.value, 10) || 80);
-  const suggestedHoldMax = holdTiers.length ? Math.max(...holdTiers) : (parseInt(document.getElementById('cfgHoldMaxTier')?.value, 10) || 12);
-
-  document.getElementById('ascFirstDeckTierInput').value = suggestedDeckMin;
-  document.getElementById('ascMaxHoldTierInput').value = suggestedHoldMax;
-  document.getElementById('postAscDetectedInfo').innerHTML =
-    `✅ Đã nạp thành công <b>${(state.preStowagePlan || []).length}</b> vị trí từ file <b>.ASC / .EDI</b>.<br>` +
-    `🔎 Hệ thống tự đo được: Tier dưới hầm cao nhất = <b>${String(suggestedHoldMax).padStart(2,'0')}</b> · Tier đầu tiên trên boong = <b>${String(suggestedDeckMin).padStart(2,'0')}</b>. Vui lòng kiểm tra lại và chọn thiết bị khai thác:`;
-
-  renderAscCranePicker();
-  document.getElementById('postAscSetupModal').classList.add('open');
+  if (deckTiers.length) document.getElementById('cfgDeckTier').value = Math.min(...deckTiers);
+  if (holdTiers.length) { const el = document.getElementById('cfgHoldMaxTier'); if (el) el.value = Math.max(...holdTiers); }
+  saveCraneAndVesselConfigPersist();
+  openVesselSetupWizard(2);
 }
 
-function renderAscCranePicker() {
-  const wrap = document.getElementById('ascCranePickerList');
-  if (!wrap) return;
-  wrap.innerHTML = PRESET_CRANES.map(cId => {
-    const act = state.cranes.some(c => c.id === cId && c.active);
-    return `<button type="button" class="sm ${act ? 'primary' : ''}" onclick="togglePresetCraneInAscModal('${cId}')">${act ? '✓ ' : '+ '}${cId}</button>`;
-  }).join('');
+function openVesselSetupWizard(startStep = 1) {
+  document.getElementById('wizSessionTitle').textContent = state.sessionId || 'Chưa chọn tàu';
+  document.getElementById('vesselSetupWizardModal').classList.add('open');
+  goWizardStep(startStep);
 }
 
-function togglePresetCraneInAscModal(cId) {
-  const f = state.cranes.find(c => c.id === cId);
-  if (f) f.active = !f.active;
-  else state.cranes.push({ id: cId, active: true, mode: 'BOTH', holds: [1,2], paused: false, pauseStart: null, rate: 25 });
-  renderAscCranePicker();
+function goWizardStep(stepNo) {
+  for (let i = 1; i <= 6; i++) {
+    document.getElementById(`wpane-${i}`)?.classList.toggle('active', i === stepNo);
+    const pill = document.getElementById(`wstep-${i}`);
+    if (pill) {
+      pill.classList.toggle('active', i === stepNo);
+      pill.classList.toggle('done', i < stepNo);
+    }
+  }
+  if (stepNo === 1) {
+    const box = document.getElementById('wizAscStatusBox');
+    if (box) {
+      const cnt = (state.preStowagePlan || []).length;
+      box.innerHTML = cnt > 0
+        ? `✅ Đã có <b>${cnt}</b> vị trí .ASC / .EDI trên tàu <b>${state.sessionId}</b> (có thể nạp file mới để cập nhật hoặc bấm Tiếp theo).`
+        : `⚠️ Tàu <b>${state.sessionId}</b> chưa có file .ASC / .EDI. Hãy chọn file ở ô trên để nạp ngay.`;
+    }
+  } else if (stepNo === 2) {
+    document.getElementById('wizBotUser').value = document.getElementById('botTosUser')?.value || '';
+    document.getElementById('wizBotCode').value = document.getElementById('botVesselCode')?.value || '';
+    document.getElementById('wizBotYear').value = document.getElementById('botVesselYear')?.value || '2026';
+    document.getElementById('wizBotSeq').value = document.getElementById('botVesselSeq')?.value || '0006';
+    document.getElementById('wizBotMsg').textContent = '';
+  } else if (stepNo === 3) {
+    renderWizardCranes();
+  } else if (stepNo === 4) {
+    document.getElementById('wizVesselName').value = document.getElementById('cfgVesselName')?.value || '';
+    document.getElementById('wizVoyage').value = document.getElementById('cfgVoyage')?.value || '';
+    document.getElementById('wizBerth').value = document.getElementById('cfgBerth')?.value || 'TV3';
+    document.getElementById('wizBerthSide').value = state.berthingSide || 'PORT';
+    document.getElementById('wizLength').value = document.getElementById('cfgLength')?.value || 172;
+    document.getElementById('wizBeam').value = document.getElementById('cfgBeam')?.value || 27.6;
+    document.getElementById('wizFirstDeckTier').value = document.getElementById('cfgDeckTier')?.value || 80;
+    document.getElementById('wizMaxHoldTier').value = document.getElementById('cfgHoldMaxTier')?.value || 12;
+  } else if (stepNo === 5) {
+    renderWizardYardsAndPeak();
+  }
 }
 
-async function applyPostAscSetup() {
-  const deckMin = parseInt(document.getElementById('ascFirstDeckTierInput')?.value, 10) || 80;
-  const holdMax = parseInt(document.getElementById('ascMaxHoldTierInput')?.value, 10) || 12;
-  document.getElementById('cfgDeckTier').value = deckMin;
-  const hmEl = document.getElementById('cfgHoldMaxTier');
-  if (hmEl) hmEl.value = holdMax;
+function handleWizardAscUpload(evt) {
+  if (!VesselUploadGuard.isUnlocked(state.sessionId)) VesselUploadGuard.confirmedSessionId = state.sessionId;
+  const files = Array.from(evt.target.files || []);
+  files.forEach(file => {
+    const reader = new FileReader();
+    reader.onload = async (e) => {
+      const text = e.target.result;
+      const res = (text.includes('UNH+') && text.includes('BAPLIE'))
+        ? DataAdapters.parseBaplieEdi(text) : DataAdapters.parse604Asc(text);
+      if (res.items.length) state.preStowagePlan = res.items;
+      const holdTiers = [], deckTiers = [];
+      res.items.forEach(it => {
+        const p = DataAdapters.parsePos6(it.pos);
+        if (!p) return;
+        if (p.tierNum >= 60) deckTiers.push(p.tierNum);
+        else if (p.tierNum > 0) holdTiers.push(p.tierNum);
+      });
+      if (deckTiers.length) document.getElementById('cfgDeckTier').value = Math.min(...deckTiers);
+      if (holdTiers.length) { const el = document.getElementById('cfgHoldMaxTier'); if (el) el.value = Math.max(...holdTiers); }
+      HoldLayoutEngine.syncHoldsForState(state, parseFloat(document.getElementById('cfgLength').value) || 172, false);
+      setCardStatus('edi', `✓ ${state.preStowagePlan.length} vị trí (${res.detectedVessel || file.name})`, true);
+      try {
+        await CloudRepo.saveSessionMeta();
+        await CloudRepo.uploadFile(state.sessionId, 'edi_stowage.json', { instructions: state.stowageInstructions, preStowage: state.preStowagePlan });
+      } catch (err) {}
+      updateEdiFirstRequirementUI();
+      renderAll();
+      goWizardStep(1);
+    };
+    reader.readAsText(file);
+  });
+}
 
-  CraneRailOrder.autoDistributeHolds(state);
-  const activeIds = CraneRailOrder.sortCranesOnRail(state.cranes.filter(c => c.active)).map(c => c.id).join(', ');
-  ShiftHistoryManager.logAction('THIẾT LẬP ASC', `Thiết bị: ${activeIds || 'Chưa chọn'} · Boong ≥ ${deckMin} · Hầm ≤ ${holdMax}`);
+async function startBotFromWizard() {
+  document.getElementById('botTosUser').value = document.getElementById('wizBotUser').value.trim();
+  document.getElementById('botTosPass').value = document.getElementById('wizBotPass').value;
+  document.getElementById('botVesselCode').value = document.getElementById('wizBotCode').value.trim().toUpperCase();
+  document.getElementById('botVesselYear').value = document.getElementById('wizBotYear').value.trim();
+  document.getElementById('botVesselSeq').value = document.getElementById('wizBotSeq').value.trim();
+  const msgEl = document.getElementById('wizBotMsg');
+  if (!document.getElementById('botTosUser').value || !document.getElementById('botTosPass').value) {
+    msgEl.style.color = 'var(--red)';
+    msgEl.textContent = 'Vui lòng nhập TK và MK PL-TOS (hoặc bấm Tiếp để bỏ qua nếu nạp Excel tay).';
+    return;
+  }
+  await startRemoteBot();
+  msgEl.style.color = 'var(--green)';
+  msgEl.textContent = '✓ Đã gửi lệnh khởi động Bot tới máy trạm Windows! Bấm Tiếp để chia thiết bị.';
+}
 
-  closeModal('postAscSetupModal');
-  try { await CloudRepo.saveSessionMeta(); } catch (e) {}
+function renderWizardCranes() {
+  const picker = document.getElementById('wizCranePickerList');
+  if (picker) {
+    picker.innerHTML = PRESET_CRANES.map(cId => {
+      const act = state.cranes.some(c => c.id === cId && c.active);
+      return `<button type="button" class="sm ${act ? 'primary' : ''}" onclick="togglePresetCrane('${cId}');renderWizardCranes()">${act ? '✓ ' : '+ '}${cId}</button>`;
+    }).join('');
+  }
+  const tbl = document.getElementById('wizCraneAssignTable');
+  if (tbl) {
+    const active = CraneRailOrder.sortCranesOnRail(state.cranes.filter(c => c.active));
+    tbl.innerHTML = `<table>
+      <thead><tr><th>Thiết bị</th><th>Chế độ</th><th>Hầm phụ trách</th></tr></thead>
+      <tbody>${active.map((c, idx) => `<tr>
+        <td><b>#${idx + 1} ${c.id}</b></td>
+        <td><select onchange="updateCraneMode('${c.id}', this.value);renderWizardCranes()">
+          <option value="BOTH" ${c.mode === 'BOTH' ? 'selected' : ''}>Nhập + Xuất</option>
+          <option value="IMPORT_ONLY" ${c.mode === 'IMPORT_ONLY' ? 'selected' : ''}>Chỉ Nhập</option>
+          <option value="EXPORT_ONLY" ${c.mode === 'EXPORT_ONLY' ? 'selected' : ''}>Chỉ Xuất</option>
+        </select></td>
+        <td><input value="${c.holds.join(',')}" style="width:95px" onchange="updateCraneHolds('${c.id}', this.value)"></td>
+      </tr>`).join('')}</tbody>
+    </table>`;
+  }
+}
+
+function applyWizardStep4() {
+  document.getElementById('cfgVesselName').value = (document.getElementById('wizVesselName').value || '').trim().toUpperCase();
+  document.getElementById('cfgVoyage').value = (document.getElementById('wizVoyage').value || '').trim().toUpperCase();
+  document.getElementById('cfgBerth').value = (document.getElementById('wizBerth').value || 'TV3').trim().toUpperCase();
+  document.getElementById('cfgLength').value = parseFloat(document.getElementById('wizLength').value) || 172;
+  document.getElementById('cfgBeam').value = parseFloat(document.getElementById('wizBeam').value) || 27.6;
+  document.getElementById('cfgDeckTier').value = parseInt(document.getElementById('wizFirstDeckTier').value, 10) || 80;
+  document.getElementById('cfgHoldMaxTier').value = parseInt(document.getElementById('wizMaxHoldTier').value, 10) || 12;
+  state.berthingSide = document.getElementById('wizBerthSide').value === 'STARBOARD' ? 'STARBOARD' : 'PORT';
+  document.getElementById('cfgBerthSide').value = state.berthingSide;
+  saveCraneAndVesselConfigPersist();
   renderAll();
+}
+
+function renderWizardYardsAndPeak() {
+  const tbl = document.getElementById('wizYardsTable');
+  if (tbl) {
+    tbl.innerHTML = `<table>
+      <thead><tr><th>Mã bãi</th><th>Tên bãi ngoài</th><th>km</th><th>Xóa</th></tr></thead>
+      <tbody>${(state.offDockCatalog || []).map((item, idx) => `<tr>
+        <td><b>${item.code}</b></td>
+        <td>${item.name}</td>
+        <td><input type="number" step="0.5" min="0.5" value="${item.distanceKm}" style="width:65px;min-height:26px;" onchange="updateOffDockItem(${idx},'distanceKm',this.value);renderWizardYardsAndPeak()"></td>
+        <td><button class="sm danger" onclick="removeOffDockCatalogItem(${idx});renderWizardYardsAndPeak()">✕</button></td>
+      </tr>`).join('')}</tbody>
+    </table>`;
+  }
+  const pkWrap = document.getElementById('wizPeakHours');
+  if (pkWrap) {
+    const pkSet = new Set((state.peakHours || []).map(Number));
+    let html = '';
+    for (let h = 0; h < 24; h++) {
+      const act = pkSet.has(h);
+      html += `<span class="peak-hour-chip ${act ? 'active' : ''}" onclick="togglePeakHour(${h});renderWizardYardsAndPeak()">${act ? '🚦 ' : ''}${String(h).padStart(2,'0')}h</span>`;
+    }
+    pkWrap.innerHTML = html;
+  }
+}
+
+function addYardFromWizard() {
+  const code = (document.getElementById('wizNewYardCode')?.value || '').trim().toUpperCase();
+  const name = (document.getElementById('wizNewYardName')?.value || '').trim() || ('Bãi ngoài ' + code);
+  const km = parseFloat(document.getElementById('wizNewYardKm')?.value) || 6;
+  if (!code || code === 'TV' || code === 'VNTVP') return;
+  const idx = state.offDockCatalog.findIndex(x => x.code.toUpperCase() === code);
+  if (idx >= 0) state.offDockCatalog[idx] = { code, name, distanceKm: km };
+  else state.offDockCatalog.push({ code, name, distanceKm: km });
+  document.getElementById('wizNewYardCode').value = '';
+  document.getElementById('wizNewYardName').value = '';
+  persistLocalOffDockCfg();
+  renderWizardYardsAndPeak();
+}
+
+async function finishVesselSetupWizard() {
+  state.setupCompleted = true;
+  persistLocalOffDockCfg();
+  saveCraneAndVesselConfigPersist();
+  const activeCranes = CraneRailOrder.sortCranesOnRail(state.cranes.filter(c => c.active));
+  const vName = document.getElementById('cfgVesselName')?.value || state.sessionId;
+  const deckMin = document.getElementById('cfgDeckTier')?.value || 80;
+  const holdMax = document.getElementById('cfgHoldMaxTier')?.value || 12;
+
+  ShiftHistoryManager.logAction('HOÀN TẤT THIẾT LẬP', `Hoàn tất 5 bước thiết lập tàu ${vName}`, `Cẩu: ${activeCranes.map(c => c.id + '(H' + c.holds.join(',') + ')').join(', ')}`);
+
+  document.getElementById('wizWelcomeSummary').innerHTML = `
+    <div>🚢 Tàu: <b>${vName}</b> (${document.getElementById('cfgBerth')?.value || 'TV3'}) · <b>${state.berthingSide === 'STARBOARD' ? 'Cập Mạn Phải' : 'Cập Mạn Trái'}</b></div>
+    <div>🏗️ Thiết bị đã lưu: <b>${activeCranes.map(c => `${c.id} [H${c.holds.join(',')}]`).join(' · ') || 'Chưa chọn'}</b></div>
+    <div>🔒 Nắp hầm: Dưới hầm ≤ <b>Tier ${String(holdMax).padStart(2,'0')}</b> · Trên boong ≥ <b>Tier ${deckMin}</b> · Bãi ngoài: <b>${state.offDockCatalog.length} bãi</b></div>
+  `;
+  goWizardStep(6);
+}
+
+function enterOperationsAfterWizard() {
+  closeModal('vesselSetupWizardModal');
+  switchTab('tab-dispatch');
+  renderAll();
+}
+
+function renderFleetAndQcBalancePanel(pool) {
+  const cfg = getLiveVesselCfg();
+  const shift = document.getElementById('shiftFilter')?.value || 'ALL';
+  const analysis = CraneEngine.analyzeCraneBalance(state, pool, shift);
+  const fleet = OffDockFleetAndQcEngine.analyzeFleetAndTvReserve(state, pool, analysis, cfg.deck_tier_min, cfg.hold_max_tier);
+  const tkQc = OffDockFleetAndQcEngine.analyzeTkReachAndQcShift(state, pool, analysis);
+  window._latestTkQcInfo = tkQc;
+
+  const sumBadge = document.getElementById('fleetQcSummaryBadge');
+  if (sumBadge) {
+    sumBadge.textContent = `TV ưu tiên ${fleet.tvSharePct}% · ${fleet.totalOffDockTrucks} xe bãi ngoài · ${tkQc.detectedRowCount} Row`;
+  }
+  const trkBadge = document.getElementById('offDockTrucksTotalBadge');
+  if (trkBadge) trkBadge.textContent = `${fleet.totalOffDockTrucks} xe bãi ngoài`;
+  const resBadge = document.getElementById('tvHatchReserveBadge');
+  if (resBadge) resBadge.textContent = `${fleet.totalReservedTv} cont TV giữ`;
+  const rowBadge = document.getElementById('vesselRowWidthBadge');
+  if (rowBadge) {
+    rowBadge.textContent = tkQc.isWide11Plus ? `⚠️ ${tkQc.detectedRowCount} Row (Cần QC)` : `✅ ${tkQc.detectedRowCount} Row (TK/QC đều được)`;
+    rowBadge.className = `badge ${tkQc.isWide11Plus ? 'red' : 'green'}`;
+  }
+
+  // Box 1: Cân đối xe bãi ngoài (ưu tiên hàng TV)
+  const fleetBox = document.getElementById('offDockFleetBalanceBox');
+  if (fleetBox) {
+    const tvHeader = `
+      <div class="fleet-row-card tv-prio">
+        <div><b>🏭 Nội bộ Tân Vũ (TV):</b> Còn <b>${fleet.tvRemCount} cont</b> → Ưu tiên chiếm <b>${fleet.tvSharePct}%</b> năng suất cầu (~${Math.round(fleet.totalVesselRate * fleet.tvSharePct / 100)} mv/h).</div>
+      </div>`;
+    const yardsHtml = fleet.yards.length ? fleet.yards.map(y => `
+      <div class="fleet-row-card ${y.blockingUnderDeck > 0 ? 'urgent' : ''}">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:4px;">
+          <b>🚛 ${y.code} (${y.distanceKm}km)</b>
+          <span class="badge ${y.blockingUnderDeck > 0 ? 'red' : 'amber'}">Chạy ${y.trucks} xe</span>
+        </div>
+        <div style="font-size:10.5px;color:var(--muted);margin-top:2px;">
+          Còn <b>${y.total}</b> (${y.readyB}B/${y.holdA}A) · Vòng quay ~<b>${y.roundTripMins}p</b> (~${y.capPerHr} mv/h)
+          ${y.blockingUnderDeck > 0 ? ` · <b style="color:var(--red);">⚠️ ${y.blockingUnderDeck} cont chặn dưới hầm (gọi trước)</b>` : ''}
+        </div>
+      </div>`).join('') : '<div style="font-size:11px;color:var(--muted);">Không có container bãi ngoài còn tồn.</div>';
+    fleetBox.innerHTML = tvHeader + yardsHtml;
+  }
+
+  // Box 2: Quỹ Cont TV để dành đóng nắp hầm nhanh
+  const resBox = document.getElementById('tvHatchReserveBox');
+  if (resBox) {
+    resBox.innerHTML = fleet.holdReserves.length ? fleet.holdReserves.slice(0, 5).map(hr => {
+      const payload = encodeURIComponent(JSON.stringify(hr.picked.map(c => ({ cntr: c.cntr, pos: c.plannedPos, yard: 'TV' }))));
+      return `
+        <div class="fleet-row-card tv-prio">
+          <div style="display:flex;justify-content:space-between;align-items:center;gap:4px;">
+            <b>${hr.label}</b>
+            <span class="badge ${hr.readyToCloseNow ? 'amber' : 'green'}">${hr.readyToCloseNow ? '🔓 Gọi chốt ngay' : `🔒 Giữ ${hr.picked.length} cont TV`}</span>
+          </div>
+          <div style="font-size:10.5px;color:var(--muted);margin-top:2px;">
+            ${hr.picked.map(c => `<b>${c.cntr.slice(-7)}</b> (${c.plannedPos || 'TV'})`).join(', ')}
+          </div>
+          ${hr.readyToCloseNow ? `<div style="margin-top:4px;"><button class="sm success" onclick="callBatchHatchContainers(${hr.hold}, 'TV_CLOSE', '${payload}')">📞 Gọi ngay để đóng nắp hầm</button></div>` : ''}
+        </div>`;
+    }).join('') : '<div style="font-size:11px;color:var(--muted);">Chưa có cont TV dưới hầm cần để dành đóng nắp.</div>';
+  }
+
+  // Box 3: Tầm với TK/QC (>= 11 Row) & Chi phí di chuyển QC (10-15p)
+  const tkBox = document.getElementById('tkQcReachAndShiftBox');
+  if (tkBox) {
+    let html = '';
+    if (tkQc.tkWarnings.length) {
+      html += tkQc.tkWarnings.map(w => `<div class="fleet-row-card urgent"><b>${w.message}</b></div>`).join('');
+    } else {
+      html += `<div class="fleet-row-card tv-prio">✅ Bố trí TK/QC phù hợp tầm với (${tkQc.detectedRowCount} Row).</div>`;
+    }
+    if (tkQc.qcShiftAdvices.length) {
+      html += tkQc.qcShiftAdvices.map(a => `<div class="fleet-row-card ${a.worthMoving ? 'tv-prio' : ''}">${a.text}</div>`).join('');
+    } else {
+      html += `<div class="fleet-row-card">⏱️ <b>Định mức chuyển hầm QC:</b> ${tkQc.qcMoveMinsMin}–${tkQc.qcMoveMinsMax} phút/lần (~5–6 moves). Chỉ dịch QC sang hầm khác khi hầm đích còn ≥15 cont để tối ưu năng suất.</div>`;
+    }
+    tkBox.innerHTML = html;
+  }
 }
 
 function renderAll() {
@@ -7146,6 +8244,7 @@ function renderAll() {
   renderHorizontalShipRailCard();
   renderOffDockSummary(pool);
   renderExportPrepAdvisory(pool);
+  renderFleetAndQcBalancePanel(pool);
   renderHatchCoverWatch(pool);
   renderCallableCargoSummary(pool);
   renderOpsCockpitAndTicker(pool);
