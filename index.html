@@ -854,6 +854,214 @@ pre.schema-box {
 .callable-chip.purple .cc-cnt { background: var(--purple); }
 .callable-chip.green .cc-cnt { background: var(--green); }
 
+/* ==================== TICKER BAR (KHUYẾN NGHỊ CHẠY NGANG DƯỚI HEADER) ==================== */
+.advisory-ticker-bar {
+  background: linear-gradient(90deg, #0f172a, #1e293b);
+  color: #f8fafc;
+  border-bottom: 2px solid var(--amber);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 12px;
+  font-size: 12px;
+  position: sticky;
+  top: 52px;
+  z-index: 45;
+}
+:root[data-theme="dark"] .advisory-ticker-bar {
+  background: linear-gradient(90deg, #06101c, #0f2238);
+}
+.ticker-inbox-btn {
+  background: var(--amber);
+  color: #fff;
+  border: 0;
+  border-radius: 999px;
+  padding: 4px 10px;
+  min-height: 26px;
+  font-size: 11px;
+  font-weight: 850;
+  white-space: nowrap;
+  flex-shrink: 0;
+  box-shadow: 0 0 0 0 rgba(217,119,6,0.6);
+}
+.ticker-inbox-btn.has-unread {
+  animation: pulseAmber 2s infinite;
+}
+@keyframes pulseAmber {
+  0% { box-shadow: 0 0 0 0 rgba(245,158,11,0.7); }
+  70% { box-shadow: 0 0 0 7px rgba(245,158,11,0); }
+  100% { box-shadow: 0 0 0 0 rgba(245,158,11,0); }
+}
+.ticker-viewport {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  position: relative;
+  cursor: pointer;
+  height: 22px;
+  display: flex;
+  align-items: center;
+}
+.ticker-track {
+  display: inline-flex;
+  align-items: center;
+  gap: 28px;
+  white-space: nowrap;
+  will-change: transform;
+  animation: tickerScroll 36s linear infinite;
+}
+.ticker-viewport:hover .ticker-track {
+  animation-play-state: paused;
+}
+@keyframes tickerScroll {
+  0% { transform: translateX(0%); }
+  100% { transform: translateX(-50%); }
+}
+.ticker-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 700;
+  font-size: 11.5px;
+}
+.ticker-dot { width: 7px; height: 7px; border-radius: 50%; display: inline-block; flex-shrink: 0; }
+.ticker-dot.urgent { background: #ef4444; }
+.ticker-dot.warn { background: #f59e0b; }
+.ticker-dot.info { background: #38bdf8; }
+.ticker-dot.ok { background: #10b981; }
+
+/* ==================== INBOX & SHIFT HISTORY MODAL ==================== */
+.inbox-tabs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-bottom: 12px; }
+.inbox-tabs button.active { background: var(--cyan); color: #fff; border-color: var(--cyan); }
+.inbox-pane { display: none; }
+.inbox-pane.active { display: block; }
+.mail-card {
+  border: 1px solid var(--line);
+  border-left: 4px solid var(--cyan);
+  border-radius: 8px;
+  padding: 9px 11px;
+  margin-bottom: 8px;
+  background: var(--bg);
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.mail-card.unread { background: rgba(2,132,199,0.08); border-color: var(--cyan); }
+.mail-card.urgent { border-left-color: var(--red); }
+.mail-card.warn { border-left-color: var(--amber); }
+.mail-card.ok { border-left-color: var(--green); }
+.mail-head { display: flex; justify-content: space-between; align-items: center; gap: 6px; flex-wrap: wrap; }
+.mail-body { margin-top: 6px; font-size: 11.5px; display: none; padding-top: 6px; border-top: 1px dashed var(--line); }
+.mail-card.expanded .mail-body { display: block; }
+.audit-row {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+  padding: 7px 9px;
+  border-bottom: 1px solid var(--line);
+  font-size: 11.5px;
+}
+.audit-time {
+  font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+  font-size: 10.5px;
+  color: var(--muted);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* ==================== COMPACT COLLAPSIBLE PANELS ==================== */
+.panel.is-collapsed .panel-body { display: none; }
+.panel-collapse-btn {
+  padding: 2px 8px;
+  min-height: 24px;
+  font-size: 10.5px;
+  border-radius: 6px;
+  background: var(--bg);
+  color: var(--muted);
+}
+
+/* ==================== OPS COMMAND COCKPIT (TỐI ƯU ĐIỆN THOẠI / MÁY TÍNH BẢNG) ==================== */
+.ops-cockpit {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+  margin-bottom: 12px;
+}
+.cockpit-card {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-top: 3px solid var(--cyan);
+  border-radius: 11px;
+  padding: 10px 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  min-width: 0;
+}
+.cockpit-card.c-alert { border-top-color: var(--red); }
+.cockpit-card.c-need { border-top-color: var(--amber); }
+.cockpit-card.c-area { border-top-color: var(--cyan); }
+.cockpit-card.c-remain { border-top-color: var(--green); }
+.cockpit-title {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 6px;
+  font-weight: 900;
+  font-size: 12px;
+}
+.cockpit-list {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+.cockpit-row {
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 6px 8px;
+  font-size: 11.5px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+}
+.cockpit-row:hover { border-color: var(--cyan); }
+.cockpit-row.urgent { border-left: 3.5px solid var(--red); background: rgba(220,38,38,0.07); }
+.cockpit-row.warn { border-left: 3.5px solid var(--amber); background: rgba(217,119,6,0.07); }
+.cockpit-row.ok { border-left: 3.5px solid var(--green); background: rgba(5,150,105,0.07); }
+.cockpit-chips { display: flex; flex-wrap: wrap; gap: 5px; }
+
+/* ==================== DUAL VIEW MODE: MOBILE/TABLET vs PC ==================== */
+:root[data-view="mobile"] body { padding-bottom: 68px; }
+:root[data-view="mobile"] .nav-tabs-desktop { display: none !important; }
+:root[data-view="mobile"] .mobile-bottom-nav { display: grid !important; }
+:root[data-view="mobile"] .container { max-width: 820px; padding: 10px 10px 28px; }
+:root[data-view="mobile"] .ops-cockpit { grid-template-columns: 1fr; gap: 9px; }
+:root[data-view="mobile"] .grid-2,
+:root[data-view="mobile"] .grid-3 { grid-template-columns: 1fr !important; }
+:root[data-view="mobile"] .kpi-strip {
+  display: flex;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  padding: 7px 10px;
+  gap: 7px;
+}
+:root[data-view="mobile"] .kpi-card { min-width: 158px; flex: 0 0 auto; scroll-snap-align: start; }
+:root[data-view="mobile"] .brand-sub { display: none; }
+:root[data-view="mobile"] .advisory-ticker-bar { top: 0; position: relative; }
+
+:root[data-view="pc"] .ops-cockpit { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+
+@media (max-width: 1180px) {
+  .ops-cockpit { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 768px) {
+  .ops-cockpit { grid-template-columns: 1fr; }
+  .advisory-ticker-bar { position: relative; top: 0; padding: 5px 8px; }
+}
+
 /* ==================== RESPONSIVE BREAKPOINTS ==================== */
 @media (max-width: 1100px) {
   .grid-2, .grid-3 { grid-template-columns: 1fr; }
@@ -975,10 +1183,26 @@ pre.schema-box {
     <button class="danger" onclick="deleteCurrentVesselSession()" title="Xóa tàu đang chọn (xóa tàu thừa/tạo nhầm, yêu cầu mã PIN)">🗑️ Xóa tàu</button>
     <button class="ghost" onclick="syncAllCloudData()" title="Đồng bộ dữ liệu từ Supabase Cloud & Bot ePort">🔄 Cloud</button>
     <button class="ghost" id="btnAutoPoll" onclick="openBotControlModal()" title="Điều khiển Bot OM tự động đăng nhập PL-TOS & reload F5 mỗi 5 phút">🤖 Bot OM</button>
+    <button class="ghost" id="btnViewModeToggle" onclick="toggleViewMode()" title="Chuyển giao diện Điện thoại/Máy tính bảng ↔ Máy tính PC">💻 PC</button>
     <button class="ghost" id="btnAdminPinHeader" onclick="openAdminPinModal('quản lý mã PIN', true)" title="Xác thực / Đổi PIN / Quên PIN">🔒 PIN</button>
     <button class="ghost" onclick="toggleTheme()" title="Sáng / Tối">🌓</button>
   </div>
 </header>
+
+<!-- THANH KHUYẾN NGHỊ CHẠY LIÊN TỤC DƯỚI HEADER & HỘP THƯ GỬI NGƯỜI SỬ DỤNG -->
+<div class="advisory-ticker-bar" id="advisoryTickerBar">
+  <button class="ticker-inbox-btn" id="btnOpenInboxTicker" onclick="openHistoryInboxModal('inbox')" title="Mở Hộp thư Khuyến nghị gửi đến bạn">
+    📩 Hộp thư <span id="inboxUnreadBadge">0</span>
+  </button>
+  <div class="ticker-viewport" onclick="openHistoryInboxModal('inbox')" title="Bấm để mở chi tiết Khuyến nghị & Lịch sử ca">
+    <div class="ticker-track" id="advisoryTickerTrack">
+      <span class="ticker-item"><span class="ticker-dot info"></span>Đang tổng hợp khuyến nghị điều hành theo dữ liệu tàu...</span>
+    </div>
+  </div>
+  <button class="ghost sm" style="min-height:26px;padding:3px 9px;white-space:nowrap;" onclick="openHistoryInboxModal('audit')" title="Xem lịch sử thao tác & bàn giao ca trước">
+    📜 Nhật ký ca
+  </button>
+</div>
 
 <!-- THANH KPI LIVE -->
 <div class="kpi-strip">
@@ -1030,8 +1254,40 @@ pre.schema-box {
       </div>
       <button class="danger" onclick="jumpToMandatoryEdiUpload()">📂 Nạp file EDI / ASC ngay</button>
     </div>
+    <!-- BẢNG ĐIỀU HÀNH NHANH 4 TRỌNG TÂM (TỐI ƯU ĐT/MTB & TÓM TẮT PC: CHỖ KHÔNG ỔN · CẦN HÀNG GÌ NHẤT · KHU VỰC · CÒN BAO NHIÊU) -->
+    <div class="ops-cockpit" id="mobileOpsCockpit">
+      <div class="cockpit-card c-alert">
+        <div class="cockpit-title">
+          <span>🚨 Chỗ nào đang KHÔNG ỔN</span>
+          <span class="badge red" id="ckAlertCount">0 cảnh báo</span>
+        </div>
+        <div class="cockpit-list" id="ckAlertList"></div>
+      </div>
+      <div class="cockpit-card c-need">
+        <div class="cockpit-title">
+          <span>🎯 Chỗ nào CẦN HÀNG GÌ NHẤT</span>
+          <span class="badge amber" id="ckNeedCount">Ưu tiên</span>
+        </div>
+        <div class="cockpit-list" id="ckNeedList"></div>
+      </div>
+      <div class="cockpit-card c-area">
+        <div class="cockpit-title">
+          <span>📍 Số lượng theo Khu vực</span>
+          <span class="badge" id="ckAreaSummary">TV / Ngoài</span>
+        </div>
+        <div class="cockpit-chips" id="ckAreaChips"></div>
+      </div>
+      <div class="cockpit-card c-remain">
+        <div class="cockpit-title">
+          <span>📦 Còn bao nhiêu mỗi Loại</span>
+          <span class="badge green" id="ckRemainSummary">Nhập / Xuất</span>
+        </div>
+        <div class="cockpit-chips" id="ckRemainChips"></div>
+      </div>
+    </div>
+
     <!-- THẺ DÀI NGANG TOÀN MÀN HÌNH: MÔ PHỎNG HÌNH CON TÀU, HƯỚNG CẬP MẠN & TIẾN ĐỘ THIẾT BỊ DỌC RAY CẦU TÀU -->
-    <div class="panel ship-rail-panel">
+    <div class="panel ship-rail-panel" id="panel-ship-rail">
       <div class="panel-head">
         <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
           <h3>🚢 Mô phỏng Cầu tàu, Hướng cập Mạn & Tiến độ Thiết bị dọc Ray (Thượng lưu ➔ Hạ lưu / Cửa biển)</h3>
@@ -1041,6 +1297,7 @@ pre.schema-box {
         <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;">
           <button class="sm" onclick="toggleBerthingSideQuick()" title="Đổi nhanh hướng cập Mạn Trái / Mạn Phải">🔄 Đổi Mạn Trái / Phải</button>
           <button class="primary sm" onclick="autoDistributeHoldsByRail()" title="Tự động chia lại Hầm cho các Cẩu theo đúng thứ tự vật lý trên ray không vượt mặt">⚡ Tự chia Hầm đúng ray</button>
+          <button class="panel-collapse-btn" onclick="togglePanelCollapse('panel-ship-rail', this)">▼ Thu gọn</button>
         </div>
       </div>
       <div class="panel-body" style="padding:10px 12px;">
@@ -1057,9 +1314,9 @@ pre.schema-box {
     </div>
 
     <div class="grid-2">
-      <div class="panel">
+      <div class="panel" id="panel-crane-hourly">
         <div class="panel-head">
-          <h3>📊 Sản lượng Cẩu theo Khung giờ (Chạm/Rê chuột vào cột giờ xem cẩu ít/nhiều)</h3>
+          <h3>📊 Sản lượng Cẩu theo Khung giờ</h3>
           <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">
             <select id="shiftFilter" onchange="renderCraneHourlyChart()">
               <option value="ALL">Toàn bộ giờ làm tàu (Đủ 24h+)</option>
@@ -1068,6 +1325,7 @@ pre.schema-box {
               <option value="NIGHT">Ca Đêm (19:00 - 06:00)</option>
             </select>
             <span class="badge" id="craneImbalanceBadge">Cân bằng</span>
+            <button class="panel-collapse-btn" onclick="togglePanelCollapse('panel-crane-hourly', this)">▼ Thu gọn</button>
           </div>
         </div>
         <div class="panel-body">
@@ -1093,10 +1351,13 @@ pre.schema-box {
         </div>
       </div>
 
-      <div class="panel">
+      <div class="panel" id="panel-yard-recon">
         <div class="panel-head">
-          <h3>🚛 Đối chiếu Vị trí Bãi (Tân Vũ vs Bãi ngoài) & Trạng thái Bắn Job OM</h3>
-          <span class="badge amber" id="offDockTotalBadge">0 Cont bãi ngoài</span>
+          <h3>🚛 Đối chiếu Vị trí Bãi (TV vs Bãi ngoài) & Job OM</h3>
+          <div style="display:flex;gap:5px;align-items:center;">
+            <span class="badge amber" id="offDockTotalBadge">0 Cont bãi ngoài</span>
+            <button class="panel-collapse-btn" onclick="togglePanelCollapse('panel-yard-recon', this)">▼ Thu gọn</button>
+          </div>
         </div>
         <div class="panel-body">
           <div style="font-size:11px;color:var(--muted);">
@@ -1122,7 +1383,7 @@ pre.schema-box {
     </div>
 
     <!-- THẺ TÓM TẮT HÀNG CÓ THỂ GỌI (THEO CẢNG POD · DẢI TẤN · LOẠI HÀNG ĐẶC BIỆT RF/DG/OOG/OT) -->
-    <div class="panel" style="border-top:3px solid var(--green);">
+    <div class="panel" id="panel-callable-cargo" style="border-top:3px solid var(--green);">
       <div class="panel-head">
         <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
           <h3>📦 Tóm tắt Hàng có thể gọi (POD · Dải tấn · RF / DG / OOG / OT) & Khuyến nghị Hầm theo ASC</h3>
@@ -1134,7 +1395,7 @@ pre.schema-box {
             <option value="REMAIN_BA">Tất cả tồn chưa xếp (B + A)</option>
             <option value="ALL_EXP">Toàn bộ hàng Xuất (B + A + C)</option>
           </select>
-          <span style="font-size:11px;color:var(--muted);">💡 Bấm vào từng thẻ để xem Popup chi tiết & hầm xếp theo .ASC</span>
+          <button class="panel-collapse-btn" onclick="togglePanelCollapse('panel-callable-cargo', this)">▼ Thu gọn</button>
         </div>
       </div>
       <div class="panel-body">
@@ -1155,7 +1416,7 @@ pre.schema-box {
       </div>
     </div>
 
-    <div class="panel">
+    <div class="panel" id="panel-smart-dispatch">
       <div class="panel-head">
         <h3>🎯 Khuyến nghị Gọi hàng Thông minh theo Thiết bị</h3>
         <div style="display:flex;gap:7px;flex-wrap:wrap;align-items:center;">
@@ -1173,7 +1434,8 @@ pre.schema-box {
             <option value="OFF_DOCK_ONLY">Bãi: Chỉ gọi Bãi ngoài (GFW, HHH, SA...)</option>
             <option value="TV_ONLY">Bãi: Chỉ gọi nội bộ Tân Vũ (TV)</option>
           </select>
-          <button class="danger" onclick="clearExportDataOnly()">🗑️ Xóa hàng Xuất</button>
+          <button class="danger sm" onclick="clearExportDataOnly()">🗑️ Xóa Xuất</button>
+          <button class="panel-collapse-btn" onclick="togglePanelCollapse('panel-smart-dispatch', this)">▼ Thu gọn</button>
         </div>
       </div>
       <div class="panel-body">
@@ -1221,7 +1483,7 @@ pre.schema-box {
       </div>
       <div class="panel-body">
         <div style="font-size:11px;color:var(--muted);margin-bottom:8px;">
-          💡 Số hầm tự động chia theo <b>số Bay thực tế</b> trong file & <b>chiều dài tàu (LOA)</b>. Chỉ đạo viên có thể sửa trực tiếp dãy số Bay ngay dưới mỗi thẻ Hầm (VD: <code>01, 02, 03</code>) rồi bấm <b>Lưu sơ đồ Hầm</b> lên Cloud. Bấm vào từng nút <b>Bay</b> để mở Popup sơ đồ <b>Row × Tier</b>.
+          💡 Mặc định chia chuẩn <b>2 bay lẻ + 1 bay chẵn = 1 Hầm</b> (<code>01-02-03</code>, <code>05-06-07</code>, <code>09-10-11</code>...). Chỉ đạo viên có thể sửa trực tiếp dãy số Bay ngay dưới mỗi thẻ Hầm (VD: <code>01, 02, 03</code>) rồi bấm <b>Lưu sơ đồ Hầm</b> lên Cloud. Bấm vào từng nút <b>Bay</b> để mở Popup sơ đồ <b>Row × Tier</b>.
         </div>
         <div class="holds-grid" id="holdsOverviewGrid"></div>
       </div>
@@ -1652,6 +1914,51 @@ pre.schema-box {
   </div>
 </div>
 
+<!-- MODAL 6: HỘP THƯ KHUYẾN NGHỊ & LỊCH SỬ THAO TÁC / BÀN GIAO CA -->
+<div class="modal-shade" id="historyInboxModal" onclick="if(event.target===this) closeModal('historyInboxModal')">
+  <div class="modal-card" style="width:min(860px, 100%);">
+    <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--line);padding-bottom:8px;margin-bottom:10px;gap:8px;flex-wrap:wrap;">
+      <h3 style="margin:0;">📩 Hộp thư Khuyến nghị & 📜 Nhật ký Thao tác / Bàn giao Ca</h3>
+      <div style="display:flex;gap:6px;align-items:center;">
+        <button class="sm" onclick="markAllInboxRead()">✓ Đánh dấu đã đọc hết</button>
+        <button class="sm" onclick="closeModal('historyInboxModal')">✕ Đóng</button>
+      </div>
+    </div>
+
+    <div class="inbox-tabs">
+      <button id="itab-inbox" class="active" onclick="switchInboxTab('inbox')">📩 Thư Khuyến nghị (<span id="itabInboxCnt">0</span>)</button>
+      <button id="itab-audit" onclick="switchInboxTab('audit')">🛠️ Lịch sử Thao tác (<span id="itabAuditCnt">0</span>)</button>
+      <button id="itab-handover" onclick="switchInboxTab('handover')">📝 Bàn giao Ca (<span id="itabHandoverCnt">0</span>)</button>
+    </div>
+
+    <!-- PANE 1: THƯ KHUYẾN NGHỊ -->
+    <div id="ipane-inbox" class="inbox-pane active">
+      <div style="font-size:11px;color:var(--muted);margin-bottom:8px;">
+        Mọi khuyến nghị quan trọng đều được hệ thống gửi thành từng thư có ghi ngày/giờ. Bấm vào từng thư để mở xem chi tiết & tự đánh dấu đã đọc.
+      </div>
+      <div id="inboxMailList" style="max-height:55vh;overflow-y:auto;"></div>
+    </div>
+
+    <!-- PANE 2: LỊCH SỬ THAO TÁC TRONG CA -->
+    <div id="ipane-audit" class="inbox-pane">
+      <div style="font-size:11px;color:var(--muted);margin-bottom:8px;">
+        Tự động ghi lại toàn bộ các thay đổi (Gọi xe, Đổi mạn, Chia hầm/bay, Tạm dừng/Cắt cẩu, Nạp file, Bot OM...) để ca sau nắm rõ ca trước đã xử lý thế nào.
+      </div>
+      <div id="auditLogList" style="max-height:55vh;overflow-y:auto;border:1px solid var(--line);border-radius:8px;background:var(--bg);"></div>
+    </div>
+
+    <!-- PANE 3: GHI CHÚ BÀN GIAO CA & TỔNG HỢP THEO NGÀY -->
+    <div id="ipane-handover" class="inbox-pane">
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;">
+        <input id="handoverAuthorInput" placeholder="Tên / Ca (VD: Ca 2 - Dũng)" style="width:170px;min-height:34px;">
+        <input id="handoverNoteInput" placeholder="Nhập ghi chú bàn giao cho ca sau (VD: Hầm 3 chờ cont GFW, QC11 ưu tiên hàng nhẹ)..." style="flex:1;min-width:200px;min-height:34px;" onkeydown="if(event.key==='Enter') addManualHandoverNote()">
+        <button class="success" onclick="addManualHandoverNote()">💾 Lưu bàn giao</button>
+      </div>
+      <div id="handoverTimelineList" style="max-height:50vh;overflow-y:auto;"></div>
+    </div>
+  </div>
+</div>
+
 <!-- MODAL 5: CHỌN TÀU ĐANG Ở CẦU / SẮP CẬP HOẶC THÊM MỚI GÕ TAY + HƯỚNG CẬP MẠN -->
 <div class="modal-shade" id="newVesselModal" onclick="if(event.target===this) closeModal('newVesselModal')">
   <div class="modal-card" style="width:min(760px, 100%);">
@@ -1820,7 +2127,9 @@ const state = {
   eportJobs: {},
   upcomingVessels: [],
   todayTide: null,
-  selectedChartHour: null
+  selectedChartHour: null,
+  viewMode: 'AUTO', // 'AUTO' | 'MOBILE' | 'PC'
+  shiftHistory: { recommendations: [], actions: [], notes: [] }
 };
 
 const AdminPinGuard = {
@@ -2235,14 +2544,16 @@ const CloudRepo = {
 
       const deckTier = parseInt(document.getElementById('cfgDeckTier')?.value, 10) || 80;
       const existingFiles = await this.listExistingSessionFiles(sessionId, true);
-      const [sbpJson, finalJson, resJson, jobsJson, ediJson, logsRes] = await Promise.all([
+      const [sbpJson, finalJson, resJson, jobsJson, ediJson, histJson, logsRes] = await Promise.all([
         this.downloadFile(sessionId, 'sbp.json', existingFiles),
         this.downloadFile(sessionId, 'final.json', existingFiles),
         this.downloadFile(sessionId, 'reserved.json', existingFiles),
         this.downloadFile(sessionId, 'jobs.json', existingFiles),
         this.downloadFile(sessionId, 'edi_stowage.json', existingFiles),
+        this.downloadFile(sessionId, 'shift_history.json', existingFiles),
         sb.from('dispatch_logs').select('container_no').eq('session_id', sessionId)
       ]);
+      ShiftHistoryManager.hydrateFromCloud(sessionId, histJson);
 
       let foundCount = 0;
       if (sbpJson) {
@@ -2861,9 +3172,10 @@ const HoldLayoutEngine = {
       ]);
     }
     const numBlocks = orderedBlocks.length;
+    // Mặc định: cứ 2 bay lẻ + 1 bay chẵn (01-02-03, 05-06-07, 09-10-11...) = 1 Hầm độc lập; chỉ gộp khi người khai thác tự nhập Số hầm mục tiêu > 0
     const targetHolds = desiredHoldCount > 0
       ? Math.min(numBlocks, Math.max(1, desiredHoldCount))
-      : (numBlocks <= 10 ? numBlocks : Math.max(5, Math.min(10, Math.round(loaMeters / 26))));
+      : numBlocks;
 
     const holds = [];
     for (let i = 0; i < targetHolds; i++) {
@@ -4713,6 +5025,7 @@ function renderHorizontalShipRailCard() {
 
 function toggleBerthingSideQuick() {
   state.berthingSide = state.berthingSide === 'STARBOARD' ? 'PORT' : 'STARBOARD';
+  ShiftHistoryManager.logAction('HƯỚNG MẠN', `Đổi hướng cập mạn sang ${state.berthingSide === 'STARBOARD' ? 'Mạn Phải (Starboard)' : 'Mạn Trái (Port)'}`);
   const sel = document.getElementById('cfgBerthSide');
   if (sel) sel.value = state.berthingSide;
   renderAll();
@@ -4725,6 +5038,7 @@ function onBerthingSideChanged(val) {
 
 function autoDistributeHoldsByRail() {
   CraneRailOrder.autoDistributeHolds(state);
+  ShiftHistoryManager.logAction('CHIA CẨU', 'Tự động chia lại Hầm cho các cẩu khớp thứ tự ray');
   renderAll();
 }
 
@@ -4823,6 +5137,7 @@ function renderDispatchRecommendations() {
 
 async function markContainerCalled(cntr, craneId, targetSlot) {
   state.calledContainers.add(cntr);
+  ShiftHistoryManager.logAction('GỌI XE', `Gọi cont ${cntr} cho ${craneId}`, targetSlot ? `Vị trí dự kiến: ${targetSlot}` : '');
   renderDispatchRecommendations();
   try {
     await sb.from('dispatch_logs').upsert({
@@ -4914,6 +5229,7 @@ function recalcHoldsAuto() {
 }
 function onEditHoldBays(holdNo, str) {
   HoldLayoutEngine.updateHoldBays(state, holdNo, str);
+  ShiftHistoryManager.logAction('CHIA HẦM', `Sửa danh sách Bay của HOLD ${String(holdNo).padStart(2,'0')}`, `Bay mới: ${str}`);
   renderAll();
 }
 function addManualHold() {
@@ -5331,11 +5647,13 @@ function toggleCranePause(craneId) {
   const c = state.cranes.find(x => x.id === craneId);
   if (!c) return;
   c.paused = !c.paused;
+  ShiftHistoryManager.logAction('SỰ CỐ CẨU', `${c.paused ? 'Tạm dừng sự cố' : 'Chạy lại'} thiết bị ${craneId}`);
   c.pauseStart = c.paused ? Date.now() : null;
   renderAll();
 }
 function transferHolds(fromId, toId) {
   const f = state.cranes.find(c => c.id === fromId), t = state.cranes.find(c => c.id === toId);
+  ShiftHistoryManager.logAction('CHUYỂN HẦM', `Chuyển hầm của ${fromId} sang ${toId}`);
   if (f && t) { t.holds = Array.from(new Set([...t.holds, ...f.holds])).sort((a, b) => a - b); f.holds = []; }
   renderAll();
 }
@@ -6125,6 +6443,7 @@ function cutCraneFromWork(craneId) {
   if (!confirm(`Xác nhận CẮT LÀM VIỆC thiết bị ${craneId} (tắt khỏi danh sách cẩu đang chạy tàu này)?`)) return;
   const c = state.cranes.find(x => x.id === craneId);
   if (c) c.active = false;
+  ShiftHistoryManager.logAction('CẮT CẨU', `Cắt làm việc thiết bị ${craneId}`);
   renderAll();
 }
 
@@ -6170,6 +6489,419 @@ function runHourlyCraneEfficiencyReview(manualTrigger = false) {
   }).join('');
 }
 
+// =========================================================================
+// [PHẦN 4B] QUẢN LÝ GIAO DIỆN ĐT/MTB vs PC, HỘP THƯ KHUYẾN NGHỊ & LỊCH SỬ CA
+// =========================================================================
+const ViewModeManager = {
+  KEY: 'tos_view_mode_v1',
+  init() {
+    try {
+      const saved = localStorage.getItem(this.KEY);
+      if (saved === 'MOBILE' || saved === 'PC' || saved === 'AUTO') state.viewMode = saved;
+    } catch (e) {}
+    this.apply(true);
+    window.addEventListener('resize', () => { if (state.viewMode === 'AUTO') this.apply(false); });
+  },
+  isMobileView() {
+    if (state.viewMode === 'MOBILE') return true;
+    if (state.viewMode === 'PC') return false;
+    return window.innerWidth <= 1024;
+  },
+  apply(applyDefaultCollapse = false) {
+    const isMob = this.isMobileView();
+    document.documentElement.setAttribute('data-view', isMob ? 'mobile' : 'pc');
+    const btn = document.getElementById('btnViewModeToggle');
+    if (btn) {
+      btn.textContent = state.viewMode === 'MOBILE' ? '📱 ĐT/MTB' : (state.viewMode === 'PC' ? '💻 PC' : (isMob ? '📱 Auto' : '💻 Auto'));
+      btn.title = 'Chuyển đổi giao diện: Tự động ↔ Điện thoại/Máy tính bảng ↔ Máy tính PC';
+    }
+    if (applyDefaultCollapse) {
+      // Trên ĐT/MTB tự động gói gọn các khối chi tiết dài, chỉ mở sẵn Bảng điều hành nhanh 4 trọng tâm
+      const panelsToFold = ['panel-ship-rail', 'panel-crane-hourly', 'panel-yard-recon', 'panel-callable-cargo'];
+      panelsToFold.forEach(pid => {
+        const p = document.getElementById(pid);
+        if (!p) return;
+        const toggleBtn = p.querySelector('.panel-collapse-btn');
+        if (isMob) {
+          p.classList.add('is-collapsed');
+          if (toggleBtn) toggleBtn.textContent = '▶ Mở chi tiết';
+        } else {
+          p.classList.remove('is-collapsed');
+          if (toggleBtn) toggleBtn.textContent = '▼ Thu gọn';
+        }
+      });
+    }
+  },
+  cycle() {
+    const order = ['AUTO', 'MOBILE', 'PC'];
+    const next = order[(order.indexOf(state.viewMode) + 1) % order.length];
+    state.viewMode = next;
+    try { localStorage.setItem(this.KEY, next); } catch (e) {}
+    this.apply(true);
+  }
+};
+
+function toggleViewMode() { ViewModeManager.cycle(); }
+
+function togglePanelCollapse(panelId, btnEl) {
+  const p = document.getElementById(panelId);
+  if (!p) return;
+  const collapsed = p.classList.toggle('is-collapsed');
+  if (btnEl) btnEl.textContent = collapsed ? '▶ Mở chi tiết' : '▼ Thu gọn';
+}
+
+function expandAndScrollTo(panelId) {
+  const p = document.getElementById(panelId);
+  if (!p) return;
+  p.classList.remove('is-collapsed');
+  const btn = p.querySelector('.panel-collapse-btn');
+  if (btn) btn.textContent = '▼ Thu gọn';
+  p.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+const ShiftHistoryManager = {
+  _saveTimer: null,
+  _lastRecKeys: new Set(),
+
+  localKey(sid) { return `tos_shift_history_v1_${sid || 'DEFAULT'}`; },
+
+  nowFormatted() {
+    const d = new Date();
+    const pad = n => String(n).padStart(2, '0');
+    return `${pad(d.getDate())}/${pad(d.getMonth()+1)}/${d.getFullYear()} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+  },
+
+  hydrateFromCloud(sessionId, cloudJson) {
+    let localData = null;
+    try { localData = JSON.parse(localStorage.getItem(this.localKey(sessionId)) || 'null'); } catch (e) {}
+    const base = (cloudJson && typeof cloudJson === 'object') ? cloudJson : (localData || {});
+    state.shiftHistory = {
+      recommendations: Array.isArray(base.recommendations) ? base.recommendations : [],
+      actions: Array.isArray(base.actions) ? base.actions : [],
+      notes: Array.isArray(base.notes) ? base.notes : []
+    };
+    this._lastRecKeys = new Set(state.shiftHistory.recommendations.slice(0, 40).map(r => r.fingerprint));
+  },
+
+  persist() {
+    const sid = state.sessionId;
+    if (!sid) return;
+    // Giữ tối đa 150 bản ghi mỗi mục để file nhẹ
+    state.shiftHistory.recommendations = state.shiftHistory.recommendations.slice(0, 150);
+    state.shiftHistory.actions = state.shiftHistory.actions.slice(0, 200);
+    state.shiftHistory.notes = state.shiftHistory.notes.slice(0, 100);
+    try { localStorage.setItem(this.localKey(sid), JSON.stringify(state.shiftHistory)); } catch (e) {}
+
+    if (this._saveTimer) clearTimeout(this._saveTimer);
+    this._saveTimer = setTimeout(() => {
+      CloudRepo.uploadFile(sid, 'shift_history.json', {
+        session_id: sid,
+        updated_at: new Date().toISOString(),
+        ...state.shiftHistory
+      }).catch(() => {});
+    }, 1500);
+  },
+
+  logAction(category, summary, detail = '') {
+    if (!state.sessionId) return;
+    state.shiftHistory.actions.unshift({
+      id: 'ACT_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6),
+      time: this.nowFormatted(),
+      iso: new Date().toISOString(),
+      category,
+      summary,
+      detail
+    });
+    this.persist();
+    this.updateBadges();
+  },
+
+  pushRecommendations(liveRecs) {
+    if (!state.sessionId || !Array.isArray(liveRecs)) return;
+    let added = false;
+    liveRecs.forEach(r => {
+      const fp = `${r.severity}|${r.title}`;
+      if (this._lastRecKeys.has(fp)) return;
+      this._lastRecKeys.add(fp);
+      state.shiftHistory.recommendations.unshift({
+        id: 'REC_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6),
+        fingerprint: fp,
+        time: this.nowFormatted(),
+        iso: new Date().toISOString(),
+        severity: r.severity || 'info',
+        title: r.title,
+        detail: r.detail || r.title,
+        read: false
+      });
+      added = true;
+    });
+    if (added) this.persist();
+    this.updateBadges();
+  },
+
+  addNote(author, text) {
+    if (!text.trim()) return;
+    state.shiftHistory.notes.unshift({
+      id: 'NOTE_' + Date.now(),
+      time: this.nowFormatted(),
+      iso: new Date().toISOString(),
+      author: author.trim() || 'Chỉ đạo viên',
+      text: text.trim()
+    });
+    this.logAction('BÀN GIAO CA', `Ghi chú bàn giao (${author.trim() || 'Chỉ đạo viên'})`, text.trim());
+    this.persist();
+    renderHistoryInboxModal();
+  },
+
+  updateBadges() {
+    const unread = (state.shiftHistory.recommendations || []).filter(r => !r.read).length;
+    const b = document.getElementById('inboxUnreadBadge');
+    const btn = document.getElementById('btnOpenInboxTicker');
+    if (b) b.textContent = unread;
+    if (btn) btn.classList.toggle('has-unread', unread > 0);
+  }
+};
+
+function openHistoryInboxModal(tab = 'inbox') {
+  switchInboxTab(tab);
+  renderHistoryInboxModal();
+  document.getElementById('historyInboxModal').classList.add('open');
+}
+
+function switchInboxTab(tab) {
+  ['inbox', 'audit', 'handover'].forEach(t => {
+    document.getElementById(`itab-${t}`)?.classList.toggle('active', t === tab);
+    document.getElementById(`ipane-${t}`)?.classList.toggle('active', t === tab);
+  });
+}
+
+function toggleMailCard(recId) {
+  const rec = (state.shiftHistory.recommendations || []).find(r => r.id === recId);
+  if (rec && !rec.read) {
+    rec.read = true;
+    ShiftHistoryManager.persist();
+    ShiftHistoryManager.updateBadges();
+  }
+  const el = document.getElementById('mail_' + recId);
+  if (el) {
+    el.classList.remove('unread');
+    el.classList.toggle('expanded');
+  }
+}
+
+function markAllInboxRead() {
+  (state.shiftHistory.recommendations || []).forEach(r => { r.read = true; });
+  ShiftHistoryManager.persist();
+  ShiftHistoryManager.updateBadges();
+  renderHistoryInboxModal();
+}
+
+function addManualHandoverNote() {
+  const author = document.getElementById('handoverAuthorInput')?.value || '';
+  const text = document.getElementById('handoverNoteInput')?.value || '';
+  if (!text.trim()) return;
+  ShiftHistoryManager.addNote(author, text);
+  document.getElementById('handoverNoteInput').value = '';
+}
+
+function renderHistoryInboxModal() {
+  const recs = state.shiftHistory.recommendations || [];
+  const acts = state.shiftHistory.actions || [];
+  const notes = state.shiftHistory.notes || [];
+  document.getElementById('itabInboxCnt').textContent = recs.length;
+  document.getElementById('itabAuditCnt').textContent = acts.length;
+  document.getElementById('itabHandoverCnt').textContent = notes.length;
+
+  const mailList = document.getElementById('inboxMailList');
+  if (mailList) {
+    mailList.innerHTML = recs.length ? recs.map(r => `
+      <div class="mail-card ${r.severity} ${r.read ? '' : 'unread'}" id="mail_${r.id}" onclick="toggleMailCard('${r.id}')">
+        <div class="mail-head">
+          <strong style="font-size:12px;">${r.read ? '✉️' : '📩'} ${r.title}</strong>
+          <span style="font-size:10.5px;color:var(--muted);">🕒 ${r.time} ${r.read ? '' : '<span class="badge red">Mới</span>'}</span>
+        </div>
+        <div class="mail-body">${r.detail}</div>
+      </div>`).join('') : '<div style="padding:12px;color:var(--muted);">Chưa có thư khuyến nghị nào cho tàu này.</div>';
+  }
+
+  const auditList = document.getElementById('auditLogList');
+  if (auditList) {
+    auditList.innerHTML = acts.length ? acts.map(a => `
+      <div class="audit-row">
+        <span class="audit-time">${a.time}</span>
+        <span class="badge">${a.category}</span>
+        <div style="flex:1;"><b>${a.summary}</b>${a.detail ? `<div style="color:var(--muted);font-size:11px;">${a.detail}</div>` : ''}</div>
+      </div>`).join('') : '<div style="padding:12px;color:var(--muted);">Chưa có thao tác thay đổi nào được ghi nhận trong ca này.</div>';
+  }
+
+  const hoList = document.getElementById('handoverTimelineList');
+  if (hoList) {
+    const merged = [
+      ...notes.map(n => ({ iso: n.iso, time: n.time, kind: 'NOTE', badge: `📝 ${n.author}`, text: n.text })),
+      ...acts.slice(0, 30).map(a => ({ iso: a.iso, time: a.time, kind: 'ACT', badge: `🛠️ ${a.category}`, text: `${a.summary}${a.detail ? ' — ' + a.detail : ''}` })),
+      ...recs.slice(0, 20).map(r => ({ iso: r.iso, time: r.time, kind: 'REC', badge: `📩 Khuyến nghị`, text: r.title }))
+    ].sort((a, b) => String(b.iso).localeCompare(String(a.iso)));
+
+    hoList.innerHTML = merged.length ? merged.map(m => `
+      <div class="audit-row" style="${m.kind === 'NOTE' ? 'background:rgba(5,150,105,0.08);' : ''}">
+        <span class="audit-time">${m.time}</span>
+        <span class="badge ${m.kind === 'NOTE' ? 'green' : (m.kind === 'REC' ? 'amber' : '')}">${m.badge}</span>
+        <div style="flex:1;">${m.text}</div>
+      </div>`).join('') : '<div style="padding:12px;color:var(--muted);">Chưa có lịch sử bàn giao ca.</div>';
+  }
+}
+
+function renderOpsCockpitAndTicker(pool) {
+  const cfg = getLiveVesselCfg();
+  const shift = document.getElementById('shiftFilter')?.value || 'ALL';
+  const analysis = CraneEngine.analyzeCraneBalance(state, pool, shift);
+  const effEvals = CraneEngine.evaluateHourlyEfficiency(state, pool, analysis);
+  const hatchAlerts = HatchContinuityEngine.analyze(state, pool, analysis, cfg.deck_tier_min);
+  const draft = DraftAndTideEngine.calculateLiveDraft(cfg, pool, state.holdConfig, state.todayTide);
+  const noJobList = UnifiedPoolBuilder.getNoJobFromFinal(state, pool);
+  const isRemAB = x => x.jobStatus === 'A' || x.jobStatus === 'B';
+
+  // 1. CHỖ NÀO ĐANG KHÔNG ỔN?
+  const issues = [];
+  if (draft.level === 'DANGER' || draft.level === 'WARNING') {
+    issues.push({ severity: draft.level === 'DANGER' ? 'urgent' : 'warn', title: `Mớn nước: ${draft.alertText}`, detail: `Mũi ${draft.draftF.toFixed(2)}m / Lái ${draft.draftA.toFixed(2)}m (Trim ${draft.trimVal.toFixed(2)}m).`, action: "switchTab('tab-cranes')" });
+  }
+  (analysis.railCrossingConflicts || []).forEach(cf => {
+    issues.push({ severity: 'urgent', title: `Chéo ray cẩu: ${cf.message}`, detail: 'Bấm "Tự chia Hầm đúng ray" để chỉnh lại thứ tự vật lý.', action: "expandAndScrollTo('panel-ship-rail')" });
+  });
+  hatchAlerts.filter(a => a.severity === 'URGENT' || a.severity === 'WARN').forEach(a => {
+    issues.push({ severity: a.severity === 'URGENT' ? 'urgent' : 'warn', title: `${a.label} (${a.craneId}): ${a.underDeckOffDockCount} cont bãi ngoài chặn nắp hầm`, detail: a.actionLabel, action: "expandAndScrollTo('panel-smart-dispatch')" });
+  });
+  effEvals.filter(e => e.level !== 'OK').forEach(e => {
+    issues.push({ severity: e.level === 'LOW_EFFICIENCY' ? 'warn' : 'info', title: `${e.crane.id}: ${e.level === 'CUT_WORK' ? 'Hết đất làm — Cắt cẩu' : 'Sản lượng thấp (' + e.metrics.avgRate + ' mv/h)'}`, detail: e.advice, action: "expandAndScrollTo('panel-crane-hourly')" });
+  });
+  if (noJobList.length > 0) {
+    issues.push({ severity: 'warn', title: `${noJobList.length} cont Final chưa có Job trên OM`, detail: 'Cần báo bộ phận Data / Hãng tàu kiểm tra bắn job bổ sung.', action: "openExceptionModal('NO_JOB')" });
+  }
+  (state.cranes || []).filter(c => c.active && c.paused).forEach(c => {
+    issues.push({ severity: 'urgent', title: `Cẩu ${c.id} đang tạm dừng sự cố!`, detail: `Hầm ${c.holds.join(', ')} đang bị gián đoạn. Vào Tab 3 chọn PA tiếp ứng.`, action: "switchTab('tab-cranes')" });
+  });
+
+  const ckAlertCnt = document.getElementById('ckAlertCount');
+  if (ckAlertCnt) {
+    ckAlertCnt.textContent = issues.length ? `${issues.length} cần xử lý` : 'Ổn định';
+    ckAlertCnt.className = `badge ${issues.some(i => i.severity === 'urgent') ? 'red' : (issues.length ? 'amber' : 'green')}`;
+  }
+  const ckAlertList = document.getElementById('ckAlertList');
+  if (ckAlertList) {
+    ckAlertList.innerHTML = issues.length
+      ? issues.slice(0, 4).map(it => `<div class="cockpit-row ${it.severity}" onclick="${it.action}"><span><b>${it.title}</b></span><span>➔</span></div>`).join('')
+      : '<div class="cockpit-row ok"><span>✅ Toàn bộ cẩu, hầm & mớn nước đang ổn định</span></div>';
+  }
+
+  // 2. HIỆN TẠI CHỖ NÀO ĐANG CẦN LOẠI HÀNG GÌ NHẤT?
+  const opts = {
+    podStrategy: document.getElementById('podStrategy')?.value || 'FEWEST_FIRST',
+    weightStrategy: document.getElementById('weightStrategy')?.value || 'HEAVY_FIRST',
+    yardFilter: document.getElementById('yardFilter')?.value || 'ALL',
+    deckTierMin: cfg.deck_tier_min
+  };
+  const craneRecs = DispatchEngine.getRecommendationsByCrane(state, pool, opts, draft);
+  const topNeeds = craneRecs.filter(r => r.topItems.length > 0).map(r => {
+    const top = r.topItems[0];
+    const yardLbl = top.isOffDock ? `Bãi ${top.transferPort}` : `TV (${top.yardBlock || top.yardPos})`;
+    return {
+      craneId: r.crane.id,
+      holds: r.crane.holds.join(','),
+      readyCnt: r.totalReadyInHolds,
+      pod: top.pod,
+      size: top.size,
+      weight: top.weight.toFixed(1),
+      yardLbl,
+      cntr: top.cntr
+    };
+  });
+  const ckNeedCnt = document.getElementById('ckNeedCount');
+  if (ckNeedCnt) ckNeedCnt.textContent = `${topNeeds.length} cẩu đang cần`;
+  const ckNeedList = document.getElementById('ckNeedList');
+  if (ckNeedList) {
+    ckNeedList.innerHTML = topNeeds.length
+      ? topNeeds.slice(0, 4).map(n => `
+          <div class="cockpit-row warn" onclick="expandAndScrollTo('panel-smart-dispatch')">
+            <div style="min-width:0;">
+              <div><b>${n.craneId}</b> (H${n.holds}) cần <b>${n.pod} · ${n.size}</b> (${n.weight}T)</div>
+              <div style="font-size:10.5px;color:var(--muted);">Lấy tại: <b>${n.yardLbl}</b> · Còn ${n.readyCnt}B</div>
+            </div>
+            <span class="badge green">Gọi</span>
+          </div>`).join('')
+      : '<div class="cockpit-row ok"><span>Chưa có cẩu Xuất nào đang cần hàng B</span></div>';
+  }
+
+  // 3. SỐ LƯỢNG MỖI KHU VỰC (TÂN VŨ vs BÃI NGOÀI)
+  const tvRem = pool.filter(x => !x.isOffDock && isRemAB(x));
+  const offRem = pool.filter(x => x.isOffDock && isRemAB(x));
+  const offByYard = {};
+  offRem.forEach(x => { const k = x.transferPort || 'KHÁC'; offByYard[k] = (offByYard[k] || 0) + 1; });
+  const tvBlocks = {};
+  tvRem.forEach(x => {
+    const b = x.yardBlock || (x.yardPos && x.yardPos !== '---' ? String(x.yardPos).split('-')[0] : 'Chưa rõ');
+    tvBlocks[b] = (tvBlocks[b] || 0) + 1;
+  });
+
+  const ckAreaSum = document.getElementById('ckAreaSummary');
+  if (ckAreaSum) ckAreaSum.textContent = `TV ${tvRem.length} · Ngoài ${offRem.length}`;
+  const ckAreaChips = document.getElementById('ckAreaChips');
+  if (ckAreaChips) {
+    const offHtml = Object.entries(offByYard).sort((a,b) => b[1]-a[1])
+      .map(([y, c]) => `<span class="callable-chip warn" onclick="expandAndScrollTo('panel-yard-recon')"><span>🚛 ${y}</span><span class="cc-cnt">${c}</span></span>`).join('');
+    const blkHtml = Object.entries(tvBlocks).sort((a,b) => b[1]-a[1]).slice(0, 5)
+      .map(([b, c]) => `<span class="callable-chip green" onclick="expandAndScrollTo('panel-yard-recon')"><span>TV-${b}</span><span class="cc-cnt">${c}</span></span>`).join('');
+    ckAreaChips.innerHTML = `
+      <span class="callable-chip green" onclick="expandAndScrollTo('panel-yard-recon')"><span>Tân Vũ (TV)</span><span class="cc-cnt">${tvRem.length}</span></span>
+      ${offHtml}${blkHtml}
+      ${noJobList.length ? `<span class="callable-chip purple" onclick="openExceptionModal('NO_JOB')"><span>Chưa Job</span><span class="cc-cnt">${noJobList.length}</span></span>` : ''}`;
+  }
+
+  // 4. CÒN BAO NHIÊU MỖI LOẠI (NHẬP, XUẤT, POD, ĐẶC BIỆT)
+  const impAll = (state.liveJobs || []).filter(j => j.io === 'Import' || /dỡ\s*tàu/i.test(j.job_type || ''));
+  const impRemCnt = impAll.filter(j => j.status === 'A' || j.status === 'B').length;
+  const expRemList = pool.filter(isRemAB);
+  const podMap = {};
+  const specCnt = { RF: 0, DG: 0, OOG: 0, OT: 0 };
+  expRemList.forEach(c => {
+    podMap[c.pod || 'KHÁC'] = (podMap[c.pod || 'KHÁC'] || 0) + 1;
+    classifyCargoTypes(c).forEach(t => { if (specCnt[t] !== undefined) specCnt[t]++; });
+  });
+  const ckRemSum = document.getElementById('ckRemainSummary');
+  if (ckRemSum) ckRemSum.textContent = `N:${impRemCnt} · X:${expRemList.length}`;
+  const ckRemChips = document.getElementById('ckRemainChips');
+  if (ckRemChips) {
+    const podChips = Object.entries(podMap).sort((a,b) => b[1]-a[1]).slice(0, 4)
+      .map(([p, c]) => `<span class="callable-chip" onclick="openCallableCargoModal('POD','${p}')"><span>${p}</span><span class="cc-cnt">${c}</span></span>`).join('');
+    const specChips = Object.entries(specCnt).filter(([,c]) => c > 0)
+      .map(([t, c]) => `<span class="callable-chip danger" onclick="openCallableCargoModal('TYPE','${t}')"><span>${t}</span><span class="cc-cnt">${c}</span></span>`).join('');
+    ckRemChips.innerHTML = `
+      <span class="callable-chip" onclick="switchTab('tab-holds')"><span>📥 Nhập còn</span><span class="cc-cnt">${impRemCnt}</span></span>
+      <span class="callable-chip green" onclick="expandAndScrollTo('panel-callable-cargo')"><span>📤 Xuất còn</span><span class="cc-cnt">${expRemList.length}</span></span>
+      ${podChips}${specChips}`;
+  }
+
+  // 5. ĐẨY KHUYẾN NGHỊ LÊN THANH CHẠY NGANG (TICKER) & GỬI VÀO HỘP THƯ LỊCH SỬ
+  const tickerRecs = [
+    ...issues.map(i => ({ severity: i.severity, title: i.title, detail: i.detail })),
+    ...topNeeds.slice(0, 3).map(n => ({
+      severity: 'info',
+      title: `🎯 ${n.craneId} (H${n.holds}) cần nhất: ${n.pod} ${n.size} (${n.weight}T) tại ${n.yardLbl}`,
+      detail: `Container ưu tiên số 1: ${n.cntr} · Tổng còn ${n.readyCnt} cont B trong hầm phụ trách.`
+    }))
+  ];
+  ShiftHistoryManager.pushRecommendations(tickerRecs);
+
+  const track = document.getElementById('advisoryTickerTrack');
+  if (track) {
+    const displayItems = tickerRecs.length ? tickerRecs : [{ severity: 'ok', title: '✅ Toàn tàu đang khai thác ổn định — Nhấn vào đây để mở Hộp thư & Nhật ký bàn giao ca.' }];
+    const renderSpan = it => `<span class="ticker-item"><span class="ticker-dot ${it.severity}"></span>${it.title}</span>`;
+    const half = displayItems.map(renderSpan).join('');
+    // Nhân đôi nội dung để vòng chạy marquee nối liền mạch không bị khoảng trống
+    track.innerHTML = half + half;
+  }
+}
+
 function renderAll() {
   const cfg = getLiveVesselCfg();
   HoldLayoutEngine.syncHoldsForState(state, cfg.length_m, false);
@@ -6194,6 +6926,7 @@ function renderAll() {
   renderExportPrepAdvisory(pool);
   renderHatchCoverWatch(pool);
   renderCallableCargoSummary(pool);
+  renderOpsCockpitAndTicker(pool);
   renderCraneHourlyChart();
   runHourlyCraneEfficiencyReview(false);
   renderDispatchRecommendations();
@@ -6499,6 +7232,7 @@ async function deleteCurrentVesselSession() {
 }
 
 window.addEventListener('DOMContentLoaded', () => {
+  ViewModeManager.init();
   updateStep1GuardUI();
   AdminPinGuard.restoreFromDevice();
   AdminPinGuard.enforceGateUI();
