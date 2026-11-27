@@ -1331,6 +1331,66 @@ pre.schema-box {
   .sub-pill { min-height: 36px; padding: 6px 12px; font-size: 12px; }
   .att-btn { min-height: 34px; padding: 5px 10px; }
 }
+
+/* ==================== HELP (?) BUTTON & GMAIL SWIPE-TO-DISMISS ==================== */
+.help-q-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  min-height: 20px !important;
+  padding: 0 !important;
+  border-radius: 50% !important;
+  border: 1.5px solid var(--cyan) !important;
+  background: rgba(2,132,199,0.12) !important;
+  color: var(--cyan) !important;
+  font-size: 11px !important;
+  font-weight: 900 !important;
+  margin-left: 4px;
+  vertical-align: middle;
+  cursor: pointer;
+}
+.help-q-btn:hover { background: var(--cyan) !important; color: #fff !important; }
+
+.swipe-wrap {
+  position: relative;
+  overflow: hidden;
+  border-radius: 8px;
+}
+.swipe-bg {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, #dc2626, #ef4444);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 14px;
+  font-size: 11px;
+  font-weight: 850;
+  border-radius: 8px;
+  pointer-events: none;
+}
+.swipe-card {
+  position: relative;
+  z-index: 2;
+  transition: transform 0.22s ease, opacity 0.22s ease;
+  touch-action: pan-y;
+}
+.swipe-card.swiping { transition: none; }
+.swipe-card.dismissed-left { transform: translateX(-115%) !important; opacity: 0; }
+.swipe-card.dismissed-right { transform: translateX(115%) !important; opacity: 0; }
+.dismiss-x-btn {
+  border: 0 !important;
+  background: transparent !important;
+  color: var(--muted) !important;
+  padding: 2px 5px !important;
+  min-height: 22px !important;
+  font-size: 12px !important;
+  opacity: 0.7;
+}
+.dismiss-x-btn:hover { color: var(--red) !important; opacity: 1; }
 </style>
 </head>
 <body>
@@ -1483,7 +1543,7 @@ pre.schema-box {
   <div id="tab-dispatch" class="tab-pane active">
     <div class="zone-intro">
       <div>
-        <div class="zone-intro-title">📊 Kiểm soát Tiến độ & Gọi hàng nhanh</div>
+        <div class="zone-intro-title">📊 Kiểm soát Tiến độ & Gọi hàng nhanh <button type="button" class="help-q-btn" onclick="openHelpPopup('overview')" title="Hướng dẫn sử dụng & Cơ chế hoạt động">?</button></div>
         <div class="zone-intro-sub">Xem nhanh chỗ đang cần xử lý, cẩu cần hàng gì nhất, mô phỏng tàu và gọi xe ngay trong 1 chạm.</div>
       </div>
       <div style="display:flex;gap:6px;flex-wrap:wrap;">
@@ -1506,14 +1566,14 @@ pre.schema-box {
     <div class="ops-cockpit" id="mobileOpsCockpit">
       <div class="cockpit-card c-alert">
         <div class="cockpit-title">
-          <span>🚨 Chỗ nào đang KHÔNG ỔN</span>
+          <span>🚨 Chỗ nào đang KHÔNG ỔN <button type="button" class="help-q-btn" onclick="openHelpPopup('alerts')" title="Cơ chế cảnh báo & Gạt bỏ qua">?</button></span>
           <span class="badge red" id="ckAlertCount">0 cảnh báo</span>
         </div>
         <div class="cockpit-list" id="ckAlertList"></div>
       </div>
       <div class="cockpit-card c-need">
         <div class="cockpit-title">
-          <span>🎯 Chỗ nào CẦN HÀNG GÌ NHẤT</span>
+          <span>🎯 Chỗ nào CẦN HÀNG GÌ NHẤT <button type="button" class="help-q-btn" onclick="openHelpPopup('dispatch')" title="Cơ chế ưu tiên ASC & gọi hàng">?</button></span>
           <span class="badge amber" id="ckNeedCount">Ưu tiên</span>
         </div>
         <div class="cockpit-list" id="ckNeedList"></div>
@@ -1654,7 +1714,7 @@ pre.schema-box {
     <div class="panel" id="panel-callable-cargo" style="border-top:3px solid var(--green);">
       <div class="panel-head">
         <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
-          <h3>📦 Tóm tắt Hàng có thể gọi (POD · Dải tấn · RF / DG / OOG / OT) & Khuyến nghị Hầm theo ASC</h3>
+          <h3>📦 Tóm tắt Hàng có thể gọi (POD · Dải tấn · RF / DG / OOG / OT) <button type="button" class="help-q-btn" onclick="openHelpPopup('callable')" title="Hướng dẫn lọc POD & Dải tấn">?</button></h3>
           <span class="badge green" id="callableTotalBadge">0 Cont sẵn sàng (B)</span>
         </div>
         <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">
@@ -1725,7 +1785,7 @@ pre.schema-box {
     <div class="detail-sub-sec" data-detail-sec="cranes">
       <div class="panel" id="panel-crane-hourly">
         <div class="panel-head">
-          <h3>📊 Sản lượng Cẩu theo Khung giờ</h3>
+          <h3>📊 Sản lượng Cẩu theo Khung giờ <button type="button" class="help-q-btn" onclick="openHelpPopup('cranes')" title="Cơ chế tính năng suất Cẩu & Cắt cẩu">?</button></h3>
           <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">
             <select id="shiftFilter" onchange="renderCraneHourlyChart()">
               <option value="ALL">Toàn bộ giờ làm tàu (Đủ 24h+)</option>
@@ -1766,7 +1826,7 @@ pre.schema-box {
     <div class="detail-sub-sec" data-detail-sec="yards">
       <div class="panel" id="panel-yard-recon">
         <div class="panel-head">
-          <h3>🚛 Đối chiếu Vị trí Bãi (TV vs Bãi ngoài) & Job OM</h3>
+          <h3>🚛 Đối chiếu Vị trí Bãi (TV vs Bãi ngoài) & Job OM <button type="button" class="help-q-btn" onclick="openHelpPopup('yards')" title="Hướng dẫn đẩy file vị trí đảo chuyển & bãi ngoài">?</button></h3>
           <div style="display:flex;gap:5px;align-items:center;flex-wrap:wrap;">
             <span class="badge amber" id="offDockTotalBadge">0 Cont bãi ngoài</span>
             <label class="badge green" style="cursor:pointer;padding:4px 8px;" title="Đẩy nhanh file Excel/CSV cập nhật vị trí bãi thực tế (đảo chuyển)">
@@ -1867,7 +1927,7 @@ pre.schema-box {
 
     <div class="panel">
       <div class="panel-head">
-        <h3>🔁 Khuyến nghị Gọi hàng Đuổi & Thay thế Gần Tấn Tạ Nhất (Chia theo từng Hầm)</h3>
+        <h3>🔁 Gọi hàng Đuổi theo ASC & Thay thế (Dung sai 3–5 tấn) <button type="button" class="help-q-btn" onclick="openHelpPopup('chase')" title="Hướng dẫn & Cơ chế">?</button></h3>
         <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
           <select id="chaseHoldFilter" onchange="renderRollingChaseByHold()">
             <option value="ALL">Tất cả các Hầm</option>
@@ -1885,7 +1945,7 @@ pre.schema-box {
   <div id="tab-setup" class="tab-pane">
     <div class="setup-welcome-card">
       <div style="flex:1;min-width:220px;">
-        <div style="font-weight:900;font-size:13.5px;color:var(--cyan);">⚙️ Khu vực Cài đặt & Chuẩn bị Dữ liệu tàu</div>
+        <div style="font-weight:900;font-size:13.5px;color:var(--cyan);">⚙️ Khu vực Cài đặt & Chuẩn bị Dữ liệu tàu <button type="button" class="help-q-btn" onclick="openHelpPopup('setup')" title="Quy trình nạp ASC & chạy Bot OM">?</button></div>
         <div style="font-size:11.5px;color:var(--muted);margin-top:2px;">
           Toàn bộ thao tác <b>Nạp file, Chạy Bot OM, Đổi mạn, Tự chia hầm đúng ray, Thiết lập Cẩu, Tàu & Bãi ngoài (km + số xe)</b> được gom gọn tại đây. Người mới nên bấm nút <b>Hướng dẫn 5 bước</b> để làm lần lượt từ A–Z.
         </div>
@@ -1942,7 +2002,6 @@ pre.schema-box {
       <div class="panel-head">
         <h3>📂 Bước 2: Nạp File riêng cho tàu <span id="uploadVesselLabel" style="color:var(--cyan);">KUO_LUNG_1009S</span></h3>
         <div style="display:flex;gap:8px;flex-wrap:wrap;">
-          <button class="primary" onclick="loadSampleKuoLung1009S(false)">⚡ Chạy thử mẫu KUO LUNG 1009S</button>
           <button class="danger" onclick="clearExportDataOnly()">🗑️ Xóa riêng dữ liệu Hàng xuất (PIN)</button>
         </div>
       </div>
@@ -1951,46 +2010,30 @@ pre.schema-box {
           🔒 Các ô nạp file đang KHÓA AN TOÀN. Hãy bấm nút "Xác nhận đúng tàu này để mở nạp file" ở Bước 1 phía trên!
         </div>
         <div id="ediFirstStepNotice" class="upload-lock-notice" style="display:none;background:rgba(217,119,6,0.12);border-color:var(--amber);color:var(--amber);">
-          ⚠️ <b>BƯỚC 2A (BẮT BUỘC ĐẦU TIÊN):</b> Tàu này chưa có dữ liệu <b>EDI / ASC</b> trên Cloud. Hãy nạp file <b>.ASC ($604)</b> hoặc <b>.EDI (BAPLIE)</b> ở <b>Ô 5 (viền đỏ)</b> trước; sau khi nạp xong, Ô 1–4 sẽ tự động mở khóa!
+          ⚠️ <b>BƯỚC 2A (BẮT BUỘC ĐẦU TIÊN):</b> Tàu này chưa có file <b>.ASC ($604) / .EDI</b>. Vui lòng <b>liên hệ bộ phận Shiplanner</b> để lấy file sơ đồ dự kiến (<b>không chạy Bot được</b>) và nạp vào <b>Ô 1 (viền đỏ)</b> trước; sau khi nạp xong, các danh sách Reserved / Final / Job List (có thể chạy Bot OM) sẽ tự động mở khóa!
         </div>
 
         <div class="upload-grid upload-zone-locked" id="uploadCardsContainer">
-          <div class="upload-card" id="card-sbp">
+          <div class="upload-card optional" id="card-edi">
             <div>
-              <span class="badge green">Ô 1 · Nạp 1 lần đầu ca</span>
-              <h4 style="margin:6px 0 4px;">1. Sơ đồ hầm hàng nhập (SBP)</h4>
+              <span class="badge red">Ô 1 · BẮT BUỘC ĐẦU TIÊN (Không chạy Bot)</span>
+              <h4 style="margin:6px 0 4px;">1. Sơ đồ .ASC ($604) / .EDI & Chỉ dẫn xếp</h4>
               <div style="font-size:11px;color:var(--muted);">
-                Màn hình OM: <i>Hàng nhập → Sơ đồ hầm hàng (SBP)</i>.<br>
-                Tự đọc: <b>Vị Trí</b> (tự dựng khung Bay/Hầm), <b>Số Container, Kích Cỡ, Trọng Lượng</b>.
+                <b>Liên hệ bộ phận Shiplanner</b> để lấy file sơ đồ hãng tàu (<b>không chạy Bot được</b>). Nạp <b>.asc ($604)</b>, <b>.edi</b> hoặc <b>chỉ dẫn xếp (.xlsx)</b> trước tiên.
               </div>
             </div>
             <div>
-              <input type="file" accept=".xlsx,.xls,.csv" onchange="handleUploadExcel(event, 'sbp')">
-              <div id="stat-sbp" style="font-size:11px;font-weight:700;margin-top:4px;color:var(--muted);">Chưa nạp</div>
-            </div>
-          </div>
-
-          <div class="upload-card" id="card-final">
-            <div>
-              <span class="badge amber">Ô 2 · Bãi ngoài (Cột cuối)</span>
-              <h4 style="margin:6px 0 4px;">2. Danh sách Final Loading</h4>
-              <div style="font-size:11px;color:var(--muted);">
-                Đọc cột cuối <b>Cảng chuyển</b> (trừ <b>TV</b> & Stacking để lọc <b>GFW, HHH, SA, VNB DV, SI</b>), <b>Vị trí bãi, TL hải quan</b>.
-              </div>
-            </div>
-            <div>
-              <input type="file" accept=".xlsx,.xls,.csv" onchange="handleUploadExcel(event, 'final')">
-              <div id="stat-final" style="font-size:11px;font-weight:700;margin-top:4px;color:var(--muted);">Chưa nạp</div>
+              <input type="file" multiple accept=".xlsx,.xls,.edi,.asc,.txt,.bap" onchange="handleUploadEdiOrStowage(event)">
+              <div id="stat-edi" style="font-size:11px;font-weight:700;margin-top:4px;color:var(--muted);">Chưa nạp</div>
             </div>
           </div>
 
           <div class="upload-card" id="card-reserved">
             <div>
-              <span class="badge">Ô 3 · Nạp khi có thay đổi</span>
-              <h4 style="margin:6px 0 4px;">3. Danh sách Xuất (Reserved)</h4>
+              <span class="badge">Ô 2 · Hàng xuất (Có thể chạy Bot OM)</span>
+              <h4 style="margin:6px 0 4px;">2. Danh sách Xuất - Reserved (Chạy Bot được)</h4>
               <div style="font-size:11px;color:var(--muted);">
-                Màn hình OM: <i>Danh sách Container Xuất tàu</i>.<br>
-                Chỉ giữ dòng <b>Chọn = 1</b>, đọc <b>Block, Cảng dỡ, TL Hàng, Kích cỡ</b>.
+                Màn hình OM: <i>Danh sách Container Xuất tàu</i> (<b>có thể chạy Bot OM tự động</b>). Lọc <b>Chọn = 1</b>, đọc Block, Cảng dỡ, TL Hàng, Kích cỡ.
               </div>
             </div>
             <div>
@@ -1999,12 +2042,26 @@ pre.schema-box {
             </div>
           </div>
 
+          <div class="upload-card" id="card-final">
+            <div>
+              <span class="badge amber">Ô 3 · Bãi ngoài (Có thể chạy Bot OM)</span>
+              <h4 style="margin:6px 0 4px;">3. Danh sách Final Loading List (Chạy Bot được)</h4>
+              <div style="font-size:11px;color:var(--muted);">
+                <b>Có thể chạy Bot OM tự động</b>. Đọc cột cuối <b>Cảng chuyển</b> (lọc <b>GFW, HHH, SA, VNB DV, SI</b>), <b>Vị trí bãi, TL hải quan, Cancel</b>.
+              </div>
+            </div>
+            <div>
+              <input type="file" accept=".xlsx,.xls,.csv" onchange="handleUploadExcel(event, 'final')">
+              <div id="stat-final" style="font-size:11px;font-weight:700;margin-top:4px;color:var(--muted);">Chưa nạp</div>
+            </div>
+          </div>
+
           <div class="upload-card" id="card-jobs">
             <div>
-              <span class="badge red">Ô 4 · Nạp liên tục / Bot OM</span>
-              <h4 style="margin:6px 0 4px;">4. Thay đổi công việc tàu (Job List)</h4>
+              <span class="badge red">Ô 4 · Tiến độ Live (Có thể chạy Bot OM)</span>
+              <h4 style="margin:6px 0 4px;">4. Thay đổi công việc tàu - Job List (Chạy Bot được)</h4>
               <div style="font-size:11px;color:var(--muted);">
-                Chuẩn hóa sang <b>jobs.json (v1.0)</b> cho cả Excel tay lẫn <b>Bot OM tự động</b>. Cập nhật A/B/C, Vị trí thực tế & Cẩu.
+                <b>Có thể chạy Bot OM tự động</b> mỗi 5 phút hoặc nạp Excel tay. Cập nhật trạng thái A/B/C, Vị trí thực tế & Năng suất Cẩu.
               </div>
             </div>
             <div>
@@ -2013,17 +2070,17 @@ pre.schema-box {
             </div>
           </div>
 
-          <div class="upload-card optional" id="card-edi">
+          <div class="upload-card" id="card-sbp">
             <div>
-              <span class="badge purple">Ô 5 · Dự kiến xuất & Chỉ dẫn</span>
-              <h4 style="margin:6px 0 4px;">5. Sơ đồ .ASC ($604) / .EDI & Chỉ dẫn xếp</h4>
+              <span class="badge green">Ô 5 · Hàng nhập (Tùy chọn đầu ca)</span>
+              <h4 style="margin:6px 0 4px;">5. Sơ đồ hầm hàng nhập (SBP)</h4>
               <div style="font-size:11px;color:var(--muted);">
-                Chọn 1 hoặc nhiều file: <b>.asc ($604)</b>, <b>.edi (BAPLIE)</b>, <b>chi dan xep (.xlsx)</b>. Đọc đủ 100% DG, RF, OH/AK, UD/OD.
+                Màn hình OM: <i>Hàng nhập → Sơ đồ hầm hàng (SBP)</i>. Tự đọc <b>Vị Trí</b>, <b>Số Container, Kích Cỡ, Trọng Lượng</b>.
               </div>
             </div>
             <div>
-              <input type="file" multiple accept=".xlsx,.xls,.edi,.asc,.txt,.bap" onchange="handleUploadEdiOrStowage(event)">
-              <div id="stat-edi" style="font-size:11px;font-weight:700;margin-top:4px;color:var(--muted);">Chưa nạp</div>
+              <input type="file" accept=".xlsx,.xls,.csv" onchange="handleUploadExcel(event, 'sbp')">
+              <div id="stat-sbp" style="font-size:11px;font-weight:700;margin-top:4px;color:var(--muted);">Chưa nạp</div>
             </div>
           </div>
 
@@ -2152,6 +2209,20 @@ pre.schema-box {
   <button data-tab="tab-details" onclick="switchTab('tab-details')"><span class="m-ico">🔍</span><span>Chi tiết</span></button>
   <button data-tab="tab-setup" onclick="switchTab('tab-setup')"><span class="m-ico">⚙️</span><span>Cài đặt</span></button>
 </nav>
+
+<!-- MODAL HƯỚNG DẪN SỬ DỤNG & CƠ CHẾ HOẠT ĐỘNG (?) -->
+<div class="modal-shade" id="helpInfoModal" onclick="if(event.target===this) closeModal('helpInfoModal')">
+  <div class="modal-card" style="width:min(640px, 100%);">
+    <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--line);padding-bottom:8px;margin-bottom:10px;gap:8px;">
+      <h3 id="helpModalTitle" style="margin:0;">❓ Hướng dẫn & Cơ chế hoạt động</h3>
+      <button class="sm" onclick="closeModal('helpInfoModal')">✕ Đóng</button>
+    </div>
+    <div id="helpModalBody" style="font-size:12.5px;line-height:1.6;"></div>
+    <div style="display:flex;justify-content:flex-end;margin-top:12px;padding-top:8px;border-top:1px solid var(--line);">
+      <button class="primary sm" onclick="closeModal('helpInfoModal')">Đã hiểu</button>
+    </div>
+  </div>
+</div>
 
 <!-- TOOLTIP DESKTOP -->
 <div id="craneTooltip"></div>
@@ -2709,6 +2780,7 @@ const state = {
   viewMode: 'AUTO', // 'AUTO' | 'MOBILE' | 'PC'
   vesselAttitude: { heel: 'EVEN', trim: 'EVEN' }, // heel: EVEN | LIST_PORT | LIST_STARBOARD ; trim: EVEN | BOW_DOWN | BOW_UP
   setupCompleted: false,
+  dismissedRecs: new Set(),
   shiftHistory: { recommendations: [], actions: [], notes: [] }
 };
 
@@ -3160,6 +3232,7 @@ const CloudRepo = {
         sb.from('dispatch_logs').select('container_no').eq('session_id', sessionId)
       ]);
       ShiftHistoryManager.hydrateFromCloud(sessionId, histJson);
+      loadDismissedRecs();
 
       let foundCount = 0;
       if (sbpJson) {
@@ -4033,6 +4106,11 @@ const DispatchEngine = {
 
       const bottomOk = this.isBottomTierSatisfied(c, pool, deckTierMin);
       if (!bottomOk) { score -= 200; reasons.push('Chờ tầng dưới'); }
+      // Ưu tiên xếp đúng theo sơ đồ .ASC của hãng tàu gửi
+      if (c.inAsc && c.plannedPos) {
+        score += 45;
+        reasons.push('📋 Theo ASC hãng tàu');
+      }
       const etaMins = OffDockTrafficEngine.estimateTransitMins(c.transferPort, c.isOffDock);
       const isPeak = OffDockTrafficEngine.isPeakHour();
       const holdMaxTierCfg = parseInt(document.getElementById('cfgHoldMaxTier')?.value, 10) || 12;
@@ -4186,10 +4264,19 @@ const DispatchEngine = {
           if (isUnderDeck && cand.instFlags?.mustOnDeck) return false;
           if (!isUnderDeck && cand.instFlags?.mustUnderDeck) return false;
           if (cand.weight > belowWeight + 2.0) return false;
+          // Dung sai thay đổi thực tế so với ASC hãng tàu: tối đa 5 tấn (ưu tiên trong khoảng 0-3T, chấp nhận 3-5T)
+          const diffW = Math.abs((cand.weight || 0) - (m.weight || 0));
+          if (m.weight > 0 && diffW > 5.0) return false;
           return true;
-        }).map(cand => ({
-          ...cand, weightDiff: Math.abs((cand.weight || 0) - (m.weight || 0)), isFreeSlot: !cand.plannedPos
-        })).sort((a, b) => (a.isFreeSlot !== b.isFreeSlot ? (a.isFreeSlot ? -1 : 1) : a.weightDiff - b.weightDiff)).slice(0, 3);
+        }).map(cand => {
+          const weightDiff = Math.abs((cand.weight || 0) - (m.weight || 0));
+          return {
+            ...cand,
+            weightDiff,
+            tolTag: weightDiff <= 3.0 ? '±3T' : '3–5T',
+            isFreeSlot: !cand.plannedPos
+          };
+        }).sort((a, b) => (a.isFreeSlot !== b.isFreeSlot ? (a.isFreeSlot ? -1 : 1) : a.weightDiff - b.weightDiff)).slice(0, 3);
         return { missing: m, substitutes };
       });
       return { hold: h.hold, label: h.label, bays: h.bays, count: items.length, items };
@@ -4999,10 +5086,13 @@ const OffDockFleetAndQcEngine = {
     const registerPos = (posStr) => {
       const p = DataAdapters.parsePos6(posStr);
       if (!p || !p.row) return;
+      const bNum = parseInt(p.bay, 10);
       const rn = parseInt(p.row, 10);
-      if (isNaN(rn)) return;
+      const tn = p.tierNum;
+      // Chỉ nhận tọa độ tàu hợp lệ (Bay 01..62, Row 00..22, Tier hầm 02..24 hoặc boong 70..98) -> tránh nhầm tọa độ bãi gây 101 Row
+      const validTier = (tn >= 2 && tn <= 24) || (tn >= 70 && tn <= 98);
+      if (isNaN(bNum) || bNum < 1 || bNum > 62 || isNaN(rn) || rn < 0 || rn > 22 || !validTier) return;
       allRowsGlobal.add(rn);
-      // Suy diễn đối xứng row lẻ/chẵn
       if (rn > 0) allRowsGlobal.add(rn % 2 === 1 ? rn + 1 : rn - 1);
       const hNo = HoldLayoutEngine.getHoldByBay(p.bay, st.holdConfig);
       if (!holdRowMap[hNo]) holdRowMap[hNo] = new Set();
@@ -6194,6 +6284,7 @@ function renderDispatchRecommendations() {
                 <span>${item.cntr}</span>
                 <span class="badge">${item.size}</span>
                 <span class="badge green">${item.pod}</span>
+                ${item.inAsc && item.plannedPos ? `<span class="badge" title="Ưu tiên xếp đúng sơ đồ ASC hãng tàu gửi">📋 ASC</span>` : ''}
                 ${item.inst ? `<span class="badge purple">${item.inst}</span>` : ''}
                 ${(item.reasons || []).filter(r => r.startsWith('⚖️')).map(r => `<span class="badge red">${r}</span>`).join('')}
                 ${(item.reasons || []).some(r => r.includes('Giữ đóng hầm')) ? `<span class="badge green">🔒 Giữ đóng hầm TV</span>` : ''}
@@ -8033,7 +8124,10 @@ function renderOpsCockpitAndTicker(pool) {
     issues.push({ severity: 'urgent', title: `Chéo ray cẩu: ${cf.message}`, detail: 'Bấm "Tự chia Hầm đúng ray" để chỉnh lại thứ tự vật lý.', action: "expandAndScrollTo('panel-ship-rail')" });
   });
   hatchAlerts.filter(a => a.severity === 'URGENT' || a.severity === 'WARN').forEach(a => {
-    issues.push({ severity: a.severity === 'URGENT' ? 'urgent' : 'warn', title: `${a.label} (${a.craneId}): ${a.underDeckOffDockCount} cont bãi ngoài chặn nắp hầm`, detail: a.actionLabel, action: "expandAndScrollTo('panel-smart-dispatch')" });
+    const hTitle = a.underDeckOffDockCount > 0
+      ? `${a.label} (${a.craneId}): ${a.underDeckOffDockCount} cont bãi ngoài chặn nắp hầm`
+      : `${a.label} (${a.craneId}): Sắp đóng nắp hầm (còn ${a.underDeckRemainCount} cont TV dưới hầm)`;
+    issues.push({ id: `HATCH_${a.hold}`, severity: a.severity === 'URGENT' ? 'urgent' : 'warn', title: hTitle, detail: a.actionLabel, action: "expandAndScrollTo('panel-smart-dispatch')" });
   });
   effEvals.filter(e => e.level !== 'OK').forEach(e => {
     issues.push({ severity: e.level === 'LOW_EFFICIENCY' ? 'warn' : 'info', title: `${e.crane.id}: ${e.level === 'CUT_WORK' ? 'Hết đất làm — Cắt cẩu' : 'Sản lượng thấp (' + e.metrics.avgRate + ' mv/h)'}`, detail: e.advice, action: "expandAndScrollTo('panel-crane-hourly')" });
@@ -8050,11 +8144,28 @@ function renderOpsCockpitAndTicker(pool) {
     ckAlertCnt.textContent = issues.length ? `${issues.length} cần xử lý` : 'Ổn định';
     ckAlertCnt.className = `badge ${issues.some(i => i.severity === 'urgent') ? 'red' : (issues.length ? 'amber' : 'green')}`;
   }
+  const visibleIssues = issues.filter(it => !isRecDismissed('AL_' + (it.id || it.title)));
+  const dismissedAlertCnt = issues.length - visibleIssues.length;
+  if (ckAlertCnt) {
+    ckAlertCnt.textContent = visibleIssues.length ? `${visibleIssues.length} cần xử lý` : 'Ổn định';
+    ckAlertCnt.className = `badge ${visibleIssues.some(i => i.severity === 'urgent') ? 'red' : (visibleIssues.length ? 'amber' : 'green')}`;
+  }
   const ckAlertList = document.getElementById('ckAlertList');
   if (ckAlertList) {
-    ckAlertList.innerHTML = issues.length
-      ? issues.slice(0, 4).map(it => `<div class="cockpit-row ${it.severity}" onclick="${it.action}"><span><b>${it.title}</b></span><span>➔</span></div>`).join('')
-      : '<div class="cockpit-row ok"><span>✅ Toàn bộ cẩu, hầm & mớn nước đang ổn định</span></div>';
+    ckAlertList.innerHTML = (visibleIssues.length
+      ? visibleIssues.slice(0, 5).map(it => {
+          const recKey = 'AL_' + (it.id || it.title);
+          const safeKey = encodeURIComponent(recKey);
+          return `<div class="swipe-wrap">
+            <div class="swipe-bg"><span>🗑️ Bỏ qua</span><span>Bỏ qua 🗑️</span></div>
+            <div class="cockpit-row swipe-card ${it.severity}" data-swipe-key="${safeKey}" onclick="${it.action}">
+              <span style="flex:1;"><b>${it.title}</b></span>
+              <button type="button" class="dismiss-x-btn" title="Bỏ qua khuyến nghị này (hoặc gạt ngang)" onclick="event.stopPropagation();dismissRecommendation('${safeKey}')">✕</button>
+            </div>
+          </div>`;
+        }).join('')
+      : '<div class="cockpit-row ok"><span>✅ Toàn bộ cẩu, hầm & cân bằng tàu đang ổn định</span></div>')
+      + (dismissedAlertCnt > 0 ? `<div style="text-align:right;margin-top:2px;"><button type="button" class="sm" onclick="restoreDismissedRecs('AL_')">↺ Hiện lại ${dismissedAlertCnt} mục đã bỏ qua</button></div>` : '');
   }
 
   // 2. HIỆN TẠI CHỖ NÀO ĐANG CẦN LOẠI HÀNG GÌ NHẤT?
@@ -8081,18 +8192,27 @@ function renderOpsCockpitAndTicker(pool) {
   });
   const ckNeedCnt = document.getElementById('ckNeedCount');
   if (ckNeedCnt) ckNeedCnt.textContent = `${topNeeds.length} cẩu đang cần`;
+  const visibleNeeds = topNeeds.filter(n => !isRecDismissed('ND_' + n.craneId + '_' + n.cntr));
+  const dismissedNeedCnt = topNeeds.length - visibleNeeds.length;
   const ckNeedList = document.getElementById('ckNeedList');
   if (ckNeedList) {
-    ckNeedList.innerHTML = topNeeds.length
-      ? topNeeds.slice(0, 4).map(n => `
-          <div class="cockpit-row warn" onclick="expandAndScrollTo('panel-smart-dispatch')">
-            <div style="min-width:0;">
-              <div><b>${n.craneId}</b>${n.holds ? ` (H${n.holds})` : ''} cần <b>${n.pod} · ${n.size}</b> (${n.weight}T)</div>
-              <div style="font-size:10.5px;color:var(--muted);">Lấy tại: <b>${n.yardLbl}</b> · Còn <b>${n.readyCnt} cont</b> (B)</div>
+    ckNeedList.innerHTML = (visibleNeeds.length
+      ? visibleNeeds.slice(0, 4).map(n => {
+          const safeKey = encodeURIComponent('ND_' + n.craneId + '_' + n.cntr);
+          return `<div class="swipe-wrap">
+            <div class="swipe-bg"><span>🗑️ Bỏ qua</span><span>Bỏ qua 🗑️</span></div>
+            <div class="cockpit-row swipe-card warn" data-swipe-key="${safeKey}" onclick="expandAndScrollTo('panel-smart-dispatch')">
+              <div style="min-width:0;flex:1;">
+                <div><b>${n.craneId}</b>${n.holds ? ` (H${n.holds})` : ''} cần <b>${n.pod} · ${n.size}</b> (${n.weight}T)</div>
+                <div style="font-size:10.5px;color:var(--muted);">Lấy tại: <b>${n.yardLbl}</b> · Còn <b>${n.readyCnt} cont</b> (B)</div>
+              </div>
+              <span class="badge green">Gọi</span>
+              <button type="button" class="dismiss-x-btn" title="Gạt hoặc bấm để bỏ qua" onclick="event.stopPropagation();dismissRecommendation('${safeKey}')">✕</button>
             </div>
-            <span class="badge green">Gọi</span>
-          </div>`).join('')
-      : '<div class="cockpit-row ok"><span>Chưa có cẩu Xuất nào đang cần hàng B</span></div>';
+          </div>`;
+        }).join('')
+      : '<div class="cockpit-row ok"><span>Chưa có cẩu Xuất nào đang cần hàng B</span></div>')
+      + (dismissedNeedCnt > 0 ? `<div style="text-align:right;margin-top:2px;"><button type="button" class="sm" onclick="restoreDismissedRecs('ND_')">↺ Hiện lại ${dismissedNeedCnt} gợi ý đã bỏ qua</button></div>` : '');
   }
 
   // 3. SỐ LƯỢNG MỖI KHU VỰC (TÂN VŨ vs BÃI NGOÀI)
@@ -8571,6 +8691,170 @@ function renderFleetAndQcBalancePanel(pool) {
     tkBox.innerHTML = html;
   }
 }
+
+
+// ==================== HƯỚNG DẪN (?) POPUP & GẠT BỎ QUA NHƯ GMAIL ====================
+const HELP_TOPICS = {
+  overview: {
+    title: '📊 Hướng dẫn Khu vực 1: Tiến độ & Điều hành nhanh',
+    html: `
+      <p><b>Mục đích:</b> Giúp chỉ đạo viên nhìn 1 lượt biết ngay toàn tàu đang ổn hay có điểm nghẽn nào cần xử lý gấp.</p>
+      <ul>
+        <li><b>🚨 Chỗ nào đang KHÔNG ỔN:</b> Tự động gom cảnh báo nghiêng/chúi tàu, chéo ray cẩu, hầm sắp đóng nắp, cẩu năng suất thấp, cont chưa có Job OM.</li>
+        <li><b>🎯 Chỗ nào CẦN HÀNG GÌ NHẤT:</b> Gợi ý container ưu tiên số 1 cho từng cẩu theo sơ đồ <b>.ASC hãng tàu gửi</b>, vị trí bãi gần/xa và giờ cao điểm.</li>
+        <li><b>👆 Mẹo trên điện thoại:</b> <b>Gạt ngang sang trái hoặc phải</b> (như Gmail) trên bất kỳ thẻ khuyến nghị nào để ẩn bớt khi đã xử lý xong. Bấm <b>"↺ Hiện lại"</b> nếu muốn xem lại.</li>
+      </ul>`
+  },
+  alerts: {
+    title: '🚨 Cơ chế Cảnh báo & Gạt bỏ qua (Gmail Swipe)',
+    html: `
+      <p>Hệ thống tự động quét dữ liệu theo thời gian thực để cảnh báo:</p>
+      <ul>
+        <li><b>Nghiêng mạn / Mũi chìm–vếch:</b> Khi bạn bấm nút báo trên thanh Cân bằng, hệ thống tự ưu tiên gọi hàng nặng sang mạn/đầu đối diện.</li>
+        <li><b>Tầm với TK/QC (≥11 Row):</b> Tàu rộng từ 11 Row trở lên, cẩu TK không với tới sẽ tự báo để đổi sang QC.</li>
+        <li><b>Nắp hầm & Bãi ngoài:</b> So sánh thời gian cẩu làm tới điểm đóng nắp hầm với thời gian kéo xe từ bãi ngoài để nhắc gọi sớm.</li>
+        <li><b>Gạt để bỏ qua:</b> Kéo ngang thẻ sang trái/phải hoặc bấm dấu <b>✕</b> để ẩn cảnh báo đã xử lý.</li>
+      </ul>`
+  },
+  dispatch: {
+    title: '🎯 Cơ chế Ưu tiên theo ASC Hãng tàu & Gọi hàng',
+    html: `
+      <ul>
+        <li><b>Ưu tiên số 1 — Theo .ASC hãng tàu gửi:</b> Các container đã có vị trí xếp dự kiến trong file <b>.ASC</b> luôn được cộng điểm ưu tiên cao nhất và gắn nhãn <b>📋 ASC</b>.</li>
+        <li><b>Ưu tiên nội bộ Tân Vũ (TV):</b> Luôn ưu tiên xếp tối đa hàng tại bãi TV để đạt năng suất cẩu cao nhất; đồng thời để dành 2–3 cont TV chốt đóng nắp hầm nhanh (~4 phút).</li>
+        <li><b>Gọi sớm bãi ngoài:</b> Tự tính quãng đường (km) + hệ số giờ cao điểm (×1.7) để gọi sớm cont bãi ngoài nằm dưới hầm.</li>
+      </ul>`
+  },
+  callable: {
+    title: '📦 Hướng dẫn Lọc Container theo Cảng (POD) & Dải tấn',
+    html: `
+      <p>Dùng khi cần tìm nhanh container đủ điều kiện để ghép hầm hoặc cân bằng trọng lượng tàu:</p>
+      <ul>
+        <li>Chọn <b>Cảng dỡ (POD)</b>, <b>Dải tấn</b> (0–10T, 10–15.99T, ..., Trên 30T), <b>Khu bãi</b> (TV / Ngoài) và <b>Loại hàng</b> (GP, RF, DG, OOG, OT).</li>
+        <li>Bảng kết quả hiện ngay số cont, vị trí bãi thực tế, khuyến nghị hầm theo <b>.ASC</b> và nút <b>Gọi xe</b> trực tiếp.</li>
+      </ul>`
+  },
+  cranes: {
+    title: '📊 Cơ chế tính Sản lượng Cẩu & Đánh giá 1 tiếng/lần',
+    html: `
+      <ul>
+        <li><b>Sản lượng thực tế (mv/h):</b> Chỉ tính chính xác trên các container trạng thái <b>C (Hoàn tất)</b> có <b>Ngày hoàn tất</b> (Cột 9) trong file Thay đổi công việc tàu.</li>
+        <li><b>Đánh giá định kỳ 1 tiếng/lần:</b> Tự động báo đỏ nếu cẩu dưới năng suất chuẩn (TK &lt; 12 mv/h, QC &lt; 16 mv/h) hoặc đề xuất <b>Cắt làm việc</b> khi cẩu đã hết đất làm.</li>
+      </ul>`
+  },
+  yards: {
+    title: '🚛 Hướng dẫn Đối chiếu Bãi & Đẩy file Vị trí đảo chuyển',
+    html: `
+      <ul>
+        <li><b>📍 Đẩy vị trí bãi:</b> Khi bãi đảo chuyển nhiều, bấm nút <b>📍 Đẩy vị trí bãi</b> để nạp file Excel/CSV (Số Cont, Kích cỡ/ISO, Block-Bay-Row-Tier hoặc Vùng thực tế). Hệ thống tự ghi đè vị trí mới nhất và đồng bộ Cloud.</li>
+        <li><b>Cân đối xe bãi ngoài:</b> So sánh số xe bạn đã setup (mặc định <b>05 xe/bãi</b>) với số xe cần thiết theo quãng đường (km) và giờ cao điểm.</li>
+      </ul>`
+  },
+  chase: {
+    title: '🔁 Cơ chế Gọi hàng Đuổi & Dung sai 3–5 tấn',
+    html: `
+      <ul>
+        <li>Hệ thống ưu tiên xếp đúng container theo sơ đồ <b>.ASC</b> hãng tàu gửi.</li>
+        <li>Nếu thực tế container dự kiến bị giữ trạng thái <b>A</b> hoặc đã đảo vị trí, hệ thống tự tìm container <b>B</b> thay thế cùng <b>POD</b>, cùng <b>Kích cỡ</b>, đúng quy định <b>UD/OD</b> trong phạm vi <b>dung sai trọng lượng 3–5 tấn</b> (ưu tiên ≤ 3 tấn trước).</li>
+      </ul>`
+  },
+  setup: {
+    title: '⚙️ Quy trình Nạp File & Chạy Bot OM cho người mới',
+    html: `
+      <ol>
+        <li><b>Bước 1 (Bắt buộc đầu tiên):</b> Liên hệ bộ phận <b>Shiplanner</b> để lấy file sơ đồ <b>.ASC ($604) / .EDI</b> (<b>không chạy Bot được</b>) và nạp vào <b>Ô 1</b>.</li>
+        <li><b>Bước 2 (Có thể chạy Bot OM):</b> Các danh sách <b>Reserved</b>, <b>Final Loading List</b> và <b>Thay đổi công việc tàu (Job List)</b> có thể bật <b>🤖 Bot OM</b> tự động cập nhật mỗi 5 phút hoặc nạp Excel thủ công.</li>
+        <li><b>Bước 3:</b> Chọn thiết bị cẩu, hướng cập mạn (Trái/Phải) và bấm <b>⚡ Tự chia Hầm đúng ray</b> (mặc định vẽ gọn 12 hầm).</li>
+        <li><b>Bước 4:</b> Kiểm tra danh mục bãi ngoài (số km + số xe mặc định 05 xe) và khung giờ cao điểm.</li>
+      </ol>`
+  }
+};
+
+function openHelpPopup(topicKey) {
+  const t = HELP_TOPICS[topicKey] || HELP_TOPICS.overview;
+  document.getElementById('helpModalTitle').textContent = t.title;
+  document.getElementById('helpModalBody').innerHTML = t.html;
+  document.getElementById('helpInfoModal').classList.add('open');
+}
+
+function dismissedStorageKey() { return 'tos_dismissed_recs_v1_' + (state.sessionId || 'DEFAULT'); }
+function loadDismissedRecs() {
+  try {
+    const arr = JSON.parse(localStorage.getItem(dismissedStorageKey()) || '[]');
+    state.dismissedRecs = new Set(Array.isArray(arr) ? arr : []);
+  } catch (e) { state.dismissedRecs = new Set(); }
+}
+function saveDismissedRecs() {
+  try { localStorage.setItem(dismissedStorageKey(), JSON.stringify(Array.from(state.dismissedRecs || []))); } catch (e) {}
+}
+function isRecDismissed(rawKey) {
+  return state.dismissedRecs && state.dismissedRecs.has(rawKey);
+}
+function dismissRecommendation(encodedKey) {
+  const key = decodeURIComponent(encodedKey);
+  if (!state.dismissedRecs) state.dismissedRecs = new Set();
+  state.dismissedRecs.add(key);
+  saveDismissedRecs();
+  renderAll();
+}
+function restoreDismissedRecs(prefix = '') {
+  if (!state.dismissedRecs) return;
+  if (!prefix) state.dismissedRecs.clear();
+  else {
+    Array.from(state.dismissedRecs).forEach(k => { if (k.startsWith(prefix)) state.dismissedRecs.delete(k); });
+  }
+  saveDismissedRecs();
+  renderAll();
+}
+
+// Gắn sự kiện vuốt ngang như Gmail cho mọi .swipe-card trên điện thoại
+(function initGmailSwipeListener() {
+  let activeEl = null, startX = 0, startY = 0, curDx = 0, isHorizontal = false;
+  document.addEventListener('touchstart', (e) => {
+    const card = e.target.closest('.swipe-card');
+    if (!card || e.touches.length !== 1) return;
+    activeEl = card;
+    startX = e.touches[0].clientX;
+    startY = e.touches[0].clientY;
+    curDx = 0;
+    isHorizontal = false;
+  }, { passive: true });
+
+  document.addEventListener('touchmove', (e) => {
+    if (!activeEl) return;
+    const dx = e.touches[0].clientX - startX;
+    const dy = e.touches[0].clientY - startY;
+    if (!isHorizontal) {
+      if (Math.abs(dx) > 14 && Math.abs(dx) > Math.abs(dy) * 1.4) {
+        isHorizontal = true;
+        activeEl.classList.add('swiping');
+      } else if (Math.abs(dy) > 14) {
+        activeEl = null;
+        return;
+      }
+    }
+    if (isHorizontal) {
+      curDx = dx;
+      activeEl.style.transform = `translateX(${dx}px)`;
+      activeEl.style.opacity = String(Math.max(0.25, 1 - Math.abs(dx) / 220));
+    }
+  }, { passive: true });
+
+  document.addEventListener('touchend', () => {
+    if (!activeEl) return;
+    const el = activeEl;
+    activeEl = null;
+    el.classList.remove('swiping');
+    if (isHorizontal && Math.abs(curDx) > 90) {
+      el.classList.add(curDx < 0 ? 'dismissed-left' : 'dismissed-right');
+      const key = el.getAttribute('data-swipe-key');
+      setTimeout(() => { if (key) dismissRecommendation(key); }, 200);
+    } else {
+      el.style.transform = '';
+      el.style.opacity = '';
+    }
+  });
+})();
 
 function renderAll() {
   const cfg = getLiveVesselCfg();
