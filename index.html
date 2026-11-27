@@ -3368,14 +3368,41 @@ const DispatchEngine = {
       return { ...c, holdNo, bottomOk, score, reasons };
     }).sort((a, b) => b.score - a.score);
 
-    return CraneRailOrder.sortCranesOnRail((st.cranes || []).filter(c => c.active && c.mode !== 'IMPORT_ONLY')).map(crane => {
+    const exportCranes = CraneRailOrder.sortCranesOnRail((st.cranes || []).filter(c => c.active && !c.paused && c.mode !== 'IMPORT_ONLY'));
+    const ascPodHoldMap = (typeof buildAscPodHoldMap === 'function') ? buildAscPodHoldMap(st, deckTierMin) : {};
+    const assignedCntrs = new Set();
+
+    // Suy diễn hầm từ cùng POD trên .ASC cho các cont chưa có plannedPos (holdNo === 0)
+    const scoredResolved = scored.map(item => {
+      if (item.holdNo > 0) return item;
+      const podRec = ascPodHoldMap[item.pod];
+      if (podRec && podRec.length) {
+        return { ...item, holdNo: podRec[0].hold, inferredHold: true };
+      }
+      return item;
+    });
+
+    const results = exportCranes.map(crane => {
       const assigned = new Set(crane.holds || []);
-      const list = scored.filter(item => {
+      const list = scoredResolved.filter(item => {
+        if (assignedCntrs.has(item.cntr)) return false;
         if (item.instFlags?.forcedBay) return assigned.has(HoldLayoutEngine.getHoldByBay(item.instFlags.forcedBay, holdConfig));
-        return item.holdNo === 0 || assigned.has(item.holdNo);
+        return item.holdNo > 0 && assigned.has(item.holdNo);
       });
+      list.forEach(item => assignedCntrs.add(item.cntr));
       return { crane, totalReadyInHolds: list.length, topItems: list.slice(0, 6) };
     });
+
+    // Các cont B hoàn toàn chưa có vị trí .ASC (holdNo === 0) gom về 1 nhóm duy nhất, KHÔNG nhân bản sang mọi cẩu
+    const unmappedList = scoredResolved.filter(item => !assignedCntrs.has(item.cntr));
+    if (unmappedList.length > 0) {
+      results.push({
+        crane: { id: 'CHƯA GÁN HẦM', active: true, mode: 'EXPORT_ONLY', holds: [], paused: false },
+        totalReadyInHolds: unmappedList.length,
+        topItems: unmappedList.slice(0, 6)
+      });
+    }
+    return results;
   },
 
   getRollingChaseByHold(st, pool, deckTierMin = 80) {
@@ -6824,8 +6851,8 @@ function renderOpsCockpitAndTicker(pool) {
       ? topNeeds.slice(0, 4).map(n => `
           <div class="cockpit-row warn" onclick="expandAndScrollTo('panel-smart-dispatch')">
             <div style="min-width:0;">
-              <div><b>${n.craneId}</b> (H${n.holds}) cần <b>${n.pod} · ${n.size}</b> (${n.weight}T)</div>
-              <div style="font-size:10.5px;color:var(--muted);">Lấy tại: <b>${n.yardLbl}</b> · Còn ${n.readyCnt}B</div>
+              <div><b>${n.craneId}</b>${n.holds ? ` (H${n.holds})` : ''} cần <b>${n.pod} · ${n.size}</b> (${n.weight}T)</div>
+              <div style="font-size:10.5px;color:var(--muted);">Lấy tại: <b>${n.yardLbl}</b> · Còn <b>${n.readyCnt} cont</b> (B)</div>
             </div>
             <span class="badge green">Gọi</span>
           </div>`).join('')
