@@ -1628,6 +1628,41 @@ pre.schema-box {
             <div class="callable-chips" id="callableByType"></div>
           </div>
         </div>
+
+        <!-- BỘ LỌC KẾT HỢP CHỌN CẢNG (POD) + DẢI TẤN + KHU BÃI ĐỂ HIỆN DANH SÁCH CONTAINER ĐỦ ĐIỀU KIỆN -->
+        <div style="margin-top:11px;padding-top:10px;border-top:1.5px dashed var(--line);">
+          <div style="display:flex;gap:7px;flex-wrap:wrap;align-items:center;margin-bottom:8px;">
+            <strong style="font-size:12px;">🔎 Lọc Container đủ điều kiện:</strong>
+            <select id="filterCallablePod" onchange="renderCallableFilteredTable()" style="min-height:30px;font-size:11.5px;min-width:130px;">
+              <option value="ALL">🌐 Tất cả Cảng (POD)</option>
+            </select>
+            <select id="filterCallableWeight" onchange="renderCallableFilteredTable()" style="min-height:30px;font-size:11.5px;min-width:140px;">
+              <option value="ALL">⚖️ Tất cả Dải tấn</option>
+              <option value="W_0_10">0 – 10T</option>
+              <option value="W_10_15">10 – 15.99T</option>
+              <option value="W_16_20">16 – 20.99T</option>
+              <option value="W_21_25">21 – 25.99T</option>
+              <option value="W_26_30">26 – 30T</option>
+              <option value="W_GT_30">Trên 30T</option>
+            </select>
+            <select id="filterCallableYard" onchange="renderCallableFilteredTable()" style="min-height:30px;font-size:11.5px;">
+              <option value="ALL">📍 Tất cả Bãi (TV + Ngoài)</option>
+              <option value="TV">Nội bộ Tân Vũ (TV)</option>
+              <option value="OFF_DOCK">Chỉ Bãi ngoài</option>
+            </select>
+            <select id="filterCallableType" onchange="renderCallableFilteredTable()" style="min-height:30px;font-size:11.5px;">
+              <option value="ALL">🏷️ Tất cả Loại hàng</option>
+              <option value="GP">GP (Thường)</option>
+              <option value="RF">❄️ RF (Lạnh)</option>
+              <option value="DG">☣️ DG (Nguy hiểm)</option>
+              <option value="OOG">📐 OOG (Quá khổ)</option>
+              <option value="OT">🔓 OT (Mở nóc)</option>
+            </select>
+            <button type="button" class="sm" onclick="resetCallableFilters()">↺ Xóa lọc</button>
+            <span class="badge green" id="callableFilteredCountBadge" style="margin-left:auto;">0 cont đủ điều kiện</span>
+          </div>
+          <div class="table-wrap" style="max-height:260px;" id="callableFilteredTableWrap"></div>
+        </div>
       </div>
     </div>
 
@@ -1791,7 +1826,8 @@ pre.schema-box {
             <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px;">
               <input id="newYardCode" placeholder="Mã viết tắt (VD: GFW)" style="width:130px;min-height:30px;">
               <input id="newYardName" placeholder="Tên bãi (VD: Bãi GFW Đình Vũ)" style="flex:1;min-width:140px;min-height:30px;">
-              <input id="newYardKm" type="number" step="0.5" min="0.5" value="6" placeholder="km" style="width:74px;min-height:30px;">
+              <input id="newYardKm" type="number" step="0.5" min="0.5" value="6" placeholder="km" title="Quãng đường (km)" style="width:68px;min-height:30px;">
+              <input id="newYardTrucks" type="number" min="1" max="50" value="5" placeholder="Xe" title="Số xe chạy (mặc định 05 xe)" style="width:66px;min-height:30px;">
               <button class="primary sm" onclick="addOffDockCatalogItem()">+ Thêm bãi</button>
             </div>
             <div class="table-wrap" style="max-height:220px;" id="offDockCatalogTableWrap"></div>
@@ -2266,7 +2302,8 @@ pre.schema-box {
       <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px;">
         <input id="wizNewYardCode" placeholder="Mã bãi (VD: GFW)" style="width:120px;min-height:30px;">
         <input id="wizNewYardName" placeholder="Tên bãi ngoài" style="flex:1;min-width:130px;min-height:30px;">
-        <input id="wizNewYardKm" type="number" step="0.5" min="0.5" value="6" style="width:70px;min-height:30px;">
+        <input id="wizNewYardKm" type="number" step="0.5" min="0.5" value="6" title="Số km" style="width:64px;min-height:30px;">
+        <input id="wizNewYardTrucks" type="number" min="1" max="50" value="5" title="Số xe chạy (mặc định 05 xe)" style="width:62px;min-height:30px;">
         <button class="primary sm" onclick="addYardFromWizard()">+ Thêm bãi</button>
       </div>
       <div id="wizYardsTable" class="table-wrap" style="max-height:170px;margin-bottom:10px;"></div>
@@ -2447,12 +2484,12 @@ const sbBot = window.supabase.createClient(APP_CONFIG.BOT_SUPABASE_URL, APP_CONF
 
 const PRESET_CRANES = ['QC10','QC09','QC08','QC07','QC11','QC12','TK07','TK10','QC06','QC05','TK06','TK05','TK11','TK12'];
 const DEFAULT_OFF_DOCK_CATALOG = [
-  { code: 'GFW', name: 'Bãi GFW (Ngoài cảng)', distanceKm: 6 },
-  { code: 'HHH', name: 'Bãi Hoàng Huy (HHH)', distanceKm: 8 },
-  { code: 'SA', name: 'Bãi Sao Á (SA)', distanceKm: 5 },
-  { code: 'VNB DV', name: 'Bãi VNB Đình Vũ', distanceKm: 4 },
-  { code: 'SI', name: 'Bãi SI (Ngoài cảng)', distanceKm: 7 },
-  { code: 'KHM', name: 'Bãi KHM (Ngoài cảng)', distanceKm: 10 }
+  { code: 'GFW', name: 'Bãi GFW (Ngoài cảng)', distanceKm: 6, trucks: 5 },
+  { code: 'HHH', name: 'Bãi Hoàng Huy (HHH)', distanceKm: 8, trucks: 5 },
+  { code: 'SA', name: 'Bãi Sao Á (SA)', distanceKm: 5, trucks: 5 },
+  { code: 'VNB DV', name: 'Bãi VNB Đình Vũ', distanceKm: 4, trucks: 5 },
+  { code: 'SI', name: 'Bãi SI (Ngoài cảng)', distanceKm: 7, trucks: 5 },
+  { code: 'KHM', name: 'Bãi KHM (Ngoài cảng)', distanceKm: 10, trucks: 5 }
 ];
 const DEFAULT_PEAK_HOURS = [7, 8, 11, 12, 16, 17, 18];
 
@@ -2467,7 +2504,10 @@ const OFF_DOCK_LABELS = {
 function loadLocalOffDockCfg() {
   try {
     const raw = JSON.parse(localStorage.getItem('tos_offdock_cfg_v1') || 'null');
-    if (raw && Array.isArray(raw.offDockCatalog) && Array.isArray(raw.peakHours)) return raw;
+    if (raw && Array.isArray(raw.offDockCatalog) && Array.isArray(raw.peakHours)) {
+      raw.offDockCatalog = raw.offDockCatalog.map(x => ({ ...x, trucks: Math.max(1, parseInt(x.trucks, 10) || 5) }));
+      return raw;
+    }
   } catch (e) {}
   return {
     offDockCatalog: DEFAULT_OFF_DOCK_CATALOG.map(x => ({ ...x })),
@@ -2931,7 +2971,7 @@ const CloudRepo = {
           : { heel: 'EVEN', trim: 'EVEN' };
         state.setupCompleted = Boolean(s.stats_summary && s.stats_summary.setupCompleted);
         if (s.stats_summary && Array.isArray(s.stats_summary.offDockCatalog) && s.stats_summary.offDockCatalog.length) {
-          state.offDockCatalog = s.stats_summary.offDockCatalog;
+          state.offDockCatalog = s.stats_summary.offDockCatalog.map(x => ({ ...x, trucks: Math.max(1, parseInt(x.trucks, 10) || 5) }));
         }
         if (s.stats_summary && Array.isArray(s.stats_summary.peakHours)) {
           state.peakHours = s.stats_summary.peakHours;
@@ -3445,11 +3485,11 @@ const OffDockTrafficEngine = {
   getYardMeta(code) {
     const c = String(code || '').trim().toUpperCase();
     if (!c || c === 'TV' || c === 'VNTVP') {
-      return { code: 'TV', name: 'Nội bộ Cảng Tân Vũ (TV)', distanceKm: 0.8 };
+      return { code: 'TV', name: 'Nội bộ Cảng Tân Vũ (TV)', distanceKm: 0.8, trucks: 10 };
     }
     const found = (state.offDockCatalog || []).find(x => String(x.code || '').trim().toUpperCase() === c);
-    if (found) return { code: c, name: found.name || ('Bãi ngoài ' + c), distanceKm: Number(found.distanceKm) || 6 };
-    return { code: c, name: OFF_DOCK_LABELS[c] || ('Bãi ngoài ' + c), distanceKm: 7 };
+    if (found) return { code: c, name: found.name || ('Bãi ngoài ' + c), distanceKm: Number(found.distanceKm) || 6, trucks: Math.max(1, parseInt(found.trucks, 10) || 5) };
+    return { code: c, name: OFF_DOCK_LABELS[c] || ('Bãi ngoài ' + c), distanceKm: 7, trucks: 5 };
   },
   getOffDockCodeSet() {
     const s = new Set(['KHM', 'HHH', 'SA', 'GFW', 'SI', 'VNB DV']);
@@ -3659,10 +3699,11 @@ const HoldLayoutEngine = {
     let nums = Array.from(new Set((baysList || []).map(b => parseInt(b, 10)).filter(n => !isNaN(n) && n > 0))).sort((a, b) => a - b);
     const maxBay = nums.length > 0
       ? Math.max(...nums)
-      : (Math.max(3, Math.min(18, Math.round((loaMeters - 35) / 15))) * 4 - 1);
-    const maxBlkIdx = Math.max(0, Math.floor((maxBay - 1) / 4));
+      : (Math.max(3, Math.min(12, Math.round((loaMeters - 35) / 15))) * 4 - 1);
+    // Bình thường tàu chỉ khoảng 12 hầm -> mặc định vẽ tối đa 12 hầm (01..47); nếu người dùng muốn thêm/xóa thì dùng nút + Thêm Hầm / Xóa sau
+    const rawMaxBlkIdx = Math.max(0, Math.floor((maxBay - 1) / 4));
+    const maxBlkIdx = desiredHoldCount > 0 ? rawMaxBlkIdx : Math.min(11, rawMaxBlkIdx);
 
-    // Luôn dựng khung tàu liên tục từ Bay 01 (01-02-03 = Hầm 1, 05-06-07 = Hầm 2, ...) đến hầm lớn nhất
     const orderedBlocks = [];
     for (let blkIdx = 0; blkIdx <= maxBlkIdx; blkIdx++) {
       const base = blkIdx * 4 + 1;
@@ -3673,10 +3714,9 @@ const HoldLayoutEngine = {
       ]);
     }
     const numBlocks = orderedBlocks.length;
-    // Mặc định: cứ 2 bay lẻ + 1 bay chẵn (01-02-03, 05-06-07, 09-10-11...) = 1 Hầm độc lập; chỉ gộp khi người khai thác tự nhập Số hầm mục tiêu > 0
     const targetHolds = desiredHoldCount > 0
-      ? Math.min(numBlocks, Math.max(1, desiredHoldCount))
-      : numBlocks;
+      ? Math.min(Math.max(numBlocks, desiredHoldCount), Math.max(1, desiredHoldCount))
+      : Math.min(12, numBlocks);
 
     const holds = [];
     for (let i = 0; i < targetHolds; i++) {
@@ -4722,17 +4762,19 @@ const OffDockFleetAndQcEngine = {
       const roundTripMins = oneWayMins * 2 + 16; // 2 chiều + thời gian gắp bãi & chờ cầu
       const shareRatio = g.total / Math.max(1, offRem.length);
       const yardMovesPerHr = Math.max(1.5, offDockTargetRate * shareRatio);
-      let trucks = Math.max(1, Math.ceil((yardMovesPerHr * roundTripMins) / 60));
+      const configuredTrucks = Math.max(1, parseInt(meta.trucks, 10) || 5);
+      let recommendedTrucks = Math.max(1, Math.ceil((yardMovesPerHr * roundTripMins) / 60));
       // Nếu có nhiều cont bãi ngoài nằm dưới hầm (chặn đóng nắp) -> tăng thêm 1 xe kéo ưu tiên
-      if (g.blockingUnderDeck >= 4 && trucks < 5) trucks += 1;
-      const capPerHr = +((trucks * 60) / roundTripMins).toFixed(1);
+      if (g.blockingUnderDeck >= 4 && recommendedTrucks < 5) recommendedTrucks += 1;
+      const capPerHr = +((configuredTrucks * 60) / roundTripMins).toFixed(1);
       return {
         ...g,
         name: meta.name,
         distanceKm: meta.distanceKm,
         oneWayMins,
         roundTripMins,
-        trucks,
+        trucks: configuredTrucks,
+        recommendedTrucks,
         capPerHr,
         isPeak
       };
@@ -7127,6 +7169,101 @@ function renderCallableCargoSummary(poolArg) {
         </span>`;
     }).join('');
   }
+
+  // Đồng bộ danh sách Cảng (POD) vào dropdown bộ lọc kết hợp Cảng + Dải tấn
+  const podSel = document.getElementById('filterCallablePod');
+  if (podSel) {
+    const prevPod = podSel.value || 'ALL';
+    podSel.innerHTML = `<option value="ALL">🌐 Tất cả Cảng (${podEntries.length})</option>` +
+      podEntries.map(([pod, cnt]) => `<option value="${pod}">${pod} (${cnt} cont)</option>`).join('');
+    podSel.value = (prevPod === 'ALL' || podMap[prevPod]) ? prevPod : 'ALL';
+  }
+  renderCallableFilteredTable(pool);
+}
+
+function resetCallableFilters() {
+  if (document.getElementById('filterCallablePod')) document.getElementById('filterCallablePod').value = 'ALL';
+  if (document.getElementById('filterCallableWeight')) document.getElementById('filterCallableWeight').value = 'ALL';
+  if (document.getElementById('filterCallableYard')) document.getElementById('filterCallableYard').value = 'ALL';
+  if (document.getElementById('filterCallableType')) document.getElementById('filterCallableType').value = 'ALL';
+  renderCallableFilteredTable();
+}
+
+function renderCallableFilteredTable(poolArg) {
+  const wrap = document.getElementById('callableFilteredTableWrap');
+  const badge = document.getElementById('callableFilteredCountBadge');
+  if (!wrap) return;
+
+  const cfg = getLiveVesselCfg();
+  const pool = poolArg || window._latestExportPool || UnifiedPoolBuilder.build(state, cfg.deck_tier_min);
+  const baseList = getFilteredCallablePool(pool);
+  const podVal = document.getElementById('filterCallablePod')?.value || 'ALL';
+  const wVal = document.getElementById('filterCallableWeight')?.value || 'ALL';
+  const yVal = document.getElementById('filterCallableYard')?.value || 'ALL';
+  const tVal = document.getElementById('filterCallableType')?.value || 'ALL';
+  const band = WEIGHT_BANDS.find(b => b.id === wVal);
+
+  const filtered = baseList.filter(c => {
+    if (podVal !== 'ALL' && (c.pod || 'KHÁC') !== podVal) return false;
+    if (band && !band.match(Number(c.weight) || 0)) return false;
+    if (yVal === 'TV' && c.isOffDock) return false;
+    if (yVal === 'OFF_DOCK' && !c.isOffDock) return false;
+    if (tVal !== 'ALL' && !classifyCargoTypes(c).includes(tVal)) return false;
+    return true;
+  });
+
+  if (badge) badge.textContent = `${filtered.length} cont đủ điều kiện`;
+
+  const isFiltering = podVal !== 'ALL' || wVal !== 'ALL' || yVal !== 'ALL' || tVal !== 'ALL';
+  if (!isFiltering) {
+    wrap.innerHTML = `<div style="font-size:11.5px;color:var(--muted);padding:6px 4px;">💡 Hãy chọn <b>Cảng dỡ (POD)</b> và/hoặc <b>Dải tấn</b> ở thanh lọc phía trên để hiện danh sách các container đủ điều kiện gọi ngay (hiện có <b>${baseList.length}</b> cont).</div>`;
+    return;
+  }
+
+  if (!filtered.length) {
+    wrap.innerHTML = `<div style="font-size:11.5px;color:var(--amber);padding:8px;">Không tìm thấy container nào thỏa mãn đồng thời các điều kiện đã chọn.</div>`;
+    return;
+  }
+
+  const ascPodHoldMap = buildAscPodHoldMap(state, cfg.deck_tier_min);
+  const enriched = filtered.map(c => ({
+    ...c,
+    ascRec: getAscHoldRecommendation(c, ascPodHoldMap, state.holdConfig, cfg.deck_tier_min),
+    cargoTypes: classifyCargoTypes(c)
+  })).sort((a, b) => (a.ascRec.holdNo || 99) - (b.ascRec.holdNo || 99) || (b.weight - a.weight));
+
+  wrap.innerHTML = `
+    <table>
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Số Container</th>
+          <th>Size / Loại</th>
+          <th>POD</th>
+          <th>TL (T)</th>
+          <th>Khu bãi / Vị trí</th>
+          <th>TT</th>
+          <th>Khuyến nghị Hầm (.ASC)</th>
+          <th>Thao tác</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${enriched.slice(0, 150).map((x, i) => `
+          <tr>
+            <td>${i + 1}</td>
+            <td><b>${x.cntr}</b></td>
+            <td>${x.size} ${x.cargoTypes.map(t => `<span class="badge ${t === 'DG' ? 'red' : (t === 'OOG' ? 'purple' : (t === 'GP' ? 'green' : 'amber'))}">${t}</span>`).join('')}</td>
+            <td><span class="badge">${x.pod}</span></td>
+            <td><b>${(Number(x.weight) || 0).toFixed(2)}</b></td>
+            <td>${x.isOffDock ? `<span class="badge amber">${x.transferPort} (~${x.etaMins}p)</span>` : `<span class="badge green">TV</span> <b>${x.yardPos}</b>${x.yardPosUpdated ? ' 🔄' : ''}`}</td>
+            <td><span class="badge ${x.jobStatus === 'B' ? '' : (x.jobStatus === 'C' ? 'green' : 'amber')}">${x.jobStatus}</span></td>
+            <td><b>${x.ascRec.text}</b></td>
+            <td>
+              ${x.jobStatus === 'B' ? `<button class="primary sm" onclick="markContainerCalled('${x.cntr}','LOC','${x.plannedPos || ''}');renderCallableFilteredTable()">${state.calledContainers.has(x.cntr) ? '✓ Đã gọi' : 'Gọi xe'}</button>` : '—'}
+            </td>
+          </tr>`).join('')}
+      </tbody>
+    </table>`;
 }
 
 function openCallableCargoModal(filterType, filterVal) {
@@ -7254,14 +7391,16 @@ function renderOffDockAndPeakSettings() {
     const isPeak = OffDockTrafficEngine.isPeakHour();
     wrap.innerHTML = `
       <table>
-        <thead><tr><th>Mã viết tắt</th><th>Tên bãi ngoài</th><th>Quãng đường (km)</th><th>ETA hiện tại</th><th>Xóa</th></tr></thead>
+        <thead><tr><th>Mã bãi</th><th>Tên bãi ngoài</th><th>Số km</th><th>Số xe</th><th>ETA</th><th>Xóa</th></tr></thead>
         <tbody>
           ${(state.offDockCatalog || []).map((item, idx) => {
             const eta = OffDockTrafficEngine.estimateTransitMins(item.code, true);
+            const trk = Math.max(1, parseInt(item.trucks, 10) || 5);
             return `<tr>
               <td><b>${item.code}</b></td>
               <td><input value="${item.name}" style="width:100%;min-height:26px;font-size:11px;" onchange="updateOffDockItem(${idx}, 'name', this.value)"></td>
-              <td><input type="number" step="0.5" min="0.5" value="${item.distanceKm}" style="width:68px;min-height:26px;font-size:11px;" onchange="updateOffDockItem(${idx}, 'distanceKm', this.value)"></td>
+              <td><input type="number" step="0.5" min="0.5" value="${item.distanceKm}" style="width:62px;min-height:26px;font-size:11px;" onchange="updateOffDockItem(${idx}, 'distanceKm', this.value)"></td>
+              <td><input type="number" min="1" max="50" value="${trk}" style="width:58px;min-height:26px;font-size:11px;" onchange="updateOffDockItem(${idx}, 'trucks', this.value)"></td>
               <td><span class="badge ${isPeak ? 'red' : 'amber'}">~${eta}p</span></td>
               <td><button class="sm danger" onclick="removeOffDockCatalogItem(${idx})">✕</button></td>
             </tr>`;
@@ -7288,19 +7427,23 @@ function addOffDockCatalogItem() {
   const code = (document.getElementById('newYardCode')?.value || '').trim().toUpperCase();
   const name = (document.getElementById('newYardName')?.value || '').trim() || ('Bãi ngoài ' + code);
   const km = parseFloat(document.getElementById('newYardKm')?.value) || 6;
+  const trucks = Math.max(1, parseInt(document.getElementById('newYardTrucks')?.value, 10) || 5);
   if (!code || code === 'TV' || code === 'VNTVP') { alert('Vui lòng nhập mã viết tắt bãi ngoài hợp lệ (khác TV).'); return; }
   const idx = state.offDockCatalog.findIndex(x => x.code.toUpperCase() === code);
-  if (idx >= 0) state.offDockCatalog[idx] = { code, name, distanceKm: km };
-  else state.offDockCatalog.push({ code, name, distanceKm: km });
+  if (idx >= 0) state.offDockCatalog[idx] = { code, name, distanceKm: km, trucks };
+  else state.offDockCatalog.push({ code, name, distanceKm: km, trucks });
   document.getElementById('newYardCode').value = '';
   document.getElementById('newYardName').value = '';
+  if (document.getElementById('newYardTrucks')) document.getElementById('newYardTrucks').value = '5';
   persistLocalOffDockCfg();
   renderAll();
 }
 
 function updateOffDockItem(idx, field, val) {
   if (!state.offDockCatalog[idx]) return;
-  state.offDockCatalog[idx][field] = field === 'distanceKm' ? (parseFloat(val) || 5) : String(val || '').trim();
+  if (field === 'distanceKm') state.offDockCatalog[idx].distanceKm = parseFloat(val) || 5;
+  else if (field === 'trucks') state.offDockCatalog[idx].trucks = Math.max(1, parseInt(val, 10) || 5);
+  else state.offDockCatalog[idx][field] = String(val || '').trim();
   persistLocalOffDockCfg();
   renderAll();
 }
@@ -8082,11 +8225,12 @@ function renderWizardYardsAndPeak() {
   const tbl = document.getElementById('wizYardsTable');
   if (tbl) {
     tbl.innerHTML = `<table>
-      <thead><tr><th>Mã bãi</th><th>Tên bãi ngoài</th><th>km</th><th>Xóa</th></tr></thead>
+      <thead><tr><th>Mã bãi</th><th>Tên bãi ngoài</th><th>Số km</th><th>Số xe</th><th>Xóa</th></tr></thead>
       <tbody>${(state.offDockCatalog || []).map((item, idx) => `<tr>
         <td><b>${item.code}</b></td>
         <td>${item.name}</td>
-        <td><input type="number" step="0.5" min="0.5" value="${item.distanceKm}" style="width:65px;min-height:26px;" onchange="updateOffDockItem(${idx},'distanceKm',this.value);renderWizardYardsAndPeak()"></td>
+        <td><input type="number" step="0.5" min="0.5" value="${item.distanceKm}" style="width:60px;min-height:26px;" onchange="updateOffDockItem(${idx},'distanceKm',this.value);renderWizardYardsAndPeak()"></td>
+        <td><input type="number" min="1" max="50" value="${Math.max(1, parseInt(item.trucks, 10) || 5)}" style="width:56px;min-height:26px;" onchange="updateOffDockItem(${idx},'trucks',this.value);renderWizardYardsAndPeak()"></td>
         <td><button class="sm danger" onclick="removeOffDockCatalogItem(${idx});renderWizardYardsAndPeak()">✕</button></td>
       </tr>`).join('')}</tbody>
     </table>`;
@@ -8107,12 +8251,14 @@ function addYardFromWizard() {
   const code = (document.getElementById('wizNewYardCode')?.value || '').trim().toUpperCase();
   const name = (document.getElementById('wizNewYardName')?.value || '').trim() || ('Bãi ngoài ' + code);
   const km = parseFloat(document.getElementById('wizNewYardKm')?.value) || 6;
+  const trucks = Math.max(1, parseInt(document.getElementById('wizNewYardTrucks')?.value, 10) || 5);
   if (!code || code === 'TV' || code === 'VNTVP') return;
   const idx = state.offDockCatalog.findIndex(x => x.code.toUpperCase() === code);
-  if (idx >= 0) state.offDockCatalog[idx] = { code, name, distanceKm: km };
-  else state.offDockCatalog.push({ code, name, distanceKm: km });
+  if (idx >= 0) state.offDockCatalog[idx] = { code, name, distanceKm: km, trucks };
+  else state.offDockCatalog.push({ code, name, distanceKm: km, trucks });
   document.getElementById('wizNewYardCode').value = '';
   document.getElementById('wizNewYardName').value = '';
+  if (document.getElementById('wizNewYardTrucks')) document.getElementById('wizNewYardTrucks').value = '5';
   persistLocalOffDockCfg();
   renderWizardYardsAndPeak();
 }
@@ -8173,9 +8319,9 @@ function renderFleetAndQcBalancePanel(pool) {
       </div>`;
     const yardsHtml = fleet.yards.length ? fleet.yards.map(y => `
       <div class="fleet-row-card ${y.blockingUnderDeck > 0 ? 'urgent' : ''}">
-        <div style="display:flex;justify-content:space-between;align-items:center;gap:4px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:4px;flex-wrap:wrap;">
           <b>🚛 ${y.code} (${y.distanceKm}km)</b>
-          <span class="badge ${y.blockingUnderDeck > 0 ? 'red' : 'amber'}">Chạy ${y.trucks} xe</span>
+          <span class="badge ${y.trucks < y.recommendedTrucks || y.blockingUnderDeck > 0 ? 'red' : 'amber'}">Setup ${y.trucks} xe · Cần ${y.recommendedTrucks} xe</span>
         </div>
         <div style="font-size:10.5px;color:var(--muted);margin-top:2px;">
           Còn <b>${y.total}</b> (${y.readyB}B/${y.holdA}A) · Vòng quay ~<b>${y.roundTripMins}p</b> (~${y.capPerHr} mv/h)
