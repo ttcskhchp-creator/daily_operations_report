@@ -1356,27 +1356,103 @@ pre.schema-box {
 .swipe-wrap {
   position: relative;
   overflow: hidden;
-  border-radius: 8px;
+  border-radius: 9px;
 }
 .swipe-bg {
   position: absolute;
   inset: 0;
-  background: linear-gradient(90deg, #dc2626, #ef4444);
+  background: #dc2626;
   color: #fff;
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 0 14px;
-  font-size: 11px;
-  font-weight: 850;
-  border-radius: 8px;
+  font-size: 11.5px;
+  font-weight: 800;
+  border-radius: 9px;
   pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.12s ease;
+}
+.swipe-wrap.is-swiping .swipe-bg {
+  opacity: 1;
 }
 .swipe-card {
   position: relative;
   z-index: 2;
+  background: var(--card) !important;
   transition: transform 0.22s ease, opacity 0.22s ease;
   touch-action: pan-y;
+}
+
+/* ==================== CLEAN, CRISP CARD POLISH & READABLE TEXT WRAP ==================== */
+.cockpit-card {
+  border: 1.5px solid var(--line);
+  box-shadow: 0 2px 6px rgba(15, 23, 42, 0.05);
+  gap: 8px;
+}
+.cockpit-row {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  padding: 8px 10px;
+  font-size: 12px;
+  line-height: 1.45;
+  gap: 8px;
+  white-space: normal;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+}
+.cockpit-row.urgent {
+  background: var(--card) !important;
+  border-left: 4px solid var(--red);
+}
+.cockpit-row.warn {
+  background: var(--card) !important;
+  border-left: 4px solid var(--amber);
+}
+.cockpit-row.ok {
+  background: var(--card) !important;
+  border-left: 4px solid var(--green);
+}
+.cockpit-row b, .cockpit-row span {
+  white-space: normal;
+  word-break: break-word;
+}
+.kpi-card {
+  border: 1.5px solid var(--line);
+  background: var(--card);
+}
+.kpi-card strong {
+  white-space: normal;
+  word-break: break-word;
+  line-height: 1.3;
+}
+.kpi-card .kpi-sub {
+  white-space: normal;
+  word-break: break-word;
+  line-height: 1.35;
+}
+.panel {
+  border: 1.5px solid var(--line);
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
+}
+.panel-head {
+  background: var(--bg);
+  border-bottom: 1.5px solid var(--line);
+}
+.panel-head h3 {
+  white-space: normal;
+  line-height: 1.35;
+}
+.cockpit-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.callable-chip {
+  max-width: 100%;
+  white-space: normal;
 }
 .swipe-card.swiping { transition: none; }
 .swipe-card.dismissed-left { transform: translateX(-115%) !important; opacity: 0; }
@@ -1661,7 +1737,6 @@ pre.schema-box {
             <option value="OFF_DOCK_ONLY">Bãi: Chỉ gọi Bãi ngoài (GFW, HHH, SA...)</option>
             <option value="TV_ONLY">Bãi: Chỉ gọi nội bộ Tân Vũ (TV)</option>
           </select>
-          <button class="danger sm" onclick="clearExportDataOnly()">🗑️ Xóa Xuất</button>
           <button class="panel-collapse-btn" onclick="togglePanelCollapse('panel-smart-dispatch', this)">▼ Thu gọn</button>
         </div>
       </div>
@@ -1954,6 +2029,7 @@ pre.schema-box {
         <button class="primary" onclick="openVesselSetupWizard(1)">🧭 Hướng dẫn Thiết lập 5 bước</button>
         <button class="sm" onclick="toggleBerthingSideQuick()" title="Đổi hướng cập Mạn Trái / Mạn Phải">🔄 Đổi Mạn</button>
         <button class="sm success" onclick="autoDistributeHoldsByRail()" title="Tự chia hầm khớp ray cẩu">⚡ Tự chia Hầm đúng ray</button>
+        <button class="sm danger" onclick="clearExportDataOnly()" title="Xóa riêng dữ liệu Hàng xuất của tàu này (yêu cầu PIN)">🗑️ Xóa dữ liệu Xuất</button>
       </div>
     </div>
 
@@ -8828,6 +8904,7 @@ function restoreDismissedRecs(prefix = '') {
       if (Math.abs(dx) > 14 && Math.abs(dx) > Math.abs(dy) * 1.4) {
         isHorizontal = true;
         activeEl.classList.add('swiping');
+        activeEl.closest('.swipe-wrap')?.classList.add('is-swiping');
       } else if (Math.abs(dy) > 14) {
         activeEl = null;
         return;
@@ -8852,6 +8929,7 @@ function restoreDismissedRecs(prefix = '') {
     } else {
       el.style.transform = '';
       el.style.opacity = '';
+      el.closest('.swipe-wrap')?.classList.remove('is-swiping');
     }
   });
 })();
