@@ -5126,22 +5126,51 @@ const OffDockFleetAndQcEngine = {
 
     const totalOffDockTrucks = yards.reduce((s, y) => s + y.trucks, 0);
 
-    // 2. Xác định danh sách Cont nội bộ Tân Vũ (TV) để dành đóng nắp hầm nhanh nhất
+    // 2. Xác định danh sách Cont nội bộ Tân Vũ (TV) để dành đóng nắp hầm nhanh nhất + theo dõi hầm đã đóng nắp lên Boong
     const reserveSet = new Set();
     const holdReserves = [];
+    const closedHolds = [];
+    let totalUnderDeckAll = 0;
+    let totalUnderDeckRem = 0;
+    let totalOnDeckAll = 0;
+    let totalOnDeckRem = 0;
+
     (st.holdConfig || []).forEach(h => {
       const baySet = new Set(h.bays || []);
       const expInH = (pool || []).filter(c => {
         const p = DataAdapters.parsePos6(c.actualPos || c.plannedPos, deckTierMin);
         return p && baySet.has(p.bay);
       });
-      const underDeckRem = expInH.filter(c => {
+      const underDeckAll = expInH.filter(c => {
         const p = DataAdapters.parsePos6(c.actualPos || c.plannedPos, deckTierMin);
-        return p && p.tierNum <= holdMaxTier && p.tierNum < deckTierMin && isRemAB(c);
+        return p && p.tierNum <= holdMaxTier && p.tierNum < deckTierMin;
       });
+      const underDeckRem = underDeckAll.filter(c => c.jobStatus !== 'C');
+      const onDeckAll = expInH.filter(c => {
+        const p = DataAdapters.parsePos6(c.actualPos || c.plannedPos, deckTierMin);
+        return p && p.tierNum >= deckTierMin;
+      });
+      const onDeckRem = onDeckAll.filter(c => c.jobStatus !== 'C');
+
+      totalUnderDeckAll += underDeckAll.length;
+      totalUnderDeckRem += underDeckRem.length;
+      totalOnDeckAll += onDeckAll.length;
+      totalOnDeckRem += onDeckRem.length;
+
+      if (underDeckAll.length > 0 && underDeckRem.length === 0) {
+        closedHolds.push({
+          hold: h.hold,
+          label: h.label,
+          bays: h.bays || [],
+          onDeckRemCount: onDeckRem.length,
+          onDeckAllCount: onDeckAll.length
+        });
+        return;
+      }
+
       const underDeckOffDock = underDeckRem.filter(c => c.isOffDock);
       const underDeckTvReady = underDeckRem.filter(c => !c.isOffDock && c.jobStatus === 'B');
-      if (!underDeckTvReady.length) return;
+      if (!underDeckTvReady.length && !underDeckOffDock.length) return;
 
       // Ưu tiên giữ lại 2-3 cont TV nằm ở tầng cao nhất dưới hầm (gần nắp hầm nhất) để chốt đóng hầm trong 4 phút
       const sortedTopUnderDeck = [...underDeckTvReady].sort((a, b) => {
@@ -5159,13 +5188,17 @@ const OffDockFleetAndQcEngine = {
       holdReserves.push({
         hold: h.hold,
         label: h.label,
+        bays: h.bays || [],
         readyToCloseNow,
         underDeckOffDockCount: underDeckOffDock.length,
+        underDeckOffDock,
         underDeckRemCount: underDeckRem.length,
+        onDeckRemCount: onDeckRem.length,
         picked
       });
     });
 
+    const allHatchesClosed = totalUnderDeckAll > 0 && totalUnderDeckRem === 0;
     st._tvHatchReserveSet = reserveSet;
     return {
       tvRemCount: tvRem.length,
@@ -5175,6 +5208,12 @@ const OffDockFleetAndQcEngine = {
       totalOffDockTrucks,
       yards,
       holdReserves,
+      closedHolds,
+      totalUnderDeckAll,
+      totalUnderDeckRem,
+      totalOnDeckAll,
+      totalOnDeckRem,
+      allHatchesClosed,
       totalReservedTv: reserveSet.size
     };
   },
@@ -7345,8 +7384,12 @@ function renderHatchCoverWatch(pool) {
 
   const urgentCnt = alerts.filter(a => a.severity === 'URGENT').length;
   const warnCnt = alerts.filter(a => a.severity === 'WARN').length;
+  const allUnderDeckDone = Boolean(window._latestFleetInfo && window._latestFleetInfo.allHatchesClosed);
   if (badge) {
-    if (!alerts.length) {
+    if (allUnderDeckDone) {
+      badge.textContent = '✅ Tất cả nắp hầm đã đóng · Đang xếp trên mặt boong';
+      badge.className = 'badge green';
+    } else if (!alerts.length) {
       badge.textContent = '✅ Các hầm dưới boong đang tiến độ tốt';
       badge.className = 'badge green';
     } else if (urgentCnt > 0) {
@@ -7361,8 +7404,16 @@ function renderHatchCoverWatch(pool) {
     }
   }
 
+  if (allUnderDeckDone) {
+    const fl = window._latestFleetInfo;
+    grid.innerHTML = `<div class="hatch-watch-card" style="border-left-color:var(--green);background:rgba(5,150,105,0.08);">
+      <strong style="color:var(--green);">✅ TẤT CẢ CÁC VỊ TRÍ NẮP HẦM ĐÃ XẾP HẾT — TẤT CẢ NẮP HẦM ĐÃ ĐƯỢC ĐÓNG VÀ ĐANG XẾP TRÊN MẶT BOONG!</strong>
+      <div style="font-size:11px;color:var(--muted);margin-top:3px;">Đã hoàn thành ${fl.totalUnderDeckAll}/${fl.totalUnderDeckAll} vị trí dưới hầm · Trên mặt boong còn <b>${fl.totalOnDeckRem}/${fl.totalOnDeckAll}</b> container.</div>
+    </div>`;
+    return;
+  }
   if (!alerts.length) {
-    grid.innerHTML = '<div style="font-size:11px;color:var(--muted);">Hiện toàn bộ hàng xuất dưới hầm đều nằm tại Tân Vũ (TV) hoặc chưa có cont bãi ngoài gây gián đoạn đóng nắp hầm.</div>';
+    grid.innerHTML = '<div style="font-size:11px;color:var(--muted);">Hiện toàn bộ hàng xuất dưới hầm đều nằm tại Tân Vũ (TV) hoặc chưa có cont bãi ngoài cần gọi gấp để đóng nắp hầm.</div>';
     return;
   }
 
@@ -8800,6 +8851,7 @@ function renderFleetAndQcBalancePanel(pool) {
   const analysis = CraneEngine.analyzeCraneBalance(state, pool, shift);
   const fleet = OffDockFleetAndQcEngine.analyzeFleetAndTvReserve(state, pool, analysis, cfg.deck_tier_min, cfg.hold_max_tier);
   const tkQc = OffDockFleetAndQcEngine.analyzeTkReachAndQcShift(state, pool, analysis);
+  window._latestFleetInfo = fleet;
   window._latestTkQcInfo = tkQc;
 
   const sumBadge = document.getElementById('fleetQcSummaryBadge');
@@ -8809,7 +8861,15 @@ function renderFleetAndQcBalancePanel(pool) {
   const trkBadge = document.getElementById('offDockTrucksTotalBadge');
   if (trkBadge) trkBadge.textContent = `${fleet.totalOffDockTrucks} xe bãi ngoài`;
   const resBadge = document.getElementById('tvHatchReserveBadge');
-  if (resBadge) resBadge.textContent = `${fleet.totalReservedTv} cont TV giữ`;
+  if (resBadge) {
+    if (fleet.allHatchesClosed) {
+      resBadge.textContent = '✅ Đã đóng hết nắp hầm · Xếp Boong';
+      resBadge.className = 'badge green';
+    } else {
+      resBadge.textContent = `${fleet.totalReservedTv} cont TV giữ`;
+      resBadge.className = 'badge green';
+    }
+  }
   const rowBadge = document.getElementById('vesselRowWidthBadge');
   if (rowBadge) {
     rowBadge.textContent = `⏱️ 10–15p/lần chuyển hầm`;
@@ -8837,23 +8897,53 @@ function renderFleetAndQcBalancePanel(pool) {
     fleetBox.innerHTML = tvHeader + yardsHtml;
   }
 
-  // Box 2: Quỹ Cont TV để dành đóng nắp hầm nhanh
+  // Box 2: Quỹ Cont TV để dành đóng nắp hầm nhanh (có Popup chi tiết vị trí bãi & gợi ý thay thế bãi ngoài + báo khi đóng hết nắp hầm)
   const resBox = document.getElementById('tvHatchReserveBox');
   if (resBox) {
-    resBox.innerHTML = fleet.holdReserves.length ? fleet.holdReserves.slice(0, 5).map(hr => {
-      const payload = encodeURIComponent(JSON.stringify(hr.picked.map(c => ({ cntr: c.cntr, pos: c.plannedPos, yard: 'TV' }))));
-      return `
-        <div class="fleet-row-card tv-prio">
-          <div style="display:flex;justify-content:space-between;align-items:center;gap:4px;">
-            <b>${hr.label}</b>
-            <span class="badge ${hr.readyToCloseNow ? 'amber' : 'green'}">${hr.readyToCloseNow ? '🔓 Gọi chốt ngay' : `🔒 Giữ ${hr.picked.length} cont TV`}</span>
+    if (fleet.allHatchesClosed) {
+      resBox.innerHTML = `
+        <div class="fleet-row-card tv-prio" style="background:rgba(5,150,105,0.09);border-left-width:4px;">
+          <div style="font-weight:900;color:var(--green);font-size:12px;">✅ HẾT VỊ TRÍ DƯỚI HẦM — TẤT CẢ NẮP HẦM ĐÃ ĐƯỢC ĐÓNG!</div>
+          <div style="font-size:11px;margin-top:4px;">
+            Toàn bộ <b>${fleet.totalUnderDeckAll}/${fleet.totalUnderDeckAll}</b> vị trí dưới hầm đã xếp xong. Tàu hiện <b>đang xếp trên mặt boong</b> (còn <b>${fleet.totalOnDeckRem}/${fleet.totalOnDeckAll}</b> cont boong).
           </div>
-          <div style="font-size:10.5px;color:var(--muted);margin-top:2px;">
-            ${hr.picked.map(c => `<b>${c.cntr.slice(-7)}</b> (${c.plannedPos || 'TV'})`).join(', ')}
-          </div>
-          ${hr.readyToCloseNow ? `<div style="margin-top:4px;"><button class="sm success" onclick="callBatchHatchContainers(${hr.hold}, 'TV_CLOSE', '${payload}')">📞 Gọi ngay để đóng nắp hầm</button></div>` : ''}
         </div>`;
-    }).join('') : '<div style="font-size:11px;color:var(--muted);">Chưa có cont TV dưới hầm cần để dành đóng nắp.</div>';
+    } else {
+      const closedNote = fleet.closedHolds.length
+        ? `<div class="fleet-row-card tv-prio" style="background:rgba(5,150,105,0.06);">
+            <b style="color:var(--green);">✅ Đã đóng nắp & đang xếp Boong:</b> ${fleet.closedHolds.map(ch => `${ch.label} (còn ${ch.onDeckRemCount} boong)`).join(', ')}
+          </div>`
+        : '';
+
+      const reservesHtml = fleet.holdReserves.length ? fleet.holdReserves.map(hr => {
+        const payload = encodeURIComponent(JSON.stringify(hr.picked.map(c => ({ cntr: c.cntr, pos: c.plannedPos, yard: 'TV' }))));
+        const itemsHtml = hr.picked.length
+          ? hr.picked.map(c => `
+              <div style="margin-top:3px;font-size:11px;display:flex;justify-content:space-between;gap:6px;flex-wrap:wrap;cursor:pointer;" onclick="openTvHatchReservePopup(${hr.hold})" title="Bấm xem chi tiết vị trí bãi & thay thế">
+                <span><b>${c.cntr}</b> <span style="color:var(--muted);">(${c.pod} · ${c.weight.toFixed(1)}T)</span></span>
+                <span>📍 <b style="color:var(--green);">${c.yardPos || 'TV'}</b> · Tàu <b>${c.plannedPos || '—'}</b></span>
+              </div>`).join('')
+          : `<div style="font-size:10.5px;color:var(--amber);margin-top:2px;">⚠️ Không còn cont TV dưới hầm · còn ${hr.underDeckOffDockCount} cont bãi ngoài (bấm xem thay thế TV).</div>`;
+
+        return `
+          <div class="fleet-row-card ${hr.underDeckOffDockCount > 0 ? 'urgent' : 'tv-prio'}">
+            <div style="display:flex;justify-content:space-between;align-items:center;gap:4px;flex-wrap:wrap;">
+              <b style="cursor:pointer;color:var(--cyan);" onclick="openTvHatchReservePopup(${hr.hold})">${hr.label} 🔍</b>
+              <div style="display:flex;gap:4px;align-items:center;flex-wrap:wrap;">
+                <span class="badge ${hr.readyToCloseNow ? 'amber' : 'green'}">${hr.readyToCloseNow ? '🔓 Gọi chốt ngay' : `🔒 Giữ ${hr.picked.length} cont TV`}</span>
+                ${hr.underDeckOffDockCount > 0 ? `<span class="badge red">${hr.underDeckOffDockCount} bãi ngoài</span>` : ''}
+              </div>
+            </div>
+            ${itemsHtml}
+            <div style="margin-top:6px;display:flex;gap:5px;flex-wrap:wrap;">
+              <button class="sm primary" onclick="openTvHatchReservePopup(${hr.hold})">📋 Chi tiết vị trí & Thay thế</button>
+              ${hr.readyToCloseNow && hr.picked.length ? `<button class="sm success" onclick="callBatchHatchContainers(${hr.hold}, 'TV_CLOSE', '${payload}')">📞 Gọi ngay để đóng nắp hầm</button>` : ''}
+            </div>
+          </div>`;
+      }).join('') : '<div style="font-size:11px;color:var(--muted);">Chưa có dữ liệu vị trí dưới hầm để theo dõi đóng nắp hầm.</div>';
+
+      resBox.innerHTML = closedNote + reservesHtml;
+    }
   }
 
   // Box 3: Chi phí di chuyển QC qua hầm (10-15p/lần)
@@ -8867,6 +8957,147 @@ function renderFleetAndQcBalancePanel(pool) {
     }
     tkBox.innerHTML = html;
   }
+}
+
+
+
+function openTvHatchReservePopup(holdNo) {
+  const fleet = window._latestFleetInfo;
+  const pool = window._latestExportPool || [];
+  const titleEl = document.getElementById('exceptionModalTitle');
+  const bodyEl = document.getElementById('exceptionModalBody');
+  if (!fleet || !titleEl || !bodyEl) return;
+
+  const hr = (fleet.holdReserves || []).find(x => x.hold === holdNo);
+  if (!hr) {
+    titleEl.textContent = `🔒 Chi tiết đóng nắp HOLD ${String(holdNo).padStart(2, '0')}`;
+    bodyEl.innerHTML = '<div style="padding:12px;color:var(--green);font-weight:800;">✅ Hầm này đã xếp hết dưới hầm, nắp hầm đã được đóng và đang xếp trên mặt boong!</div>';
+    document.getElementById('exceptionModal').classList.add('open');
+    return;
+  }
+
+  const readyBAll = pool.filter(c => c.jobStatus === 'B' && !c.instFlags?.isStandby);
+  const findSubs = (target, wantOffDock) => {
+    return readyBAll.filter(cand => {
+      if (cand.cntr === target.cntr) return false;
+      if (wantOffDock && !cand.isOffDock) return false;
+      if (!wantOffDock && cand.isOffDock) return false;
+      if (cand.pod !== target.pod || cand.size !== target.size) return false;
+      if (cand.instFlags?.mustOnDeck) return false;
+      const diffW = Math.abs((Number(cand.weight) || 0) - (Number(target.weight) || 0));
+      if ((Number(target.weight) || 0) > 0 && diffW > 5.0) return false;
+      return true;
+    }).map(cand => ({
+      ...cand,
+      weightDiff: Math.abs((Number(cand.weight) || 0) - (Number(target.weight) || 0))
+    })).sort((a, b) => a.weightDiff - b.weightDiff || (a.etaMins - b.etaMins)).slice(0, 3);
+  };
+
+  titleEl.textContent = `🔒 Chi tiết Cont TV giữ đóng nắp ${hr.label} (Bay ${(hr.bays || []).join(', ')}) & Gợi ý Thay thế Bãi ngoài`;
+
+  const tvRowsHtml = hr.picked.length ? hr.picked.map((c, i) => {
+    const offSubs = findSubs(c, true);
+    const subHtml = offSubs.length
+      ? offSubs.map(s => `
+          <div style="margin-bottom:3px;">
+            <span class="badge amber">${s.transferPort} (~${s.etaMins}p)</span>
+            <b>${s.cntr}</b> (${s.weight.toFixed(1)}T, Δ${s.weightDiff.toFixed(1)}T)
+            <button class="sm" style="min-height:20px;padding:1px 6px;" onclick="markContainerCalled('${s.cntr}','H${hr.hold}_SUB','${c.plannedPos || ''}');openTvHatchReservePopup(${hr.hold})">${state.calledContainers.has(s.cntr) ? '✓ Đã gọi' : 'Gọi'}</button>
+          </div>`).join('')
+      : '<span style="color:var(--muted);font-size:10.5px;">Không có cont bãi ngoài cùng POD/Size ±5T</span>';
+
+    return `<tr>
+      <td>${i + 1}</td>
+      <td><b>${c.cntr}</b></td>
+      <td>${c.size}</td>
+      <td><span class="badge">${c.pod}</span></td>
+      <td><b>${(Number(c.weight) || 0).toFixed(2)}</b></td>
+      <td><span class="badge green">TV</span> <b>${c.yardPos || '---'}</b>${c.yardPosUpdated ? ' 🔄' : ''}</td>
+      <td><b>${c.plannedPos || '---'}</b></td>
+      <td>
+        <button class="primary sm" onclick="markContainerCalled('${c.cntr}','TV_CLOSE_H${hr.hold}','${c.plannedPos || ''}');openTvHatchReservePopup(${hr.hold})">
+          ${state.calledContainers.has(c.cntr) ? '✓ Đã gọi' : 'Gọi xe TV'}
+        </button>
+      </td>
+      <td style="white-space:normal;min-width:220px;">${subHtml}</td>
+    </tr>`;
+  }).join('') : '<tr><td colspan="9" style="color:var(--muted);">Không còn cont TV sẵn sàng B dưới hầm này.</td></tr>';
+
+  const offUnderList = hr.underDeckOffDock || [];
+  const offReplaceHtml = offUnderList.length ? `
+    <div style="margin-top:14px;padding-top:10px;border-top:2px dashed var(--line);">
+      <div style="font-weight:850;font-size:12.5px;color:var(--amber);margin-bottom:6px;">
+        🚛 Cont Bãi ngoài đang xếp dưới hầm ${hr.label} (${offUnderList.length} cont) — Gợi ý Cont TV thay thế để đóng nắp hầm nhanh (không chờ xe ngoài):
+      </div>
+      <div class="table-wrap" style="max-height:240px;">
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Cont Bãi ngoài (.ASC)</th>
+              <th>Bãi / ETA</th>
+              <th>POD / Size / TL</th>
+              <th>Vị trí tàu</th>
+              <th>Gọi bãi ngoài</th>
+              <th>🔄 Cont TV thay thế ngay (±5T · Vị trí bãi TV)</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${offUnderList.map((oc, idx) => {
+              const tvSubs = findSubs(oc, false);
+              const tvSubHtml = tvSubs.length
+                ? tvSubs.map(s => `
+                    <div style="margin-bottom:3px;">
+                      <span class="badge green">TV</span> <b>${s.yardPos || '---'}</b> · <b>${s.cntr}</b> (${s.weight.toFixed(1)}T, Δ${s.weightDiff.toFixed(1)}T)
+                      <button class="success sm" style="min-height:20px;padding:1px 6px;" onclick="markContainerCalled('${s.cntr}','TV_SUB_H${hr.hold}','${oc.plannedPos || ''}');openTvHatchReservePopup(${hr.hold})">${state.calledContainers.has(s.cntr) ? '✓ Đã gọi' : 'Gọi TV thay'}</button>
+                    </div>`).join('')
+                : '<span style="color:var(--muted);font-size:10.5px;">Chưa có cont TV cùng POD/Size ±5T → Nên gọi sớm bãi ngoài</span>';
+              return `<tr>
+                <td>${idx + 1}</td>
+                <td><b>${oc.cntr}</b> <span class="badge ${oc.jobStatus === 'B' ? '' : 'amber'}">${oc.jobStatus}</span></td>
+                <td><span class="badge amber">${oc.transferPort} (~${oc.etaMins}p)</span></td>
+                <td>${oc.pod} · ${oc.size} · <b>${(Number(oc.weight) || 0).toFixed(1)}T</b></td>
+                <td><b>${oc.plannedPos || '---'}</b></td>
+                <td>
+                  ${oc.jobStatus === 'B' ? `<button class="warning sm" onclick="markContainerCalled('${oc.cntr}','OFF_H${hr.hold}','${oc.plannedPos || ''}');openTvHatchReservePopup(${hr.hold})">${state.calledContainers.has(oc.cntr) ? '✓ Đã gọi' : 'Gọi ngoài'}</button>` : '—'}
+                </td>
+                <td style="white-space:normal;min-width:250px;">${tvSubHtml}</td>
+              </tr>`;
+            }).join('')}
+          </tbody>
+        </table>
+      </div>
+    </div>` : `
+    <div style="margin-top:12px;padding:8px 10px;border-radius:8px;background:rgba(5,150,105,0.08);border:1px solid var(--green);font-size:11.5px;color:var(--green);font-weight:750;">
+      ✅ Dưới hầm ${hr.label} hiện KHÔNG còn cont bãi ngoài nào — chỉ cần xếp nốt ${hr.underDeckRemCount} cont TV là có thể đóng nắp hầm để xếp ${hr.onDeckRemCount} cont trên boong.
+    </div>`;
+
+  bodyEl.innerHTML = `
+    <div style="font-size:11.5px;color:var(--muted);margin-bottom:8px;">
+      • Dưới hầm ${hr.label} còn <b>${hr.underDeckRemCount} cont</b> (${hr.underDeckOffDockCount} bãi ngoài) · Trên boong chờ xếp: <b>${hr.onDeckRemCount} cont</b>.<br>
+      • Các cont TV dưới đây đã hiển thị đầy đủ <b>Số Container</b> và <b>Vị trí bãi TV (Block-Bay-Row-Tier)</b> để bạn gọi thẳng xe nội bộ khi sắp đóng nắp hầm, hoặc chọn cont <b>Bãi ngoài thay thế</b> ở cột cuối.
+    </div>
+    <div class="table-wrap" style="max-height:260px;">
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Số Container</th>
+            <th>Size</th>
+            <th>POD</th>
+            <th>TL (T)</th>
+            <th>Vị trí bãi TV</th>
+            <th>Vị trí tàu (.ASC)</th>
+            <th>Gọi xe TV</th>
+            <th>🔄 Gợi ý thay bằng Bãi ngoài (±5T)</th>
+          </tr>
+        </thead>
+        <tbody>${tvRowsHtml}</tbody>
+      </table>
+    </div>
+    ${offReplaceHtml}`;
+
+  document.getElementById('exceptionModal').classList.add('open');
 }
 
 
