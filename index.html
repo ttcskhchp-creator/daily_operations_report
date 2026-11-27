@@ -1938,7 +1938,7 @@ pre.schema-box {
     <div class="panel" id="panel-fleet-qc-balance" style="border-top:3px solid var(--purple);">
       <div class="panel-head">
         <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
-          <h3>⚖️ Cân đối Xe Bãi ngoài (Ưu tiên TV) · 🔒 Giữ Cont TV đóng hầm · 🏗️ TK/QC (≥11 Row) & Chuyển hầm QC (10–15p)</h3>
+          <h3>⚖️ Cân đối Xe Bãi ngoài (Ưu tiên TV) · 🔒 Giữ Cont TV đóng hầm · 🏗️ Định mức chuyển hầm QC (10–15p)</h3>
           <span class="badge purple" id="fleetQcSummaryBadge">Đang tính toán...</span>
         </div>
         <button class="panel-collapse-btn" onclick="togglePanelCollapse('panel-fleet-qc-balance', this)">▼ Thu gọn</button>
@@ -1963,7 +1963,7 @@ pre.schema-box {
 
           <div class="ops-sub-box">
             <div class="ops-sub-title">
-              <span>🏗️ Tầm với TK/QC (≥11 Row) & Chi phí chuyển QC (10–15p)</span>
+              <span>🏗️ Chi phí di chuyển QC qua hầm (10–15p/lần)</span>
               <span class="badge" id="vesselRowWidthBadge">Đo Row...</span>
             </div>
             <div id="tkQcReachAndShiftBox" style="display:flex;flex-direction:column;gap:5px;"></div>
@@ -5017,9 +5017,19 @@ const HatchContinuityEngine = {
         actionLabel = `⚠️ GỌI SỚM TRONG ${bufferMins}p TỚI để kịp khép nắp hầm (ETA bãi ngoài ~${maxLeadMins}p, năng suất ${craneId}: ${craneRate} mv/h).`;
       }
 
+      // Thu thập chính xác các Bay dưới hầm còn hàng cần xếp để đóng nắp hầm
+      const baySetNeed = new Set();
+      (underDeckRemain.length ? underDeckRemain : targetOffDockList).forEach(c => {
+        const p = DataAdapters.parsePos6(c.actualPos || c.plannedPos, effDeckMin);
+        if (p && p.bay) baySetNeed.add(p.bay);
+      });
+      const baysNeeded = Array.from(baySetNeed).sort((a, b) => parseInt(a, 10) - parseInt(b, 10));
+      const baysText = baysNeeded.length ? baysNeeded.join(', ') : (h.bays || []).join(', ');
+
       alerts.push({
         hold: h.hold,
         label: h.label,
+        baysText,
         craneId,
         craneRate,
         isHatchCoverBlocking,
@@ -5189,23 +5199,7 @@ const OffDockFleetAndQcEngine = {
     const tkWarnings = [];
     const qcShiftAdvices = [];
 
-    activeCranes.forEach(c => {
-      const isTK = /^TK/i.test(c.id);
-      if (isTK) {
-        const wideHolds = (c.holds || []).filter(hNo => {
-          const cnt = holdRowMap[hNo] ? holdRowMap[hNo].size : (isWide11Plus ? detectedRowCount : 0);
-          return cnt >= 11;
-        });
-        if (wideHolds.length > 0 || (isWide11Plus && (c.holds || []).length > 0)) {
-          tkWarnings.push({
-            craneId: c.id,
-            holds: wideHolds.length ? wideHolds : c.holds,
-            rowCount: detectedRowCount,
-            message: `🚫 ${c.id} KHÔNG làm được tàu ≥11 Row (Hầm ${(wideHolds.length ? wideHolds : c.holds).join(', ')} có ${detectedRowCount} Row) → Bắt buộc bố trí QC thay thế hoặc chỉ để TK làm hầm mũi/lái hẹp (<11 Row).`
-          });
-        }
-      }
-    });
+    // Đã bỏ cảnh báo tầm với TK theo Row theo yêu cầu khai thác thực tế
 
     // Đánh giá chi phí di chuyển QC qua hầm (10-15 phút/lần, trung bình 12.5 phút -> mất ~5-6 moves/lần)
     const qcMoveMinsMin = 10;
@@ -7337,7 +7331,7 @@ function renderHatchCoverWatch(pool) {
   const warnCnt = alerts.filter(a => a.severity === 'WARN').length;
   if (badge) {
     if (!alerts.length) {
-      badge.textContent = '✅ Không có cont bãi ngoài chắn nắp hầm';
+      badge.textContent = '✅ Các hầm dưới boong đang tiến độ tốt';
       badge.className = 'badge green';
     } else if (urgentCnt > 0) {
       badge.textContent = `🚨 ${urgentCnt} hầm nguy cơ dừng máng · ${warnCnt} sắp cần gọi`;
@@ -7365,7 +7359,7 @@ function renderHatchCoverWatch(pool) {
     return `
       <div class="hatch-watch-card ${cls}">
         <div style="display:flex;justify-content:space-between;align-items:center;gap:4px;flex-wrap:wrap;">
-          <strong>${a.label} · ${a.craneId} (${a.craneRate} mv/h)</strong>
+          <strong>${a.label} (Bay ${a.baysText || "—"}) · ${a.craneId} (${a.craneRate} mv/h)</strong>
           <span class="badge ${a.isHatchCoverBlocking ? 'purple' : ''}">${a.isHatchCoverBlocking ? '🔒 Khép nắp hầm' : 'Bãi ngoài'}</span>
         </div>
         <div style="font-size:10.5px;color:var(--muted);margin-top:3px;">
@@ -8191,18 +8185,15 @@ function renderOpsCockpitAndTicker(pool) {
   } else if (att.trim === 'BOW_UP') {
     issues.push({ severity: 'urgent', title: '⏫ Mũi đang VẾCH (Chìm lái) → Ưu tiên gọi hàng nặng lên các Hầm Mũi', detail: 'Thuật toán đã ưu tiên gọi cont nặng ở nhóm Hầm đầu (Mũi) và hãm cont nặng đuôi Lái.', action: "expandAndScrollTo('panel-smart-dispatch')" });
   }
-  if (window._latestTkQcInfo && window._latestTkQcInfo.tkWarnings.length) {
-    window._latestTkQcInfo.tkWarnings.forEach(w => {
-      issues.push({ severity: 'urgent', title: `${w.craneId} không làm được tàu ${w.rowCount} Row (Hầm ${w.holds.join(',')})`, detail: w.message, action: "expandAndScrollTo('panel-fleet-qc-balance')" });
-    });
-  }
+
   (analysis.railCrossingConflicts || []).forEach(cf => {
     issues.push({ severity: 'urgent', title: `Chéo ray cẩu: ${cf.message}`, detail: 'Bấm "Tự chia Hầm đúng ray" để chỉnh lại thứ tự vật lý.', action: "expandAndScrollTo('panel-ship-rail')" });
   });
   hatchAlerts.filter(a => a.severity === 'URGENT' || a.severity === 'WARN').forEach(a => {
+    const bayStr = a.baysText ? `Bay ${a.baysText}` : 'dưới hầm';
     const hTitle = a.underDeckOffDockCount > 0
-      ? `${a.label} (${a.craneId}): ${a.underDeckOffDockCount} cont bãi ngoài chặn nắp hầm`
-      : `${a.label} (${a.craneId}): Sắp đóng nắp hầm (còn ${a.underDeckRemainCount} cont TV dưới hầm)`;
+      ? `${a.label} (${a.craneId}) sắp đầy · cần xếp nốt ${a.underDeckOffDockCount} cont bãi ngoài ở ${bayStr} để đóng nắp hầm`
+      : `${a.label} (${a.craneId}) sắp đầy · còn ${a.underDeckRemainCount} cont TV ở ${bayStr} để đóng nắp hầm`;
     issues.push({ id: `HATCH_${a.hold}`, severity: a.severity === 'URGENT' ? 'urgent' : 'warn', title: hTitle, detail: a.actionLabel, action: "expandAndScrollTo('panel-smart-dispatch')" });
   });
   effEvals.filter(e => e.level !== 'OK').forEach(e => {
@@ -8698,7 +8689,7 @@ function renderFleetAndQcBalancePanel(pool) {
 
   const sumBadge = document.getElementById('fleetQcSummaryBadge');
   if (sumBadge) {
-    sumBadge.textContent = `TV ưu tiên ${fleet.tvSharePct}% · ${fleet.totalOffDockTrucks} xe bãi ngoài · ${tkQc.detectedRowCount} Row`;
+    sumBadge.textContent = `TV ưu tiên ${fleet.tvSharePct}% · ${fleet.totalOffDockTrucks} xe bãi ngoài`;
   }
   const trkBadge = document.getElementById('offDockTrucksTotalBadge');
   if (trkBadge) trkBadge.textContent = `${fleet.totalOffDockTrucks} xe bãi ngoài`;
@@ -8706,8 +8697,8 @@ function renderFleetAndQcBalancePanel(pool) {
   if (resBadge) resBadge.textContent = `${fleet.totalReservedTv} cont TV giữ`;
   const rowBadge = document.getElementById('vesselRowWidthBadge');
   if (rowBadge) {
-    rowBadge.textContent = tkQc.isWide11Plus ? `⚠️ ${tkQc.detectedRowCount} Row (Cần QC)` : `✅ ${tkQc.detectedRowCount} Row (TK/QC đều được)`;
-    rowBadge.className = `badge ${tkQc.isWide11Plus ? 'red' : 'green'}`;
+    rowBadge.textContent = `⏱️ 10–15p/lần chuyển hầm`;
+    rowBadge.className = 'badge';
   }
 
   // Box 1: Cân đối xe bãi ngoài (ưu tiên hàng TV)
@@ -8725,7 +8716,7 @@ function renderFleetAndQcBalancePanel(pool) {
         </div>
         <div style="font-size:10.5px;color:var(--muted);margin-top:2px;">
           Còn <b>${y.total}</b> (${y.readyB}B/${y.holdA}A) · Vòng quay ~<b>${y.roundTripMins}p</b> (~${y.capPerHr} mv/h)
-          ${y.blockingUnderDeck > 0 ? ` · <b style="color:var(--red);">⚠️ ${y.blockingUnderDeck} cont chặn dưới hầm (gọi trước)</b>` : ''}
+          ${y.blockingUnderDeck > 0 ? ` · <b style="color:var(--red);">⚠️ ${y.blockingUnderDeck} cont cần xếp dưới hầm để đóng nắp (gọi trước)</b>` : ''}
         </div>
       </div>`).join('') : '<div style="font-size:11px;color:var(--muted);">Không có container bãi ngoài còn tồn.</div>';
     fleetBox.innerHTML = tvHeader + yardsHtml;
@@ -8750,19 +8741,14 @@ function renderFleetAndQcBalancePanel(pool) {
     }).join('') : '<div style="font-size:11px;color:var(--muted);">Chưa có cont TV dưới hầm cần để dành đóng nắp.</div>';
   }
 
-  // Box 3: Tầm với TK/QC (>= 11 Row) & Chi phí di chuyển QC (10-15p)
+  // Box 3: Chi phí di chuyển QC qua hầm (10-15p/lần)
   const tkBox = document.getElementById('tkQcReachAndShiftBox');
   if (tkBox) {
     let html = '';
-    if (tkQc.tkWarnings.length) {
-      html += tkQc.tkWarnings.map(w => `<div class="fleet-row-card urgent"><b>${w.message}</b></div>`).join('');
-    } else {
-      html += `<div class="fleet-row-card tv-prio">✅ Bố trí TK/QC phù hợp tầm với (${tkQc.detectedRowCount} Row).</div>`;
-    }
     if (tkQc.qcShiftAdvices.length) {
       html += tkQc.qcShiftAdvices.map(a => `<div class="fleet-row-card ${a.worthMoving ? 'tv-prio' : ''}">${a.text}</div>`).join('');
     } else {
-      html += `<div class="fleet-row-card">⏱️ <b>Định mức chuyển hầm QC:</b> ${tkQc.qcMoveMinsMin}–${tkQc.qcMoveMinsMax} phút/lần (~5–6 moves). Chỉ dịch QC sang hầm khác khi hầm đích còn ≥15 cont để tối ưu năng suất.</div>`;
+      html += `<div class="fleet-row-card tv-prio">⏱️ <b>Định mức chuyển hầm QC:</b> ${tkQc.qcMoveMinsMin}–${tkQc.qcMoveMinsMax} phút/lần (~5–6 moves). Chỉ dịch QC sang hầm khác khi hầm đích còn ≥15 cont để tối ưu năng suất.</div>`;
     }
     tkBox.innerHTML = html;
   }
@@ -8787,7 +8773,6 @@ const HELP_TOPICS = {
       <p>Hệ thống tự động quét dữ liệu theo thời gian thực để cảnh báo:</p>
       <ul>
         <li><b>Nghiêng mạn / Mũi chìm–vếch:</b> Khi bạn bấm nút báo trên thanh Cân bằng, hệ thống tự ưu tiên gọi hàng nặng sang mạn/đầu đối diện.</li>
-        <li><b>Tầm với TK/QC (≥11 Row):</b> Tàu rộng từ 11 Row trở lên, cẩu TK không với tới sẽ tự báo để đổi sang QC.</li>
         <li><b>Nắp hầm & Bãi ngoài:</b> So sánh thời gian cẩu làm tới điểm đóng nắp hầm với thời gian kéo xe từ bãi ngoài để nhắc gọi sớm.</li>
         <li><b>Gạt để bỏ qua:</b> Kéo ngang thẻ sang trái/phải hoặc bấm dấu <b>✕</b> để ẩn cảnh báo đã xử lý.</li>
       </ul>`
