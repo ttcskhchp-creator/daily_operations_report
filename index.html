@@ -2667,17 +2667,29 @@ const OffDockTrafficEngine = {
 };
 
 const UnifiedPoolBuilder = {
+  normCntr(s) {
+    return String(s || '').toUpperCase().replace(/[^A-Z0-9]/g, '');
+  },
+
   getCancelledList(st) {
     return (st.finalLoading || []).filter(f => Boolean(f.cancel));
   },
 
   build(st, deckTierMin = 80) {
     const map = new Map();
-    const hasLiveJobs = Array.isArray(st.liveJobs) && st.liveJobs.length > 0;
-    const cancelledSet = new Set(this.getCancelledList(st).map(f => f.cntr));
+    const exportJobs = (st.liveJobs || []).filter(j =>
+      j.io === 'Export' || j.job_type === 'Xếp tàu' || /xuất\s*tàu/i.test(j.out_plan || '')
+    );
+    const hasLiveJobs = exportJobs.length > 0 || (Array.isArray(st.liveJobs) && st.liveJobs.length > 0);
+    const hasFinal = Array.isArray(st.finalLoading) && st.finalLoading.length > 0;
+    const hasAuthoritativeList = hasFinal || exportJobs.length > 0;
+
+    const cancelledSet = new Set(this.getCancelledList(st).map(f => this.normCntr(f.cntr)).filter(Boolean));
     const offDockCodes = OffDockTrafficEngine.getOffDockCodeSet();
 
-    const ensure = (cntr) => {
+    const ensure = (rawCntr) => {
+      const cntr = this.normCntr(rawCntr);
+      if (!cntr) return null;
       if (!map.has(cntr)) {
         map.set(cntr, {
           cntr, plannedPos: '', actualPos: '', size: '40HC', iso: '', weight: 0,
@@ -2692,53 +2704,11 @@ const UnifiedPoolBuilder = {
       return map.get(cntr);
     };
 
-    (st.preStowagePlan || []).forEach(p => {
-      if (cancelledSet.has(p.cntr)) return;
-      const cur = ensure(p.cntr);
-      cur.inAsc = true;
-      cur.plannedPos = p.pos || cur.plannedPos;
-      cur.iso = p.iso || cur.iso;
-      cur.size = String(p.iso || '').startsWith('2') ? '20DC' : '40HC';
-      if (p.weight > 0) cur.weight = p.weight;
-      if (p.pod) cur.pod = p.pod;
-      if (p.inst) cur.inst = p.inst;
-      if (!hasLiveJobs) cur.jobStatus = 'B';
-    });
-
-    (st.reservedExport || []).forEach(r => {
-      if (cancelledSet.has(r.cntr)) return;
-      const cur = ensure(r.cntr);
-      cur.inReserved = true;
-      if (r.size) cur.size = r.size;
-      if (r.iso) cur.iso = r.iso;
-      if (r.weight > 0) cur.weight = r.weight;
-      if (r.pod) cur.pod = r.pod;
-      if (r.transport) cur.transport = r.transport;
-      if (r.barge_code) cur.bargeCode = r.barge_code;
-
-      const isBarge = /barge|sà\s*lan|sa\s*lan/i.test(String(r.transport || ''))
-        || /ghe|sl|barge/i.test(String(r.ptgn || ''))
-        || Boolean(String(r.barge_code || '').trim());
-
-      if (r.yard_pos && r.yard_pos !== '---') {
-        cur.yardPos = r.yard_pos;
-        cur.yardBlock = r.block || String(r.yard_pos).split('-')[0].trim().toUpperCase();
-      }
-      if (isBarge) {
-        // Cont hạ bãi bằng Sà lan coi như đã ở Tân Vũ (TV)
-        cur.isBargeToTV = true;
-        cur.transferPort = 'TV';
-        cur.isOffDock = false;
-      } else if (offDockCodes.has(r.block)) {
-        cur.transferPort = r.block;
-        cur.isOffDock = true;
-      }
-    });
-
-    // Final Loading List ưu tiên cao nhất cho vị trí bãi hiện tại & phân loại Tân Vũ (TV) vs Bãi ngoài
+    // 1. Nạp danh sách chuẩn từ Final Loading List (không bị Cancel)
     (st.finalLoading || []).forEach(f => {
-      if (f.cancel) return; // Đã bị Cancel -> trừ khỏi số phải xếp!
+      if (f.cancel) return;
       const cur = ensure(f.cntr);
+      if (!cur) return;
       cur.inFinal = true;
       if (f.size) cur.size = f.size;
       if (f.iso) cur.iso = f.iso;
@@ -2750,13 +2720,8 @@ const UnifiedPoolBuilder = {
         cur.yardPos = f.yard_pos;
         cur.yardBlock = String(f.yard_pos).split('-')[0].trim().toUpperCase();
       }
-      if (cur.isBargeToTV) {
-        cur.transferPort = 'TV';
-        cur.isOffDock = false;
-      } else {
-        cur.transferPort = f.transfer_port || 'TV';
-        cur.isOffDock = Boolean(f.is_off_dock);
-      }
+      cur.transferPort = f.transfer_port || 'TV';
+      cur.isOffDock = Boolean(f.is_off_dock);
       cur.customs = Boolean(f.customs);
       if (f.ship_pos && f.ship_pos !== '--' && !cur.plannedPos) {
         const p6 = DataAdapters.parsePos6(f.ship_pos, deckTierMin);
@@ -2764,21 +2729,76 @@ const UnifiedPoolBuilder = {
       }
     });
 
-    Object.entries(st.stowageInstructions || {}).forEach(([cntr, inst]) => {
-      if (map.has(cntr)) {
-        const cur = map.get(cntr);
-        cur.inst = cur.inst && !cur.inst.includes(inst) ? `${cur.inst} / ${inst}` : inst;
-      }
-    });
-
-    (st.liveJobs || []).filter(j => j.io === 'Export' || j.job_type === 'Xếp tàu' || /xuất\s*tàu/i.test(j.out_plan || '')).forEach(j => {
-      if (cancelledSet.has(j.cntr)) return;
-      const cur = ensure(j.cntr);
+    // 2. Nạp danh sách Xuất từ Thay đổi công việc tàu (OM liveJobs)
+    exportJobs.forEach(j => {
+      const key = this.normCntr(j.cntr);
+      if (!key || cancelledSet.has(key)) return;
+      const cur = ensure(key);
+      if (!cur) return;
       cur.hasJobInOM = true;
       if (j.status) cur.jobStatus = j.status;
       if (j.crane) cur.crane = j.crane;
       if (j.pod && !cur.pod) cur.pod = j.pod;
       if (j.status === 'C' && j.pos) cur.actualPos = j.pos;
+    });
+
+    // 3. Bổ sung thông tin Reserved (phương tiện Sà lan / Truck, trọng lượng, vị trí bãi nếu Final chưa có)
+    (st.reservedExport || []).forEach(r => {
+      const key = this.normCntr(r.cntr);
+      if (!key || cancelledSet.has(key)) return;
+      // Nếu đã có Final/OM thì chỉ bổ sung cho cont có trong danh sách; nếu chưa có thì thêm mới
+      if (hasAuthoritativeList && !map.has(key)) return;
+      const cur = ensure(key);
+      if (!cur) return;
+      cur.inReserved = true;
+      if (r.size && !cur.size) cur.size = r.size;
+      if (r.iso && !cur.iso) cur.iso = r.iso;
+      if (r.weight > 0 && cur.weight === 0) cur.weight = r.weight;
+      if (r.pod && (!cur.pod || cur.pod === 'SGSIN')) cur.pod = r.pod;
+      if (r.transport) cur.transport = r.transport;
+      if (r.barge_code) cur.bargeCode = r.barge_code;
+
+      const isBarge = /barge|sà\s*lan|sa\s*lan/i.test(String(r.transport || ''))
+        || /ghe|sl|barge/i.test(String(r.ptgn || ''))
+        || Boolean(String(r.barge_code || '').trim());
+
+      if ((!cur.yardPos || cur.yardPos === '---') && r.yard_pos && r.yard_pos !== '---') {
+        cur.yardPos = r.yard_pos;
+        cur.yardBlock = r.block || String(r.yard_pos).split('-')[0].trim().toUpperCase();
+      }
+      if (isBarge) {
+        cur.isBargeToTV = true;
+        cur.transferPort = 'TV';
+        cur.isOffDock = false;
+      } else if (!cur.inFinal && offDockCodes.has(r.block)) {
+        cur.transferPort = r.block;
+        cur.isOffDock = true;
+      }
+    });
+
+    // 4. Ghép sơ đồ dự kiến .ASC / .EDI (chỉ bổ sung vị trí dự kiến & chỉ dẫn, KHÔNG cộng dồn cont ngoài Final/OM làm nhân đôi tổng!)
+    (st.preStowagePlan || []).forEach(p => {
+      const key = this.normCntr(p.cntr);
+      if (!key || cancelledSet.has(key)) return;
+      if (hasAuthoritativeList && !map.has(key)) return;
+      const cur = ensure(key);
+      if (!cur) return;
+      cur.inAsc = true;
+      cur.plannedPos = p.pos || cur.plannedPos;
+      if (p.iso && !cur.iso) cur.iso = p.iso;
+      if (!cur.size) cur.size = String(p.iso || '').startsWith('2') ? '20DC' : '40HC';
+      if (p.weight > 0 && cur.weight === 0) cur.weight = p.weight;
+      if (p.pod && (!cur.pod || cur.pod === 'SGSIN')) cur.pod = p.pod;
+      if (p.inst) cur.inst = p.inst;
+      if (!hasLiveJobs) cur.jobStatus = 'B';
+    });
+
+    Object.entries(st.stowageInstructions || {}).forEach(([rawCntr, inst]) => {
+      const key = this.normCntr(rawCntr);
+      if (map.has(key)) {
+        const cur = map.get(key);
+        cur.inst = cur.inst && !cur.inst.includes(inst) ? `${cur.inst} / ${inst}` : inst;
+      }
     });
 
     const list = Array.from(map.values());
@@ -2789,8 +2809,10 @@ const UnifiedPoolBuilder = {
     return list;
   },
 
+  // Chưa có job OM = cont trong Final Loading List (không bị Cancel) và KHÔNG có trong danh sách Thay đổi công việc tàu
   getNoJobFromFinal(st, pool) {
-    return (pool || []).filter(x => x.inFinal && !x.hasJobInOM);
+    const allJobCntrs = new Set((st.liveJobs || []).map(j => this.normCntr(j.cntr)).filter(Boolean));
+    return (pool || []).filter(x => x.inFinal && !allJobCntrs.has(this.normCntr(x.cntr)));
   }
 };
 
@@ -4167,17 +4189,17 @@ function recalcDraftLive() {
 function renderOffDockSummary(pool) {
   const cancelledList = UnifiedPoolBuilder.getCancelledList(state);
   const noJobList = UnifiedPoolBuilder.getNoJobFromFinal(state, pool);
-  const offDock = pool.filter(x => x.isOffDock && x.jobStatus !== 'C');
+  const isRemainingAB = (x) => x.jobStatus === 'A' || x.jobStatus === 'B';
+  const offDock = pool.filter(x => x.isOffDock && isRemainingAB(x));
   const groups = {};
   offDock.forEach(item => {
     const k = item.transferPort || 'KHÁC';
-    if (!groups[k]) groups[k] = { total: 0, readyB: 0, holdA: 0, noJob: 0 };
+    if (!groups[k]) groups[k] = { total: 0, readyB: 0, holdA: 0 };
     groups[k].total++;
     if (item.jobStatus === 'B') groups[k].readyB++;
-    else if (item.jobStatus === 'NO_JOB') groups[k].noJob++;
     else groups[k].holdA++;
   });
-  const tvRemain = pool.filter(x => !x.isOffDock && x.jobStatus !== 'C');
+  const tvRemain = pool.filter(x => !x.isOffDock && isRemainingAB(x));
   const bargeCount = pool.filter(x => x.isBargeToTV).length;
   const isPeak = OffDockTrafficEngine.isPeakHour();
 
