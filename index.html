@@ -1246,6 +1246,91 @@ pre.schema-box {
 .fleet-row-card.tv-prio { border-left-color: var(--green); }
 .fleet-row-card.urgent { border-left-color: var(--red); background: rgba(220,38,38,0.06); }
 
+
+/* ==================== SMART 3-ZONE MOBILE-FIRST UI ==================== */
+.mobile-bottom-nav {
+  grid-template-columns: repeat(3, 1fr) !important;
+  padding: 5px 8px calc(5px + env(safe-area-inset-bottom));
+  gap: 8px;
+}
+.mobile-bottom-nav button {
+  border-radius: 10px;
+  min-height: 50px;
+  font-size: 11px;
+  font-weight: 800;
+}
+.mobile-bottom-nav button.active {
+  background: rgba(2,132,199,0.14);
+  color: var(--cyan);
+  box-shadow: inset 0 2px 0 var(--cyan);
+}
+.zone-intro {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-left: 4px solid var(--cyan);
+  border-radius: 10px;
+  padding: 9px 12px;
+  margin-bottom: 10px;
+}
+.zone-intro-title { font-weight: 900; font-size: 13.5px; }
+.zone-intro-sub { font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+.setup-welcome-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  background: linear-gradient(135deg, rgba(2,132,199,0.10), rgba(5,150,105,0.08));
+  border: 1.5px solid var(--cyan);
+  border-radius: 11px;
+  padding: 11px 13px;
+  margin-bottom: 10px;
+}
+
+.sub-pill-bar {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 4px 2px 10px;
+  margin-bottom: 6px;
+  scrollbar-width: none;
+}
+.sub-pill-bar::-webkit-scrollbar { display: none; }
+.sub-pill {
+  flex: 0 0 auto;
+  border-radius: 999px;
+  padding: 6px 13px;
+  min-height: 34px;
+  font-size: 11.5px;
+  font-weight: 800;
+  background: var(--card);
+  border: 1.5px solid var(--line);
+  color: var(--muted);
+  white-space: nowrap;
+}
+.sub-pill.active {
+  background: var(--cyan);
+  border-color: var(--cyan);
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(2,132,199,0.28);
+}
+.detail-sub-sec.hidden-sub,
+.setup-sub-sec.hidden-sub {
+  display: none;
+}
+@media (max-width: 768px) {
+  .zone-intro { padding: 8px 10px; }
+  .zone-intro-sub { font-size: 10.5px; }
+  .sub-pill { min-height: 36px; padding: 6px 12px; font-size: 12px; }
+  .att-btn { min-height: 34px; padding: 5px 10px; }
+}
 </style>
 </head>
 <body>
@@ -1387,16 +1472,26 @@ pre.schema-box {
 
 <!-- TAB DESKTOP -->
 <nav class="nav-tabs-desktop">
-  <button class="active" data-tab="tab-dispatch" onclick="switchTab('tab-dispatch')">1. Khuyến nghị Gọi hàng & Cẩu</button>
-  <button data-tab="tab-holds" onclick="switchTab('tab-holds')">2. Chia Hầm Động & Gọi hàng Đuổi</button>
-  <button data-tab="tab-cranes" onclick="switchTab('tab-cranes')">3. Thiết lập Tàu, Cẩu & Sự cố</button>
-  <button data-tab="tab-upload" onclick="switchTab('tab-upload')">4. Nạp File riêng theo Tàu & Bot OM</button>
+  <button class="active" data-tab="tab-dispatch" onclick="switchTab('tab-dispatch')">📊 1. Tiến độ & Điều hành</button>
+  <button data-tab="tab-details" onclick="switchTab('tab-details')">🔍 2. Chi tiết (Lọc Cont · Cẩu · Bãi · Hầm)</button>
+  <button data-tab="tab-setup" onclick="switchTab('tab-setup')">⚙️ 3. Cài đặt & Nạp dữ liệu</button>
 </nav>
 
 <div class="container">
 
-  <!-- ==================== TAB 1: KHUYẾN NGHỊ GỌI HÀNG & CẨU ==================== -->
+  <!-- ==================== KHU VỰC 1: KIỂM SOÁT TIẾN ĐỘ & ĐIỀU HÀNH NHANH ==================== -->
   <div id="tab-dispatch" class="tab-pane active">
+    <div class="zone-intro">
+      <div>
+        <div class="zone-intro-title">📊 Kiểm soát Tiến độ & Gọi hàng nhanh</div>
+        <div class="zone-intro-sub">Xem nhanh chỗ đang cần xử lý, cẩu cần hàng gì nhất, mô phỏng tàu và gọi xe ngay trong 1 chạm.</div>
+      </div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;">
+        <button class="sm primary" onclick="switchTab('tab-details', 'callable')">🔎 Lọc Cont POD/Tấn</button>
+        <button class="sm" onclick="switchTab('tab-setup', 'upload')">⚙️ Cài đặt / Nạp file</button>
+      </div>
+    </div>
+
     <div class="edi-required-banner" id="globalEdiRequiredBanner">
       <div style="flex:1;min-width:240px;">
         <div style="font-weight:900;font-size:13px;color:var(--red);">🚨 YÊU CẦU BẮT BUỘC: TÀU NÀY CHƯA CÓ DỮ LIỆU SƠ ĐỒ .ASC ($604) HOẶC .EDI (BAPLIE)</div>
@@ -1406,26 +1501,7 @@ pre.schema-box {
       </div>
       <button class="danger" onclick="jumpToMandatoryEdiUpload()">📂 Nạp file EDI / ASC ngay</button>
     </div>
-    <!-- THANH BÁO TRẠNG THÁI NGHIÊNG MẠN / MŨI CHÌM - VẾCH ĐỂ KHUYẾN NGHỊ GỌI HÀNG XỬ LÝ -->
-    <div class="attitude-bar" id="vesselAttitudeBar">
-      <div class="attitude-group">
-        <span style="font-weight:850;font-size:11.5px;">⚖️ Báo Nghiêng mạn:</span>
-        <button class="att-btn active-ok" id="btnHeelEven" onclick="setVesselAttitude('heel','EVEN')">✓ Cân mạn</button>
-        <button class="att-btn" id="btnHeelPort" onclick="setVesselAttitude('heel','LIST_PORT')">↙️ Nghiêng Trái (Port)</button>
-        <button class="att-btn" id="btnHeelStbd" onclick="setVesselAttitude('heel','LIST_STARBOARD')">↘️ Nghiêng Phải (Stbd)</button>
-      </div>
-      <div class="attitude-group">
-        <span style="font-weight:850;font-size:11.5px;">🚢 Báo Mũi / Lái:</span>
-        <button class="att-btn active-ok" id="btnTrimEven" onclick="setVesselAttitude('trim','EVEN')">✓ Thăng bằng</button>
-        <button class="att-btn" id="btnTrimBowDown" onclick="setVesselAttitude('trim','BOW_DOWN')">⏬ Mũi đang chìm</button>
-        <button class="att-btn" id="btnTrimBowUp" onclick="setVesselAttitude('trim','BOW_UP')">⏫ Mũi đang vếch</button>
-      </div>
-      <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
-        <span id="attitudeAdviceInline" style="font-size:11px;font-weight:750;color:var(--green);">✅ Tàu đang cân bằng tốt</span>
-        <button class="primary sm" onclick="openVesselSetupWizard(1)" title="Mở trình hướng dẫn 5 bước thiết lập tàu">🧭 Thiết lập 5 bước</button>
-      </div>
-    </div>
-
+    
     <!-- BẢNG ĐIỀU HÀNH NHANH 4 TRỌNG TÂM (TỐI ƯU ĐT/MTB & TÓM TẮT PC: CHỖ KHÔNG ỔN · CẦN HÀNG GÌ NHẤT · KHU VỰC · CÒN BAO NHIÊU) -->
     <div class="ops-cockpit" id="mobileOpsCockpit">
       <div class="cockpit-card c-alert">
@@ -1458,6 +1534,7 @@ pre.schema-box {
       </div>
     </div>
 
+    
     <!-- THẺ DÀI NGANG TOÀN MÀN HÌNH: MÔ PHỎNG HÌNH CON TÀU, HƯỚNG CẬP MẠN & TIẾN ĐỘ THIẾT BỊ DỌC RAY CẦU TÀU -->
     <div class="panel ship-rail-panel" id="panel-ship-rail">
       <div class="panel-head">
@@ -1467,8 +1544,7 @@ pre.schema-box {
           <span class="badge red" id="railCrossingAlertBadge" style="display:none;">⚠️ Chéo ray cẩu!</span>
         </div>
         <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;">
-          <button class="sm" onclick="toggleBerthingSideQuick()" title="Đổi nhanh hướng cập Mạn Trái / Mạn Phải">🔄 Đổi Mạn Trái / Phải</button>
-          <button class="primary sm" onclick="autoDistributeHoldsByRail()" title="Tự động chia lại Hầm cho các Cẩu theo đúng thứ tự vật lý trên ray không vượt mặt">⚡ Tự chia Hầm đúng ray</button>
+          <button class="sm" onclick="switchTab('tab-setup', 'cranes')" title="Mở khu Cài đặt để chỉnh Cẩu, hướng mạn hoặc chia lại hầm">⚙️ Chỉnh Cẩu / Mạn</button>
           <button class="panel-collapse-btn" onclick="togglePanelCollapse('panel-ship-rail', this)">▼ Thu gọn</button>
         </div>
       </div>
@@ -1485,119 +1561,96 @@ pre.schema-box {
       </div>
     </div>
 
-    <div class="grid-2">
-      <div class="panel" id="panel-crane-hourly">
-        <div class="panel-head">
-          <h3>📊 Sản lượng Cẩu theo Khung giờ</h3>
-          <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">
-            <select id="shiftFilter" onchange="renderCraneHourlyChart()">
-              <option value="ALL">Toàn bộ giờ làm tàu (Đủ 24h+)</option>
-              <option value="LAST_12H">12 giờ gần nhất</option>
-              <option value="DAY">Ca Ngày (07:00 - 18:00)</option>
-              <option value="NIGHT">Ca Đêm (19:00 - 06:00)</option>
-            </select>
-            <span class="badge" id="craneImbalanceBadge">Cân bằng</span>
-            <button class="panel-collapse-btn" onclick="togglePanelCollapse('panel-crane-hourly', this)">▼ Thu gọn</button>
-          </div>
-        </div>
-        <div class="panel-body">
-          <div class="crane-legend" id="craneChartLegend"></div>
-          <div class="hourly-bars" id="craneHourlyBars"></div>
-          <div class="hour-detail-bar" id="mobileHourDetail"></div>
-          <div class="crane-prod-strip" id="craneProdStrip"></div>
-          <details style="margin-top:8px;" open>
-            <summary style="cursor:pointer;font-size:11.5px;font-weight:800;color:var(--cyan);">📋 Bảng Sản lượng theo Giờ từng thiết bị TK / QC (Tính theo Cột 9: Ngày hoàn tất · Trạng thái C)</summary>
-            <div class="table-wrap" style="max-height:210px;margin-top:6px;" id="craneHourlyMatrixTable"></div>
-          </details>
-          <div id="craneAdviceBox" style="margin-top:9px;padding:8px 10px;border-radius:7px;background:rgba(2,132,199,0.08);font-size:11.5px;"></div>
-          <div style="margin-top:10px;border-top:1px dashed var(--line);padding-top:9px;">
-            <div style="display:flex;justify-content:space-between;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:6px;">
-              <strong style="font-size:12px;">⏱️ Đánh giá Hiệu suất Cẩu định kỳ (1 tiếng/lần) & Đề xuất Cắt làm việc</strong>
-              <div style="display:flex;gap:6px;align-items:center;">
-                <span class="badge" id="hourlyEvalCountdown">Lần tới: 60p</span>
-                <button class="sm primary" onclick="runHourlyCraneEfficiencyReview(true)">🔄 Đánh giá ngay</button>
-              </div>
-            </div>
-            <div id="hourlyEfficiencyBox"></div>
-          </div>
-        </div>
+    
+    <!-- THANH BÁO TRẠNG THÁI NGHIÊNG MẠN / MŨI CHÌM - VẾCH ĐỂ KHUYẾN NGHỊ GỌI HÀNG XỬ LÝ -->
+    <div class="attitude-bar" id="vesselAttitudeBar">
+      <div class="attitude-group">
+        <span style="font-weight:850;font-size:11.5px;">⚖️ Báo Nghiêng mạn:</span>
+        <button class="att-btn active-ok" id="btnHeelEven" onclick="setVesselAttitude('heel','EVEN')">✓ Cân mạn</button>
+        <button class="att-btn" id="btnHeelPort" onclick="setVesselAttitude('heel','LIST_PORT')">↙️ Nghiêng Trái (Port)</button>
+        <button class="att-btn" id="btnHeelStbd" onclick="setVesselAttitude('heel','LIST_STARBOARD')">↘️ Nghiêng Phải (Stbd)</button>
       </div>
-
-      <div class="panel" id="panel-yard-recon">
-        <div class="panel-head">
-          <h3>🚛 Đối chiếu Vị trí Bãi (TV vs Bãi ngoài) & Job OM</h3>
-          <div style="display:flex;gap:5px;align-items:center;flex-wrap:wrap;">
-            <span class="badge amber" id="offDockTotalBadge">0 Cont bãi ngoài</span>
-            <label class="badge green" style="cursor:pointer;padding:4px 8px;" title="Đẩy nhanh file Excel/CSV cập nhật vị trí bãi thực tế (đảo chuyển)">
-              📍 Đẩy vị trí bãi
-              <input type="file" accept=".xlsx,.xls,.csv" style="display:none;" onchange="handleUploadYardPositions(event, true)">
-            </label>
-            <button class="panel-collapse-btn" onclick="togglePanelCollapse('panel-yard-recon', this)">▼ Thu gọn</button>
-          </div>
-        </div>
-        <div class="panel-body">
-          <div style="font-size:11px;color:var(--muted);">
-            Khớp khóa chung <b>Số Container</b> giữa <b>Final Loading List</b>, <b>Reserved</b>, <b>.ASC</b> và <b>Thay đổi công việc tàu</b> (phân tách rõ cont ở bãi <b>Tân Vũ</b>, <b>Bãi ngoài</b> và cont <b>Chưa bắn Job</b> lên OM).
-          </div>
-          <div class="offdock-grid" id="offDockCards"></div>
-          <div id="tvBlockSummaryLine" style="font-size:11px;color:var(--muted);margin-top:8px;"></div>
-          <details style="margin-top:8px;">
-            <summary style="cursor:pointer;font-size:11.5px;font-weight:800;color:var(--cyan);">🔍 Bảng đối chiếu chi tiết từng Container (Vị trí bãi · Bãi TV/Ngoài · Đã/Chưa bắn Job)</summary>
-            <div style="display:flex;gap:6px;flex-wrap:wrap;margin:6px 0;">
-              <select id="yardReconFilter" onchange="renderYardReconcileTable()" style="min-height:28px;font-size:11px;">
-                <option value="NO_JOB">Chưa bắn Job trên OM</option>
-                <option value="SHIFTED">🔄 Đã cập nhật / Đảo chuyển vị trí</option>
-                <option value="OFF_DOCK">Chỉ Bãi ngoài</option>
-                <option value="TV">Nội bộ Tân Vũ (TV)</option>
-                <option value="ALL">Tất cả cont Xuất</option>
-              </select>
-              <input id="yardReconSearch" placeholder="Tìm số cont / Block (VD: AI, AK)..." oninput="renderYardReconcileTable()" style="min-height:28px;font-size:11px;flex:1;min-width:140px;">
-            </div>
-            <div class="table-wrap" style="max-height:220px;" id="yardReconTableWrap"></div>
-          </details>
-        </div>
+      <div class="attitude-group">
+        <span style="font-weight:850;font-size:11.5px;">🚢 Báo Mũi / Lái:</span>
+        <button class="att-btn active-ok" id="btnTrimEven" onclick="setVesselAttitude('trim','EVEN')">✓ Thăng bằng</button>
+        <button class="att-btn" id="btnTrimBowDown" onclick="setVesselAttitude('trim','BOW_DOWN')">⏬ Mũi đang chìm</button>
+        <button class="att-btn" id="btnTrimBowUp" onclick="setVesselAttitude('trim','BOW_UP')">⏫ Mũi đang vếch</button>
+      </div>
+      <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
+        <span id="attitudeAdviceInline" style="font-size:11px;font-weight:750;color:var(--green);">✅ Tàu đang cân bằng tốt</span>
+        <button class="primary sm" onclick="openVesselSetupWizard(1)" title="Mở trình hướng dẫn 5 bước thiết lập tàu">🧭 Hướng dẫn 5 bước</button>
       </div>
     </div>
 
-    <!-- CÂN ĐỐI XE BÃI NGOÀI (ƯU TIÊN HÀNG TV) · GIỮ CONT TV ĐÓNG HẦM · TẦM VỚI TK/QC (>=11 ROW) & DI CHUYỂN QC 10-15P -->
-    <div class="panel" id="panel-fleet-qc-balance" style="border-top:3px solid var(--purple);">
+    
+    <div class="panel" id="panel-smart-dispatch">
       <div class="panel-head">
-        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
-          <h3>⚖️ Cân đối Xe Bãi ngoài (Ưu tiên TV) · 🔒 Giữ Cont TV đóng hầm · 🏗️ TK/QC (≥11 Row) & Chuyển hầm QC (10–15p)</h3>
-          <span class="badge purple" id="fleetQcSummaryBadge">Đang tính toán...</span>
+        <h3>🎯 Khuyến nghị Gọi hàng Thông minh theo Thiết bị</h3>
+        <div style="display:flex;gap:7px;flex-wrap:wrap;align-items:center;">
+          <select id="podStrategy" onchange="renderDispatchRecommendations()">
+            <option value="FEWEST_FIRST">POD: Ưu tiên cảng ít trước</option>
+            <option value="ROUND_ROBIN">POD: Xếp san đều các cảng</option>
+            <option value="MOST_FIRST">POD: Ưu tiên cảng nhiều trước</option>
+          </select>
+          <select id="weightStrategy" onchange="renderDispatchRecommendations()">
+            <option value="HEAVY_FIRST">Tấn: Tấn to xếp trước</option>
+            <option value="LIGHT_FIRST">Tấn: Tấn nhẹ xếp trước</option>
+          </select>
+          <select id="yardFilter" onchange="renderDispatchRecommendations()">
+            <option value="ALL">Bãi: Trộn tự động (Gọi sớm bãi ngoài)</option>
+            <option value="OFF_DOCK_ONLY">Bãi: Chỉ gọi Bãi ngoài (GFW, HHH, SA...)</option>
+            <option value="TV_ONLY">Bãi: Chỉ gọi nội bộ Tân Vũ (TV)</option>
+          </select>
+          <button class="danger sm" onclick="clearExportDataOnly()">🗑️ Xóa Xuất</button>
+          <button class="panel-collapse-btn" onclick="togglePanelCollapse('panel-smart-dispatch', this)">▼ Thu gọn</button>
         </div>
-        <button class="panel-collapse-btn" onclick="togglePanelCollapse('panel-fleet-qc-balance', this)">▼ Thu gọn</button>
       </div>
       <div class="panel-body">
-        <div class="ops-tri-grid">
-          <div class="ops-sub-box">
-            <div class="ops-sub-title">
-              <span>🚛 Cân đối số Xe Bãi ngoài (Ưu tiên xếp tối đa hàng TV)</span>
-              <span class="badge amber" id="offDockTrucksTotalBadge">0 xe ngoài</span>
+        <div style="margin-bottom:10px;padding:9px 11px;border-radius:8px;border:1px solid var(--line);background:rgba(2,132,199,0.05);">
+          <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;">
+            <strong style="font-size:12px;">🧭 Khuyến nghị Chuẩn bị Xuất Hầm trước & Gọi Bãi theo Quãng đường / Cao điểm giao thông</strong>
+            <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">
+              <span class="badge" id="trafficStatusBadge">🟢 Thông thoáng</span>
+              <button class="sm" onclick="switchTab('tab-cranes')">⚙️ Sửa Bãi ngoài & Giờ cao điểm</button>
             </div>
-            <div id="offDockFleetBalanceBox" style="display:flex;flex-direction:column;gap:5px;"></div>
           </div>
-
-          <div class="ops-sub-box">
-            <div class="ops-sub-title">
-              <span>🔒 Cont TV để dành đóng nắp hầm nhanh (~4p)</span>
-              <span class="badge green" id="tvHatchReserveBadge">0 cont giữ</span>
+          <div class="prep-rec-strip" id="exportPrepAdvisoryStrip"></div>
+          <div style="margin-top:10px;padding-top:9px;border-top:1px dashed var(--line);">
+            <div style="display:flex;justify-content:space-between;align-items:center;gap:6px;flex-wrap:wrap;">
+              <strong style="font-size:12px;">🛡️ Chống dừng Máng & Khép Nắp Hầm (Cont còn ít ở Bãi ngoài cần làm đầy dưới hầm)</strong>
+              <span class="badge" id="hatchWatchSummaryBadge">Đang tính toán...</span>
             </div>
-            <div id="tvHatchReserveBox" style="display:flex;flex-direction:column;gap:5px;"></div>
-          </div>
-
-          <div class="ops-sub-box">
-            <div class="ops-sub-title">
-              <span>🏗️ Tầm với TK/QC (≥11 Row) & Chi phí chuyển QC (10–15p)</span>
-              <span class="badge" id="vesselRowWidthBadge">Đo Row...</span>
+            <div style="font-size:11px;color:var(--muted);margin-top:2px;">
+              So sánh <b>thời gian máng làm tới điểm đóng nắp hầm</b> (theo năng suất cẩu mv/h) với <b>thời gian trung bình cont bãi ngoài được xếp trong ca</b> để báo gọi sớm, không để cẩu chờ nắp hầm.
             </div>
-            <div id="tkQcReachAndShiftBox" style="display:flex;flex-direction:column;gap:5px;"></div>
+            <div class="hatch-watch-grid" id="hatchCoverWatchGrid"></div>
           </div>
         </div>
+        <div class="grid-3" id="craneDispatchColumns"></div>
       </div>
     </div>
 
-    <!-- THẺ TÓM TẮT HÀNG CÓ THỂ GỌI (THEO CẢNG POD · DẢI TẤN · LOẠI HÀNG ĐẶC BIỆT RF/DG/OOG/OT) -->
+  </div>
+
+  <!-- ==================== KHU VỰC 2: CHỨC NĂNG CHI TIẾT ==================== -->
+  <div id="tab-details" class="tab-pane">
+    <div class="zone-intro">
+      <div>
+        <div class="zone-intro-title">🔍 Chi tiết Khai thác (Lọc Container · Cẩu · Bãi · Hầm)</div>
+        <div class="zone-intro-sub">Chọn nhanh từng mục bên dưới để xem gọn trên điện thoại mà không cần cuộn dài.</div>
+      </div>
+    </div>
+
+    <div class="sub-pill-bar" id="detailSubPillBar">
+      <button class="sub-pill active" data-sub="ALL" onclick="switchDetailSub('ALL')">✨ Tất cả</button>
+      <button class="sub-pill" data-sub="callable" onclick="switchDetailSub('callable')">🎯 Lọc Cont (POD · Tấn)</button>
+      <button class="sub-pill" data-sub="cranes" onclick="switchDetailSub('cranes')">📊 Sản lượng Cẩu</button>
+      <button class="sub-pill" data-sub="yards" onclick="switchDetailSub('yards')">🚛 Bãi & Cân đối Xe</button>
+      <button class="sub-pill" data-sub="holds" onclick="switchDetailSub('holds')">🚢 Hầm, Bay & Đuổi</button>
+    </div>
+
+    <div class="detail-sub-sec" data-detail-sec="callable">
+      <!-- THẺ TÓM TẮT HÀNG CÓ THỂ GỌI (THEO CẢNG POD · DẢI TẤN · LOẠI HÀNG ĐẶC BIỆT RF/DG/OOG/OT) -->
     <div class="panel" id="panel-callable-cargo" style="border-top:3px solid var(--green);">
       <div class="panel-head">
         <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
@@ -1666,56 +1719,129 @@ pre.schema-box {
       </div>
     </div>
 
-    <div class="panel" id="panel-smart-dispatch">
-      <div class="panel-head">
-        <h3>🎯 Khuyến nghị Gọi hàng Thông minh theo Thiết bị</h3>
-        <div style="display:flex;gap:7px;flex-wrap:wrap;align-items:center;">
-          <select id="podStrategy" onchange="renderDispatchRecommendations()">
-            <option value="FEWEST_FIRST">POD: Ưu tiên cảng ít trước</option>
-            <option value="ROUND_ROBIN">POD: Xếp san đều các cảng</option>
-            <option value="MOST_FIRST">POD: Ưu tiên cảng nhiều trước</option>
-          </select>
-          <select id="weightStrategy" onchange="renderDispatchRecommendations()">
-            <option value="HEAVY_FIRST">Tấn: Tấn to xếp trước</option>
-            <option value="LIGHT_FIRST">Tấn: Tấn nhẹ xếp trước</option>
-          </select>
-          <select id="yardFilter" onchange="renderDispatchRecommendations()">
-            <option value="ALL">Bãi: Trộn tự động (Gọi sớm bãi ngoài)</option>
-            <option value="OFF_DOCK_ONLY">Bãi: Chỉ gọi Bãi ngoài (GFW, HHH, SA...)</option>
-            <option value="TV_ONLY">Bãi: Chỉ gọi nội bộ Tân Vũ (TV)</option>
-          </select>
-          <button class="danger sm" onclick="clearExportDataOnly()">🗑️ Xóa Xuất</button>
-          <button class="panel-collapse-btn" onclick="togglePanelCollapse('panel-smart-dispatch', this)">▼ Thu gọn</button>
+    
+    </div>
+
+    <div class="detail-sub-sec" data-detail-sec="cranes">
+      <div class="panel" id="panel-crane-hourly">
+        <div class="panel-head">
+          <h3>📊 Sản lượng Cẩu theo Khung giờ</h3>
+          <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">
+            <select id="shiftFilter" onchange="renderCraneHourlyChart()">
+              <option value="ALL">Toàn bộ giờ làm tàu (Đủ 24h+)</option>
+              <option value="LAST_12H">12 giờ gần nhất</option>
+              <option value="DAY">Ca Ngày (07:00 - 18:00)</option>
+              <option value="NIGHT">Ca Đêm (19:00 - 06:00)</option>
+            </select>
+            <span class="badge" id="craneImbalanceBadge">Cân bằng</span>
+            <button class="panel-collapse-btn" onclick="togglePanelCollapse('panel-crane-hourly', this)">▼ Thu gọn</button>
+          </div>
         </div>
+        <div class="panel-body">
+          <div class="crane-legend" id="craneChartLegend"></div>
+          <div class="hourly-bars" id="craneHourlyBars"></div>
+          <div class="hour-detail-bar" id="mobileHourDetail"></div>
+          <div class="crane-prod-strip" id="craneProdStrip"></div>
+          <details style="margin-top:8px;" open>
+            <summary style="cursor:pointer;font-size:11.5px;font-weight:800;color:var(--cyan);">📋 Bảng Sản lượng theo Giờ từng thiết bị TK / QC (Tính theo Cột 9: Ngày hoàn tất · Trạng thái C)</summary>
+            <div class="table-wrap" style="max-height:210px;margin-top:6px;" id="craneHourlyMatrixTable"></div>
+          </details>
+          <div id="craneAdviceBox" style="margin-top:9px;padding:8px 10px;border-radius:7px;background:rgba(2,132,199,0.08);font-size:11.5px;"></div>
+          <div style="margin-top:10px;border-top:1px dashed var(--line);padding-top:9px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:6px;">
+              <strong style="font-size:12px;">⏱️ Đánh giá Hiệu suất Cẩu định kỳ (1 tiếng/lần) & Đề xuất Cắt làm việc</strong>
+              <div style="display:flex;gap:6px;align-items:center;">
+                <span class="badge" id="hourlyEvalCountdown">Lần tới: 60p</span>
+                <button class="sm primary" onclick="runHourlyCraneEfficiencyReview(true)">🔄 Đánh giá ngay</button>
+              </div>
+            </div>
+            <div id="hourlyEfficiencyBox"></div>
+          </div>
+        </div>
+      </div>
+
+
+    </div>
+
+    <div class="detail-sub-sec" data-detail-sec="yards">
+      <div class="panel" id="panel-yard-recon">
+        <div class="panel-head">
+          <h3>🚛 Đối chiếu Vị trí Bãi (TV vs Bãi ngoài) & Job OM</h3>
+          <div style="display:flex;gap:5px;align-items:center;flex-wrap:wrap;">
+            <span class="badge amber" id="offDockTotalBadge">0 Cont bãi ngoài</span>
+            <label class="badge green" style="cursor:pointer;padding:4px 8px;" title="Đẩy nhanh file Excel/CSV cập nhật vị trí bãi thực tế (đảo chuyển)">
+              📍 Đẩy vị trí bãi
+              <input type="file" accept=".xlsx,.xls,.csv" style="display:none;" onchange="handleUploadYardPositions(event, true)">
+            </label>
+            <button class="panel-collapse-btn" onclick="togglePanelCollapse('panel-yard-recon', this)">▼ Thu gọn</button>
+          </div>
+        </div>
+        <div class="panel-body">
+          <div style="font-size:11px;color:var(--muted);">
+            Khớp khóa chung <b>Số Container</b> giữa <b>Final Loading List</b>, <b>Reserved</b>, <b>.ASC</b> và <b>Thay đổi công việc tàu</b> (phân tách rõ cont ở bãi <b>Tân Vũ</b>, <b>Bãi ngoài</b> và cont <b>Chưa bắn Job</b> lên OM).
+          </div>
+          <div class="offdock-grid" id="offDockCards"></div>
+          <div id="tvBlockSummaryLine" style="font-size:11px;color:var(--muted);margin-top:8px;"></div>
+          <details style="margin-top:8px;">
+            <summary style="cursor:pointer;font-size:11.5px;font-weight:800;color:var(--cyan);">🔍 Bảng đối chiếu chi tiết từng Container (Vị trí bãi · Bãi TV/Ngoài · Đã/Chưa bắn Job)</summary>
+            <div style="display:flex;gap:6px;flex-wrap:wrap;margin:6px 0;">
+              <select id="yardReconFilter" onchange="renderYardReconcileTable()" style="min-height:28px;font-size:11px;">
+                <option value="NO_JOB">Chưa bắn Job trên OM</option>
+                <option value="SHIFTED">🔄 Đã cập nhật / Đảo chuyển vị trí</option>
+                <option value="OFF_DOCK">Chỉ Bãi ngoài</option>
+                <option value="TV">Nội bộ Tân Vũ (TV)</option>
+                <option value="ALL">Tất cả cont Xuất</option>
+              </select>
+              <input id="yardReconSearch" placeholder="Tìm số cont / Block (VD: AI, AK)..." oninput="renderYardReconcileTable()" style="min-height:28px;font-size:11px;flex:1;min-width:140px;">
+            </div>
+            <div class="table-wrap" style="max-height:220px;" id="yardReconTableWrap"></div>
+          </details>
+        </div>
+      </div>
+
+      <!-- CÂN ĐỐI XE BÃI NGOÀI (ƯU TIÊN HÀNG TV) · GIỮ CONT TV ĐÓNG HẦM · TẦM VỚI TK/QC (>=11 ROW) & DI CHUYỂN QC 10-15P -->
+    <div class="panel" id="panel-fleet-qc-balance" style="border-top:3px solid var(--purple);">
+      <div class="panel-head">
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+          <h3>⚖️ Cân đối Xe Bãi ngoài (Ưu tiên TV) · 🔒 Giữ Cont TV đóng hầm · 🏗️ TK/QC (≥11 Row) & Chuyển hầm QC (10–15p)</h3>
+          <span class="badge purple" id="fleetQcSummaryBadge">Đang tính toán...</span>
+        </div>
+        <button class="panel-collapse-btn" onclick="togglePanelCollapse('panel-fleet-qc-balance', this)">▼ Thu gọn</button>
       </div>
       <div class="panel-body">
-        <div style="margin-bottom:10px;padding:9px 11px;border-radius:8px;border:1px solid var(--line);background:rgba(2,132,199,0.05);">
-          <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;">
-            <strong style="font-size:12px;">🧭 Khuyến nghị Chuẩn bị Xuất Hầm trước & Gọi Bãi theo Quãng đường / Cao điểm giao thông</strong>
-            <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">
-              <span class="badge" id="trafficStatusBadge">🟢 Thông thoáng</span>
-              <button class="sm" onclick="switchTab('tab-cranes')">⚙️ Sửa Bãi ngoài & Giờ cao điểm</button>
+        <div class="ops-tri-grid">
+          <div class="ops-sub-box">
+            <div class="ops-sub-title">
+              <span>🚛 Cân đối số Xe Bãi ngoài (Ưu tiên xếp tối đa hàng TV)</span>
+              <span class="badge amber" id="offDockTrucksTotalBadge">0 xe ngoài</span>
             </div>
+            <div id="offDockFleetBalanceBox" style="display:flex;flex-direction:column;gap:5px;"></div>
           </div>
-          <div class="prep-rec-strip" id="exportPrepAdvisoryStrip"></div>
-          <div style="margin-top:10px;padding-top:9px;border-top:1px dashed var(--line);">
-            <div style="display:flex;justify-content:space-between;align-items:center;gap:6px;flex-wrap:wrap;">
-              <strong style="font-size:12px;">🛡️ Chống dừng Máng & Khép Nắp Hầm (Cont còn ít ở Bãi ngoài cần làm đầy dưới hầm)</strong>
-              <span class="badge" id="hatchWatchSummaryBadge">Đang tính toán...</span>
+
+          <div class="ops-sub-box">
+            <div class="ops-sub-title">
+              <span>🔒 Cont TV để dành đóng nắp hầm nhanh (~4p)</span>
+              <span class="badge green" id="tvHatchReserveBadge">0 cont giữ</span>
             </div>
-            <div style="font-size:11px;color:var(--muted);margin-top:2px;">
-              So sánh <b>thời gian máng làm tới điểm đóng nắp hầm</b> (theo năng suất cẩu mv/h) với <b>thời gian trung bình cont bãi ngoài được xếp trong ca</b> để báo gọi sớm, không để cẩu chờ nắp hầm.
+            <div id="tvHatchReserveBox" style="display:flex;flex-direction:column;gap:5px;"></div>
+          </div>
+
+          <div class="ops-sub-box">
+            <div class="ops-sub-title">
+              <span>🏗️ Tầm với TK/QC (≥11 Row) & Chi phí chuyển QC (10–15p)</span>
+              <span class="badge" id="vesselRowWidthBadge">Đo Row...</span>
             </div>
-            <div class="hatch-watch-grid" id="hatchCoverWatchGrid"></div>
+            <div id="tkQcReachAndShiftBox" style="display:flex;flex-direction:column;gap:5px;"></div>
           </div>
         </div>
-        <div class="grid-3" id="craneDispatchColumns"></div>
       </div>
     </div>
-  </div>
 
-  <!-- ==================== TAB 2: CHIA HẦM ĐỘNG & GỌI HÀNG ĐUỔI ==================== -->
-  <div id="tab-holds" class="tab-pane">
+    
+    </div>
+
+    <div class="detail-sub-sec" data-detail-sec="holds">
+      
     <div class="panel">
       <div class="panel-head">
         <h3>🚢 Cấu trúc Hầm hàng Động (<span id="holdCountBadge" style="color:var(--cyan);">0 Hầm</span>) & Tiến độ Dỡ/Xếp</h3>
@@ -1751,101 +1877,35 @@ pre.schema-box {
       </div>
       <div class="panel-body" id="rollingChaseContainer"></div>
     </div>
-  </div>
 
-  <!-- ==================== TAB 3: THIẾT LẬP TÀU, CẨU & SỰ CỐ ==================== -->
-  <div id="tab-cranes" class="tab-pane">
-    <div class="grid-2">
-      <div class="panel">
-        <div class="panel-head">
-          <h3>📐 Thông số Tàu, Nắp hầm & Trạng thái Cân bằng</h3>
-          <div style="display:flex;gap:6px;flex-wrap:wrap;">
-            <button class="primary sm" onclick="openVesselSetupWizard(1)">🧭 Thiết lập 5 bước</button>
-            <button class="success sm" onclick="saveVesselSessionToCloud()">💾 Lưu Cloud</button>
-            <button class="danger sm" onclick="deleteCurrentVesselSession()">🗑️ Xóa tàu</button>
-          </div>
-        </div>
-        <div class="panel-body">
-          <div class="grid-form">
-            <div><label>Tên tàu<br><input id="cfgVesselName" value="KUO LUNG" style="width:100%" oninput="renderHorizontalShipRailCard()"></label></div>
-            <div><label>Chuyến (Voyage)<br><input id="cfgVoyage" value="1009S" style="width:100%"></label></div>
-            <div><label>Cầu bến<br><input id="cfgBerth" value="TV3" style="width:100%"></label></div>
-            <div><label>Chiều dài L (m)<br><input id="cfgLength" type="number" value="172" style="width:100%" oninput="onLengthBeamChange()"></label></div>
-            <div><label>Chiều rộng B (m)<br><input id="cfgBeam" type="number" step="0.1" value="27.6" style="width:100%" oninput="onLengthBeamChange()"></label></div>
-            <div><label>Tier đầu tiên trên Boong<br><input id="cfgDeckTier" type="number" value="80" style="width:100%" onchange="saveCraneAndVesselConfigPersist();renderAll()"></label></div>
-            <div><label>Tier cao nhất dưới Hầm<br><input id="cfgHoldMaxTier" type="number" value="12" style="width:100%" onchange="saveCraneAndVesselConfigPersist();renderAll()"></label></div>
-            <div><label>Hướng cập mạn tàu<br>
-              <select id="cfgBerthSide" style="width:100%" onchange="onBerthingSideChanged(this.value)">
-                <option value="PORT">⬅️ Mạn Trái (Port · Mũi hướng Thượng lưu)</option>
-                <option value="STARBOARD">➡️ Mạn Phải (Starboard · Mũi ra Cửa biển)</option>
-              </select>
-            </label></div>
-          </div>
-          <div style="margin-top:10px;padding-top:9px;border-top:1px dashed var(--line);font-size:11.5px;color:var(--muted);">
-            💡 Hệ thống đã bỏ cảnh báo mớn nước cố định. Hãy dùng các nút <b>Báo Nghiêng mạn (Trái/Phải)</b> và <b>Báo Mũi (Chìm/Vếch)</b> ngay trên Tab 1 để nhận khuyến nghị gọi hàng cân bằng tàu theo thực tế hiện trường.
-          </div>
-        </div>
-      </div>
-
-      <div class="panel">
-        <div class="panel-head">
-          <h3>🏗️ Phương tiện Cẩu Tân Vũ & Xử lý Sự cố Gián đoạn</h3>
-          <div style="display:flex;gap:5px;">
-            <input id="customCraneInput" placeholder="Thêm mã (VD: QC14)" style="width:130px;">
-            <button class="primary" onclick="addCustomCrane()">+ Thêm</button>
-          </div>
-        </div>
-        <div class="panel-body">
-          <div style="font-size:11px;color:var(--muted);margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;gap:6px;flex-wrap:wrap;">
-            <span>Thứ tự cẩu cố định dọc ray <b>Thượng lưu ➔ Hạ lưu (Cửa biển)</b>: <code>QC10 ➔ QC09 ➔ QC08 ➔ QC07 ➔ QC11 ➔ QC12 ➔ TK07 ➔ TK10 ➔ QC06 ➔ QC05 ➔ TK06 ➔ TK05 ➔ TK11 ➔ TK12</code> (không thể vượt qua nhau).</span>
-            <div style="display:flex;gap:5px;flex-wrap:wrap;">
-              <button class="primary sm" onclick="autoDistributeHoldsByRail()">⚡ Tự chia Hầm khớp ray</button>
-              <button class="success sm" onclick="saveCraneAndVesselConfigPersist(true)">💾 Lưu chia Cẩu lên Cloud</button>
-            </div>
-          </div>
-          <div id="craneRosterList" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px;"></div>
-          <div id="craneAssignmentTable"></div>
-          <div id="failoverAdvicePanel" style="margin-top:10px;"></div>
-        </div>
-      </div>
-    </div>
-
-    <!-- DANH MỤC BÃI NGOÀI (VIẾT TẮT + KM) & KHUNG GIỜ CAO ĐIỂM GIAO THÔNG -->
-    <div class="panel">
-      <div class="panel-head">
-        <h3>🚛 Danh mục Viết tắt Bãi ngoài, Quãng đường đến Cảng (km) & Khung giờ Cao điểm Giao thông</h3>
-        <div style="display:flex;gap:6px;flex-wrap:wrap;">
-          <span class="badge" id="cfgTrafficNowBadge">🟢 Giờ thường</span>
-          <button class="success sm" onclick="saveOffDockAndPeakConfig()">💾 Lưu cấu hình Bãi & Cao điểm</button>
-        </div>
-      </div>
-      <div class="panel-body">
-        <div class="grid-2">
-          <div>
-            <div style="font-weight:850;font-size:12px;margin-bottom:6px;">1. Danh mục Bãi ngoài & Khoảng cách tới Cầu Tân Vũ </div>
-            <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px;">
-              <input id="newYardCode" placeholder="Mã viết tắt (VD: GFW)" style="width:130px;min-height:30px;">
-              <input id="newYardName" placeholder="Tên bãi (VD: Bãi GFW Đình Vũ)" style="flex:1;min-width:140px;min-height:30px;">
-              <input id="newYardKm" type="number" step="0.5" min="0.5" value="6" placeholder="km" title="Quãng đường (km)" style="width:68px;min-height:30px;">
-              <input id="newYardTrucks" type="number" min="1" max="50" value="5" placeholder="Xe" title="Số xe chạy (mặc định 05 xe)" style="width:66px;min-height:30px;">
-              <button class="primary sm" onclick="addOffDockCatalogItem()">+ Thêm bãi</button>
-            </div>
-            <div class="table-wrap" style="max-height:220px;" id="offDockCatalogTableWrap"></div>
-          </div>
-          <div>
-            <div style="font-weight:850;font-size:12px;margin-bottom:4px;">2. Tích chọn các Khung giờ Cao điểm Giao thông (Hệ số thời gian xe chạy ×1.7)</div>
-            <div style="font-size:11px;color:var(--muted);margin-bottom:6px;">
-              Khi giờ hiện tại rơi vào khung giờ được tích đỏ, thuật toán gọi hàng sẽ tự động tăng điểm ưu tiên <b>Pre-call (gọi sớm)</b> cho các bãi có quãng đường xa (km lớn) để cẩu không bị đói hàng.
-            </div>
-            <div class="peak-hours-grid" id="peakHoursCheckboxes"></div>
-          </div>
-        </div>
-      </div>
     </div>
   </div>
 
-  <!-- ==================== TAB 4: BƯỚC 1 CẢNH BÁO CHỌN TÀU + 5 Ô UPLOAD + BOT OM ==================== -->
-  <div id="tab-upload" class="tab-pane">
+  <!-- ==================== KHU VỰC 3: CÀI ĐẶT & NẠP DỮ LIỆU (SETUP) ==================== -->
+  <div id="tab-setup" class="tab-pane">
+    <div class="setup-welcome-card">
+      <div style="flex:1;min-width:220px;">
+        <div style="font-weight:900;font-size:13.5px;color:var(--cyan);">⚙️ Khu vực Cài đặt & Chuẩn bị Dữ liệu tàu</div>
+        <div style="font-size:11.5px;color:var(--muted);margin-top:2px;">
+          Toàn bộ thao tác <b>Nạp file, Chạy Bot OM, Đổi mạn, Tự chia hầm đúng ray, Thiết lập Cẩu, Tàu & Bãi ngoài (km + số xe)</b> được gom gọn tại đây. Người mới nên bấm nút <b>Hướng dẫn 5 bước</b> để làm lần lượt từ A–Z.
+        </div>
+      </div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;">
+        <button class="primary" onclick="openVesselSetupWizard(1)">🧭 Hướng dẫn Thiết lập 5 bước</button>
+        <button class="sm" onclick="toggleBerthingSideQuick()" title="Đổi hướng cập Mạn Trái / Mạn Phải">🔄 Đổi Mạn</button>
+        <button class="sm success" onclick="autoDistributeHoldsByRail()" title="Tự chia hầm khớp ray cẩu">⚡ Tự chia Hầm đúng ray</button>
+      </div>
+    </div>
+
+    <div class="sub-pill-bar" id="setupSubPillBar">
+      <button class="sub-pill active" data-sub="ALL" onclick="switchSetupSub('ALL')">✨ Tất cả Cài đặt</button>
+      <button class="sub-pill" data-sub="upload" onclick="switchSetupSub('upload')">📂 Nạp File & Bot OM</button>
+      <button class="sub-pill" data-sub="cranes" onclick="switchSetupSub('cranes')">🏗️ Cẩu, Ray & Sự cố</button>
+      <button class="sub-pill" data-sub="vessel" onclick="switchSetupSub('vessel')">📐 Thông số Tàu & Bãi ngoài</button>
+    </div>
+
+    <div class="setup-sub-sec" data-setup-sec="upload">
+      
     <!-- BẢNG ĐIỀU KHIỂN NHANH BOT OM WINDOWS -->
     <div class="panel" style="border-left:4px solid var(--cyan);">
       <div class="panel-head">
@@ -1986,16 +2046,111 @@ pre.schema-box {
         </div>
       </div>
     </div>
+
+    </div>
+
+    <div class="setup-sub-sec" data-setup-sec="cranes">
+            <div class="panel">
+        <div class="panel-head">
+          <h3>🏗️ Phương tiện Cẩu Tân Vũ & Xử lý Sự cố Gián đoạn</h3>
+          <div style="display:flex;gap:5px;">
+            <input id="customCraneInput" placeholder="Thêm mã (VD: QC14)" style="width:130px;">
+            <button class="primary" onclick="addCustomCrane()">+ Thêm</button>
+          </div>
+        </div>
+        <div class="panel-body">
+          <div style="font-size:11px;color:var(--muted);margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;gap:6px;flex-wrap:wrap;">
+            <span>Thứ tự cẩu cố định dọc ray <b>Thượng lưu ➔ Hạ lưu (Cửa biển)</b>: <code>QC10 ➔ QC09 ➔ QC08 ➔ QC07 ➔ QC11 ➔ QC12 ➔ TK07 ➔ TK10 ➔ QC06 ➔ QC05 ➔ TK06 ➔ TK05 ➔ TK11 ➔ TK12</code> (không thể vượt qua nhau).</span>
+            <div style="display:flex;gap:5px;flex-wrap:wrap;">
+              <button class="sm" onclick="toggleBerthingSideQuick()" title="Đổi hướng cập Mạn Trái / Mạn Phải">🔄 Đổi Mạn Trái / Phải</button>
+              <button class="primary sm" onclick="autoDistributeHoldsByRail()" title="Tự động chia Hầm cho các cẩu theo đúng thứ tự vật lý trên ray">⚡ Tự chia Hầm đúng ray</button>
+              <button class="success sm" onclick="saveCraneAndVesselConfigPersist(true)">💾 Lưu chia Cẩu lên Cloud</button>
+            </div>
+          </div>
+          <div id="craneRosterList" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px;"></div>
+          <div id="craneAssignmentTable"></div>
+          <div id="failoverAdvicePanel" style="margin-top:10px;"></div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="setup-sub-sec" data-setup-sec="vessel">
+            <div class="panel">
+        <div class="panel-head">
+          <h3>📐 Thông số Tàu, Nắp hầm & Trạng thái Cân bằng</h3>
+          <div style="display:flex;gap:6px;flex-wrap:wrap;">
+            <button class="primary sm" onclick="openVesselSetupWizard(1)">🧭 Thiết lập 5 bước</button>
+            <button class="success sm" onclick="saveVesselSessionToCloud()">💾 Lưu Cloud</button>
+            <button class="danger sm" onclick="deleteCurrentVesselSession()">🗑️ Xóa tàu</button>
+          </div>
+        </div>
+        <div class="panel-body">
+          <div class="grid-form">
+            <div><label>Tên tàu<br><input id="cfgVesselName" value="KUO LUNG" style="width:100%" oninput="renderHorizontalShipRailCard()"></label></div>
+            <div><label>Chuyến (Voyage)<br><input id="cfgVoyage" value="1009S" style="width:100%"></label></div>
+            <div><label>Cầu bến<br><input id="cfgBerth" value="TV3" style="width:100%"></label></div>
+            <div><label>Chiều dài L (m)<br><input id="cfgLength" type="number" value="172" style="width:100%" oninput="onLengthBeamChange()"></label></div>
+            <div><label>Chiều rộng B (m)<br><input id="cfgBeam" type="number" step="0.1" value="27.6" style="width:100%" oninput="onLengthBeamChange()"></label></div>
+            <div><label>Tier đầu tiên trên Boong<br><input id="cfgDeckTier" type="number" value="80" style="width:100%" onchange="saveCraneAndVesselConfigPersist();renderAll()"></label></div>
+            <div><label>Tier cao nhất dưới Hầm<br><input id="cfgHoldMaxTier" type="number" value="12" style="width:100%" onchange="saveCraneAndVesselConfigPersist();renderAll()"></label></div>
+            <div><label>Hướng cập mạn tàu<br>
+              <select id="cfgBerthSide" style="width:100%" onchange="onBerthingSideChanged(this.value)">
+                <option value="PORT">⬅️ Mạn Trái (Port · Mũi hướng Thượng lưu)</option>
+                <option value="STARBOARD">➡️ Mạn Phải (Starboard · Mũi ra Cửa biển)</option>
+              </select>
+            </label></div>
+          </div>
+          <div style="margin-top:10px;padding-top:9px;border-top:1px dashed var(--line);font-size:11.5px;color:var(--muted);">
+            💡 Hệ thống đã bỏ cảnh báo mớn nước cố định. Hãy dùng các nút <b>Báo Nghiêng mạn (Trái/Phải)</b> và <b>Báo Mũi (Chìm/Vếch)</b> ngay trên Tab 1 để nhận khuyến nghị gọi hàng cân bằng tàu theo thực tế hiện trường.
+          </div>
+        </div>
+      </div>
+
+
+      <!-- DANH MỤC BÃI NGOÀI (VIẾT TẮT + KM) & KHUNG GIỜ CAO ĐIỂM GIAO THÔNG -->
+    <div class="panel">
+      <div class="panel-head">
+        <h3>🚛 Danh mục Viết tắt Bãi ngoài, Quãng đường đến Cảng (km) & Khung giờ Cao điểm Giao thông</h3>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;">
+          <span class="badge" id="cfgTrafficNowBadge">🟢 Giờ thường</span>
+          <button class="success sm" onclick="saveOffDockAndPeakConfig()">💾 Lưu cấu hình Bãi & Cao điểm</button>
+        </div>
+      </div>
+      <div class="panel-body">
+        <div class="grid-2">
+          <div>
+            <div style="font-weight:850;font-size:12px;margin-bottom:6px;">1. Danh mục Bãi ngoài & Khoảng cách tới Cầu Tân Vũ </div>
+            <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px;">
+              <input id="newYardCode" placeholder="Mã viết tắt (VD: GFW)" style="width:130px;min-height:30px;">
+              <input id="newYardName" placeholder="Tên bãi (VD: Bãi GFW Đình Vũ)" style="flex:1;min-width:140px;min-height:30px;">
+              <input id="newYardKm" type="number" step="0.5" min="0.5" value="6" placeholder="km" title="Quãng đường (km)" style="width:68px;min-height:30px;">
+              <input id="newYardTrucks" type="number" min="1" max="50" value="5" placeholder="Xe" title="Số xe chạy (mặc định 05 xe)" style="width:66px;min-height:30px;">
+              <button class="primary sm" onclick="addOffDockCatalogItem()">+ Thêm bãi</button>
+            </div>
+            <div class="table-wrap" style="max-height:220px;" id="offDockCatalogTableWrap"></div>
+          </div>
+          <div>
+            <div style="font-weight:850;font-size:12px;margin-bottom:4px;">2. Tích chọn các Khung giờ Cao điểm Giao thông (Hệ số thời gian xe chạy ×1.7)</div>
+            <div style="font-size:11px;color:var(--muted);margin-bottom:6px;">
+              Khi giờ hiện tại rơi vào khung giờ được tích đỏ, thuật toán gọi hàng sẽ tự động tăng điểm ưu tiên <b>Pre-call (gọi sớm)</b> cho các bãi có quãng đường xa (km lớn) để cẩu không bị đói hàng.
+            </div>
+            <div class="peak-hours-grid" id="peakHoursCheckboxes"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    </div>
   </div>
 
 </div>
 
-<!-- MOBILE BOTTOM NAV -->
+<!-- MOBILE BOTTOM NAV (3 KHU VỰC RÕ RÀNG, DỄ BẤM 1 TAY) -->
 <nav class="mobile-bottom-nav">
-  <button class="active" data-tab="tab-dispatch" onclick="switchTab('tab-dispatch')"><span class="m-ico">🎯</span><span>Gọi hàng</span></button>
-  <button data-tab="tab-holds" onclick="switchTab('tab-holds')"><span class="m-ico">🚢</span><span>Hầm & Bay</span></button>
-  <button data-tab="tab-cranes" onclick="switchTab('tab-cranes')"><span class="m-ico">🏗️</span><span>Cẩu & Tàu</span></button>
-  <button data-tab="tab-upload" onclick="switchTab('tab-upload')"><span class="m-ico">📂</span><span>Nạp File</span></button>
+  <button class="active" data-tab="tab-dispatch" onclick="switchTab('tab-dispatch')"><span class="m-ico">📊</span><span>Tiến độ</span></button>
+  <button data-tab="tab-details" onclick="switchTab('tab-details')"><span class="m-ico">🔍</span><span>Chi tiết</span></button>
+  <button data-tab="tab-setup" onclick="switchTab('tab-setup')"><span class="m-ico">⚙️</span><span>Cài đặt</span></button>
 </nav>
 
 <!-- TOOLTIP DESKTOP -->
@@ -4922,12 +5077,49 @@ const OffDockFleetAndQcEngine = {
 // =========================================================================
 // [PHẦN 4] UI CONTROLLERS, ADMIN PIN MODAL, RESPONSIVE RENDERERS
 // =========================================================================
-function switchTab(tabId) {
+function switchTab(tabId, subKey = null) {
+  // Tự động ánh xạ các tab cũ sang cấu trúc 3 khu vực thông minh (Tiến độ / Chi tiết / Cài đặt)
+  let targetTab = tabId;
+  let targetSub = subKey;
+  if (tabId === 'tab-holds') { targetTab = 'tab-details'; targetSub = targetSub || 'holds'; }
+  else if (tabId === 'tab-cranes') { targetTab = 'tab-setup'; targetSub = targetSub || 'cranes'; }
+  else if (tabId === 'tab-upload') { targetTab = 'tab-setup'; targetSub = targetSub || 'upload'; }
+
   document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('[data-tab]').forEach(b => b.classList.toggle('active', b.dataset.tab === tabId));
-  const pane = document.getElementById(tabId);
+  document.querySelectorAll('[data-tab]').forEach(b => b.classList.toggle('active', b.dataset.tab === targetTab));
+  const pane = document.getElementById(targetTab);
   if (pane) pane.classList.add('active');
+
+  if (targetTab === 'tab-details' && targetSub) switchDetailSub(targetSub);
+  if (targetTab === 'tab-setup' && targetSub) switchSetupSub(targetSub);
   window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function switchDetailSub(subKey = 'ALL') {
+  document.querySelectorAll('#detailSubPillBar .sub-pill').forEach(b => {
+    b.classList.toggle('active', b.dataset.sub === subKey);
+  });
+  document.querySelectorAll('.detail-sub-sec').forEach(sec => {
+    const show = (subKey === 'ALL' || sec.dataset.detailSec === subKey);
+    sec.classList.toggle('hidden-sub', !show);
+    if (show) {
+      sec.querySelectorAll('.panel.is-collapsed').forEach(p => {
+        p.classList.remove('is-collapsed');
+        const btn = p.querySelector('.panel-collapse-btn');
+        if (btn) btn.textContent = '▼ Thu gọn';
+      });
+    }
+  });
+}
+
+function switchSetupSub(subKey = 'ALL') {
+  document.querySelectorAll('#setupSubPillBar .sub-pill').forEach(b => {
+    b.classList.toggle('active', b.dataset.sub === subKey);
+  });
+  document.querySelectorAll('.setup-sub-sec').forEach(sec => {
+    const show = (subKey === 'ALL' || sec.dataset.setupSec === subKey);
+    sec.classList.toggle('hidden-sub', !show);
+  });
 }
 
 function toggleTheme() {
@@ -5896,7 +6088,7 @@ function renderHorizontalShipRailCard() {
   const noteEl = document.getElementById('railConstraintNote');
   if (noteEl) {
     if (railCrossingConflicts.length) {
-      noteEl.innerHTML = `<span style="color:var(--red);font-weight:800;">⚠️ Phát hiện gán hầm ngược thứ tự ray: ${railCrossingConflicts.map(x => x.message).join('; ')}. Bấm <b>"⚡ Tự chia Hầm đúng ray"</b> ở góc trên để sửa ngay!</span>`;
+      noteEl.innerHTML = `<span style="color:var(--red);font-weight:800;">⚠️ Phát hiện gán hầm ngược thứ tự ray: ${railCrossingConflicts.map(x => x.message).join('; ')}. Vào <b>⚙️ Cài đặt → Cẩu & Ray</b> để bấm <b>"⚡ Tự chia Hầm đúng ray"</b>!</span>`;
     } else {
       noteEl.innerHTML = `✅ Thứ tự thiết bị khớp đúng ray cầu tàu (<b>Thượng lưu ➔ Hạ lưu</b>). Bấm trực tiếp vào từng ô Hầm trên thân tàu để mở sơ đồ Bay chi tiết.`;
     }
@@ -7563,7 +7755,7 @@ const ViewModeManager = {
     }
     if (applyDefaultCollapse) {
       // Trên ĐT/MTB tự động gói gọn các khối chi tiết dài, chỉ mở sẵn Bảng điều hành nhanh 4 trọng tâm
-      const panelsToFold = ['panel-ship-rail', 'panel-crane-hourly', 'panel-yard-recon', 'panel-callable-cargo'];
+      const panelsToFold = ['panel-ship-rail'];
       panelsToFold.forEach(pid => {
         const p = document.getElementById(pid);
         if (!p) return;
@@ -7599,10 +7791,22 @@ function togglePanelCollapse(panelId, btnEl) {
 function expandAndScrollTo(panelId) {
   const p = document.getElementById(panelId);
   if (!p) return;
+  // Tự động chuyển sang đúng Khu vực (Tiến độ / Chi tiết / Cài đặt) và đúng mục con chứa panel
+  const parentTab = p.closest('.tab-pane');
+  if (parentTab && !parentTab.classList.contains('active')) {
+    const dSec = p.closest('.detail-sub-sec');
+    const sSec = p.closest('.setup-sub-sec');
+    switchTab(parentTab.id, dSec ? dSec.dataset.detailSec : (sSec ? sSec.dataset.setupSec : 'ALL'));
+  } else {
+    const dSec = p.closest('.detail-sub-sec');
+    if (dSec && dSec.classList.contains('hidden-sub')) switchDetailSub(dSec.dataset.detailSec);
+    const sSec = p.closest('.setup-sub-sec');
+    if (sSec && sSec.classList.contains('hidden-sub')) switchSetupSub(sSec.dataset.setupSec);
+  }
   p.classList.remove('is-collapsed');
   const btn = p.querySelector('.panel-collapse-btn');
   if (btn) btn.textContent = '▼ Thu gọn';
-  p.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  setTimeout(() => p.scrollIntoView({ behavior: 'smooth', block: 'start' }), 60);
 }
 
 const ShiftHistoryManager = {
