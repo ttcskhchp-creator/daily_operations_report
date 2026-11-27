@@ -2509,20 +2509,21 @@ const HoldLayoutEngine = {
 
   autoBuild(baysList, loaMeters = 172, desiredHoldCount = 0) {
     let nums = Array.from(new Set((baysList || []).map(b => parseInt(b, 10)).filter(n => !isNaN(n) && n > 0))).sort((a, b) => a - b);
-    if (nums.length === 0) {
-      const est40 = Math.max(3, Math.min(18, Math.round((loaMeters - 35) / 15)));
-      for (let g = 0; g < est40; g++) {
-        const base = g * 4 + 1;
-        nums.push(base, base + 1, base + 2);
-      }
+    const maxBay = nums.length > 0
+      ? Math.max(...nums)
+      : (Math.max(3, Math.min(18, Math.round((loaMeters - 35) / 15))) * 4 - 1);
+    const maxBlkIdx = Math.max(0, Math.floor((maxBay - 1) / 4));
+
+    // Luôn dựng khung tàu liên tục từ Bay 01 (01-02-03 = Hầm 1, 05-06-07 = Hầm 2, ...) đến hầm lớn nhất
+    const orderedBlocks = [];
+    for (let blkIdx = 0; blkIdx <= maxBlkIdx; blkIdx++) {
+      const base = blkIdx * 4 + 1;
+      orderedBlocks.push([
+        String(base).padStart(2, '0'),
+        String(base + 1).padStart(2, '0'),
+        String(base + 2).padStart(2, '0')
+      ]);
     }
-    const blockMap = new Map();
-    nums.forEach(n => {
-      const blkIdx = Math.floor((n - 1) / 4);
-      if (!blockMap.has(blkIdx)) blockMap.set(blkIdx, []);
-      blockMap.get(blkIdx).push(String(n).padStart(2, '0'));
-    });
-    const orderedBlocks = Array.from(blockMap.keys()).sort((a, b) => a - b).map(k => blockMap.get(k));
     const numBlocks = orderedBlocks.length;
     const targetHolds = desiredHoldCount > 0
       ? Math.min(numBlocks, Math.max(1, desiredHoldCount))
@@ -4138,37 +4139,140 @@ function renderRollingChaseByHold() {
 function openBayPopup(bay) {
   const cfg = getLiveVesselCfg();
   const pool = UnifiedPoolBuilder.build(state, cfg.deck_tier_min);
-  const inBay = pool.filter(c => { const p = DataAdapters.parsePos6(c.actualPos || c.plannedPos); return p && p.bay === bay; });
-  const holdNo = HoldLayoutEngine.getHoldByBay(bay, state.holdConfig);
-  document.getElementById('bayModalTitle').textContent = `Sơ đồ Bay ${bay} (HOLD ${String(holdNo).padStart(2,'0')}) · ${inBay.length} cont`;
+  const expInBay = pool.filter(c => { const p = DataAdapters.parsePos6(c.actualPos || c.plannedPos); return p && p.bay === bay; });
 
-  const rows = ['10','08','06','04','02','00','01','03','05','07','09'];
-  const deckTiers = ['90','88','86','84','82'];
-  const holdTiers = ['10','08','06','04','02'];
+  // Đọc thêm container Nhập (Dỡ tàu) từ file Thay đổi công việc tàu (liveJobs) & SBP
+  const impMap = new Map();
+  (state.sbpImport || []).forEach(s => {
+    const p = DataAdapters.parsePos6(s.pos);
+    if (p && p.bay === bay) {
+      impMap.set(s.cntr, { cntr: s.cntr, pos: p, status: 'B', pod: s.pod || 'HPH', weight: Number(s.weight) || 0, isImport: true });
+    }
+  });
+  (state.liveJobs || []).filter(j => j.io === 'Import' || j.job_type === 'Dỡ tàu').forEach(j => {
+    const p = DataAdapters.parsePos6(j.pos);
+    if (p && p.bay === bay) {
+      const prev = impMap.get(j.cntr);
+      impMap.set(j.cntr, {
+        cntr: j.cntr,
+        pos: p,
+        status: j.status || (prev ? prev.status : 'B'),
+        pod: j.pod || (prev ? prev.pod : 'HPH'),
+        weight: prev ? prev.weight : 0,
+        crane: j.crane || '',
+        isImport: true
+      });
+    }
+  });
+  const impInBay = Array.from(impMap.values());
+  const impRemain = impInBay.filter(x => x.status !== 'C').length;
+
+  const holdNo = HoldLayoutEngine.getHoldByBay(bay, state.holdConfig);
+  document.getElementById('bayModalTitle').textContent =
+    `Sơ đồ Bay ${bay} (HOLD ${String(holdNo).padStart(2,'0')}) · Nhập còn ${impRemain}/${impInBay.length} · Xuất ${expInBay.length} cont`;
+
+  // Gom toàn bộ tọa độ thực tế trong Bay (Xuất + Nhập) để tự nhận diện ngưỡng boong (72/80) & suy diễn đối xứng
+  const allPoints = [];
   const slotMap = {};
-  inBay.forEach(c => {
+  impInBay.forEach(imp => {
+    allPoints.push(imp.pos);
+    slotMap[`${imp.pos.row}_${imp.pos.tier}`] = imp;
+  });
+  expInBay.forEach(c => {
     const p = DataAdapters.parsePos6(c.actualPos || c.plannedPos);
-    if (p) slotMap[`${p.row}_${p.tier}`] = c;
+    if (p) {
+      allPoints.push(p);
+      slotMap[`${p.row}_${p.tier}`] = c;
+    }
   });
 
-  const renderTierRow = (t) => `<tr><th>${t}</th>${rows.map(r => {
-    const item = slotMap[`${r}_${t}`];
-    if (!item) return `<td class="slot-EMPTY">-</td>`;
-    const cls = state.calledContainers.has(item.cntr) ? 'slot-CALLED' : `slot-${item.jobStatus}`;
-    const clickAttr = item.jobStatus === 'B' ? `onclick="markContainerCalled('${item.cntr}','BAY${bay}','${item.plannedPos}');openBayPopup('${bay}');"` : '';
-    return `<td class="${cls}" ${clickAttr} title="${item.cntr} | ${item.weight}T | ${item.transferPort} | ${item.inst}">
-      <div>${item.pod}</div><div>${item.weight.toFixed(1)}T</div><div style="font-size:9px;">${item.cntr.slice(-4)}</div>
-    </td>`;
-  }).join('')}</tr>`;
+  // Tự nhận diện ngưỡng boong: nếu Bay có tier 70..78 (chuẩn Maersk/ASC) thì Deck >= 70, ngược lại dùng cfg.deck_tier_min
+  const hasTier70s = allPoints.some(p => { const t = parseInt(p.tier, 10); return t >= 70 && t < 80; });
+  const effDeckMin = hasTier70s ? 70 : (cfg.deck_tier_min || 80);
+
+  // Suy diễn đối xứng Row: nếu có Row lẻ r thì đối xứng là r+1 (chẵn), nếu có chẵn r thì đối xứng là r-1 (lẻ)
+  let maxRowNum = 10;
+  let hasRow00 = false;
+  const deckRowMaxTier = {};
+  const holdRowMaxTier = {};
+  let maxDeckTier = hasTier70s ? 78 : 88;
+  let minDeckTier = hasTier70s ? 72 : 82;
+  let maxHoldTier = 10;
+
+  allPoints.forEach(p => {
+    const rn = parseInt(p.row, 10);
+    const tn = parseInt(p.tier, 10);
+    if (rn === 0) hasRow00 = true;
+    if (rn > maxRowNum) maxRowNum = rn;
+    const symRow = rn === 0 ? 0 : (rn % 2 === 1 ? rn + 1 : rn - 1);
+    if (symRow > maxRowNum) maxRowNum = symRow;
+
+    if (tn >= effDeckMin) {
+      if (tn > maxDeckTier) maxDeckTier = tn;
+      if (tn < minDeckTier) minDeckTier = tn;
+      deckRowMaxTier[rn] = Math.max(deckRowMaxTier[rn] || 0, tn);
+      deckRowMaxTier[symRow] = Math.max(deckRowMaxTier[symRow] || 0, tn);
+    } else if (tn > 0) {
+      if (tn > maxHoldTier) maxHoldTier = tn;
+      holdRowMaxTier[rn] = Math.max(holdRowMaxTier[rn] || 0, tn);
+      holdRowMaxTier[symRow] = Math.max(holdRowMaxTier[symRow] || 0, tn);
+    }
+  });
+
+  // Dựng danh sách Row chuẩn đối xứng: ...10, 08, 06, 04, 02, (00), 01, 03, 05, 07, 09...
+  const maxEven = maxRowNum % 2 === 0 ? maxRowNum : maxRowNum + 1;
+  const rows = [];
+  for (let r = maxEven; r >= 2; r -= 2) rows.push(String(r).padStart(2, '0'));
+  if (hasRow00 || maxEven <= 10) rows.push('00');
+  for (let r = 1; r <= maxEven - 1; r += 2) rows.push(String(r).padStart(2, '0'));
+
+  const deckTiers = [];
+  for (let t = maxDeckTier; t >= minDeckTier; t -= 2) deckTiers.push(String(t).padStart(2, '0'));
+  const holdTiers = [];
+  for (let t = maxHoldTier; t >= 2; t -= 2) holdTiers.push(String(t).padStart(2, '0'));
+
+  const renderTierRow = (t, isDeck) => {
+    const tn = parseInt(t, 10);
+    return `<tr><th>${t}</th>${rows.map(r => {
+      const rn = parseInt(r, 10);
+      const item = slotMap[`${r}_${t}`];
+      if (!item) {
+        const inferredMax = isDeck ? (deckRowMaxTier[rn] || 0) : (holdRowMaxTier[rn] || 0);
+        const isInferredSlot = inferredMax > 0 && tn <= inferredMax;
+        if (isInferredSlot) {
+          return `<td class="slot-EMPTY" style="background:rgba(148,163,184,0.14);color:var(--muted);" title="Vị trí suy diễn đối xứng (trống hoặc hàng ROB/Transit)">·</td>`;
+        }
+        return `<td class="slot-EMPTY">-</td>`;
+      }
+      if (item.isImport) {
+        const done = item.status === 'C';
+        const bg = done ? 'rgba(34,197,94,0.18)' : 'rgba(139,92,246,0.22)';
+        const bd = done ? '#16a34a' : '#7c3aed';
+        return `<td style="background:${bg};border:1px solid ${bd};" title="NHẬP (${item.status}) | ${item.cntr} | ${item.crane || '---'}">
+          <div style="font-size:9px;font-weight:700;color:${bd};">${done ? 'NHẬP ✓' : 'NHẬP'}</div>
+          <div style="font-size:9px;">${item.cntr.slice(-4)}</div>
+        </td>`;
+      }
+      const cls = state.calledContainers.has(item.cntr) ? 'slot-CALLED' : `slot-${item.jobStatus}`;
+      const clickAttr = item.jobStatus === 'B' ? `onclick="markContainerCalled('${item.cntr}','BAY${bay}','${item.plannedPos}');openBayPopup('${bay}');"` : '';
+      return `<td class="${cls}" ${clickAttr} title="XUẤT (${item.jobStatus}) | ${item.cntr} | ${item.weight}T | ${item.transferPort} | ${item.inst}">
+        <div>${item.pod}</div><div>${item.weight.toFixed(1)}T</div><div style="font-size:9px;">${item.cntr.slice(-4)}</div>
+      </td>`;
+    }).join('')}</tr>`;
+  };
 
   document.getElementById('bayModalBody').innerHTML = `
+    <div style="font-size:11.5px;color:var(--muted);margin-bottom:8px;">
+      • Ô <span style="display:inline-block;padding:0 5px;border:1px solid #7c3aed;background:rgba(139,92,246,0.22);border-radius:3px;color:#7c3aed;font-weight:700;">NHẬP</span>: Cont nhập đọc từ <b>Thay đổi công việc tàu</b> (tím = còn lại chưa dỡ, xanh lá = đã dỡ).
+      • Ô <span style="display:inline-block;padding:0 6px;background:rgba(148,163,184,0.18);border-radius:3px;">·</span>: Vị trí suy diễn đối xứng của tàu (trống hoặc hàng ROB/Transit).
+    </div>
     <div class="table-wrap">
       <table class="bay-matrix">
-        <thead><tr><th>Tier \\ Row</th>${rows.map(r => `<th>${r}</th>`).join('')}</tr></thead>
+        <thead><tr><th>Tier \ Row</th>${rows.map(r => `<th>${r}</th>`).join('')}</tr></thead>
         <tbody>
-          ${deckTiers.map(renderTierRow).join('')}
-          <tr class="deck-divider"><td colspan="${rows.length + 1}">MẶT BOONG (TIER >= ${cfg.deck_tier_min}) ▲ | ▼ DƯỚI HẦM</td></tr>
-          ${holdTiers.map(renderTierRow).join('')}
+          ${deckTiers.map(t => renderTierRow(t, true)).join('')}
+          <tr class="deck-divider"><td colspan="${rows.length + 1}">MẶT BOONG (TIER >= ${effDeckMin}) ▲ | ▼ DƯỚI HẦM</td></tr>
+          ${holdTiers.map(t => renderTierRow(t, false)).join('')}
         </tbody>
       </table>
     </div>
