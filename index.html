@@ -4874,7 +4874,7 @@ const ImportExportPrepEngine = {
       const expRemain = expB + expA;
       if (expRemain === 0) return null;
 
-      // Gom bãi cần gọi cho hầm này (ưu tiên bãi ngoài xa nhất trước)
+      // Gom bãi cần gọi cho hầm này (ưu tiên bãi ngoài xa nhất trước) + lưu chi tiết cont (ISO, POD, Trọng lượng)
       const yardMap = {};
       expInH.filter(c => c.jobStatus === 'B' || c.jobStatus === 'A').forEach(c => {
         const key = c.isOffDock ? c.transferPort : 'TV';
@@ -4883,10 +4883,12 @@ const ImportExportPrepEngine = {
             code: key,
             isOffDock: c.isOffDock,
             count: 0,
-            etaMins: OffDockTrafficEngine.estimateTransitMins(key, c.isOffDock)
+            etaMins: OffDockTrafficEngine.estimateTransitMins(key, c.isOffDock),
+            items: []
           };
         }
         yardMap[key].count++;
+        yardMap[key].items.push(c);
       });
       const yardsSorted = Object.values(yardMap).sort((a, b) => b.etaMins - a.etaMins);
       const topYard = yardsSorted[0] || { code: 'TV', isOffDock: false, count: expRemain, etaMins: 4 };
@@ -5010,9 +5012,10 @@ const HatchContinuityEngine = {
         const yc = yardCycleStats[y];
         const lead = yc ? yc.effectiveMins : OffDockTrafficEngine.estimateTransitMins(y, true);
         if (lead > maxLeadMins) maxLeadMins = lead;
-        if (!yardBreakdown[y]) yardBreakdown[y] = { code: y, count: 0, leadMins: lead, shiftAvg: yc?.shiftAvgMins || null, cntrs: [] };
+        if (!yardBreakdown[y]) yardBreakdown[y] = { code: y, count: 0, leadMins: lead, shiftAvg: yc?.shiftAvgMins || null, cntrs: [], items: [] };
         yardBreakdown[y].count++;
         yardBreakdown[y].cntrs.push(c.cntr);
+        yardBreakdown[y].items.push(c);
       });
 
       // Số cont làm đệm trước khi cẩu chạm tới cont bãi ngoài khép hầm = Nhập còn + TV dưới hầm
@@ -5061,6 +5064,7 @@ const HatchContinuityEngine = {
         severity,
         actionLabel,
         yards: Object.values(yardBreakdown).sort((a, b) => b.leadMins - a.leadMins),
+        urgentItems: targetOffDockList,
         urgentCntrs: targetOffDockList.map(c => ({ cntr: c.cntr, pos: c.plannedPos, yard: c.transferPort }))
       });
     });
@@ -7417,24 +7421,33 @@ function renderHatchCoverWatch(pool) {
     return;
   }
 
+  window._hatchAlertMap = {};
+  alerts.forEach(a => { window._hatchAlertMap[a.hold] = a; });
+
   grid.innerHTML = alerts.map(a => {
     const cls = a.severity === 'URGENT' ? 'urgent' : (a.severity === 'WARN' ? 'warn' : '');
-    const yardsHtml = a.yards.map(y =>
-      `<span class="badge amber">${y.code}: <b>${y.count}</b> cont (~${y.leadMins}p${y.shiftAvg ? `, TB ca ${y.shiftAvg}p` : ''})</span>`
-    ).join(' ');
+    const yardsHtml = a.yards.map(y => {
+      const sp = summarizeContainerSpecs(y.items || []);
+      const safeYard = String(y.code || '').replace(/'/g, "\\'");
+      return `<div style="padding:4px 7px;border-radius:6px;border:1px solid rgba(217,119,6,0.4);background:rgba(217,119,6,0.08);font-size:10.5px;cursor:pointer;" onclick="openHatchWatchDetailPopup(${a.hold}, '${safeYard}')" title="Bấm xem chi tiết số container bãi ${y.code}">
+        <b style="color:var(--amber);">${y.code}: ${y.count} cont</b> (~${y.leadMins}p${y.shiftAvg ? `, TB ca ${y.shiftAvg}p` : ''}) ·
+        ISO: <b>${sp.isoText}</b> · POD: <b>${sp.podText}</b> · TL: <b>${sp.weightText}</b> 🔍
+      </div>`;
+    }).join('');
     const payload = encodeURIComponent(JSON.stringify(a.urgentCntrs.slice(0, 12)));
     return `
       <div class="hatch-watch-card ${cls}">
         <div style="display:flex;justify-content:space-between;align-items:center;gap:4px;flex-wrap:wrap;">
-          <strong>${a.label} (Bay ${a.baysText || "—"}) · ${a.craneId} (${a.craneRate} mv/h)</strong>
+          <strong style="cursor:pointer;color:var(--cyan);" onclick="openHatchWatchDetailPopup(${a.hold}, 'ALL')">${a.label} (Bay ${a.baysText || "—"}) · ${a.craneId} (${a.craneRate} mv/h) 🔍</strong>
           <span class="badge ${a.isHatchCoverBlocking ? 'purple' : ''}">${a.isHatchCoverBlocking ? '🔒 Khép nắp hầm' : 'Bãi ngoài'}</span>
         </div>
         <div style="font-size:10.5px;color:var(--muted);margin-top:3px;">
           Dưới hầm còn: <b>${a.underDeckRemainCount}</b> (<b>${a.underDeckOffDockCount}</b> bãi ngoài, ${a.underDeckTVCount} TV) · Boong chờ: <b>${a.onDeckRemainCount}</b> · Đệm: <b>${a.timeToNeedMins}p</b>
         </div>
-        <div style="margin-top:4px;display:flex;gap:4px;flex-wrap:wrap;">${yardsHtml}</div>
+        <div style="margin-top:5px;display:flex;flex-direction:column;gap:4px;">${yardsHtml}</div>
         <div style="margin-top:5px;font-weight:700;">${a.actionLabel}</div>
-        <div style="margin-top:6px;display:flex;justify-content:flex-end;">
+        <div style="margin-top:6px;display:flex;justify-content:flex-end;gap:5px;flex-wrap:wrap;">
+          <button class="sm" onclick="openHatchWatchDetailPopup(${a.hold}, 'ALL')">📋 Chi tiết số cont</button>
           <button class="sm ${a.severity === 'URGENT' ? 'danger' : 'primary'}" onclick="callBatchHatchContainers(${a.hold}, '${a.craneId}', '${payload}')">
             📞 Gọi ngay ${a.urgentCntrs.length} cont bãi ngoài
           </button>
@@ -7884,24 +7897,165 @@ function renderExportPrepAdvisory(pool) {
     return;
   }
 
+  window._prepRecMap = {};
+  recommendations.forEach(r => { window._prepRecMap[r.hold] = r; });
+
   strip.innerHTML = recommendations.slice(0, 4).map((r, idx) => {
-    const yardTxt = r.yardsSorted.slice(0, 3).map(y =>
-      y.isOffDock
-        ? `<b style="color:var(--amber)">${y.code}</b> (${y.count} cont · ~${y.etaMins}p)`
-        : `<b style="color:var(--green)">TV</b> (${y.count} cont)`
-    ).join(', ');
-    const actionTxt = r.readyNow
-      ? `✅ Sạch nhập → <b>Xuất ngay</b> (Ưu tiên gọi: ${yardTxt})`
-      : `⏳ Nhập còn <b>${r.impRemain}</b> (${r.impB}B/${r.impA}A) → Chuẩn bị gọi trước: ${yardTxt}`;
+    const headStatus = r.readyNow
+      ? `✅ Sạch nhập → <b>Xuất ngay</b> · Ưu tiên gọi:`
+      : `⏳ Nhập còn <b>${r.impRemain}</b> (${r.impB}B/${r.impA}A) · Chuẩn bị gọi trước:`;
+
+    const yardRowsHtml = r.yardsSorted.slice(0, 3).map(y => {
+      const sp = summarizeContainerSpecs(y.items || []);
+      const safeYard = String(y.code || '').replace(/'/g, "\\'");
+      const colStyle = y.isOffDock ? 'var(--amber)' : 'var(--green)';
+      return `
+        <div style="margin-top:4px;padding:4px 7px;border-radius:6px;border:1px solid var(--line);background:var(--card);font-size:10.5px;cursor:pointer;" onclick="openPrepYardDetailPopup(${r.hold}, '${safeYard}')" title="Bấm mở popup chi tiết số container">
+          <div style="display:flex;justify-content:space-between;gap:4px;flex-wrap:wrap;">
+            <span><b style="color:${colStyle};">${y.code}</b> (<b>${y.count} cont</b>${y.isOffDock ? ` · ~${y.etaMins}p` : ''})</span>
+            <span style="color:var(--cyan);font-weight:750;">📋 Xem số cont</span>
+          </div>
+          <div style="color:var(--muted);margin-top:2px;">
+            ISO: <b style="color:var(--ink);">${sp.isoText}</b> · Cảng: <b style="color:var(--ink);">${sp.podText}</b> · TL: <b style="color:var(--ink);">${sp.weightText}</b>
+          </div>
+        </div>`;
+    }).join('');
+
     return `
       <div class="prep-rec-card ${r.readyNow ? 'ready-now' : ''}">
-        <div style="display:flex;justify-content:space-between;align-items:center;gap:4px;">
-          <strong>#${idx + 1} ${r.label}</strong>
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:4px;flex-wrap:wrap;">
+          <strong style="cursor:pointer;color:var(--cyan);" onclick="openPrepYardDetailPopup(${r.hold}, 'ALL')">#${idx + 1} ${r.label} 🔍</strong>
           <span class="badge ${r.readyNow ? 'green' : 'amber'}">Xuất: ${r.expB}B / ${r.expA}A</span>
         </div>
-        <div style="margin-top:4px;font-size:11px;">${actionTxt}</div>
+        <div style="margin-top:4px;font-size:11px;">${headStatus}</div>
+        ${yardRowsHtml}
       </div>`;
   }).join('');
+}
+
+
+function summarizeContainerSpecs(items) {
+  const list = items || [];
+  if (!list.length) return { isoText: '—', podText: '—', weightText: '—' };
+  const isoCounts = {};
+  const podCounts = {};
+  let minW = Infinity, maxW = -Infinity, hasW = false;
+  list.forEach(c => {
+    const iso = String(c.iso || c.size || '—').trim().toUpperCase();
+    isoCounts[iso] = (isoCounts[iso] || 0) + 1;
+    const pod = String(c.pod || '—').trim().toUpperCase();
+    podCounts[pod] = (podCounts[pod] || 0) + 1;
+    const w = Number(c.weight);
+    if (!isNaN(w) && w > 0) {
+      hasW = true;
+      if (w < minW) minW = w;
+      if (w > maxW) maxW = w;
+    }
+  });
+  const fmtMap = (m, limit = 3) => {
+    const arr = Object.entries(m).sort((a, b) => b[1] - a[1]);
+    const head = arr.slice(0, limit).map(([k, v]) => arr.length === 1 ? k : `${k}(${v})`).join(', ');
+    return arr.length > limit ? `${head} +${arr.length - limit}` : head;
+  };
+  const weightText = !hasW
+    ? '—'
+    : (Math.abs(maxW - minW) < 0.05 ? `${minW.toFixed(1)}T` : `${minW.toFixed(1)}–${maxW.toFixed(1)}T`);
+  return {
+    isoText: fmtMap(isoCounts, 3),
+    podText: fmtMap(podCounts, 3),
+    weightText
+  };
+}
+
+function openPrepYardDetailPopup(holdNo, yardCode = 'ALL') {
+  const rec = window._prepRecMap ? window._prepRecMap[holdNo] : null;
+  if (!rec) return;
+  let items = [];
+  if (yardCode === 'ALL') {
+    (rec.yardsSorted || []).forEach(y => { items = items.concat(y.items || []); });
+  } else {
+    const yObj = (rec.yardsSorted || []).find(y => y.code === yardCode);
+    items = yObj ? (yObj.items || []) : [];
+  }
+  const title = `🧭 Chi tiết Ưu tiên gọi — ${rec.label} · ${yardCode === 'ALL' ? 'Tất cả bãi' : 'Bãi ' + yardCode} (${items.length} cont)`;
+  openPriorityCallDetailPopup(title, items, `H${holdNo}`, () => openPrepYardDetailPopup(holdNo, yardCode));
+}
+
+function openHatchWatchDetailPopup(holdNo, yardCode = 'ALL') {
+  const a = window._hatchAlertMap ? window._hatchAlertMap[holdNo] : null;
+  if (!a) return;
+  let items = [];
+  if (yardCode === 'ALL') {
+    items = a.urgentItems || [];
+  } else {
+    const yObj = (a.yards || []).find(y => y.code === yardCode);
+    items = yObj ? (yObj.items || []) : [];
+  }
+  const title = `🛡️ Chi tiết Chống dừng máng — ${a.label} (${a.craneId}) · ${yardCode === 'ALL' ? 'Tất cả bãi ngoài' : 'Bãi ' + yardCode} (${items.length} cont)`;
+  openPriorityCallDetailPopup(title, items, a.craneId || `H${holdNo}`, () => openHatchWatchDetailPopup(holdNo, yardCode));
+}
+
+function openPriorityCallDetailPopup(title, items, craneId, reopenCb) {
+  const titleEl = document.getElementById('exceptionModalTitle');
+  const bodyEl = document.getElementById('exceptionModalBody');
+  if (!titleEl || !bodyEl) return;
+
+  window._priorityPopupReopen = reopenCb || null;
+  const list = [...(items || [])].sort((a, b) => compareYardPos(a, b));
+  const sp = summarizeContainerSpecs(list);
+  const readyB = list.filter(x => x.jobStatus === 'B');
+  const batchPayload = encodeURIComponent(JSON.stringify(readyB.map(c => ({ cntr: c.cntr, pos: c.plannedPos || '', yard: c.transferPort || 'TV' }))));
+
+  titleEl.textContent = title;
+  if (!list.length) {
+    bodyEl.innerHTML = '<div style="padding:12px;color:var(--muted);">Không có container nào trong danh sách này.</div>';
+    document.getElementById('exceptionModal').classList.add('open');
+    return;
+  }
+
+  bodyEl.innerHTML = `
+    <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;padding:8px 10px;border-radius:8px;background:rgba(2,132,199,0.08);border:1px solid var(--cyan);margin-bottom:10px;font-size:11.5px;">
+      <div>
+        📦 <b>ISO/Loại:</b> ${sp.isoText} &nbsp;|&nbsp;
+        🌐 <b>Cảng (POD):</b> ${sp.podText} &nbsp;|&nbsp;
+        ⚖️ <b>Trọng lượng:</b> ${sp.weightText}
+      </div>
+      ${readyB.length ? `<button class="sm success" onclick="callBatchHatchContainers(0, '${String(craneId || '').replace(/'/g, "\\'")}', '${batchPayload}');if(window._priorityPopupReopen) window._priorityPopupReopen();">📞 Gọi tất cả ${readyB.length} cont (B)</button>` : ''}
+    </div>
+    <div class="table-wrap" style="max-height:380px;">
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Số Container</th>
+            <th>ISO / Size</th>
+            <th>Cảng (POD)</th>
+            <th>TL (T)</th>
+            <th>Khu bãi / Vị trí</th>
+            <th>Vị trí tàu (.ASC)</th>
+            <th>TT</th>
+            <th>Thao tác</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${list.map((x, i) => `
+            <tr>
+              <td>${i + 1}</td>
+              <td><b>${x.cntr}</b></td>
+              <td><b>${x.iso || '—'}</b> <span style="color:var(--muted);font-size:10px;">${x.size || ''}</span></td>
+              <td><span class="badge">${x.pod || '—'}</span></td>
+              <td><b>${(Number(x.weight) || 0).toFixed(2)}</b></td>
+              <td>${x.isOffDock ? `<span class="badge amber">${x.transferPort} (~${x.etaMins}p)</span>` : `<span class="badge green">TV</span> <b>${x.yardPos || '---'}</b>${x.yardPosUpdated ? ' 🔄' : ''}`}</td>
+              <td><b>${x.actualPos || x.plannedPos || '---'}</b></td>
+              <td><span class="badge ${x.jobStatus === 'B' ? '' : (x.jobStatus === 'C' ? 'green' : 'amber')}">${x.jobStatus}</span></td>
+              <td>
+                ${x.jobStatus === 'B' ? `<button class="primary sm" onclick="markContainerCalled('${x.cntr}','${String(craneId || 'PRIO').replace(/'/g, "\\'")}','${x.plannedPos || ''}');if(window._priorityPopupReopen) window._priorityPopupReopen();">${state.calledContainers.has(x.cntr) ? '✓ Đã gọi' : 'Gọi xe'}</button>` : '—'}
+              </td>
+            </tr>`).join('')}
+        </tbody>
+      </table>
+    </div>`;
+  document.getElementById('exceptionModal').classList.add('open');
 }
 
 function renderOffDockAndPeakSettings() {
