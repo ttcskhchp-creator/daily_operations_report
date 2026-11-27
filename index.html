@@ -107,7 +107,24 @@ input, select {
 }
 .brand-title { font-weight: 900; font-size: 14px; letter-spacing: 0.2px; }
 .brand-sub { font-size: 11px; opacity: 0.85; }
-.topbar-controls { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.topbar-controls {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  flex-wrap: wrap;
+}
+.topbar-btn-group {
+  display: grid;
+  grid-template-columns: repeat(7, auto);
+  gap: 5px;
+  align-items: center;
+}
+.topbar-btn-group button {
+  min-height: 31px;
+  padding: 4px 9px;
+  font-size: 11.5px;
+  white-space: nowrap;
+}
 .vessel-select-box {
   display: flex;
   align-items: center;
@@ -1071,8 +1088,20 @@ pre.schema-box {
   body { padding-bottom: 66px; }
   .topbar { padding: 8px 10px; gap: 7px; }
   .brand-sub { display: none; }
-  .topbar-controls { width: 100%; justify-content: space-between; }
+  .topbar-controls { width: 100%; gap: 6px; }
   .vessel-select-box { width: 100%; }
+  .topbar-btn-group {
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 5px;
+  }
+  .topbar-btn-group button {
+    width: 100%;
+    padding: 5px 4px;
+    font-size: 11px;
+    min-height: 33px;
+  }
   .vessel-select-box select { flex: 1; min-width: 0; max-width: none; }
   .kpi-strip {
     display: flex;
@@ -1179,13 +1208,15 @@ pre.schema-box {
         <option value="">-- Đang tải danh sách tàu... --</option>
       </select>
     </div>
-    <button class="primary" onclick="createNewVesselSession()">+ Tàu mới</button>
-    <button class="danger" onclick="deleteCurrentVesselSession()" title="Xóa tàu đang chọn (xóa tàu thừa/tạo nhầm, yêu cầu mã PIN)">🗑️ Xóa tàu</button>
-    <button class="ghost" onclick="syncAllCloudData()" title="Đồng bộ dữ liệu từ Supabase Cloud & Bot ePort">🔄 Cloud</button>
-    <button class="ghost" id="btnAutoPoll" onclick="openBotControlModal()" title="Điều khiển Bot OM tự động đăng nhập PL-TOS & reload F5 mỗi 5 phút">🤖 Bot OM</button>
-    <button class="ghost" id="btnViewModeToggle" onclick="toggleViewMode()" title="Chuyển giao diện Điện thoại/Máy tính bảng ↔ Máy tính PC">💻 PC</button>
-    <button class="ghost" id="btnAdminPinHeader" onclick="openAdminPinModal('quản lý mã PIN', true)" title="Xác thực / Đổi PIN / Quên PIN">🔒 PIN</button>
-    <button class="ghost" onclick="toggleTheme()" title="Sáng / Tối">🌓</button>
+    <div class="topbar-btn-group">
+      <button class="primary" onclick="createNewVesselSession()">+ Tàu mới</button>
+      <button class="danger" onclick="deleteCurrentVesselSession()" title="Xóa tàu đang chọn (xóa tàu thừa/tạo nhầm, yêu cầu mã PIN)">🗑️ Xóa</button>
+      <button class="ghost" onclick="syncAllCloudData()" title="Đồng bộ dữ liệu từ Supabase Cloud & Bot ePort">🔄 Cloud</button>
+      <button class="ghost" id="btnAutoPoll" onclick="openBotControlModal()" title="Điều khiển Bot OM tự động đăng nhập PL-TOS & reload F5 mỗi 5 phút">🤖 Bot OM</button>
+      <button class="ghost" id="btnViewModeToggle" onclick="toggleViewMode()" title="Chuyển giao diện Điện thoại/Máy tính bảng ↔ Máy tính PC">💻 PC</button>
+      <button class="ghost" id="btnAdminPinHeader" onclick="openAdminPinModal('quản lý mã PIN', true)" title="Xác thực / Đổi PIN / Quên PIN">🔒 PIN</button>
+      <button class="ghost" onclick="toggleTheme()" title="Sáng / Tối">🌓</button>
+    </div>
   </div>
 </header>
 
@@ -1526,7 +1557,8 @@ pre.schema-box {
             <div><label>Mớn Lái ban đầu (m)<br><input id="cfgDraftA" type="number" step="0.01" value="8.20" style="width:100%" oninput="recalcDraftLive()"></label></div>
             <div><label>Mớn Giới hạn Tmax (m)<br><input id="cfgMaxDraft" type="number" step="0.01" value="9.20" style="width:100%" oninput="recalcDraftLive()"></label></div>
             <div><label>Độ sâu đáy bến (m)<br><input id="cfgBerthDepth" type="number" step="0.1" value="9.0" style="width:100%" oninput="recalcDraftLive()"></label></div>
-            <div><label>Ngưỡng Tier Boong (>=)<br><input id="cfgDeckTier" type="number" value="80" style="width:100%" oninput="renderAll()"></label></div>
+            <div><label>Tier đầu tiên trên Boong<br><input id="cfgDeckTier" type="number" value="80" style="width:100%" oninput="renderAll()"></label></div>
+            <div><label>Tier cao nhất dưới Hầm<br><input id="cfgHoldMaxTier" type="number" value="12" style="width:100%" oninput="renderAll()"></label></div>
             <div><label>Hướng cập mạn tàu<br>
               <select id="cfgBerthSide" style="width:100%" onchange="onBerthingSideChanged(this.value)">
                 <option value="PORT">⬅️ Mạn Trái (Port · Mũi hướng Thượng lưu)</option>
@@ -1547,7 +1579,7 @@ pre.schema-box {
         </div>
         <div class="panel-body">
           <div style="font-size:11px;color:var(--muted);margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;gap:6px;flex-wrap:wrap;">
-            <span>Thứ tự cẩu cố định dọc ray <b>Thượng lưu ➔ Hạ lưu (Cửa biển)</b>: <code>QC10 ➔ QC09 ➔ QC08 ➔ QC07 ➔ QC11 ➔ QC12 ➔ TK07 ➔ TK10 ➔ QC06 ➔ QC05 ➔ TK11 ➔ TK12</code> (không thể vượt qua nhau).</span>
+            <span>Thứ tự cẩu cố định dọc ray <b>Thượng lưu ➔ Hạ lưu (Cửa biển)</b>: <code>QC10 ➔ QC09 ➔ QC08 ➔ QC07 ➔ QC11 ➔ QC12 ➔ TK07 ➔ TK10 ➔ QC06 ➔ QC05 ➔ TK06 ➔ TK05 ➔ TK11 ➔ TK12</code> (không thể vượt qua nhau).</span>
             <button class="primary sm" onclick="autoDistributeHoldsByRail()">⚡ Tự chia Hầm khớp ray & hướng mạn</button>
           </div>
           <div id="craneRosterList" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px;"></div>
@@ -1914,6 +1946,40 @@ pre.schema-box {
   </div>
 </div>
 
+<!-- MODAL 7: THIẾT LẬP NHANH SAU KHI NẠP FILE .ASC / .EDI (THIẾT BỊ + TIER BOONG + TIER HẦM) -->
+<div class="modal-shade" id="postAscSetupModal" onclick="if(event.target===this) closeModal('postAscSetupModal')">
+  <div class="modal-card" style="width:min(640px, 100%);">
+    <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--line);padding-bottom:8px;margin-bottom:10px;gap:8px;">
+      <h3 style="margin:0;">⚙️ Thiết lập Khai thác & Nắp hầm sau khi nạp .ASC / .EDI</h3>
+      <button class="sm" onclick="closeModal('postAscSetupModal')">✕ Đóng</button>
+    </div>
+    <div id="postAscDetectedInfo" style="background:rgba(2,132,199,0.08);border:1px solid var(--cyan);border-radius:8px;padding:9px 11px;margin-bottom:12px;font-size:11.5px;"></div>
+
+    <div class="grid-form" style="grid-template-columns:repeat(2, minmax(0, 1fr));gap:10px;margin-bottom:12px;">
+      <div class="form-field" style="margin:0;">
+        <label>Số Tier ĐẦU TIÊN trên Boong (*)</label>
+        <input type="number" id="ascFirstDeckTierInput" value="80" placeholder="VD: 72, 80, 82">
+        <div style="font-size:10.5px;color:var(--muted);margin-top:2px;">Container có Tier ≥ số này tính là trên boong (trên nắp hầm).</div>
+      </div>
+      <div class="form-field" style="margin:0;">
+        <label>Số Tier CAO NHẤT dưới Hầm (*)</label>
+        <input type="number" id="ascMaxHoldTierInput" value="12" placeholder="VD: 08, 10, 12, 14">
+        <div style="font-size:10.5px;color:var(--muted);margin-top:2px;">Dùng để xác định chính xác nắp hầm & báo hầm sắp đầy cần đóng nắp.</div>
+      </div>
+    </div>
+
+    <div class="form-field">
+      <label>Chọn Thiết bị khai thác tàu này (Thứ tự cố định dọc ray Thượng lưu ➔ Hạ lưu):</label>
+      <div id="ascCranePickerList" style="display:flex;flex-wrap:wrap;gap:6px;margin-top:4px;"></div>
+    </div>
+
+    <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:12px;padding-top:10px;border-top:1px solid var(--line);">
+      <button onclick="closeModal('postAscSetupModal')">Để sau</button>
+      <button class="success" onclick="applyPostAscSetup()">✅ Xác nhận, tự chia Hầm & Lưu Cloud</button>
+    </div>
+  </div>
+</div>
+
 <!-- MODAL 6: HỘP THƯ KHUYẾN NGHỊ & LỊCH SỬ THAO TÁC / BÀN GIAO CA -->
 <div class="modal-shade" id="historyInboxModal" onclick="if(event.target===this) closeModal('historyInboxModal')">
   <div class="modal-card" style="width:min(860px, 100%);">
@@ -2064,7 +2130,7 @@ const APP_CONFIG = {
 const sb = window.supabase.createClient(APP_CONFIG.SUPABASE_URL, APP_CONFIG.SUPABASE_KEY);
 const sbBot = window.supabase.createClient(APP_CONFIG.BOT_SUPABASE_URL, APP_CONFIG.BOT_SUPABASE_KEY);
 
-const PRESET_CRANES = ['QC10','QC09','QC08','QC07','QC11','QC12','TK07','TK10','QC06','QC05','TK11','TK12'];
+const PRESET_CRANES = ['QC10','QC09','QC08','QC07','QC11','QC12','TK07','TK10','QC06','QC05','TK06','TK05','TK11','TK12'];
 const DEFAULT_OFF_DOCK_CATALOG = [
   { code: 'GFW', name: 'Bãi GFW (Ngoài cảng)', distanceKm: 6 },
   { code: 'HHH', name: 'Bãi Hoàng Huy (HHH)', distanceKm: 8 },
@@ -2312,9 +2378,17 @@ const CloudRepo = {
   async downloadFile(sessionId, fileName, knownFilesSet = null) {
     try {
       if (knownFilesSet && !knownFilesSet.has(fileName)) return null;
-      const { data, error } = await sb.storage.from(APP_CONFIG.BUCKET_NAME).download(`${sessionId}/${fileName}`);
-      if (error || !data) return null;
-      return JSON.parse(await data.text());
+      const path = `${sessionId}/${fileName}`;
+      const url = `${APP_CONFIG.SUPABASE_URL}/storage/v1/object/${APP_CONFIG.BUCKET_NAME}/${encodeURI(path)}?t=${Date.now()}`;
+      const res = await fetch(url, {
+        cache: 'no-store',
+        headers: {
+          apikey: APP_CONFIG.SUPABASE_KEY,
+          Authorization: `Bearer ${APP_CONFIG.SUPABASE_KEY}`
+        }
+      });
+      if (!res.ok) return null;
+      return await res.json();
     } catch (e) {
       return null;
     }
@@ -2352,6 +2426,7 @@ const CloudRepo = {
         isCustomHoldConfig: state.isCustomHoldConfig,
         berth_depth: parseFloat(document.getElementById('cfgBerthDepth')?.value) || 9.0,
         berthingSide: state.berthingSide || 'PORT',
+        hold_max_tier: parseInt(document.getElementById('cfgHoldMaxTier')?.value, 10) || 12,
         offDockCatalog: state.offDockCatalog,
         peakHours: state.peakHours
       },
@@ -2363,19 +2438,22 @@ const CloudRepo = {
   async getDeletedVessels() {
     const set = new Set();
     try {
-      const local = JSON.parse(localStorage.getItem('tos_deleted_vessels_v1') || '[]');
-      if (Array.isArray(local)) local.forEach(x => x && set.add(String(x).trim().toUpperCase()));
+      const url = `${APP_CONFIG.SUPABASE_URL}/storage/v1/object/${APP_CONFIG.BUCKET_NAME}/_deleted_vessels.json?t=${Date.now()}`;
+      const res = await fetch(url, {
+        cache: 'no-store',
+        headers: { apikey: APP_CONFIG.SUPABASE_KEY, Authorization: `Bearer ${APP_CONFIG.SUPABASE_KEY}` }
+      });
+      if (res.ok) {
+        const parsed = await res.json();
+        const arr = Array.isArray(parsed) ? parsed : (parsed?.deleted || []);
+        arr.forEach(x => x && set.add(String(x).trim().toUpperCase()));
+        try { localStorage.setItem('tos_deleted_vessels_v1', JSON.stringify(Array.from(set))); } catch (e) {}
+        return set;
+      }
     } catch (e) {}
     try {
-      const rootFiles = await this.listExistingSessionFiles('', true);
-      if (!rootFiles || rootFiles.has('_deleted_vessels.json')) {
-        const { data } = await sb.storage.from(APP_CONFIG.BUCKET_NAME).download('_deleted_vessels.json');
-        if (data) {
-          const parsed = JSON.parse(await data.text());
-          const arr = Array.isArray(parsed) ? parsed : (parsed?.deleted || []);
-          arr.forEach(x => x && set.add(String(x).trim().toUpperCase()));
-        }
-      }
+      const local = JSON.parse(localStorage.getItem('tos_deleted_vessels_v1') || '[]');
+      if (Array.isArray(local)) local.forEach(x => x && set.add(String(x).trim().toUpperCase()));
     } catch (e) {}
     return set;
   },
@@ -2410,13 +2488,16 @@ const CloudRepo = {
   async listAllVessels() {
     const [dbRes, eportRes, deletedSet] = await Promise.allSettled([
       sb.from('vessel_sessions').select('session_id, vessel_name, voyage, berth, updated_at').order('updated_at', { ascending: false }).limit(50),
-      sbBot.storage.from('port-documents').download('eport_tanvu_jobs.json'),
+      fetch(`${APP_CONFIG.BOT_SUPABASE_URL}/storage/v1/object/port-documents/eport_tanvu_jobs.json?t=${Date.now()}`, {
+        cache: 'no-store',
+        headers: { apikey: APP_CONFIG.BOT_SUPABASE_KEY, Authorization: `Bearer ${APP_CONFIG.BOT_SUPABASE_KEY}` }
+      }).then(r => r.ok ? r.json() : {}),
       this.getDeletedVessels()
     ]);
     const sessions = (dbRes.status === 'fulfilled' && Array.isArray(dbRes.value.data)) ? dbRes.value.data : [];
     let eportMap = {};
-    if (eportRes.status === 'fulfilled' && eportRes.value.data) {
-      try { eportMap = JSON.parse(await eportRes.value.data.text()); } catch (e) {}
+    if (eportRes.status === 'fulfilled' && eportRes.value && typeof eportRes.value === 'object') {
+      eportMap = eportRes.value;
     }
     const deleted = (deletedSet.status === 'fulfilled' && deletedSet.value instanceof Set) ? deletedSet.value : new Set();
     return { sessions, eportMap, deleted };
@@ -2511,10 +2592,12 @@ const CloudRepo = {
 
     try {
       const { data: sessRows } = await sb.from('vessel_sessions').select('*').eq('session_id', sessionId).limit(1);
+      const parsedFromSid = parseVesselNameFromSessionId(sessionId);
       if (sessRows && sessRows.length) {
         const s = sessRows[0];
-        document.getElementById('cfgVesselName').value = s.vessel_name || '';
-        document.getElementById('cfgVoyage').value = s.voyage || '';
+        const safeName = resolveDisplayVesselName(s.session_id, s.vessel_name);
+        document.getElementById('cfgVesselName').value = safeName;
+        document.getElementById('cfgVoyage').value = s.voyage || parsedFromSid.voyage || '';
         document.getElementById('cfgBerth').value = s.berth || 'TV3';
         document.getElementById('cfgLength').value = s.length_m || 172;
         document.getElementById('cfgBeam').value = s.beam_m || 27.6;
@@ -2525,6 +2608,10 @@ const CloudRepo = {
         document.getElementById('cfgDeckTier').value = s.deck_tier_min || 80;
         if (s.stats_summary && s.stats_summary.berth_depth) {
           document.getElementById('cfgBerthDepth').value = s.stats_summary.berth_depth;
+        }
+        if (s.stats_summary && s.stats_summary.hold_max_tier) {
+          const hmEl = document.getElementById('cfgHoldMaxTier');
+          if (hmEl) hmEl.value = s.stats_summary.hold_max_tier;
         }
         state.berthingSide = (s.stats_summary && s.stats_summary.berthingSide === 'STARBOARD') ? 'STARBOARD' : 'PORT';
         if (s.stats_summary && Array.isArray(s.stats_summary.offDockCatalog) && s.stats_summary.offDockCatalog.length) {
@@ -2540,6 +2627,9 @@ const CloudRepo = {
           state.holdConfig = s.hold_config;
           state.isCustomHoldConfig = Boolean(s.stats_summary?.isCustomHoldConfig);
         }
+      } else {
+        document.getElementById('cfgVesselName').value = parsedFromSid.name;
+        document.getElementById('cfgVoyage').value = parsedFromSid.voyage || '';
       }
 
       const deckTier = parseInt(document.getElementById('cfgDeckTier')?.value, 10) || 80;
@@ -4043,16 +4133,12 @@ const HatchContinuityEngine = {
         return p && (h.bays || []).includes(p.bay);
       });
 
-      // Tự nhận diện ngưỡng boong thực tế trong hầm (70 nếu có tier 72/74 chuẩn Maersk)
-      const has70s = expInHold.some(c => {
-        const p = DataAdapters.parsePos6(c.actualPos || c.plannedPos, deckTierMin);
-        return p && p.tierNum >= 70 && p.tierNum < 80;
-      });
-      const effDeckMin = has70s ? 70 : deckTierMin;
+      const holdMaxTier = parseInt(document.getElementById('cfgHoldMaxTier')?.value, 10) || 12;
+      const effDeckMin = deckTierMin || 80;
 
       const underDeckAll = expInHold.filter(c => {
         const p = DataAdapters.parsePos6(c.actualPos || c.plannedPos, effDeckMin);
-        return p && p.tierNum < effDeckMin;
+        return p && p.tierNum <= holdMaxTier && p.tierNum < effDeckMin;
       });
       const underDeckRemain = underDeckAll.filter(c => c.jobStatus !== 'C');
       const underDeckOffDock = underDeckRemain.filter(c => c.isOffDock);
@@ -4063,8 +4149,9 @@ const HatchContinuityEngine = {
       });
       const offDockAllRemain = expInHold.filter(c => c.isOffDock && c.jobStatus !== 'C');
 
-      // Chỉ cảnh báo các hầm còn cont bãi ngoài cần làm đầy dưới hầm (để đóng nắp hầm) hoặc hầm còn ít cont bãi ngoài
-      if (underDeckOffDock.length === 0 && offDockAllRemain.length === 0) return;
+      // Cảnh báo: (1) Hầm còn cont bãi ngoài cần làm đầy dưới hầm, HOẶC (2) Hầm sắp hết hàng dưới hầm (<= 8 cont) chuẩn bị đóng nắp hầm để xếp lên boong
+      const nearCloseHatch = underDeckAll.length > 0 && underDeckRemain.length > 0 && underDeckRemain.length <= 8 && onDeckRemain.length > 0;
+      if (underDeckOffDock.length === 0 && offDockAllRemain.length === 0 && !nearCloseHatch) return;
 
       const ownerCrane = activeCranes.find(c => (c.holds || []).includes(h.hold));
       const craneId = ownerCrane ? ownerCrane.id : 'Chưa gán cẩu';
@@ -4094,7 +4181,10 @@ const HatchContinuityEngine = {
 
       let severity = 'SAFE';
       let actionLabel = `Còn đệm ~${bufferMins}p (làm ${cushionMoves} cont trước khi cần bãi ngoài)`;
-      if (bufferMins <= 5) {
+      if (nearCloseHatch && underDeckOffDock.length === 0) {
+        severity = 'WARN';
+        actionLabel = `🔒 SẮP ĐÓNG NẮP HẦM! Dưới hầm (≤ Tier ${String(holdMaxTier).padStart(2,'0')}) chỉ còn ${underDeckRemain.length} cont (đều ở TV) · chuẩn bị đóng nắp để xếp ${onDeckRemain.length} cont trên Boong (≥ Tier ${effDeckMin}).`;
+      } else if (bufferMins <= 5) {
         severity = 'URGENT';
         actionLabel = `🚨 GỌI NGAY LẬP TỨC! Thiếu ${Math.abs(bufferMins)}p so với thời gian kéo bãi ngoài (~${maxLeadMins}p) → Nguy cơ dừng máng / chờ đóng nắp hầm!`;
       } else if (bufferMins <= 25) {
@@ -4499,6 +4589,7 @@ function handleUploadEdiOrStowage(evt) {
         await CloudRepo.uploadFile(state.sessionId, 'edi_stowage.json', { instructions: state.stowageInstructions, preStowage: state.preStowagePlan });
         updateEdiFirstRequirementUI();
         renderAll();
+        openPostAscSetupModal(res.items);
       };
       reader.readAsText(file);
     }
@@ -4515,7 +4606,8 @@ function getLiveVesselCfg() {
     max_draft: parseFloat(document.getElementById('cfgMaxDraft')?.value) || 9.2,
     cont_per_10cm: parseFloat(document.getElementById('cfgContPer10cm')?.value) || 28,
     berth_depth: parseFloat(document.getElementById('cfgBerthDepth')?.value) || 9.0,
-    deck_tier_min: parseInt(document.getElementById('cfgDeckTier')?.value, 10) || 80
+    deck_tier_min: parseInt(document.getElementById('cfgDeckTier')?.value, 10) || 80,
+    hold_max_tier: parseInt(document.getElementById('cfgHoldMaxTier')?.value, 10) || 12
   };
 }
 
@@ -5866,6 +5958,33 @@ async function submitNewVesselModal() {
   }
 }
 
+function parseVesselNameFromSessionId(sid) {
+  const clean = String(sid || '').trim().toUpperCase();
+  if (!clean) return { name: '', voyage: '' };
+  const parts = clean.split('_').filter(Boolean);
+  if (parts.length >= 2 && /[0-9]/.test(parts[parts.length - 1])) {
+    return { name: parts.slice(0, -1).join(' '), voyage: parts[parts.length - 1] };
+  }
+  return { name: clean.replace(/_/g, ' '), voyage: '' };
+}
+
+function normVesselCoreName(str) {
+  return String(str || '').toUpperCase().replace(/[^A-Z0-9]/g, '');
+}
+
+function resolveDisplayVesselName(sessionId, dbVesselName) {
+  const fromSid = parseVesselNameFromSessionId(sessionId).name;
+  const dbName = String(dbVesselName || '').trim().toUpperCase();
+  if (!dbName) return fromSid || sessionId;
+  // Nếu dbVesselName bị lưu nhầm tên tàu mặc định khác hẳn session_id -> ưu tiên tên chuẩn từ session_id
+  const nSid = normVesselCoreName(fromSid);
+  const nDb = normVesselCoreName(dbName);
+  if (nSid && nDb && !nSid.includes(nDb.slice(0, 4)) && !nDb.includes(nSid.slice(0, 4))) {
+    return fromSid;
+  }
+  return dbName;
+}
+
 async function syncAllCloudData() {
   try {
     const sel = document.getElementById('vesselSelect');
@@ -5873,36 +5992,56 @@ async function syncAllCloudData() {
     const { sessions, eportMap, deleted } = await CloudRepo.listAllVessels();
     state.eportJobs = eportMap;
 
-    // Xóa sạch danh sách cũ trong dropdown để chỉ hiển thị đúng tàu còn tồn tại trên CSDL (không giữ tàu cứng KUO LUNG!)
     sel.innerHTML = '';
-    const added = new Set();
+    const addedIds = new Set();
+    const addedVesselNames = new Set();
     const isDeletedId = (sid) => {
       const u = String(sid || '').trim().toUpperCase();
       return !u || deleted.has(u);
     };
 
+    // 1. Ưu tiên tuyệt đối các tàu đã khởi tạo trên Supabase (vessel_sessions), lọc trùng theo tên tàu chuẩn
     sessions.forEach(s => {
       const sid = String(s.session_id || '').trim();
-      if (sid && !added.has(sid) && !isDeletedId(sid)) {
-        added.add(sid);
-        const opt = document.createElement('option');
-        opt.value = sid;
-        opt.textContent = `${s.vessel_name} (${s.voyage || ''}) - ${s.berth || 'TV'}`;
-        sel.appendChild(opt);
-      }
+      if (!sid || addedIds.has(sid) || isDeletedId(sid)) return;
+      const dispName = resolveDisplayVesselName(sid, s.vessel_name);
+      const parsedSid = parseVesselNameFromSessionId(sid);
+      const voy = String(s.voyage || parsedSid.voyage || '').trim().toUpperCase();
+      const coreKey = normVesselCoreName(dispName) + '_' + normVesselCoreName(voy);
+      if (addedVesselNames.has(coreKey)) return;
+
+      addedIds.add(sid);
+      addedVesselNames.add(coreKey);
+      addedVesselNames.add(normVesselCoreName(dispName));
+
+      // Ghép thêm tiến độ ePort nếu trùng tên tàu
+      const eKey = Object.keys(eportMap).find(k => {
+        const nk = normVesselCoreName(k);
+        return nk && (nk === normVesselCoreName(dispName) || normVesselCoreName(sid).includes(nk));
+      });
+      const ePct = (eKey && eportMap[eKey] && eportMap[eKey].pct !== undefined) ? ` · ePort ${eportMap[eKey].pct}%` : '';
+
+      const opt = document.createElement('option');
+      opt.value = sid;
+      opt.textContent = `${dispName}${voy ? ` (${voy})` : ''} - ${s.berth || 'TV'}${ePct}`;
+      sel.appendChild(opt);
     });
 
-    Object.keys(eportMap).forEach(vKey => {
-      const sid = vKey.replace(/\s+/g, '_');
-      const vUpper = vKey.trim().toUpperCase();
-      const deletedByPrefix = Array.from(deleted).some(d => d === sid.toUpperCase() || d.startsWith(sid.toUpperCase() + '_'));
-      if (!added.has(sid) && !isDeletedId(sid) && !deleted.has(vUpper) && !deletedByPrefix) {
-        added.add(sid);
-        const opt = document.createElement('option');
-        opt.value = sid;
-        opt.textContent = `${vKey} (${eportMap[vKey].berth}) · ePort ${eportMap[vKey].pct}%`;
-        sel.appendChild(opt);
-      }
+    // 2. Chỉ bổ sung tàu từ ePort Tân Vũ nếu CHƯA CÓ bất kỳ bản ghi nào trùng tên trong vessel_sessions
+    Object.entries(eportMap).forEach(([vKey, ej]) => {
+      if (!ej || typeof ej !== 'object' || ej.berth === undefined) return;
+      const sid = vKey.trim().replace(/\s+/g, '_').toUpperCase();
+      const coreName = normVesselCoreName(vKey);
+      if (!coreName || addedIds.has(sid) || addedVesselNames.has(coreName)) return;
+      const deletedByPrefix = Array.from(deleted).some(d => d === sid || d.startsWith(sid + '_') || normVesselCoreName(d).startsWith(coreName));
+      if (isDeletedId(sid) || deleted.has(vKey.trim().toUpperCase()) || deletedByPrefix) return;
+
+      addedIds.add(sid);
+      addedVesselNames.add(coreName);
+      const opt = document.createElement('option');
+      opt.value = sid;
+      opt.textContent = `${vKey.trim().toUpperCase()} (${ej.berth || 'TV'}) · ePort ${ej.pct || 0}%`;
+      sel.appendChild(opt);
     });
 
     if (sel.options.length === 0) {
@@ -5911,7 +6050,7 @@ async function syncAllCloudData() {
       emptyOpt.textContent = '-- Chưa có tàu (Bấm + Tàu mới) --';
       sel.appendChild(emptyOpt);
       sel.value = '';
-    } else if (prevSelected && added.has(prevSelected)) {
+    } else if (prevSelected && addedIds.has(prevSelected)) {
       sel.value = prevSelected;
     } else {
       sel.selectedIndex = 0;
@@ -6927,6 +7066,62 @@ function renderOpsCockpitAndTicker(pool) {
     // Nhân đôi nội dung để vòng chạy marquee nối liền mạch không bị khoảng trống
     track.innerHTML = half + half;
   }
+}
+
+
+function openPostAscSetupModal(items) {
+  // Tự động quét file ASC vừa nạp để gợi ý Tier đầu tiên trên Boong & Tier cao nhất dưới Hầm
+  const holdTiers = [];
+  const deckTiers = [];
+  (items || state.preStowagePlan || []).forEach(it => {
+    const p = DataAdapters.parsePos6(it.pos);
+    if (!p) return;
+    if (p.tierNum >= 60) deckTiers.push(p.tierNum);
+    else if (p.tierNum > 0) holdTiers.push(p.tierNum);
+  });
+  const suggestedDeckMin = deckTiers.length ? Math.min(...deckTiers) : (parseInt(document.getElementById('cfgDeckTier')?.value, 10) || 80);
+  const suggestedHoldMax = holdTiers.length ? Math.max(...holdTiers) : (parseInt(document.getElementById('cfgHoldMaxTier')?.value, 10) || 12);
+
+  document.getElementById('ascFirstDeckTierInput').value = suggestedDeckMin;
+  document.getElementById('ascMaxHoldTierInput').value = suggestedHoldMax;
+  document.getElementById('postAscDetectedInfo').innerHTML =
+    `✅ Đã nạp thành công <b>${(state.preStowagePlan || []).length}</b> vị trí từ file <b>.ASC / .EDI</b>.<br>` +
+    `🔎 Hệ thống tự đo được: Tier dưới hầm cao nhất = <b>${String(suggestedHoldMax).padStart(2,'0')}</b> · Tier đầu tiên trên boong = <b>${String(suggestedDeckMin).padStart(2,'0')}</b>. Vui lòng kiểm tra lại và chọn thiết bị khai thác:`;
+
+  renderAscCranePicker();
+  document.getElementById('postAscSetupModal').classList.add('open');
+}
+
+function renderAscCranePicker() {
+  const wrap = document.getElementById('ascCranePickerList');
+  if (!wrap) return;
+  wrap.innerHTML = PRESET_CRANES.map(cId => {
+    const act = state.cranes.some(c => c.id === cId && c.active);
+    return `<button type="button" class="sm ${act ? 'primary' : ''}" onclick="togglePresetCraneInAscModal('${cId}')">${act ? '✓ ' : '+ '}${cId}</button>`;
+  }).join('');
+}
+
+function togglePresetCraneInAscModal(cId) {
+  const f = state.cranes.find(c => c.id === cId);
+  if (f) f.active = !f.active;
+  else state.cranes.push({ id: cId, active: true, mode: 'BOTH', holds: [1,2], paused: false, pauseStart: null, rate: 25 });
+  renderAscCranePicker();
+}
+
+async function applyPostAscSetup() {
+  const deckMin = parseInt(document.getElementById('ascFirstDeckTierInput')?.value, 10) || 80;
+  const holdMax = parseInt(document.getElementById('ascMaxHoldTierInput')?.value, 10) || 12;
+  document.getElementById('cfgDeckTier').value = deckMin;
+  const hmEl = document.getElementById('cfgHoldMaxTier');
+  if (hmEl) hmEl.value = holdMax;
+
+  CraneRailOrder.autoDistributeHolds(state);
+  const activeIds = CraneRailOrder.sortCranesOnRail(state.cranes.filter(c => c.active)).map(c => c.id).join(', ');
+  ShiftHistoryManager.logAction('THIẾT LẬP ASC', `Thiết bị: ${activeIds || 'Chưa chọn'} · Boong ≥ ${deckMin} · Hầm ≤ ${holdMax}`);
+
+  closeModal('postAscSetupModal');
+  try { await CloudRepo.saveSessionMeta(); } catch (e) {}
+  renderAll();
 }
 
 function renderAll() {
