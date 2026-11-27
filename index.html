@@ -488,6 +488,20 @@ input, select {
   cursor: pointer;
 }
 .bay-chip.selected { background: var(--cyan); color: #fff; border-color: var(--cyan); }
+.bay-chip-card {
+  display: inline-flex; flex-direction: column; gap: 3px;
+  min-width: 96px; padding: 5px 7px; border-radius: 7px;
+  border: 1px solid var(--line); background: var(--card);
+  cursor: pointer; transition: transform 0.1s, border-color 0.15s;
+}
+.bay-chip-card:hover { transform: translateY(-1px); border-color: var(--cyan); }
+.bay-chip-card.selected { border-color: var(--cyan); box-shadow: 0 0 0 1px var(--cyan); }
+.bay-chip-top { display: flex; justify-content: space-between; align-items: center; font-weight: 850; font-size: 11px; }
+.bay-mini-bars { display: flex; flex-direction: column; gap: 2px; }
+.bay-mini-row { display: flex; align-items: center; gap: 4px; font-size: 9.5px; color: var(--muted); }
+.bay-mini-track { flex: 1; height: 4px; background: var(--line); border-radius: 99px; overflow: hidden; }
+.bay-mini-fill-imp { height: 100%; background: var(--cyan); }
+.bay-mini-fill-exp { height: 100%; background: var(--green); }
 
 .hold-editor-row {
   display: flex;
@@ -984,9 +998,9 @@ pre.schema-box {
     <div class="kpi-sub" id="kpiTideWindow">Cửa sổ rời cầu: Tốt</div>
   </div>
   <div class="kpi-card">
-    <small>Tồn Xuất (B / A / C)</small>
-    <strong id="kpiExportPool">0 B / 0 A (0 C)</strong>
-    <div class="kpi-sub" id="kpiOffDockSummary" style="color:var(--amber)">Bãi ngoài: 0 cont</div>
+    <small>Tồn Nhập & Xuất (Còn lại)</small>
+    <strong id="kpiExportPool">Nhập còn 0 · Xuất còn 0</strong>
+    <div class="kpi-sub" id="kpiOffDockSummary" style="color:var(--amber)">Bãi ngoài: 0 · TV: 0</div>
   </div>
   <div class="kpi-card">
     <small>Cloud Supabase & Bot OM</small>
@@ -1293,7 +1307,7 @@ pre.schema-box {
       <div class="panel-body">
         <div class="grid-2">
           <div>
-            <div style="font-weight:850;font-size:12px;margin-bottom:6px;">1. Danh mục Bãi ngoài & Khoảng cách tới Cầu Tân Vũ (Cont Sà lan mặc định tính ở Tân Vũ)</div>
+            <div style="font-weight:850;font-size:12px;margin-bottom:6px;">1. Danh mục Bãi ngoài & Khoảng cách tới Cầu Tân Vũ </div>
             <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px;">
               <input id="newYardCode" placeholder="Mã viết tắt (VD: GFW)" style="width:130px;min-height:30px;">
               <input id="newYardName" placeholder="Tên bãi (VD: Bãi GFW Đình Vũ)" style="flex:1;min-width:140px;min-height:30px;">
@@ -2758,19 +2772,11 @@ const UnifiedPoolBuilder = {
       if (r.transport) cur.transport = r.transport;
       if (r.barge_code) cur.bargeCode = r.barge_code;
 
-      const isBarge = /barge|sà\s*lan|sa\s*lan/i.test(String(r.transport || ''))
-        || /ghe|sl|barge/i.test(String(r.ptgn || ''))
-        || Boolean(String(r.barge_code || '').trim());
-
       if ((!cur.yardPos || cur.yardPos === '---') && r.yard_pos && r.yard_pos !== '---') {
         cur.yardPos = r.yard_pos;
         cur.yardBlock = r.block || String(r.yard_pos).split('-')[0].trim().toUpperCase();
       }
-      if (isBarge) {
-        cur.isBargeToTV = true;
-        cur.transferPort = 'TV';
-        cur.isOffDock = false;
-      } else if (!cur.inFinal && offDockCodes.has(r.block)) {
+      if (!cur.inFinal && offDockCodes.has(r.block)) {
         cur.transferPort = r.block;
         cur.isOffDock = true;
       }
@@ -2822,7 +2828,15 @@ const UnifiedPoolBuilder = {
 const HoldLayoutEngine = {
   collectKnownBays(st) {
     const baySet = new Set();
-    const add = (p) => { const parsed = DataAdapters.parsePos6(p); if (parsed && parsed.bay) baySet.add(parsed.bay); };
+    const add = (p) => {
+      const parsed = DataAdapters.parsePos6(p);
+      if (!parsed || !parsed.bay) return;
+      const bNum = parseInt(parsed.bay, 10);
+      const tNum = parsed.tierNum;
+      // Chỉ nhận vị trí tàu hợp lệ: Bay 01..62 và Tier dưới hầm (02..24) hoặc trên boong (70..98)
+      const validTier = (tNum >= 2 && tNum <= 24) || (tNum >= 70 && tNum <= 98);
+      if (bNum >= 1 && bNum <= 62 && validTier) baySet.add(parsed.bay);
+    };
     (st.sbpImport || []).forEach(x => add(x.pos));
     (st.preStowagePlan || []).forEach(x => add(x.pos));
     (st.liveJobs || []).forEach(x => add(x.pos));
@@ -4223,7 +4237,7 @@ function renderOffDockSummary(pool) {
     <div class="offdock-card tv">
       <small>Nội bộ Tân Vũ (TV)</small>
       <strong>${tvRemain.length} Cont còn</strong>
-      <span style="font-size:10.5px;color:var(--green)">Tổng TV: ${pool.filter(x => !x.isOffDock).length}${bargeCount ? ` (gồm ${bargeCount} sà lan)` : ''}</span>
+      <span style="font-size:10.5px;color:var(--green)">Tổng TV: ${pool.filter(x => !x.isOffDock).length}</span>
     </div>
     <div class="offdock-card clickable" style="border-left-color:var(--red);" onclick="openExceptionModal('CANCEL')" title="Bấm xem danh sách chi tiết cont Cancel (đã trừ khỏi số phải xếp)">
       <small>🚫 Cont Cancel (Final)</small>
@@ -4249,7 +4263,7 @@ function renderOffDockSummary(pool) {
 
   const blkEl = document.getElementById('tvBlockSummaryLine');
   if (blkEl) {
-    blkEl.innerHTML = blkSummary ? `📍 <b>Phân bổ Block nội bộ Tân Vũ (đã gồm Sà lan):</b> ${blkSummary}` : '';
+    blkEl.innerHTML = blkSummary ? `📍 <b>Phân bổ Block nội bộ Tân Vũ (TV):</b> ${blkSummary}` : '';
   }
 
   window._latestExportPool = pool;
@@ -4846,24 +4860,39 @@ function renderHoldsAndChase() {
 
     return `
       <div class="hold-box">
-        <div style="display:flex;justify-content:space-between;align-items:center;">
-          <strong>${h.label}</strong>
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:4px;">
+          <strong style="cursor:pointer;color:var(--cyan);" onclick="openHoldDetailPopup(${h.hold})" title="Bấm xem Popup chi tiết toàn Hầm (Nhập & Xuất)">${h.label} 🔍</strong>
           <div style="display:flex;gap:4px;align-items:center;">
             <span class="badge ${impRem === 0 ? 'green' : 'amber'}">${impRem === 0 ? '✓ Sạch nhập' : `Nhập còn ${impRem}`}</span>
+            <button class="sm" style="padding:1px 6px;min-height:22px;" title="Chi tiết Hầm (Nhập & Xuất)" onclick="openHoldDetailPopup(${h.hold})">📋</button>
             ${holds.length > 1 ? `<button class="sm" style="padding:1px 6px;min-height:22px;" title="Xóa hầm này" onclick="removeManualHold(${h.hold})">✕</button>` : ''}
           </div>
         </div>
         <div style="font-size:10.5px;color:var(--muted);margin-top:4px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:3px;">
-          <span>Nhập: <b style="color:var(--green)">${impDone}C</b> / <b>${impReadyB}B</b>${impHoldA ? ` / <b style="color:var(--red)">${impHoldA}A</b>` : ''} (${impPct}%)</span>
-          <span>Xuất: <b style="color:var(--green)">${expDone}C</b> / <b style="color:var(--cyan)">${expReadyB}B</b> / <b style="color:var(--amber)">${expHoldA}A</b></span>
+          <span>Nhập: <b style="color:var(--cyan)">${impDone}/${impInH.length}</b> (còn ${impRem})</span>
+          <span>Xuất: <b style="color:var(--green)">${expDone}/${expInH.length}</b> (còn ${expReadyB + expHoldA})</span>
         </div>
-        <div class="prog-track"><div class="prog-fill imp" style="width:${impPct}%"></div></div>
-        <div class="prog-track"><div class="prog-fill" style="width:${expPct}%"></div></div>
+        <div class="prog-track" title="Tiến độ Dỡ Nhập: ${impPct}%"><div class="prog-fill imp" style="width:${impPct}%"></div></div>
+        <div class="prog-track" title="Tiến độ Xếp Xuất: ${expPct}%"><div class="prog-fill" style="width:${expPct}%"></div></div>
         <div class="bay-chips">
           ${h.bays.map(b => {
-            const bs = (state._bayImportStats || {})[b];
-            const impTag = bs && bs.total > 0 ? ` <small style="opacity:0.85;">(N:${bs.C}C/${bs.B}B${bs.A ? '/' + bs.A + 'A' : ''})</small>` : '';
-            return `<span class="bay-chip ${state.selectedBays.has(b) ? 'selected' : ''}" onclick="openBayPopup('${b}')">Bay ${b}${impTag}</span>`;
+            const bImp = impJobs.filter(j => { const p = DataAdapters.parsePos6(j.pos); return p && p.bay === b; });
+            const bImpDone = bImp.filter(j => j.status === 'C').length;
+            const bImpRem = bImp.filter(j => j.status === 'A' || j.status === 'B').length;
+            const bImpPct = bImp.length ? Math.round((bImpDone / bImp.length) * 100) : 100;
+
+            const bExp = pool.filter(c => { const p = DataAdapters.parsePos6(c.actualPos || c.plannedPos); return p && p.bay === b; });
+            const bExpDone = bExp.filter(c => c.jobStatus === 'C').length;
+            const bExpRem = bExp.filter(c => c.jobStatus === 'A' || c.jobStatus === 'B').length;
+            const bExpPct = bExp.length ? Math.round((bExpDone / bExp.length) * 100) : 0;
+
+            return `<div class="bay-chip-card ${state.selectedBays.has(b) ? 'selected' : ''}" onclick="openBayPopup('${b}')" title="Bấm xem Sơ đồ & Chi tiết Nhập/Xuất Bay ${b}">
+              <div class="bay-chip-top"><span>Bay ${b}</span><span style="font-size:9px;color:var(--muted);">N:${bImpRem} · X:${bExpRem}</span></div>
+              <div class="bay-mini-bars">
+                <div class="bay-mini-row"><span>N</span><div class="bay-mini-track"><div class="bay-mini-fill-imp" style="width:${bImpPct}%"></div></div><span>${bImpDone}/${bImp.length}</span></div>
+                <div class="bay-mini-row"><span>X</span><div class="bay-mini-track"><div class="bay-mini-fill-exp" style="width:${bExpPct}%"></div></div><span>${bExpDone}/${bExp.length}</span></div>
+              </div>
+            </div>`;
           }).join('')}
         </div>
         <div class="hold-editor-row">
@@ -5095,7 +5124,121 @@ function openBayPopup(bay) {
       </table>
     </div>
   `;
+  const impDetailRows = impInBay.map((x, i) => `
+    <tr>
+      <td>${i + 1}</td>
+      <td><b>${x.cntr}</b></td>
+      <td>${x.iso || x.size || '---'}</td>
+      <td><b>${x.pos ? x.pos.raw : '---'}</b></td>
+      <td><span class="badge ${x.status === 'C' ? 'green' : (x.status === 'B' ? '' : 'amber')}">${x.status}</span></td>
+      <td>${x.crane || '---'}</td>
+    </tr>`).join('');
+
+  const expDetailRows = expInBay.map((x, i) => `
+    <tr>
+      <td>${i + 1}</td>
+      <td><b>${x.cntr}</b></td>
+      <td>${x.iso || x.size || '---'}</td>
+      <td>${x.isOffDock ? `<span class="badge amber">Bãi ngoài: ${x.transferPort}</span>` : `<span class="badge green">TV</span> <b>${x.yardPos || '---'}</b>`}</td>
+      <td>${x.actualPos || x.plannedPos || '---'}</td>
+      <td><span class="badge ${x.jobStatus === 'C' ? 'green' : (x.jobStatus === 'B' ? '' : 'amber')}">${x.jobStatus}</span></td>
+    </tr>`).join('');
+
+  document.getElementById('bayModalBody').innerHTML += `
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(360px,1fr));gap:10px;margin-top:12px;border-top:2px dashed var(--line);padding-top:10px;">
+      <div>
+        <div style="font-weight:850;font-size:12px;color:var(--cyan);margin-bottom:5px;">📥 Chi tiết Hàng Nhập Bay ${bay} (${impInBay.length} cont · còn ${impRemain})</div>
+        <div class="table-wrap" style="max-height:240px;">
+          <table>
+            <thead><tr><th>#</th><th>Số Container</th><th>ISO</th><th>Vị trí trên tàu</th><th>TT</th><th>Cẩu</th></tr></thead>
+            <tbody>${impDetailRows || '<tr><td colspan="6" style="color:var(--muted);">Không có hàng nhập</td></tr>'}</tbody>
+          </table>
+        </div>
+      </div>
+      <div>
+        <div style="font-weight:850;font-size:12px;color:var(--green);margin-bottom:5px;">📤 Chi tiết Hàng Xuất Bay ${bay} (${expInBay.length} cont)</div>
+        <div class="table-wrap" style="max-height:240px;">
+          <table>
+            <thead><tr><th>#</th><th>Số Container</th><th>ISO</th><th>Vị trí Bãi TV / Ngoài</th><th>Vị trí tàu</th><th>TT</th></tr></thead>
+            <tbody>${expDetailRows || '<tr><td colspan="6" style="color:var(--muted);">Không có hàng xuất</td></tr>'}</tbody>
+          </table>
+        </div>
+      </div>
+    </div>`;
+
   document.getElementById('bayModal').classList.add('open');
+}
+
+function openHoldDetailPopup(holdNo) {
+  const h = (state.holdConfig || []).find(x => x.hold === holdNo);
+  if (!h) return;
+  const cfg = getLiveVesselCfg();
+  const pool = UnifiedPoolBuilder.build(state, cfg.deck_tier_min);
+  const baySet = new Set(h.bays || []);
+
+  const impMap = new Map();
+  (state.sbpImport || []).forEach(s => {
+    const p = DataAdapters.parsePos6(s.pos);
+    if (p && baySet.has(p.bay)) impMap.set(s.cntr, { cntr: s.cntr, iso: s.iso || s.size || '', pos: p.raw, status: 'B', crane: '' });
+  });
+  (state.liveJobs || []).filter(j => j.io === 'Import' || /dỡ\s*tàu/i.test(j.job_type || '')).forEach(j => {
+    const p = DataAdapters.parsePos6(j.pos);
+    if (p && baySet.has(p.bay)) {
+      const prev = impMap.get(j.cntr);
+      impMap.set(j.cntr, { cntr: j.cntr, iso: prev?.iso || '', pos: p.raw, status: j.status || 'B', crane: j.crane || '' });
+    }
+  });
+  const impList = Array.from(impMap.values());
+  const impRem = impList.filter(x => x.status === 'A' || x.status === 'B').length;
+
+  const expList = pool.filter(c => {
+    const p = DataAdapters.parsePos6(c.actualPos || c.plannedPos);
+    return p && baySet.has(p.bay);
+  });
+  const expRem = expList.filter(x => x.jobStatus === 'A' || x.jobStatus === 'B').length;
+
+  document.getElementById('exceptionModalTitle').textContent =
+    `🚢 Chi tiết ${h.label} (Bay ${h.bays.join(', ')}) · Nhập còn ${impRem}/${impList.length} · Xuất còn ${expRem}/${expList.length}`;
+  document.getElementById('exceptionModalBody').innerHTML = `
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(380px,1fr));gap:10px;">
+      <div>
+        <div style="font-weight:850;font-size:12px;color:var(--cyan);margin-bottom:5px;">📥 Hàng Nhập (${impList.length} cont · còn ${impRem})</div>
+        <div class="table-wrap" style="max-height:360px;">
+          <table>
+            <thead><tr><th>#</th><th>Số Container</th><th>ISO</th><th>Vị trí trên tàu</th><th>TT</th><th>Cẩu</th></tr></thead>
+            <tbody>${impList.map((x, i) => `
+              <tr>
+                <td>${i + 1}</td>
+                <td><b>${x.cntr}</b></td>
+                <td>${x.iso || '---'}</td>
+                <td><b>${x.pos}</b></td>
+                <td><span class="badge ${x.status === 'C' ? 'green' : (x.status === 'B' ? '' : 'amber')}">${x.status}</span></td>
+                <td>${x.crane || '---'}</td>
+              </tr>`).join('') || '<tr><td colspan="6" style="color:var(--muted);">Không có hàng nhập</td></tr>'}
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div>
+        <div style="font-weight:850;font-size:12px;color:var(--green);margin-bottom:5px;">📤 Hàng Xuất (${expList.length} cont · còn ${expRem})</div>
+        <div class="table-wrap" style="max-height:360px;">
+          <table>
+            <thead><tr><th>#</th><th>Số Container</th><th>ISO</th><th>Vị trí Bãi TV / Ngoài</th><th>Vị trí tàu</th><th>TT</th></tr></thead>
+            <tbody>${expList.map((x, i) => `
+              <tr>
+                <td>${i + 1}</td>
+                <td><b>${x.cntr}</b></td>
+                <td>${x.iso || x.size || '---'}</td>
+                <td>${x.isOffDock ? `<span class="badge amber">Bãi ngoài: ${x.transferPort}</span>` : `<span class="badge green">TV</span> <b>${x.yardPos || '---'}</b>`}</td>
+                <td>${x.actualPos || x.plannedPos || '---'}</td>
+                <td><span class="badge ${x.jobStatus === 'C' ? 'green' : (x.jobStatus === 'B' ? '' : 'amber')}">${x.jobStatus}</span></td>
+              </tr>`).join('') || '<tr><td colspan="6" style="color:var(--muted);">Không có hàng xuất</td></tr>'}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>`;
+  document.getElementById('exceptionModal').classList.add('open');
 }
 
 function renderCranesSetup() {
@@ -6033,13 +6176,17 @@ function renderAll() {
   const pool = UnifiedPoolBuilder.build(state, cfg.deck_tier_min);
   ImportExportPrepEngine.computeHoldAndBayStats(state, pool);
 
+  const impJobsAll = (state.liveJobs || []).filter(j => j.io === 'Import' || /dỡ\s*tàu/i.test(j.job_type || ''));
+  const impC = impJobsAll.filter(j => j.status === 'C').length;
+  const impRem = impJobsAll.filter(j => j.status === 'A' || j.status === 'B').length;
   const cDone = pool.filter(c => c.jobStatus === 'C').length;
   const bReady = pool.filter(c => c.jobStatus === 'B').length;
   const aHold = pool.filter(c => c.jobStatus === 'A').length;
+  const expRem = bReady + aHold;
   const noJob = UnifiedPoolBuilder.getNoJobFromFinal(state, pool).length;
   const cancelCnt = UnifiedPoolBuilder.getCancelledList(state).length;
   document.getElementById('kpiExportPool').textContent =
-    `${bReady} B / ${aHold} A (${cDone} C)${cancelCnt ? ` · -${cancelCnt} Cancel` : ''}${noJob ? ` · ${noJob} chưa job` : ''}`;
+    `Nhập còn ${impRem}/${impJobsAll.length} · Xuất còn ${expRem} (${bReady}B/${aHold}A/${cDone}C)`;
 
   recalcDraftLive();
   renderHorizontalShipRailCard();
