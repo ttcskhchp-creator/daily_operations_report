@@ -902,7 +902,7 @@ pre.schema-box {
     <div class="vessel-select-box">
       <span style="font-size:12px;white-space:nowrap;">🚢 Tàu:</span>
       <select id="vesselSelect" onchange="onSelectVesselSession(this.value)">
-        <option value="KUO_LUNG_1009S">KUO LUNG (1009S) - TV3</option>
+        <option value="">-- Đang tải danh sách tàu... --</option>
       </select>
     </div>
     <button class="primary" onclick="createNewVesselSession()">+ Tàu mới</button>
@@ -1580,7 +1580,7 @@ const OFF_DOCK_LABELS = {
 };
 
 const state = {
-  sessionId: 'KUO_LUNG_1009S',
+  sessionId: '',
   autoPollEnabled: false,
   autoPollTimer: null,
   jobsSource: 'EXCEL_WEB',
@@ -1836,17 +1836,66 @@ const CloudRepo = {
     if (error) throw error;
   },
 
+  async getDeletedVessels() {
+    const set = new Set();
+    try {
+      const local = JSON.parse(localStorage.getItem('tos_deleted_vessels_v1') || '[]');
+      if (Array.isArray(local)) local.forEach(x => x && set.add(String(x).trim().toUpperCase()));
+    } catch (e) {}
+    try {
+      const rootFiles = await this.listExistingSessionFiles('', true);
+      if (!rootFiles || rootFiles.has('_deleted_vessels.json')) {
+        const { data } = await sb.storage.from(APP_CONFIG.BUCKET_NAME).download('_deleted_vessels.json');
+        if (data) {
+          const parsed = JSON.parse(await data.text());
+          const arr = Array.isArray(parsed) ? parsed : (parsed?.deleted || []);
+          arr.forEach(x => x && set.add(String(x).trim().toUpperCase()));
+        }
+      }
+    } catch (e) {}
+    return set;
+  },
+
+  async saveDeletedVessels(setObj) {
+    const arr = Array.from(setObj).filter(Boolean);
+    try { localStorage.setItem('tos_deleted_vessels_v1', JSON.stringify(arr)); } catch (e) {}
+    try {
+      const blob = new Blob([JSON.stringify({ deleted: arr, updated_at: new Date().toISOString() })], { type: 'application/json' });
+      await sb.storage.from(APP_CONFIG.BUCKET_NAME).upload('_deleted_vessels.json', blob, { upsert: true, cacheControl: '0' });
+      delete this._folderFilesCache[''];
+    } catch (e) {}
+  },
+
+  async markVesselDeleted(sid) {
+    const clean = String(sid || '').trim().toUpperCase();
+    if (!clean) return;
+    const set = await this.getDeletedVessels();
+    set.add(clean);
+    await this.saveDeletedVessels(set);
+  },
+
+  async unmarkVesselDeleted(sid) {
+    const clean = String(sid || '').trim().toUpperCase();
+    if (!clean) return;
+    const set = await this.getDeletedVessels();
+    if (set.delete(clean)) {
+      await this.saveDeletedVessels(set);
+    }
+  },
+
   async listAllVessels() {
-    const [dbRes, eportRes] = await Promise.allSettled([
-      sb.from('vessel_sessions').select('session_id, vessel_name, voyage, berth, updated_at').order('updated_at', { ascending: false }).limit(30),
-      sbBot.storage.from('port-documents').download('eport_tanvu_jobs.json')
+    const [dbRes, eportRes, deletedSet] = await Promise.allSettled([
+      sb.from('vessel_sessions').select('session_id, vessel_name, voyage, berth, updated_at').order('updated_at', { ascending: false }).limit(50),
+      sbBot.storage.from('port-documents').download('eport_tanvu_jobs.json'),
+      this.getDeletedVessels()
     ]);
     const sessions = (dbRes.status === 'fulfilled' && Array.isArray(dbRes.value.data)) ? dbRes.value.data : [];
     let eportMap = {};
     if (eportRes.status === 'fulfilled' && eportRes.value.data) {
       try { eportMap = JSON.parse(await eportRes.value.data.text()); } catch (e) {}
     }
-    return { sessions, eportMap };
+    const deleted = (deletedSet.status === 'fulfilled' && deletedSet.value instanceof Set) ? deletedSet.value : new Set();
+    return { sessions, eportMap, deleted };
   },
 
   async fetchUpcomingVessels() {
@@ -1911,7 +1960,7 @@ const CloudRepo = {
   },
 
   async loadSessionFromCloud(sessionId) {
-    state.sessionId = sessionId;
+    state.sessionId = sessionId || '';
     VesselUploadGuard.lock();
     updateStep1GuardUI();
 
@@ -1925,6 +1974,14 @@ const CloudRepo = {
     state.isCustomHoldConfig = false;
     state.selectedBays = new Set();
     state.calledContainers.clear();
+
+    if (!state.sessionId) {
+      ['sbp','final','reserved','jobs','edi'].forEach(k => setCardStatus(k, 'Chưa chọn tàu', false));
+      this.setStatus('● Chưa có tàu');
+      this.setSub('Bấm "+ Tàu mới" để khởi tạo chuyến tàu');
+      renderAll();
+      return;
+    }
 
     this.setSub(`Đang tải ${sessionId} từ Cloud...`);
 
@@ -2010,14 +2067,10 @@ const CloudRepo = {
         logsRes.data.forEach(r => r.container_no && state.calledContainers.add(r.container_no));
       }
 
-      if (foundCount === 0 && sessionId === 'KUO_LUNG_1009S') {
-        loadSampleKuoLung1009S(false);
-      } else {
-        HoldLayoutEngine.syncHoldsForState(state, parseFloat(document.getElementById('cfgLength').value) || 172, false);
-        renderAll();
-        if (!hasVesselEdiOrAscData()) {
-          switchTab('tab-upload');
-        }
+      HoldLayoutEngine.syncHoldsForState(state, parseFloat(document.getElementById('cfgLength').value) || 172, false);
+      renderAll();
+      if (!hasVesselEdiOrAscData()) {
+        switchTab('tab-upload');
       }
 
       this.setStatus('● Đã đồng bộ Cloud');
@@ -4378,10 +4431,7 @@ async function submitNewVesselModal() {
   const { contPer10cm } = DraftAndTideEngine.estimateTpcAndRate(loa, beam);
   document.getElementById('cfgContPer10cm').value = contPer10cm;
 
-  try {
-    const hidden = JSON.parse(localStorage.getItem('tos_deleted_vessels_v1') || '[]').filter(x => x !== id);
-    localStorage.setItem('tos_deleted_vessels_v1', JSON.stringify(hidden));
-  } catch (e) {}
+  await CloudRepo.unmarkVesselDeleted(id);
 
   state.sessionId = id;
   state.berthingSide = side;
@@ -4409,31 +4459,54 @@ async function submitNewVesselModal() {
 async function syncAllCloudData() {
   try {
     const sel = document.getElementById('vesselSelect');
-    const existing = new Set(Array.from(sel.options).map(o => o.value));
-    const { sessions, eportMap } = await CloudRepo.listAllVessels();
+    const prevSelected = state.sessionId || sel.value || '';
+    const { sessions, eportMap, deleted } = await CloudRepo.listAllVessels();
     state.eportJobs = eportMap;
 
+    // Xóa sạch danh sách cũ trong dropdown để chỉ hiển thị đúng tàu còn tồn tại trên CSDL (không giữ tàu cứng KUO LUNG!)
+    sel.innerHTML = '';
+    const added = new Set();
+    const isDeletedId = (sid) => {
+      const u = String(sid || '').trim().toUpperCase();
+      return !u || deleted.has(u);
+    };
+
     sessions.forEach(s => {
-      if (s.session_id && !existing.has(s.session_id)) {
-        existing.add(s.session_id);
+      const sid = String(s.session_id || '').trim();
+      if (sid && !added.has(sid) && !isDeletedId(sid)) {
+        added.add(sid);
         const opt = document.createElement('option');
-        opt.value = s.session_id;
+        opt.value = sid;
         opt.textContent = `${s.vessel_name} (${s.voyage || ''}) - ${s.berth || 'TV'}`;
         sel.appendChild(opt);
       }
     });
-    let hiddenDeleted = [];
-    try { hiddenDeleted = JSON.parse(localStorage.getItem('tos_deleted_vessels_v1') || '[]'); } catch (e) {}
+
     Object.keys(eportMap).forEach(vKey => {
       const sid = vKey.replace(/\s+/g, '_');
-      if (!existing.has(sid) && !hiddenDeleted.includes(sid)) {
-        existing.add(sid);
+      const vUpper = vKey.trim().toUpperCase();
+      const deletedByPrefix = Array.from(deleted).some(d => d === sid.toUpperCase() || d.startsWith(sid.toUpperCase() + '_'));
+      if (!added.has(sid) && !isDeletedId(sid) && !deleted.has(vUpper) && !deletedByPrefix) {
+        added.add(sid);
         const opt = document.createElement('option');
         opt.value = sid;
         opt.textContent = `${vKey} (${eportMap[vKey].berth}) · ePort ${eportMap[vKey].pct}%`;
         sel.appendChild(opt);
       }
     });
+
+    if (sel.options.length === 0) {
+      const emptyOpt = document.createElement('option');
+      emptyOpt.value = '';
+      emptyOpt.textContent = '-- Chưa có tàu (Bấm + Tàu mới) --';
+      sel.appendChild(emptyOpt);
+      sel.value = '';
+    } else if (prevSelected && added.has(prevSelected)) {
+      sel.value = prevSelected;
+    } else {
+      sel.selectedIndex = 0;
+    }
+
     updateEportBanner(sel.value);
 
     const tide = await CloudRepo.fetchTodayTide();
@@ -4441,7 +4514,7 @@ async function syncAllCloudData() {
       state.todayTide = tide;
       document.getElementById('kpiTideLive').textContent = `Đỉnh ${tide.high_val}m (${tide.high_time}) · Ròng ${tide.low_val}m (${tide.low_time})`;
     }
-    await CloudRepo.loadSessionFromCloud(sel.value || state.sessionId);
+    await CloudRepo.loadSessionFromCloud(sel.value);
   } catch (e) {
     CloudRepo.setStatus('⚠ Lỗi đồng bộ', true);
   }
@@ -4498,6 +4571,17 @@ function copyBotSchema() {
 }
 
 function loadSampleKuoLung1009S(pushCloud = false) {
+  if (!state.sessionId) {
+    state.sessionId = 'KUO_LUNG_1009S';
+    const sel = document.getElementById('vesselSelect');
+    if (sel && !Array.from(sel.options).some(o => o.value === 'KUO_LUNG_1009S')) {
+      const opt = document.createElement('option');
+      opt.value = 'KUO_LUNG_1009S';
+      opt.textContent = 'KUO LUNG (1009S) - MẪU THỬ';
+      sel.appendChild(opt);
+    }
+    if (sel) sel.value = 'KUO_LUNG_1009S';
+  }
   state.stowageInstructions = { 'BMOU1103807': 'UD', 'TCLU3726021': 'UD', 'DFSU1954440': 'UD' };
   state.preStowagePlan = [
     { pos: '010282', cntr: 'SIKU2240254', iso: '22G0', weight: 29.208, pod: 'SGSIN', inst: 'DG 0001' },
@@ -4653,18 +4737,31 @@ function renderBotStatusUI(rec) {
 
 async function refreshBotCommandStatus(alsoPullJobs = false) {
   try {
-    const { data, error } = await sb
-      .from('bot_commands')
-      .select('*')
-      .eq('session_id', state.sessionId)
-      .limit(1);
-    if (!error && data && data.length) {
-      renderBotStatusUI(data[0]);
-      if (data[0].last_sync_at && (alsoPullJobs || data[0].status === 'RUNNING' || data[0].status === 'COMPLETED_100')) {
+    if (!state.sessionId) { renderBotStatusUI(null); return; }
+    const [curRes, activeRes] = await Promise.all([
+      sb.from('bot_commands').select('*').eq('session_id', state.sessionId).limit(1),
+      sb.from('bot_commands').select('session_id, status, last_message').in('status', ['START', 'RUNNING']).limit(1)
+    ]);
+    const rec = (!curRes.error && curRes.data && curRes.data.length) ? curRes.data[0] : null;
+    const otherActive = (!activeRes.error && activeRes.data && activeRes.data.length && activeRes.data[0].session_id !== state.sessionId)
+      ? activeRes.data[0] : null;
+
+    if (rec) {
+      renderBotStatusUI(rec);
+      if (rec.last_sync_at && (alsoPullJobs || rec.status === 'RUNNING' || rec.status === 'COMPLETED_100')) {
         await CloudRepo.pollLatestJobsOnly();
       }
     } else {
       renderBotStatusUI(null);
+    }
+
+    if (otherActive) {
+      const btnQuickStop = document.getElementById('btnQuickStopBot');
+      if (btnQuickStop) btnQuickStop.style.display = 'inline-flex';
+      const summaryEl = document.getElementById('botLiveSummaryText');
+      if (summaryEl && (!rec || (rec.status !== 'RUNNING' && rec.status !== 'START'))) {
+        summaryEl.innerHTML += `<div style="margin-top:4px;color:var(--amber);font-weight:700;">⚠️ Bot hiện đang chạy (${otherActive.status}) cho tàu khác: <b>${otherActive.session_id}</b>. Bấm <b>🛑 Dừng Bot</b> để ngắt ngay!</div>`;
+      }
     }
   } catch (e) {}
 }
@@ -4736,17 +4833,38 @@ async function startRemoteBot() {
 }
 
 async function stopRemoteBot() {
-  if (!(await AdminPinGuard.requireAuth(`dừng Bot OM cho tàu ${state.sessionId}`))) return;
+  if (!(await AdminPinGuard.requireAuth(`dừng Bot OM ngay lập tức`))) return;
+  const nowStr = new Date().toLocaleTimeString('vi-VN');
+  const nowIso = new Date().toISOString();
   try {
-    await sb.from('bot_commands').upsert({
-      session_id: state.sessionId,
-      status: 'STOPPED',
-      tos_pass: null,
-      last_message: `Đã gửi lệnh DỪNG từ Web lúc ${new Date().toLocaleTimeString('vi-VN')}.`,
-      updated_at: new Date().toISOString()
-    }, { onConflict: 'session_id' });
-    document.getElementById('botModalActionMsg').style.color = 'var(--amber)';
-    document.getElementById('botModalActionMsg').textContent = '✓ Đã gửi lệnh DỪNG Bot.';
+    // 1. Dừng TẤT CẢ các lệnh Bot đang START hoặc RUNNING trên Supabase (tránh trường hợp chọn nhầm tàu khác rồi bấm Dừng không ăn!)
+    const { error: errAll } = await sb.from('bot_commands')
+      .update({
+        status: 'STOPPED',
+        tos_pass: null,
+        last_message: `🛑 Đã gửi lệnh DỪNG TỨC THÌ từ Web lúc ${nowStr}.`,
+        updated_at: nowIso
+      })
+      .in('status', ['START', 'RUNNING']);
+    if (errAll) throw errAll;
+
+    // 2. Đồng thời ép trạng thái STOPPED cho tàu hiện tại nếu đang chọn tàu
+    if (state.sessionId) {
+      const { error: errCur } = await sb.from('bot_commands').upsert({
+        session_id: state.sessionId,
+        status: 'STOPPED',
+        tos_pass: null,
+        last_message: `🛑 Đã gửi lệnh DỪNG TỨC THÌ từ Web lúc ${nowStr}.`,
+        updated_at: nowIso
+      }, { onConflict: 'session_id' });
+      if (errCur) throw errCur;
+    }
+
+    const msgEl = document.getElementById('botModalActionMsg');
+    if (msgEl) {
+      msgEl.style.color = 'var(--amber)';
+      msgEl.textContent = `✓ Đã ghi lệnh DỪNG (STOPPED) lên CSDL lúc ${nowStr}. Bot Windows sẽ ngắt ngay trong vòng 3 giây!`;
+    }
     await refreshBotCommandStatus(false);
   } catch (err) {
     alert('Lỗi dừng Bot: ' + err.message);
@@ -4755,11 +4873,15 @@ async function stopRemoteBot() {
 
 async function deleteCurrentVesselSession() {
   const sid = state.sessionId;
+  if (!sid) {
+    alert('Chưa có tàu nào được chọn để xóa!');
+    return;
+  }
   if (!(await AdminPinGuard.requireAuth(`XÓA VĨNH VIỄN tàu ${sid} (và tự động dừng Bot OM)`))) return;
-  if (!confirm(`⚠️ XÁC NHẬN XÓA TÀU [ ${sid} ]?\n\n• Xóa toàn bộ dữ liệu tàu này trên Cloud Supabase\n• Tự động gửi lệnh DỪNG Bot Windows đang cào tàu này\n\nBạn chắc chắn muốn xóa?`)) return;
+  if (!confirm(`⚠️ XÁC NHẬN XÓA VĨNH VIỄN TÀU [ ${sid} ]?\n\n• Xóa HẲN dữ liệu tàu này khỏi CSDL Supabase & Storage (F5 sẽ không hiện lại)\n• Tự động ngắt Bot Windows nếu đang chạy tàu này\n\nBạn chắc chắn muốn xóa?`)) return;
 
   try {
-    // 1. Ra lệnh dừng Bot, đợi 1 nhịp rồi xóa sạch mọi dữ liệu liên quan tàu này trên Cloud
+    // 1. Ra lệnh dừng Bot ngay lập tức trên CSDL
     await sb.from('bot_commands').update({
       status: 'STOPPED',
       tos_pass: null,
@@ -4767,37 +4889,43 @@ async function deleteCurrentVesselSession() {
       updated_at: new Date().toISOString()
     }).eq('session_id', sid);
 
-    await sb.from('dispatch_logs').delete().eq('session_id', sid);
-    await sb.from('vessel_sessions').delete().eq('session_id', sid);
-    await sb.from('bot_commands').delete().eq('session_id', sid);
-    await sb.storage.from(APP_CONFIG.BUCKET_NAME).remove([
-      `${sid}/sbp.json`, `${sid}/final.json`, `${sid}/reserved.json`,
-      `${sid}/jobs.json`, `${sid}/edi_stowage.json`
-    ]);
+    // 2. Xóa các bản ghi trên CSDL & kiểm tra lỗi thực tế (tránh lỗi RLS âm thầm)
+    const { error: errLogs } = await sb.from('dispatch_logs').delete().eq('session_id', sid);
+    if (errLogs) console.warn('dispatch_logs delete:', errLogs.message);
 
-    // Lưu vào danh sách ẩn cục bộ (đề phòng ePort vẫn còn tàu thừa vừa xóa)
-    try {
-      const hidden = JSON.parse(localStorage.getItem('tos_deleted_vessels_v1') || '[]');
-      if (!hidden.includes(sid)) {
-        hidden.push(sid);
-        localStorage.setItem('tos_deleted_vessels_v1', JSON.stringify(hidden));
-      }
-    } catch (e) {}
+    const { error: errCmd } = await sb.from('bot_commands').delete().eq('session_id', sid);
+    if (errCmd) console.warn('bot_commands delete:', errCmd.message);
 
-    // 2. Xóa khỏi dropdown và chuyển sang tàu kế tiếp
+    const { error: errSess } = await sb.from('vessel_sessions').delete().eq('session_id', sid);
+    if (errSess) throw new Error('Không xóa được bảng vessel_sessions trên Supabase: ' + errSess.message);
+
+    // Xác minh lại trên DB xem dòng đã thực sự bị xóa hẳn chưa (kiểm tra trường hợp RLS chặn DELETE không trả error)
+    const { data: checkRemain } = await sb.from('vessel_sessions').select('session_id').eq('session_id', sid).limit(1);
+    if (checkRemain && checkRemain.length > 0) {
+      throw new Error(`Supabase RLS đang chặn quyền DELETE trên bảng vessel_sessions cho tàu ${sid}! Hãy bật Policy DELETE cho anon/public trên Supabase.`);
+    }
+
+    // 3. Quét và xóa TẤT CẢ các file trong thư mục Storage của tàu này
+    const folderFiles = await CloudRepo.listExistingSessionFiles(sid, true);
+    const toRemove = folderFiles && folderFiles.size > 0
+      ? Array.from(folderFiles).map(fn => `${sid}/${fn}`)
+      : [`${sid}/sbp.json`, `${sid}/final.json`, `${sid}/reserved.json`, `${sid}/jobs.json`, `${sid}/edi_stowage.json`];
+    await sb.storage.from(APP_CONFIG.BUCKET_NAME).remove(toRemove);
+    delete CloudRepo._folderFilesCache[sid];
+
+    // 4. Ghi nhận vào danh sách đã xóa trên Cloud (_deleted_vessels.json) để ePort không tự kéo lại sau khi F5
+    await CloudRepo.markVesselDeleted(sid);
+
+    // 5. Xóa khỏi dropdown & nạp lại danh sách thực tế từ CSDL (tuyệt đối không tự tạo lại KUO LUNG!)
+    state.sessionId = '';
     const sel = document.getElementById('vesselSelect');
     const opt = Array.from(sel.options).find(o => o.value === sid);
     if (opt) opt.remove();
-    if (sel.options.length === 0) {
-      const fallbackOpt = document.createElement('option');
-      fallbackOpt.value = 'KUO_LUNG_1009S';
-      fallbackOpt.textContent = 'KUO LUNG (1009S) - TV3';
-      sel.appendChild(fallbackOpt);
-    }
-    alert(`✓ Đã xóa tàu [ ${sid} ] khỏi Supabase và dừng Bot OM!`);
+
+    alert(`✓ Đã xóa HẲN tàu [ ${sid} ] trên CSDL Supabase và dừng Bot OM!`);
     await syncAllCloudData();
   } catch (err) {
-    alert('Lỗi khi xóa tàu: ' + err.message);
+    alert('❌ Lỗi khi xóa tàu: ' + err.message);
   }
 }
 
