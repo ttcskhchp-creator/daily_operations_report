@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🚢</text></svg>">
-<title>Điều phối gọi hàng - Cảng Hải Phòng · Tân Vũ</title>
+<title>TOS Dispatch & Crane Pilot - Cảng Hải Phòng · Tân Vũ</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <style>
@@ -2203,6 +2203,74 @@ button.primary{background:var(--cyan);border-color:var(--cyan);}
   :root[data-view="pc"] .vessel-select-box select{min-width:150px;}
 }
 
+/* =====================  v38: ĐỒNG BỘ MÀU, THẺ TRƯỢT, THẺ BOT  ===================== */
+/* 1) mọi khung chức năng cùng một nền / viền / đầu khung — không còn viền xanh-tím-lục lẫn lộn */
+.panel,.panel[style*="border-top"],.panel[style*="border-left"],#tab-setup .panel[style*="border-left"]{
+  background:rgba(255,255,255,.95) !important;border:1px solid var(--line) !important;border-radius:var(--radius);box-shadow:var(--shadow);}
+:root[data-theme="dark"] .panel,:root[data-theme="dark"] .panel[style*="border-top"],:root[data-theme="dark"] .panel[style*="border-left"]{
+  background:rgba(15,34,56,.96) !important;}
+.panel-head,#tab-setup .panel-head{background:var(--tint) !important;border-bottom:1px solid var(--line);}
+.panel-head h3{color:var(--navy);}
+.zone-intro,#tab-setup .setup-welcome-card{background:rgba(255,255,255,.95);}
+.cockpit-card,.cockpit-card.c-need,.cockpit-card.c-area,.cockpit-card.c-remain{background:rgba(255,255,255,.95);border:1px solid var(--line);border-top:1px solid var(--line);}
+.cockpit-card.c-alert{border-top:3px solid var(--red);}
+.callable-box,.kpi-card{background:#f6faff;}
+:root[data-theme="dark"] .callable-box,:root[data-theme="dark"] .kpi-card{background:#12304f;}
+.kpi-card{border-top:1px solid var(--line);border-left:4px solid var(--cyan);}
+.kpi-strip{padding-top:10px;}
+/* 2) nút: bớt đậm-nhạt lẫn lộn — chỉ 1 nút chính/khối, còn lại viền mảnh nền trắng */
+button.primary,.topbar-btn-group button.primary{background:var(--cyan) !important;border-color:var(--cyan) !important;color:#fff;box-shadow:none;}
+.advisory-ticker-bar .ticker-inbox-btn{box-shadow:none !important;animation:none !important;outline:0 !important;border:0 !important;}
+.advisory-ticker-bar .ticker-inbox-btn *{animation:none !important;}
+.advisory-ticker-bar{box-shadow:none;}
+#tab-setup .step1-guard-title{color:#9a5b00;}
+#tab-setup .step1-guard{border-width:1px;}
+.kpi-card strong{color:var(--navy);}
+:root[data-theme="dark"] .kpi-card strong{color:#e4edf7;}
+
+/* 3) thanh chọn nhóm TRƯỢT NGANG — nhìn là biết bấm / vuốt được */
+.sub-pill-bar{background:transparent !important;border:0 !important;border-radius:0;padding:2px 2px 8px;gap:8px;width:auto;margin:0 0 4px;
+  position:relative;scroll-snap-type:x proximity;}
+.sub-pill{background:#fff;border:1px solid #9fc0e0 !important;color:var(--navy);font-weight:800;min-height:34px;padding:6px 15px;border-radius:999px;
+  box-shadow:0 2px 0 rgba(26,111,196,.18);scroll-snap-align:start;}
+:root[data-theme="dark"] .sub-pill{background:#12304f;color:#dbeafe;border-color:#2c4a6b !important;}
+.sub-pill.active{background:var(--cyan) !important;color:#fff !important;border-color:var(--cyan) !important;box-shadow:0 2px 0 rgba(11,58,120,.35);}
+.swipe-hint{display:none;font-size:10.5px;font-weight:700;color:var(--cyan);margin:2px 4px 0;align-items:center;gap:6px;}
+.swipe-hint::after{content:"";flex:1;height:1px;background:linear-gradient(90deg,#9fc0e0,transparent);}
+:root[data-view="mobile"] .swipe-hint{display:flex;}
+:root[data-view="mobile"] .sub-pill-bar{-webkit-mask-image:linear-gradient(90deg,#000 90%,transparent);mask-image:linear-gradient(90deg,#000 90%,transparent);padding-right:26px;}
+
+/* 4) THẺ BOT — sinh động */
+.bot-card{overflow:hidden;}
+.bot-hero{position:relative;display:flex;align-items:center;gap:12px;padding:12px 14px;color:#fff;
+  background:linear-gradient(110deg,#0b3a78 0%,#1a6fc4 62%,#2aa7e6 100%);}
+.bot-hero::before,.bot-hero::after{content:"";position:absolute;border-radius:50%;background:rgba(255,255,255,.10);pointer-events:none;}
+.bot-hero::before{width:120px;height:120px;right:-30px;top:-55px;}
+.bot-hero::after{width:70px;height:70px;right:70px;bottom:-40px;}
+.bot-avatar{position:relative;flex:0 0 auto;width:44px;height:44px;border-radius:14px;background:rgba(255,255,255,.95);
+  display:flex;align-items:center;justify-content:center;font-size:25px;box-shadow:0 3px 10px rgba(0,0,0,.2);}
+.bot-pulse{position:absolute;right:-3px;top:-3px;width:12px;height:12px;border-radius:50%;background:#9fb4c9;border:2px solid #fff;}
+.bot-card[data-state="running"] .bot-pulse{background:#22c55e;animation:botPulse 1.4s infinite;}
+.bot-card[data-state="done"] .bot-pulse{background:#22c55e;}
+.bot-card[data-state="error"] .bot-pulse{background:#ef4444;}
+@keyframes botPulse{0%{box-shadow:0 0 0 0 rgba(34,197,94,.7)}100%{box-shadow:0 0 0 10px rgba(34,197,94,0)}}
+.bot-hero-text{flex:1;min-width:0;position:relative;z-index:1;}
+.bot-title{font-size:14px;font-weight:900;letter-spacing:.2px;}
+.bot-sub{font-size:11px;opacity:.88;margin-top:1px;}
+.bot-hero .badge{position:relative;z-index:1;background:rgba(255,255,255,.95) !important;color:var(--navy) !important;font-size:11px;padding:3px 10px;}
+.bot-progress{height:5px;background:var(--tint);}
+.bot-progress-bar{height:100%;width:0;background:linear-gradient(90deg,#2aa7e6,#22c55e);transition:width .6s ease;}
+.bot-card[data-state="running"] .bot-progress-bar{background-size:200% 100%;animation:botFlow 1.8s linear infinite;
+  background-image:linear-gradient(90deg,#2aa7e6,#7dd3fc,#2aa7e6);}
+@keyframes botFlow{to{background-position:-200% 0}}
+.bot-body{padding:11px 14px 12px;}
+#botLiveSummaryText{font-size:12px;line-height:1.55;background:var(--tint);border-radius:10px;padding:8px 11px;color:var(--ink) !important;}
+.bot-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;}
+.bot-actions button{min-height:34px;font-size:12px;}
+.bot-actions button:not(.primary):not(.danger){background:#fff;color:var(--navy);border:1px solid #9fc0e0;}
+:root[data-view="mobile"] .bot-actions button{flex:1 1 140px;}
+:root[data-view="mobile"] .bot-sub{display:none;}
+
 </style>
 </head>
 <body>
@@ -2277,7 +2345,7 @@ button.primary{background:var(--cyan);border-color:var(--cyan);}
   <div class="brand-wrap">
     <span class="chp-logo" role="img" aria-label="Cảng Hải Phòng"></span>
     <div>
-      <div class="brand-title">OPERATIONS &amp; CUSTOMER SERVICE CENTER</div>
+      <div class="brand-title">TOS DISPATCH &amp; CRANE PILOT</div>
       <div class="brand-sub">Cảng Tân Vũ · Gọi hàng · Chia hầm · Cân bằng cẩu</div>
     </div>
   </div>
@@ -2544,6 +2612,7 @@ button.primary{background:var(--cyan);border-color:var(--cyan);}
       </div>
     </div>
 
+    <div class="swipe-hint">↔ Vuốt ngang để xem thêm nhóm · bấm để chuyển</div>
     <div class="sub-pill-bar" id="detailSubPillBar">
       <button class="sub-pill active" data-sub="ALL" onclick="switchDetailSub('ALL')">✨ Tất cả</button>
       <button class="sub-pill" data-sub="callable" onclick="switchDetailSub('callable')">🎯 Lọc Cont (POD · Tấn)</button>
@@ -2878,6 +2947,7 @@ button.primary{background:var(--cyan);border-color:var(--cyan);}
       </div>
     </div>
 
+    <div class="swipe-hint">↔ Vuốt ngang để xem thêm nhóm · bấm để chuyển</div>
     <div class="sub-pill-bar" id="setupSubPillBar">
       <button class="sub-pill active" data-sub="ALL" onclick="switchSetupSub('ALL')">✨ Tất cả Cài đặt</button>
       <button class="sub-pill" data-sub="upload" onclick="switchSetupSub('upload')">📂 Nạp File & Bot OM</button>
@@ -2887,21 +2957,24 @@ button.primary{background:var(--cyan);border-color:var(--cyan);}
 
     <div class="setup-sub-sec" data-setup-sec="upload">
       
-    <!-- BẢNG ĐIỀU KHIỂN NHANH BOT OM WINDOWS -->
-    <div class="panel" style="border-left:4px solid var(--cyan);">
-      <div class="panel-head">
-        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
-          <h3>🤖 Bot Tự động PL-TOS (Operation Management Windows · Reload F5 mỗi 5 phút)</h3>
-          <span class="badge" id="botLiveBadge">IDLE</span>
+    <!-- THẺ BOT OM -->
+    <div class="panel bot-card" id="botCard" data-state="idle">
+      <div class="bot-hero">
+        <div class="bot-avatar">🤖<span class="bot-pulse"></span></div>
+        <div class="bot-hero-text">
+          <div class="bot-title">Bot tự động PL-TOS</div>
+          <div class="bot-sub">Operation Management · tự F5 mỗi 5 phút · đẩy dữ liệu lên Cloud</div>
         </div>
-        <div style="display:flex;gap:6px;flex-wrap:wrap;">
-          <button class="primary sm" onclick="openBotControlModal()">🚀 Nhập TK/MK & Khởi động Bot</button>
-          <button class="danger sm" id="btnQuickStopBot" style="display:none;" onclick="stopRemoteBot()">🛑 Dừng Bot</button>
-          <button class="sm" onclick="refreshBotCommandStatus(true)">🔄 Kiểm tra Bot</button>
-        </div>
+        <span class="badge" id="botLiveBadge">IDLE</span>
       </div>
-      <div class="panel-body" style="padding:9px 13px;font-size:12px;">
-        <div id="botLiveSummaryText" style="color:var(--muted);">Chưa khởi động Bot cho tàu này. Bấm <b>"Nhập TK/MK & Khởi động Bot"</b> để máy Windows tự mở PL-TOS, đăng nhập, bấm F5 và đẩy dữ liệu lên Cloud mỗi 5 phút.</div>
+      <div class="bot-progress"><div class="bot-progress-bar" id="botProgressBar"></div></div>
+      <div class="bot-body">
+        <div id="botLiveSummaryText">Chưa khởi động Bot cho tàu này. Bấm <b>"Nhập TK/MK &amp; Khởi động Bot"</b> để máy Windows tự mở PL-TOS, đăng nhập, bấm F5 và đẩy dữ liệu lên Cloud mỗi 5 phút.</div>
+        <div class="bot-actions">
+          <button class="primary" onclick="openBotControlModal()">🚀 Nhập TK/MK &amp; Khởi động Bot</button>
+          <button onclick="refreshBotCommandStatus(true)">🔄 Kiểm tra Bot</button>
+          <button class="danger" id="btnQuickStopBot" style="display:none;" onclick="stopRemoteBot()">🛑 Dừng Bot</button>
+        </div>
       </div>
     </div>
 
@@ -2915,7 +2988,6 @@ button.primary{background:var(--cyan);border-color:var(--cyan);}
       </div>
       <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
         <button id="btnConfirmVesselLock" class="warning" onclick="toggleVesselUploadConfirm()">🔒 Xác nhận đúng tàu này để mở nạp file</button>
-        <button onclick="openBotSchemaModal()">🤖 Chuẩn JSON cho Bot OM</button>
       </div>
     </div>
 
@@ -3137,6 +3209,7 @@ button.primary{background:var(--cyan);border-color:var(--cyan);}
     <div class="ft-text">
       <b>CẢNG HẢI PHÒNG · PORT OF HAI PHONG</b>
       <span>Since 1874</span>
+      <span>TOS Dispatch &amp; Crane Pilot · Cảng Tân Vũ</span>
     </div>
   </div>
   <div class="ft-stripes"></div>
@@ -14144,6 +14217,32 @@ window.addEventListener('DOMContentLoaded', () => {
     if (AdminPinGuard.isUnlocked()) refreshBotCommandStatus(false);
   }, 15000);
 });
+</script>
+<script>
+(function(){
+  function sync(){
+    try{
+      var card=document.getElementById('botCard'); if(!card) return;
+      var b=(document.getElementById('botLiveBadge')||{}).textContent||'';
+      var t=(document.getElementById('botLiveSummaryText')||{}).textContent||'';
+      var st='idle';
+      if(/ERROR|FAIL/i.test(b)) st='error';
+      else if(/COMPLETED|DONE/i.test(b)) st='done';
+      else if(/START|RUNNING/i.test(b)) st='running';
+      card.setAttribute('data-state',st);
+      var m=t.match(/(\d{1,3})\s*%/), bar=document.getElementById('botProgressBar');
+      if(bar) bar.style.width=(st==='done'?100:(m?Math.min(100,+m[1]):(st==='running'?8:0)))+'%';
+    }catch(e){}
+  }
+  function init(){
+    sync();
+    ['botLiveBadge','botLiveSummaryText'].forEach(function(id){
+      var el=document.getElementById(id); if(!el) return;
+      new MutationObserver(sync).observe(el,{childList:true,characterData:true,subtree:true,attributes:true});
+    });
+  }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',init); else init();
+})();
 </script>
 </body>
 </html>
