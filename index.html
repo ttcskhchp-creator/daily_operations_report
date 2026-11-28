@@ -2270,6 +2270,51 @@ button.primary,.topbar-btn-group button.primary{background:var(--cyan) !importan
 .bot-actions button:not(.primary):not(.danger){background:#fff;color:var(--navy);border:1px solid #9fc0e0;}
 :root[data-view="mobile"] .bot-actions button{flex:1 1 140px;}
 :root[data-view="mobile"] .bot-sub{display:none;}
+/* =====================  v39: KHUNG ĐẬM THEO LOẠI · MÀU THỐNG NHẤT · THẺ HẾT VIỆC XÁM ĐI  ===================== */
+:root{--c-cargo:#e07b12;--c-equip:#1a6fc4;--c-vessel:#7c4dcc;--frame:#9fc0e0;}
+:root[data-theme="dark"]{--c-cargo:#f59a3d;--c-equip:#4aaaf0;--c-vessel:#a98bf0;--frame:#2f5176;}
+.panel,.zone-intro{border:2px solid var(--frame) !important;}
+.panel[data-cat="cargo"]{--cat:var(--c-cargo);}
+.panel[data-cat="equip"]{--cat:var(--c-equip);}
+.panel[data-cat="vessel"]{--cat:var(--c-vessel);}
+.panel[data-cat]{border:2px solid var(--cat) !important;margin-bottom:16px;
+  box-shadow:0 3px 0 color-mix(in srgb,var(--cat) 25%,transparent),var(--shadow);}
+.panel[data-cat]>.panel-head{background:color-mix(in srgb,var(--cat) 11%,#fff) !important;border-bottom:2px solid color-mix(in srgb,var(--cat) 35%,#fff);}
+:root[data-theme="dark"] .panel[data-cat]>.panel-head{background:color-mix(in srgb,var(--cat) 18%,#0f2238) !important;border-bottom-color:color-mix(in srgb,var(--cat) 40%,#0f2238);}
+.panel[data-cat]>.panel-head h3::before{content:"";display:inline-block;width:10px;height:10px;border-radius:50%;background:var(--cat);margin-right:7px;}
+.cockpit-card{border:2px solid var(--c-cargo) !important;--cat:var(--c-cargo);}
+.cockpit-card.c-alert{border-color:var(--red) !important;--cat:var(--red);}
+.cockpit-card .cockpit-title>span:first-child::before{content:"";display:inline-block;width:9px;height:9px;border-radius:50%;background:var(--cat);margin-right:6px;}
+.ops-tri-grid .ops-sub-box{border:2px solid var(--frame);border-radius:10px;padding:9px;background:rgba(255,255,255,.9);}
+.ops-tri-grid .ops-sub-box:nth-child(1){border-color:var(--c-cargo);}
+.ops-tri-grid .ops-sub-box:nth-child(2){border-color:var(--c-vessel);}
+.ops-tri-grid .ops-sub-box:nth-child(3){border-color:var(--c-equip);}
+.ops-tri-grid .ops-sub-box:nth-child(1) .fleet-row-card{border-left-color:var(--c-cargo);}
+.ops-tri-grid .ops-sub-box:nth-child(2) .fleet-row-card{border-left-color:var(--c-vessel);}
+.ops-tri-grid .ops-sub-box:nth-child(3) .fleet-row-card{border-left-color:var(--c-equip);}
+.ops-tri-grid .fleet-row-card.urgent{border-left-color:var(--red) !important;}
+:root[data-theme="dark"] .ops-tri-grid .ops-sub-box{background:rgba(15,34,56,.9);}
+/* bảng màu thông báo: cam = HÀNG · xanh dương = THIẾT BỊ · tím = TÀU/HẦM · đỏ = cần xử lý · xanh lá = ổn/xong */
+.badge.amber{background:#fdeedb;color:#b45f06;}
+.badge.purple{background:#efe8fb;color:#6a3fc0;}
+:root[data-theme="dark"] .badge.amber{background:#3a2a12;color:#f5b062;}
+:root[data-theme="dark"] .badge.purple{background:#2a2147;color:#c4b0f7;}
+.cat-legend{display:flex;flex-wrap:wrap;gap:3px 14px;font-size:10.5px;font-weight:750;color:var(--muted);padding:0 4px 9px;}
+.cat-legend i{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:4px;vertical-align:-1px;}
+.lower-zone{margin-top:8px;padding-top:12px;border-top:2px dashed var(--frame);}
+.lower-zone-title{font-size:11px;font-weight:850;color:var(--muted);letter-spacing:.3px;margin:0 2px 9px;}
+#vesselAttitudeBar{border:2px solid var(--c-vessel) !important;border-radius:var(--radius);background:rgba(255,255,255,.95);
+  padding:6px 10px !important;gap:6px 12px !important;margin:0 0 14px !important;width:auto !important;height:auto !important;min-height:0 !important;display:flex;flex-wrap:wrap;align-items:center;}
+#vesselAttitudeBar .attitude-group{gap:4px !important;flex-wrap:wrap;}
+#vesselAttitudeBar .att-btn{min-height:24px !important;padding:2px 8px !important;font-size:10.5px !important;border-radius:7px;}
+#vesselAttitudeBar span{font-size:10.5px !important;}
+#vesselAttitudeBar .primary.sm{display:none;}
+:root[data-theme="dark"] #vesselAttitudeBar{background:rgba(15,34,56,.95);}
+/* THẺ HẾT VIỆC — tự xám đi */
+.is-dead{filter:grayscale(1);opacity:.55;position:relative;transition:opacity .3s,filter .3s;}
+.is-dead.dead-tag::after{content:"HẾT VIỆC";position:absolute;top:6px;right:8px;font-size:9px;font-weight:850;letter-spacing:.6px;
+  color:#5b6470;background:#e3e6ea;padding:1px 8px;border-radius:999px;z-index:2;}
+.is-dead:hover{opacity:.85;filter:grayscale(.4);}
 
 </style>
 </head>
@@ -2451,6 +2496,15 @@ button.primary,.topbar-btn-group button.primary{background:var(--cyan) !importan
       <button class="danger" onclick="jumpToMandatoryEdiUpload()">📂 Nạp file EDI / ASC ngay</button>
     </div>
     
+    <div class="cat-legend" aria-label="Chú giải màu">
+      <span><i style="background:var(--c-cargo)"></i>Cam: Hàng · Bãi</span>
+      <span><i style="background:var(--c-equip)"></i>Xanh dương: Thiết bị · Cẩu</span>
+      <span><i style="background:var(--c-vessel)"></i>Tím: Tàu · Hầm</span>
+      <span><i style="background:var(--red)"></i>Đỏ: Cần xử lý</span>
+      <span><i style="background:var(--green)"></i>Xanh lá: Ổn · Xong</span>
+      <span><i style="background:#9aa3ad"></i>Xám: Hết việc</span>
+    </div>
+
     <!-- BẢNG ĐIỀU HÀNH NHANH 4 TRỌNG TÂM (TỐI ƯU ĐT/MTB & TÓM TẮT PC: CHỖ KHÔNG ỔN · CẦN HÀNG GÌ NHẤT · KHU VỰC · CÒN BAO NHIÊU) -->
     <div class="ops-cockpit" id="mobileOpsCockpit">
       <div class="cockpit-card c-alert">
@@ -2485,7 +2539,55 @@ button.primary,.topbar-btn-group button.primary{background:var(--cyan) !importan
 
     
     <!-- THẺ DÀI NGANG TOÀN MÀN HÌNH: MÔ PHỎNG HÌNH CON TÀU, HƯỚNG CẬP MẠN & TIẾN ĐỘ THIẾT BỊ DỌC RAY CẦU TÀU -->
-    <div class="panel ship-rail-panel" id="panel-ship-rail">
+    <div class="panel" data-cat="cargo" id="panel-smart-dispatch">
+      <div class="panel-head">
+        <h3>🎯 Khuyến nghị Gọi hàng Thông minh theo Thiết bị</h3>
+        <div style="display:flex;gap:7px;flex-wrap:wrap;align-items:center;">
+          <select id="podStrategy" onchange="renderDispatchRecommendations()">
+            <option value="FEWEST_FIRST">POD: Ưu tiên cảng ít trước</option>
+            <option value="ROUND_ROBIN">POD: Xếp san đều các cảng</option>
+            <option value="MOST_FIRST">POD: Ưu tiên cảng nhiều trước</option>
+          </select>
+          <select id="weightStrategy" onchange="renderDispatchRecommendations()">
+            <option value="HEAVY_FIRST">Tấn: Tấn to xếp trước</option>
+            <option value="LIGHT_FIRST">Tấn: Tấn nhẹ xếp trước</option>
+          </select>
+          <select id="yardFilter" onchange="renderDispatchRecommendations()">
+            <option value="ALL">Bãi: Trộn tự động (Gọi sớm bãi ngoài)</option>
+            <option value="OFF_DOCK_ONLY">Bãi: Chỉ gọi Bãi ngoài (GFW, HHH, SA...)</option>
+            <option value="TV_ONLY">Bãi: Chỉ gọi nội bộ Tân Vũ (TV)</option>
+          </select>
+          <button class="panel-collapse-btn" onclick="togglePanelCollapse('panel-smart-dispatch', this)">▼ Thu gọn</button>
+        </div>
+      </div>
+      <div class="panel-body">
+        <div style="margin-bottom:10px;padding:9px 11px;border-radius:8px;border:1px solid var(--line);background:rgba(2,132,199,0.05);">
+          <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;">
+            <strong style="font-size:12px;">🧭 Khuyến nghị Chuẩn bị Xuất Hầm trước & Gọi Bãi theo Quãng đường / Cao điểm giao thông</strong>
+            <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">
+              <span class="badge" id="trafficStatusBadge">🟢 Thông thoáng</span>
+              <button class="sm" onclick="switchTab('tab-cranes')">⚙️ Sửa Bãi ngoài & Giờ cao điểm</button>
+            </div>
+          </div>
+          <div class="prep-rec-strip" id="exportPrepAdvisoryStrip"></div>
+          <div style="margin-top:10px;padding-top:9px;border-top:1px dashed var(--line);">
+            <div style="display:flex;justify-content:space-between;align-items:center;gap:6px;flex-wrap:wrap;">
+              <strong style="font-size:12px;">🛡️ Chống dừng Máng & Khép Nắp Hầm (Cont còn ít ở Bãi ngoài cần làm đầy dưới hầm)</strong>
+              <span class="badge" id="hatchWatchSummaryBadge">Đang tính toán...</span>
+            </div>
+            <div style="font-size:11px;color:var(--muted);margin-top:2px;">
+              So sánh <b>thời gian máng làm tới điểm đóng nắp hầm</b> (theo năng suất cẩu mv/h) với <b>thời gian trung bình cont bãi ngoài được xếp trong ca</b> để báo gọi sớm, không để cẩu chờ nắp hầm.
+            </div>
+            <div class="hatch-watch-grid" id="hatchCoverWatchGrid"></div>
+          </div>
+        </div>
+        <div class="grid-3" id="craneDispatchColumns"></div>
+      </div>
+    </div>
+
+      <div class="lower-zone">
+      <div class="lower-zone-title">🚢 MÔ PHỎNG &amp; TRẠNG THÁI TÀU · tham khảo</div>
+    <div class="panel ship-rail-panel" data-cat="vessel" id="panel-ship-rail">
       <div class="panel-head">
         <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
           <h3>🚢 Mô phỏng Cầu tàu, Hướng cập Mạn & Tiến độ Thiết bị dọc Ray (Thượng lưu ➔ Hạ lưu / Cửa biển)</h3>
@@ -2555,52 +2657,7 @@ button.primary,.topbar-btn-group button.primary{background:var(--cyan) !importan
     </div>
 
     
-    <div class="panel" id="panel-smart-dispatch">
-      <div class="panel-head">
-        <h3>🎯 Khuyến nghị Gọi hàng Thông minh theo Thiết bị</h3>
-        <div style="display:flex;gap:7px;flex-wrap:wrap;align-items:center;">
-          <select id="podStrategy" onchange="renderDispatchRecommendations()">
-            <option value="FEWEST_FIRST">POD: Ưu tiên cảng ít trước</option>
-            <option value="ROUND_ROBIN">POD: Xếp san đều các cảng</option>
-            <option value="MOST_FIRST">POD: Ưu tiên cảng nhiều trước</option>
-          </select>
-          <select id="weightStrategy" onchange="renderDispatchRecommendations()">
-            <option value="HEAVY_FIRST">Tấn: Tấn to xếp trước</option>
-            <option value="LIGHT_FIRST">Tấn: Tấn nhẹ xếp trước</option>
-          </select>
-          <select id="yardFilter" onchange="renderDispatchRecommendations()">
-            <option value="ALL">Bãi: Trộn tự động (Gọi sớm bãi ngoài)</option>
-            <option value="OFF_DOCK_ONLY">Bãi: Chỉ gọi Bãi ngoài (GFW, HHH, SA...)</option>
-            <option value="TV_ONLY">Bãi: Chỉ gọi nội bộ Tân Vũ (TV)</option>
-          </select>
-          <button class="panel-collapse-btn" onclick="togglePanelCollapse('panel-smart-dispatch', this)">▼ Thu gọn</button>
-        </div>
-      </div>
-      <div class="panel-body">
-        <div style="margin-bottom:10px;padding:9px 11px;border-radius:8px;border:1px solid var(--line);background:rgba(2,132,199,0.05);">
-          <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;">
-            <strong style="font-size:12px;">🧭 Khuyến nghị Chuẩn bị Xuất Hầm trước & Gọi Bãi theo Quãng đường / Cao điểm giao thông</strong>
-            <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">
-              <span class="badge" id="trafficStatusBadge">🟢 Thông thoáng</span>
-              <button class="sm" onclick="switchTab('tab-cranes')">⚙️ Sửa Bãi ngoài & Giờ cao điểm</button>
-            </div>
-          </div>
-          <div class="prep-rec-strip" id="exportPrepAdvisoryStrip"></div>
-          <div style="margin-top:10px;padding-top:9px;border-top:1px dashed var(--line);">
-            <div style="display:flex;justify-content:space-between;align-items:center;gap:6px;flex-wrap:wrap;">
-              <strong style="font-size:12px;">🛡️ Chống dừng Máng & Khép Nắp Hầm (Cont còn ít ở Bãi ngoài cần làm đầy dưới hầm)</strong>
-              <span class="badge" id="hatchWatchSummaryBadge">Đang tính toán...</span>
-            </div>
-            <div style="font-size:11px;color:var(--muted);margin-top:2px;">
-              So sánh <b>thời gian máng làm tới điểm đóng nắp hầm</b> (theo năng suất cẩu mv/h) với <b>thời gian trung bình cont bãi ngoài được xếp trong ca</b> để báo gọi sớm, không để cẩu chờ nắp hầm.
-            </div>
-            <div class="hatch-watch-grid" id="hatchCoverWatchGrid"></div>
-          </div>
-        </div>
-        <div class="grid-3" id="craneDispatchColumns"></div>
-      </div>
     </div>
-
   </div>
 
   <!-- ==================== KHU VỰC 2: CHỨC NĂNG CHI TIẾT ==================== -->
@@ -2623,7 +2680,7 @@ button.primary,.topbar-btn-group button.primary{background:var(--cyan) !importan
 
     <div class="detail-sub-sec" data-detail-sec="callable">
       <!-- THẺ TÓM TẮT HÀNG CÓ THỂ GỌI (THEO CẢNG POD · DẢI TẤN · LOẠI HÀNG ĐẶC BIỆT RF/DG/OOG/OT) -->
-    <div class="panel" id="panel-callable-cargo" style="border-top:3px solid var(--green);">
+    <div class="panel" data-cat="cargo" id="panel-callable-cargo">
       <div class="panel-head">
         <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
           <h3>📦 Tóm tắt Hàng có thể gọi (POD · Dải tấn · RF / DG / OOG / OT) <button type="button" class="help-q-btn" onclick="openHelpPopup('callable')" title="Hướng dẫn lọc POD & Dải tấn">?</button></h3>
@@ -2706,7 +2763,7 @@ button.primary,.topbar-btn-group button.primary{background:var(--cyan) !importan
     </div>
 
     <div class="detail-sub-sec" data-detail-sec="cranes">
-      <div class="panel" id="panel-crane-hourly">
+      <div class="panel" data-cat="equip" id="panel-crane-hourly">
         <div class="panel-head">
           <h3>📊 Sản lượng Cẩu theo Khung giờ <button type="button" class="help-q-btn" onclick="openHelpPopup('cranes')" title="Cơ chế tính năng suất Cẩu & Cắt cẩu">?</button></h3>
           <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">
@@ -2747,7 +2804,7 @@ button.primary,.topbar-btn-group button.primary{background:var(--cyan) !importan
     </div>
 
     <div class="detail-sub-sec" data-detail-sec="yards">
-      <div class="panel" id="panel-yard-recon">
+      <div class="panel" data-cat="cargo" id="panel-yard-recon">
         <div class="panel-head">
           <h3>🚛 Đối chiếu Vị trí Bãi (TV vs Bãi ngoài) & Job OM <button type="button" class="help-q-btn" onclick="openHelpPopup('yards')" title="Hướng dẫn đẩy file vị trí đảo chuyển & bãi ngoài">?</button></h3>
           <div style="display:flex;gap:5px;align-items:center;flex-wrap:wrap;">
@@ -2783,7 +2840,7 @@ button.primary,.topbar-btn-group button.primary{background:var(--cyan) !importan
       </div>
 
       <!-- CÂN ĐỐI XE BÃI NGOÀI (ƯU TIÊN HÀNG TV) · GIỮ CONT TV ĐÓNG HẦM · TẦM VỚI TK/QC (>=11 ROW) & DI CHUYỂN QC 10-15P -->
-    <div class="panel" id="panel-fleet-qc-balance" style="border-top:3px solid var(--purple);">
+    <div class="panel" data-cat="cargo" id="panel-fleet-qc-balance">
       <div class="panel-head">
         <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
           <h3>⚖️ Cân đối Xe Bãi ngoài (Ưu tiên TV) · 🔒 Giữ Cont TV đóng hầm · 🏗️ Định mức chuyển hầm QC (10–15p)</h3>
@@ -2826,7 +2883,7 @@ button.primary,.topbar-btn-group button.primary{background:var(--cyan) !importan
     <div class="detail-sub-sec" data-detail-sec="holds">
 
     <!-- PANEL MÔ PHỎNG HẦM HÀNG 3D TRỰC QUAN -->
-    <div class="panel hold3d-panel" id="panel-hold-3d">
+    <div class="panel hold3d-panel" data-cat="vessel" id="panel-hold-3d">
       <div class="panel-head">
         <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
           <h3>🧊 Mô phỏng Hầm hàng 3D Trực quan (ASC · Đã xếp · Nhập · ROB để lại) <button type="button" class="help-q-btn" onclick="openHelpPopup('hold3d')" title="Hướng dẫn cấu trúc Hầm 3D">?</button></h3>
@@ -2893,7 +2950,7 @@ button.primary,.topbar-btn-group button.primary{background:var(--cyan) !importan
     </div>
 
     <div class="panel">
-      <div class="panel-head">
+      <div class="panel-head" data-cat="vessel">
         <h3>🚢 Cấu trúc Hầm hàng Động (<span id="holdCountBadge" style="color:var(--cyan);">0 Hầm</span>) & Tiến độ Dỡ/Xếp</h3>
         <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;">
           <label style="font-size:11.5px;display:inline-flex;align-items:center;gap:4px;">
@@ -2916,7 +2973,7 @@ button.primary,.topbar-btn-group button.primary{background:var(--cyan) !importan
     </div>
 
     <div class="panel">
-      <div class="panel-head">
+      <div class="panel-head" data-cat="cargo">
         <h3>🔁 Gọi hàng Đuổi theo ASC & Thay thế (Dung sai 3–5 tấn) <button type="button" class="help-q-btn" onclick="openHelpPopup('chase')" title="Hướng dẫn & Cơ chế">?</button></h3>
         <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
           <select id="chaseHoldFilter" onchange="renderRollingChaseByHold()">
@@ -14241,6 +14298,29 @@ window.addEventListener('DOMContentLoaded', () => {
       new MutationObserver(sync).observe(el,{childList:true,characterData:true,subtree:true,attributes:true});
     });
   }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',init); else init();
+})();
+</script>
+<script>
+(function(){
+  var t;
+  function txt(e){return (e.textContent||'').replace(/\s+/g,' ');}
+  function mark(sel,test,tag){
+    document.querySelectorAll(sel).forEach(function(e){
+      var d=false; try{d=test(txt(e),e);}catch(x){}
+      e.classList.toggle('is-dead',d);
+      if(tag) e.classList.toggle('dead-tag',d);
+    });
+  }
+  function run(){
+    mark('#craneDispatchColumns > .panel',function(s){return /Hết cont sẵn sàng B/.test(s);},true);
+    mark('.rail-crane-node',function(s){return /Đã xong hầm phụ trách|Tàu đã rời cầu/.test(s);},false);
+    mark('.ship-hold-cell',function(s){return /Còn:\s*0(\D|$)/.test(s) && /100%/.test(s);},false);
+    mark('.ops-tri-grid .ops-sub-box',function(s){return /Không có container bãi ngoài còn tồn/.test(s) || /HẾT VỊ TRÍ DƯỚI HẦM/.test(s);},true);
+    mark('.callable-box',function(s){return /(^|\D)0 (Cont|cont)/.test(s) && !/[1-9]\d* (Cont|cont)/.test(s);},true);
+  }
+  function sched(){clearTimeout(t);t=setTimeout(run,300);}
+  function init(){run();new MutationObserver(sched).observe(document.body,{childList:true,subtree:true,characterData:true});}
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',init); else init();
 })();
 </script>
