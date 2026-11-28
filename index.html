@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🚢</text></svg>">
-<title>TOS Dispatch & Crane Pilot - Cảng Hải Phòng · Tân Vũ</title>
+<title>Điều độ Hàng Container Xuất - Cảng Hải Phòng</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <style>
@@ -1589,6 +1589,20 @@ pre.schema-box {
   background: var(--cyan);
   border-color: var(--cyan);
 }
+.hold3d-cam-bar button.cam-tool-active {
+  background: var(--cyan);
+  border-color: #ffffff;
+  color: #ffffff;
+  box-shadow: 0 0 0 1.5px rgba(56, 189, 248, 0.45);
+}
+.hold3d-cam-bar .cam-sep {
+  width: 1px;
+  background: rgba(255,255,255,0.28);
+  margin: 2px 1px;
+}
+.hold3d-canvas.mode-pan {
+  cursor: move;
+}
 .hold3d-hint {
   position: absolute;
   bottom: 8px;
@@ -2040,9 +2054,9 @@ body{font-size:13px;position:relative;}
   padding:7px 16px;gap:8px 14px;flex-wrap:nowrap;max-width:1760px;margin:auto;}
 .brand-wrap{gap:10px;flex:0 1 auto;}
 .brand-wrap .chp-logo{height:46px;}
-.brand-title{font-size:14px;font-weight:900;color:var(--navy);letter-spacing:.2px;line-height:1.15;}
+.brand-title{font-size:13px;font-weight:900;color:var(--navy);letter-spacing:.35px;line-height:1.18;text-transform:uppercase;}
 :root[data-theme="dark"] .brand-title{color:#fff;}
-.brand-sub{font-size:10.5px;color:var(--muted);opacity:1;}
+.brand-sub{font-size:11.5px;font-weight:800;color:var(--cyan);opacity:1;margin-top:1px;line-height:1.2;}
 .topbar-controls{flex:1 1 auto;justify-content:flex-end;gap:8px;flex-wrap:nowrap;}
 .vessel-select-box{background:var(--tint);border:1px solid var(--line);padding:2px 8px;border-radius:10px;flex:0 1 auto;}
 .vessel-select-box>span{color:var(--navy);font-weight:800;}
@@ -2171,8 +2185,8 @@ button.primary{background:var(--cyan);border-color:var(--cyan);}
 :root[data-view="mobile"] .topbar-controls{display:contents;}
 :root[data-view="mobile"] .brand-wrap{grid-column:1;grid-row:1;min-width:0;}
 :root[data-view="mobile"] .brand-wrap .chp-logo{height:38px;}
-:root[data-view="mobile"] .brand-title{font-size:12.5px;}
-:root[data-view="mobile"] .brand-sub{display:none;}
+:root[data-view="mobile"] .brand-title{font-size:10.5px;letter-spacing:.2px;line-height:1.15;}
+:root[data-view="mobile"] .brand-sub{display:block !important;font-size:10.5px;font-weight:800;color:var(--cyan);margin-top:1px;}
 :root[data-view="mobile"] .tb-mini{grid-column:2;grid-row:1;border:0;padding:0;gap:3px;}
 :root[data-view="mobile"] .tb-mini button{min-height:30px;padding:2px 7px;}
 :root[data-view="mobile"] .vessel-select-box{grid-column:1/-1;grid-row:2;width:100%;}
@@ -2199,7 +2213,8 @@ button.primary{background:var(--cyan);border-color:var(--cyan);}
 :root[data-view="pc"] .app-head .topbar{flex-wrap:nowrap;}
 :root[data-view="pc"] .topbar-btn-group{display:flex;}
 @media (max-width:1180px){
-  :root[data-view="pc"] .brand-sub{display:none;}
+  :root[data-view="pc"] .brand-title{font-size:11.5px;}
+  :root[data-view="pc"] .brand-sub{font-size:10.5px;}
   :root[data-view="pc"] .vessel-select-box select{min-width:150px;}
 }
 
@@ -2389,9 +2404,9 @@ button.primary,.topbar-btn-group button.primary{background:var(--cyan) !importan
 <header class="topbar">
   <div class="brand-wrap">
     <span class="chp-logo" role="img" aria-label="Cảng Hải Phòng"></span>
-    <div>
-      <div class="brand-title">TOS DISPATCH &amp; CRANE PILOT</div>
-      <div class="brand-sub">Cảng Tân Vũ · Gọi hàng · Chia hầm · Cân bằng cẩu</div>
+    <div style="min-width:0;">
+      <div class="brand-title">OPERATIONS &amp; CUSTOMER SERVICE CENTER</div>
+      <div class="brand-sub">Điều độ Hàng Container Xuất</div>
     </div>
   </div>
 
@@ -2930,15 +2945,18 @@ button.primary,.topbar-btn-group button.primary{background:var(--cyan) !importan
             <span class="hold3d-overlay-pill" id="inline3dOverlayTitle">HOLD 01 · 3D</span>
             <span class="hold3d-overlay-pill" id="inline3dOverlayCounts">Đã xếp: 0 · ASC: 0 · Nhập: 0 · ROB: 0</span>
           </div>
-          <div class="hold3d-hint">🖱️ Kéo để xoay 360° · Cuộn để phóng to · Bấm vào khối xem chi tiết</div>
+          <div class="hold3d-hint">🖱️ Xoay 360° · ✋ Kéo ngang/dọc (hoặc 2 ngón / chuột phải) · Cuộn phóng to</div>
           <div class="hold3d-cam-bar">
+            <button id="inline3dToolRotate" class="cam-tool-active" onclick="setHold3DDragTool('inline', 'ROTATE')" title="Chế độ kéo 1 ngón / chuột trái để xoay 360°">🔄 Xoay</button>
+            <button id="inline3dToolPan" onclick="setHold3DDragTool('inline', 'PAN')" title="Chế độ kéo 1 ngón / chuột trái để kéo ngang &amp; kéo dọc xem các Bay">✋ Kéo</button>
+            <span class="cam-sep"></span>
             <button onclick="setHold3DCameraPreset('inline', 'ISO')">🧊 3D</button>
             <button onclick="setHold3DCameraPreset('inline', 'FRONT')">📐 Mặt cắt</button>
             <button onclick="setHold3DCameraPreset('inline', 'TOP')">👁️ Trên</button>
             <button onclick="setHold3DCameraPreset('inline', 'SIDE')">↔️ Mạn</button>
-            <button onclick="zoomHold3D('inline', 1.18)">➕</button>
-            <button onclick="zoomHold3D('inline', 0.85)">➖</button>
-            <button onclick="setHold3DCameraPreset('inline', 'ISO')">↺</button>
+            <button onclick="zoomHold3D('inline', 1.2)" title="Phóng to">➕</button>
+            <button onclick="zoomHold3D('inline', 0.84)" title="Thu nhỏ">➖</button>
+            <button onclick="setHold3DCameraPreset('inline', 'ISO')" title="Đưa về góc nhìn &amp; vị trí mặc định">↺</button>
           </div>
         </div>
         <div class="hold3d-compare-wrap" id="inline3dCompareWrap"></div>
@@ -2949,8 +2967,8 @@ button.primary,.topbar-btn-group button.primary{background:var(--cyan) !importan
       </div>
     </div>
 
-    <div class="panel">
-      <div class="panel-head" data-cat="vessel">
+    <div class="panel" data-cat="vessel">
+      <div class="panel-head">
         <h3>🚢 Cấu trúc Hầm hàng Động (<span id="holdCountBadge" style="color:var(--cyan);">0 Hầm</span>) & Tiến độ Dỡ/Xếp</h3>
         <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;">
           <label style="font-size:11.5px;display:inline-flex;align-items:center;gap:4px;">
@@ -2972,8 +2990,8 @@ button.primary,.topbar-btn-group button.primary{background:var(--cyan) !importan
       </div>
     </div>
 
-    <div class="panel">
-      <div class="panel-head" data-cat="cargo">
+    <div class="panel" data-cat="cargo">
+      <div class="panel-head">
         <h3>🔁 Gọi hàng Đuổi theo ASC & Thay thế (Dung sai 3–5 tấn) <button type="button" class="help-q-btn" onclick="openHelpPopup('chase')" title="Hướng dẫn & Cơ chế">?</button></h3>
         <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
           <select id="chaseHoldFilter" onchange="renderRollingChaseByHold()">
@@ -3262,11 +3280,10 @@ button.primary,.topbar-btn-group button.primary{background:var(--cyan) !importan
 
 <footer class="app-footer">
   <div class="ft-inner">
-    <span class="chp-logo" role="img" aria-label="Port of Hai Phong"></span>
+    <span class="chp-logo" role="img" aria-label="Cảng Hải Phòng"></span>
     <div class="ft-text">
-      <b>CẢNG HẢI PHÒNG · PORT OF HAI PHONG</b>
-      <span>Since 1874</span>
-      <span>TOS Dispatch &amp; Crane Pilot · Cảng Tân Vũ</span>
+      <b>CẢNG HẢI PHÒNG · Từ năm 1874</b>
+      <span>Vận hành bởi Trung tâm Khai thác và Dịch vụ Khách hàng</span>
     </div>
   </div>
   <div class="ft-stripes"></div>
@@ -3358,15 +3375,18 @@ button.primary,.topbar-btn-group button.primary{background:var(--cyan) !importan
         <span class="hold3d-overlay-pill" id="modal3dOverlayTitle">HOLD 01 · 3D</span>
         <span class="hold3d-overlay-pill" id="modal3dOverlayCounts">Đã xếp: 0 · ASC: 0 · Nhập: 0 · ROB: 0</span>
       </div>
-      <div class="hold3d-hint">🖱️ Kéo để xoay 360° · Cuộn để phóng to · Bấm vào khối xem chi tiết</div>
+      <div class="hold3d-hint">🖱️ Xoay 360° · ✋ Kéo ngang/dọc (hoặc 2 ngón / chuột phải) · Cuộn phóng to</div>
       <div class="hold3d-cam-bar">
+        <button id="modal3dToolRotate" class="cam-tool-active" onclick="setHold3DDragTool('modal', 'ROTATE')" title="Chế độ kéo 1 ngón / chuột trái để xoay 360°">🔄 Xoay</button>
+        <button id="modal3dToolPan" onclick="setHold3DDragTool('modal', 'PAN')" title="Chế độ kéo 1 ngón / chuột trái để kéo ngang &amp; kéo dọc xem các Bay">✋ Kéo</button>
+        <span class="cam-sep"></span>
         <button onclick="setHold3DCameraPreset('modal', 'ISO')">🧊 3D</button>
         <button onclick="setHold3DCameraPreset('modal', 'FRONT')">📐 Mặt cắt</button>
         <button onclick="setHold3DCameraPreset('modal', 'TOP')">👁️ Trên</button>
         <button onclick="setHold3DCameraPreset('modal', 'SIDE')">↔️ Mạn</button>
-        <button onclick="zoomHold3D('modal', 1.18)">➕</button>
-        <button onclick="zoomHold3D('modal', 0.85)">➖</button>
-        <button onclick="setHold3DCameraPreset('modal', 'ISO')">↺</button>
+        <button onclick="zoomHold3D('modal', 1.2)" title="Phóng to">➕</button>
+        <button onclick="zoomHold3D('modal', 0.84)" title="Thu nhỏ">➖</button>
+        <button onclick="setHold3DCameraPreset('modal', 'ISO')" title="Đưa về góc nhìn &amp; vị trí mặc định">↺</button>
       </div>
     </div>
     <div class="hold3d-compare-wrap" id="modal3dCompareWrap"></div>
@@ -13182,6 +13202,7 @@ class Hold3DCanvasController {
     this.zoom = 1.0;
     this.panX = 0;
     this.panY = 0;
+    this.dragTool = 'ROTATE'; // 'ROTATE' | 'PAN'
     this.dragging = false;
     this.movedDist = 0;
     this.lastX = 0;
@@ -13189,13 +13210,59 @@ class Hold3DCanvasController {
     this.hitPolys = [];
     this.model = null;
     this.bindEvents();
+    this.syncDragToolUI();
+  }
+
+  clampPan() {
+    const rect = this.stage ? this.stage.getBoundingClientRect() : { width: 600, height: 420 };
+    const holdCount = (this.model && this.model.holdUnits) ? this.model.holdUnits.length : 1;
+    const spanBoost = Math.max(1, Math.min(3.5, holdCount * 0.65));
+    const maxPanX = Math.max(260, rect.width * this.zoom * 0.95 * spanBoost);
+    const maxPanY = Math.max(220, rect.height * this.zoom * 0.95 * spanBoost);
+    this.panX = Math.max(-maxPanX, Math.min(maxPanX, this.panX));
+    this.panY = Math.max(-maxPanY, Math.min(maxPanY, this.panY));
+  }
+
+  setDragTool(tool) {
+    this.dragTool = (tool === 'PAN') ? 'PAN' : 'ROTATE';
+    this.syncDragToolUI();
+  }
+
+  syncDragToolUI() {
+    const isPan = this.dragTool === 'PAN';
+    if (this.canvas) this.canvas.classList.toggle('mode-pan', isPan);
+    document.getElementById(`${this.prefix}3dToolRotate`)?.classList.toggle('cam-tool-active', !isPan);
+    document.getElementById(`${this.prefix}3dToolPan`)?.classList.toggle('cam-tool-active', isPan);
+  }
+
+  zoomAtFactor(factor, pivotClientX = null, pivotClientY = null) {
+    const prevZoom = this.zoom;
+    const nextZoom = Math.max(0.4, Math.min(5.5, prevZoom * factor));
+    const ratio = nextZoom / prevZoom;
+    if (pivotClientX !== null && pivotClientY !== null && this.stage) {
+      const rect = this.stage.getBoundingClientRect();
+      const px = pivotClientX - rect.left;
+      const py = pivotClientY - rect.top;
+      const baseCx = rect.width / 2;
+      const baseCy = rect.height / 2 + 16;
+      // Giữ nguyên điểm container đang soi dưới con trỏ / 2 ngón tay khi phóng to
+      this.panX = px - baseCx - (px - (baseCx + this.panX)) * ratio;
+      this.panY = py - baseCy - (py - (baseCy + this.panY)) * ratio;
+    } else {
+      // Khi bấm nút +/- vẫn giữ đúng vị trí Bay đang kéo vào giữa màn hình
+      this.panX *= ratio;
+      this.panY *= ratio;
+    }
+    this.zoom = nextZoom;
+    this.clampPan();
+    this.draw();
   }
 
   bindEvents() {
     if (!this.canvas) return;
-    const onDown = (clientX, clientY, isRight) => {
+    const onDown = (clientX, clientY, forcePan) => {
       this.dragging = true;
-      this.panMode = Boolean(isRight);
+      this.panMode = Boolean(forcePan) || (this.dragTool === 'PAN');
       this.movedDist = 0;
       this.lastX = clientX;
       this.lastY = clientY;
@@ -13210,6 +13277,7 @@ class Hold3DCanvasController {
       if (this.panMode) {
         this.panX += dx;
         this.panY += dy;
+        this.clampPan();
       } else {
         this.yaw += dx * 0.0085;
         this.pitch = Math.max(-0.25, Math.min(1.28, this.pitch + dy * 0.0075));
@@ -13227,7 +13295,7 @@ class Hold3DCanvasController {
 
     this.canvas.addEventListener('mousedown', e => {
       e.preventDefault();
-      onDown(e.clientX, e.clientY, e.button === 2 || e.shiftKey);
+      onDown(e.clientX, e.clientY, e.button === 2 || e.button === 1 || e.shiftKey);
     });
     window.addEventListener('mousemove', e => onMove(e.clientX, e.clientY));
     window.addEventListener('mouseup', e => onUp(e.clientX, e.clientY));
@@ -13235,23 +13303,31 @@ class Hold3DCanvasController {
 
     this.canvas.addEventListener('wheel', e => {
       e.preventDefault();
-      const f = e.deltaY < 0 ? 1.1 : 0.91;
-      this.zoom = Math.max(0.4, Math.min(4.0, this.zoom * f));
-      this.draw();
+      const f = e.deltaY < 0 ? 1.12 : 0.89;
+      this.zoomAtFactor(f, e.clientX, e.clientY);
     }, { passive: false });
 
     let pinchDist = 0;
+    let pinchMidX = 0;
+    let pinchMidY = 0;
+    let wasTwoFinger = false;
+
     this.canvas.addEventListener('touchstart', e => {
       if (e.touches.length === 1) {
+        wasTwoFinger = false;
         onDown(e.touches[0].clientX, e.touches[0].clientY, false);
       } else if (e.touches.length === 2) {
+        wasTwoFinger = true;
         this.dragging = false;
         pinchDist = Math.hypot(
           e.touches[0].clientX - e.touches[1].clientX,
           e.touches[0].clientY - e.touches[1].clientY
         );
+        pinchMidX = (e.touches[0].clientX + e.touches[1].clientX) / 2;
+        pinchMidY = (e.touches[0].clientY + e.touches[1].clientY) / 2;
       }
     }, { passive: true });
+
     this.canvas.addEventListener('touchmove', e => {
       if (e.touches.length === 1 && this.dragging) {
         e.preventDefault();
@@ -13262,16 +13338,39 @@ class Hold3DCanvasController {
           e.touches[0].clientX - e.touches[1].clientX,
           e.touches[0].clientY - e.touches[1].clientY
         );
-        this.zoom = Math.max(0.4, Math.min(4.0, this.zoom * (nd / pinchDist)));
+        const midX = (e.touches[0].clientX + e.touches[1].clientX) / 2;
+        const midY = (e.touches[0].clientY + e.touches[1].clientY) / 2;
+
+        // Kéo 2 ngón đồng thời dịch ngang & dịch dọc theo các Bay/Hầm + thu phóng mượt quanh tâm 2 ngón
+        this.panX += (midX - pinchMidX);
+        this.panY += (midY - pinchMidY);
+        const ratio = nd / pinchDist;
         pinchDist = nd;
-        this.draw();
+        pinchMidX = midX;
+        pinchMidY = midY;
+
+        if (Math.abs(ratio - 1) > 0.002) {
+          this.zoomAtFactor(ratio, midX, midY);
+        } else {
+          this.clampPan();
+          this.draw();
+        }
       }
     }, { passive: false });
+
     this.canvas.addEventListener('touchend', e => {
-      if (e.changedTouches.length === 1 && this.dragging) {
-        onUp(e.changedTouches[0].clientX, e.changedTouches[0].clientY);
+      if (e.touches.length === 0) {
+        if (!wasTwoFinger && e.changedTouches.length === 1 && this.dragging) {
+          onUp(e.changedTouches[0].clientX, e.changedTouches[0].clientY);
+        }
+        this.dragging = false;
+        pinchDist = 0;
+        wasTwoFinger = false;
+      } else if (e.touches.length === 1 && wasTwoFinger) {
+        // Nhấc 1 ngón sau khi kéo 2 ngón -> không nhảy vị trí đột ngột
+        pinchDist = 0;
+        this.dragging = false;
       }
-      if (e.touches.length < 2) pinchDist = 0;
     });
   }
 
@@ -14215,8 +14314,15 @@ function zoomHold3D(prefix, factor) {
   ensureHold3DControllers();
   const ctrl = hold3dControllers[prefix];
   if (ctrl) {
-    ctrl.zoom = Math.max(0.4, Math.min(4.0, ctrl.zoom * factor));
-    ctrl.draw();
+    ctrl.zoomAtFactor(factor);
+  }
+}
+
+function setHold3DDragTool(prefix, tool) {
+  ensureHold3DControllers();
+  const ctrl = hold3dControllers[prefix];
+  if (ctrl) {
+    ctrl.setDragTool(tool);
   }
 }
 
