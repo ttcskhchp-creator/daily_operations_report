@@ -1955,6 +1955,46 @@ pre.schema-box {
 .hold3d-chip-check.etd-amber {
   border-color: var(--amber);
 }
+
+.etd-bar.etd-departed {
+  border-left-color: #64748b;
+  border-color: rgba(100, 116, 139, 0.45);
+  background: rgba(100, 116, 139, 0.08);
+}
+.hold3d-etd-hud.etd-departed {
+  border-left-color: #64748b;
+  border-color: rgba(100, 116, 139, 0.45);
+  background: rgba(100, 116, 139, 0.09);
+}
+.etd-final2h-banner {
+  margin-top: 8px;
+  padding: 10px 12px;
+  border-radius: 9px;
+  border: 2px solid var(--red);
+  background: rgba(220, 38, 38, 0.10);
+  color: var(--ink);
+  font-size: 11.5px;
+  line-height: 1.5;
+}
+.etd-final2h-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px;
+  align-items: center;
+}
+.live-vessel-meta-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  align-items: center;
+  padding: 5px 9px;
+  margin-bottom: 8px;
+  border-radius: 8px;
+  background: rgba(2, 132, 199, 0.07);
+  border: 1px dashed rgba(2, 132, 199, 0.35);
+  font-size: 11px;
+}
 </style>
 </head>
 <body>
@@ -2173,25 +2213,28 @@ pre.schema-box {
         </div>
       </div>
       <div class="panel-body" style="padding:10px 12px;">
+        <div class="live-vessel-meta-bar" id="liveVesselMetaBar" style="display:none;"></div>
         <div class="etd-bar" id="shipRailEtdBar">
           <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
-            <strong style="white-space:nowrap;">🕒 ETD rời tàu:</strong>
+            <strong style="white-space:nowrap;">🕒 ETD rời cầu:</strong>
             <input type="datetime-local" id="etdInputRail" onchange="onEtdDateTimeChange(this.value)">
+            <span class="badge" id="etdSourceBadge" title="Nguồn giờ rời cầu ETD">🔄 Đồng bộ lịch tàu</span>
             <span class="etd-quick-btns" title="Đặt nhanh thời gian còn lại tới lúc rời tàu">
-              <button type="button" class="sm" onclick="setEtdHoursFromNow(3)">Còn 3h</button>
-              <button type="button" class="sm" onclick="setEtdHoursFromNow(4)">Còn 4h</button>
-              <button type="button" class="sm" onclick="setEtdHoursFromNow(5)">Còn 5h</button>
-              <button type="button" class="sm" onclick="setEtdHoursFromNow(6)">Còn 6h</button>
-              <button type="button" class="sm" onclick="setEtdHoursFromNow(8)">Còn 8h</button>
+              <button type="button" class="sm" onclick="syncEtdFromLiveFeed(true)" title="Lấy lại giờ rời cầu tự động từ vesselcalldaily (ePort + Cảng vụ)">🔄 Lịch tàu</button>
+              <button type="button" class="sm" onclick="setEtdHoursFromNow(2)">2h</button>
+              <button type="button" class="sm" onclick="setEtdHoursFromNow(4)">4h</button>
+              <button type="button" class="sm" onclick="setEtdHoursFromNow(5)">5h</button>
+              <button type="button" class="sm" onclick="setEtdHoursFromNow(6)">6h</button>
             </span>
             <span class="badge" id="etdCountdownBadge">Còn —</span>
-            <span class="badge" title="Ngưỡng cảnh báo đỏ: ≥25 mv/h · Trần tối đa 1 QC/TK: 25–27 mv/h">Trần QC/TK: 25–27 mv/h</span>
           </div>
           <div style="margin-left:auto;display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
             <span id="etdCriticalSummaryBadge" class="badge green">✅ Đang tính tiến độ ETD...</span>
+            <button type="button" class="sm" onclick="openTanVuScheduleModal()" title="Xem toàn bộ lịch tàu & sà lan Cảng Tân Vũ (vesselcalldaily)">📅 Lịch Tân Vũ</button>
             <button type="button" class="sm primary" onclick="openCriticalHoldsIn3D()" title="Mở thẳng các hầm trọng điểm trên màn hình 3D">🧊 Soi 3D Trọng điểm</button>
           </div>
         </div>
+        <div id="etdFinal2hBannerWrap" style="display:none;margin-bottom:8px;"></div>
         <div class="quay-axis-bar">
           <span style="color:var(--cyan);">⬅️ THƯỢNG LƯU (TRONG SÔNG)</span>
           <span style="color:var(--muted);font-size:10.5px;">═══ RAY CẨU CẦU TÀU TÂN VŨ (THỨ TỰ CỐ ĐỊNH · KHÔNG CHẠY VƯỢT MẶT) ═══</span>
@@ -3454,6 +3497,9 @@ const APP_CONFIG = {
   BUCKET_NAME: 'tos-vessel-plans',
   BOT_SUPABASE_URL: 'https://cyxjnexehyoblzwzrmsu.supabase.co',
   BOT_SUPABASE_KEY: 'sb_publishable_ZQdpAmhE4LLfsbKGsRiHIw_ShoTsfIe',
+  VESSEL_DAILY_PUBLIC_BUCKET: 'https://cyxjnexehyoblzwzrmsu.supabase.co/storage/v1/object/public/port-documents',
+  VESSEL_DAILY_CANGVU_API: 'https://script.google.com/macros/s/AKfycbwBqSuNYcJnfZBsfFtO2HuB8nHV3wzAgRL82GT125zpflvIhxcdtEsaWNsZdGwiwqtL/exec?format=public',
+  VESSEL_DAILY_POLL_MS: 300000, // Tự đồng bộ 5 phút/lần từ vesselcalldaily
   AUTO_POLL_MS: 60000,
   SCHEMA_VERSION: '1.0'
 };
@@ -3527,10 +3573,18 @@ const state = {
   ],
   berthingSide: 'PORT', // 'PORT' (Mạn Trái - Mũi hướng Thượng lưu) | 'STARBOARD' (Mạn Phải - Mũi ra Cửa biển)
   etdAt: '', // ISO datetime rời tàu dự kiến (ETD)
+  etdSource: 'AUTO', // 'EPORT' | 'CANGVU' | 'MANUAL' | 'AUTO'
+  etdManualOverride: false,
+  vesselDepartedManual: false,
   etdRedThreshold: 25, // Ngưỡng cảnh báo đỏ (mv/h)
   etdMaxRateQc: 27, // Năng suất tối đa 1 QC (25–27 mv/h)
   etdMaxRateTk: 26, // Năng suất tối đa 1 TK (25–27 mv/h)
   eportJobs: {},
+  cangVuCalls: [],
+  vesselCatalog: {},
+  tanVuLiveVessels: [],
+  liveFeedLoaded: false,
+  liveFeedUpdatedAt: '',
   upcomingVessels: [],
   todayTide: null,
   selectedChartHour: null,
@@ -3783,6 +3837,9 @@ const CloudRepo = {
         offDockCatalog: state.offDockCatalog,
         peakHours: state.peakHours,
         etdAt: state.etdAt || '',
+        etdSource: state.etdSource || 'AUTO',
+        etdManualOverride: Boolean(state.etdManualOverride),
+        vesselDepartedManual: Boolean(state.vesselDepartedManual),
         etdMaxRateQc: state.etdMaxRateQc || 27,
         etdMaxRateTk: state.etdMaxRateTk || 26
       },
@@ -3842,19 +3899,13 @@ const CloudRepo = {
   },
 
   async listAllVessels() {
-    const [dbRes, eportRes, deletedSet] = await Promise.allSettled([
+    const [dbRes, liveFeedRes, deletedSet] = await Promise.allSettled([
       sb.from('vessel_sessions').select('session_id, vessel_name, voyage, berth, updated_at').order('updated_at', { ascending: false }).limit(50),
-      fetch(`${APP_CONFIG.BOT_SUPABASE_URL}/storage/v1/object/port-documents/eport_tanvu_jobs.json?t=${Date.now()}`, {
-        cache: 'no-store',
-        headers: { apikey: APP_CONFIG.BOT_SUPABASE_KEY, Authorization: `Bearer ${APP_CONFIG.BOT_SUPABASE_KEY}` }
-      }).then(r => r.ok ? r.json() : {}),
+      TanVuLiveFeed.refresh(),
       this.getDeletedVessels()
     ]);
     const sessions = (dbRes.status === 'fulfilled' && Array.isArray(dbRes.value.data)) ? dbRes.value.data : [];
-    let eportMap = {};
-    if (eportRes.status === 'fulfilled' && eportRes.value && typeof eportRes.value === 'object') {
-      eportMap = eportRes.value;
-    }
+    const eportMap = (liveFeedRes.status === 'fulfilled' && liveFeedRes.value?.eportMap) ? liveFeedRes.value.eportMap : (state.eportJobs || {});
     const deleted = (deletedSet.status === 'fulfilled' && deletedSet.value instanceof Set) ? deletedSet.value : new Set();
     return { sessions, eportMap, deleted };
   },
@@ -3976,6 +4027,9 @@ const CloudRepo = {
           state.peakHours = s.stats_summary.peakHours;
         }
         state.etdAt = (s.stats_summary && s.stats_summary.etdAt) ? s.stats_summary.etdAt : '';
+        state.etdSource = (s.stats_summary && s.stats_summary.etdSource) ? s.stats_summary.etdSource : 'AUTO';
+        state.etdManualOverride = Boolean(s.stats_summary && s.stats_summary.etdManualOverride);
+        state.vesselDepartedManual = Boolean(s.stats_summary && s.stats_summary.vesselDepartedManual);
         state.etdMaxRateQc = (s.stats_summary && s.stats_summary.etdMaxRateQc) ? Number(s.stats_summary.etdMaxRateQc) : 27;
         state.etdMaxRateTk = (s.stats_summary && s.stats_summary.etdMaxRateTk) ? Number(s.stats_summary.etdMaxRateTk) : 26;
         const sideSel = document.getElementById('cfgBerthSide');
@@ -3990,6 +4044,10 @@ const CloudRepo = {
         document.getElementById('cfgVoyage').value = parsedFromSid.voyage || '';
         state.vesselAttitude = { heel: 'EVEN', trim: 'EVEN' };
         state.setupCompleted = false;
+        state.etdAt = '';
+        state.etdSource = 'AUTO';
+        state.etdManualOverride = false;
+        state.vesselDepartedManual = false;
       }
       // Khôi phục bản lưu cục bộ mới hơn (nếu có) để F5/reload KHÔNG BAO GIỜ bị reset chia hầm phương tiện
       restoreLocalCraneAndAttitudeIfNewer(sessionId, sessRows && sessRows.length ? sessRows[0].updated_at : '');
@@ -5977,28 +6035,289 @@ const OffDockFleetAndQcEngine = {
 };
 
 
-// ==================== [PHẦN 3.5] CẢNH BÁO TIẾN ĐỘ ETD & HẦM TRỌNG ĐIỂM (25–27 MV/H) ====================
+// ==================== [PHẦN 3.5] ĐỒNG BỘ VESSELCALLDAILY (3 NGUỒN JSON) & CẢNH BÁO ETD / RỜI CẦU / ≤ 2H ====================
+const TanVuLiveFeed = {
+  // Phân tích thời gian chuẩn (ISO hoặc DD/MM/YYYY HH:mm(:ss) theo múi giờ VN +07:00)
+  parseDateTime(val) {
+    if (!val) return null;
+    const s = String(val).trim();
+    if (!s) return null;
+    // 1. DD/MM/YYYY HH:mm(:ss) (chuẩn ePort BerthMap Tân Vũ)
+    let m = s.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{2,4})(?:\s+(\d{1,2}):(\d{2})(?::(\d{2}))?)?/);
+    if (m) {
+      let day = parseInt(m[1], 10), month = parseInt(m[2], 10), year = parseInt(m[3], 10);
+      if (year < 100) year += 2000;
+      const hour = m[4] !== undefined ? parseInt(m[4], 10) : 0;
+      const min = m[5] !== undefined ? parseInt(m[5], 10) : 0;
+      const sec = m[6] !== undefined ? parseInt(m[6], 10) : 0;
+      const pad = n => String(n).padStart(2, '0');
+      const isoVN = `${year}-${pad(month)}-${pad(day)}T${pad(hour)}:${pad(min)}:${pad(sec)}+07:00`;
+      const d = new Date(isoVN);
+      return isNaN(d.getTime()) ? null : d;
+    }
+    // 2. ISO có hoặc không có timezone (nếu thiếu timezone -> mặc định giờ Việt Nam +07:00)
+    if (/^\d{4}-\d{2}-\d{2}[T\s]\d{2}:\d{2}/.test(s) && !/[Zz]|[+-]\d{2}:?\d{2}$/.test(s)) {
+      const d = new Date(s.replace(' ', 'T') + '+07:00');
+      if (!isNaN(d.getTime())) return d;
+    }
+    const d = new Date(s);
+    return isNaN(d.getTime()) ? null : d;
+  },
+
+  fmtVN(val) {
+    const d = (val instanceof Date) ? val : this.parseDateTime(val);
+    if (!d) return '—';
+    return d.toLocaleString('vi-VN', {
+      day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit',
+      hour12: false, timeZone: 'Asia/Ho_Chi_Minh'
+    });
+  },
+
+  normalizeBerth(b) {
+    const s = String(b || '').trim().toUpperCase();
+    if (!s) return '';
+    const m = s.match(/(?:B|TV|CAU|CẦU)\s*([1-5])/);
+    if (m) return `TV${m[1]}`;
+    return s;
+  },
+
+  // Cách 1: Gọi trực tiếp 3 nguồn JSON công khai (CORS đầy đủ) từ vesselcalldaily.vercel.app
+  async refresh() {
+    const SB_BUCKET = APP_CONFIG.VESSEL_DAILY_PUBLIC_BUCKET;
+    const CANGVU_API = APP_CONFIG.VESSEL_DAILY_CANGVU_API;
+    const nocache = `?t=${Date.now()}`;
+
+    const [epRes, cvRes, catRes] = await Promise.allSettled([
+      fetch(`${SB_BUCKET}/eport_tanvu_jobs.json${nocache}`, { cache: 'no-store' }).then(r => r.ok ? r.json() : null),
+      fetch(CANGVU_API, { cache: 'no-store' }).then(r => r.ok ? r.json() : null),
+      fetch(`${SB_BUCKET}/vessel_catalog.json${nocache}`, { cache: 'no-store' }).then(r => r.ok ? r.json() : null)
+    ]);
+
+    const eportOk = epRes.status === 'fulfilled' && epRes.value && typeof epRes.value === 'object';
+    const cvOk = cvRes.status === 'fulfilled' && cvRes.value && Array.isArray(cvRes.value.calls);
+    const catOk = catRes.status === 'fulfilled' && catRes.value && typeof catRes.value === 'object';
+
+    const eportMap = eportOk ? epRes.value : (state.eportJobs || {});
+    const allCalls = cvOk ? cvRes.value.calls : [];
+    const catalog = catOk ? catRes.value : (state.vesselCatalog || {});
+
+    const tanVuCalls = allCalls.filter(c => {
+      const term = String(c.terminal || '').toUpperCase();
+      return term.includes('TÂN VŨ') || term.includes('TAN VU');
+    });
+
+    const todayVN = new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Ho_Chi_Minh' });
+    const merged = new Map();
+
+    // 1. Lọc tàu tại Tân Vũ trong ngày từ lịch Cảng vụ
+    tanVuCalls.forEach(c => {
+      if (!c.etb) return;
+      const etbD = String(c.etb).split('T')[0];
+      const etdD = c.etd ? String(c.etd).split('T')[0] : '9999-12-31';
+      if (etbD <= todayVN && etdD >= todayVN) {
+        const name = String(c.vessel || '').trim().toUpperCase();
+        const spec = catalog[name] || {};
+        merged.set(name, {
+          vessel: name,
+          berth: c.berth || 'B1',
+          operator: c.operator || spec.agent || '',
+          vessel_type: spec.type || 'Container',
+          imo: spec.imo || '',
+          loa: Number(c.loa) || Number(spec.loa) || 0,
+          beam: Number(spec.beam) || 0,
+          dwt: c.dwt || spec.dwt || '',
+          teu: Number(spec.teu) || 0,
+          etb: c.etb,
+          etd: c.etd || '',
+          progress_pct: null,
+          done_plan: '',
+          cont_teu: '',
+          on_berth_eport: false,
+          is_barge: false,
+          source: 'CANGVU'
+        });
+      }
+    });
+
+    // 2. Hợp nhất dữ liệu trực tiếp từ ePort BerthMap Tân Vũ
+    Object.entries(eportMap).forEach(([rawName, ep]) => {
+      if (!ep || typeof ep !== 'object') return;
+      const name = rawName.trim().toUpperCase();
+      const spec = catalog[name] || {};
+      const cur = merged.get(name) || {
+        vessel: name,
+        operator: ep.cargoType || spec.agent || '',
+        vessel_type: spec.type || 'Container',
+        imo: spec.imo || '',
+        loa: Number(spec.loa) || 0,
+        beam: Number(spec.beam) || 0,
+        dwt: spec.dwt || '',
+        teu: Number(spec.teu) || 0
+      };
+      merged.set(name, {
+        ...cur,
+        berth: ep.berth || cur.berth || 'B1',
+        etb: ep.atb || cur.etb || '',
+        etd: ep.etd || cur.etd || '',
+        progress_pct: typeof ep.pct === 'number' ? ep.pct : null,
+        done_plan: ep.donePlanStr || (ep.doneCont !== undefined && ep.totalCont !== undefined ? `${ep.doneCont}/${ep.totalCont}` : ''),
+        cont_teu: ep.contTeuStr || '',
+        on_berth_eport: true,
+        is_barge: Boolean(ep.isBarge || /^(BV|BN|HP|SG|NB|HD|QN|TB|SL|BARGE)/i.test(name)),
+        source: 'EPORT'
+      });
+    });
+
+    const liveList = Array.from(merged.values()).sort((a, b) => String(a.berth).localeCompare(String(b.berth)));
+
+    state.eportJobs = eportMap;
+    if (cvOk) state.cangVuCalls = tanVuCalls;
+    if (catOk) state.vesselCatalog = catalog;
+    state.tanVuLiveVessels = liveList;
+    state.liveFeedLoaded = Boolean(eportOk || cvOk);
+    state.liveFeedUpdatedAt = new Date().toISOString();
+
+    return { eportMap, tanVuCalls, catalog, liveList };
+  },
+
+  // Khớp thông tin tàu đang mở trên Web với 3 nguồn dữ liệu vesselcalldaily
+  matchCurrentVessel(st) {
+    const sid = String(st.sessionId || '').trim();
+    const cfgName = String(document.getElementById('cfgVesselName')?.value || '').trim().toUpperCase();
+    const fromSid = parseVesselNameFromSessionId(sid).name;
+    const rawTarget = cfgName || fromSid || sid;
+    const targetCore = normVesselCoreName(rawTarget);
+    if (!targetCore) return null;
+
+    const matchName = (cand) => {
+      const cCore = normVesselCoreName(cand);
+      if (!cCore) return false;
+      if (cCore === targetCore) return true;
+      if (cCore.length >= 5 && targetCore.length >= 5 && (cCore.includes(targetCore) || targetCore.includes(cCore))) return true;
+      return false;
+    };
+
+    // 1. Kiểm tra trên ePort BerthMap Tân Vũ (đang ở cầu)
+    let eportRec = null;
+    let eportKey = '';
+    for (const [k, ep] of Object.entries(st.eportJobs || {})) {
+      if (ep && typeof ep === 'object' && matchName(k)) {
+        eportRec = ep;
+        eportKey = k.trim().toUpperCase();
+        break;
+      }
+    }
+
+    // 2. Kiểm tra lịch Cảng vụ Hải Phòng (ưu tiên chuyến có etb/etd gần hiện tại nhất)
+    const nowMs = Date.now();
+    const cvMatches = (st.cangVuCalls || []).filter(c => matchName(c.vessel));
+    let cvRec = null;
+    if (cvMatches.length) {
+      cvMatches.sort((a, b) => {
+        const da = this.parseDateTime(a.etd || a.etb)?.getTime() || 0;
+        const db = this.parseDateTime(b.etd || b.etb)?.getTime() || 0;
+        return Math.abs(da - nowMs) - Math.abs(db - nowMs);
+      });
+      cvRec = cvMatches[0];
+    }
+
+    // 3. Tra thông số kỹ thuật tàu trong vessel_catalog.json
+    let specRec = null;
+    for (const [k, sp] of Object.entries(st.vesselCatalog || {})) {
+      if (sp && typeof sp === 'object' && matchName(k)) {
+        specRec = sp;
+        break;
+      }
+    }
+
+    if (!eportRec && !cvRec && !specRec) return null;
+
+    const etdRaw = (eportRec && eportRec.etd) ? eportRec.etd : ((cvRec && cvRec.etd) ? cvRec.etd : '');
+    const etbRaw = (eportRec && eportRec.atb) ? eportRec.atb : ((cvRec && cvRec.etb) ? cvRec.etb : '');
+    const etdDate = this.parseDateTime(etdRaw);
+    const etbDate = this.parseDateTime(etbRaw);
+    const etdSource = (eportRec && eportRec.etd) ? 'EPORT' : ((cvRec && cvRec.etd) ? 'CANGVU' : '');
+
+    return {
+      vessel: eportKey || (cvRec?.vessel ? String(cvRec.vessel).trim().toUpperCase() : rawTarget),
+      onBerthEport: Boolean(eportRec),
+      inCangVu: Boolean(cvRec),
+      berth: (eportRec?.berth) || (cvRec?.berth) || '',
+      operator: (cvRec?.operator) || (eportRec?.cargoType) || (specRec?.agent) || '',
+      vesselType: specRec?.type || 'Container',
+      imo: specRec?.imo || '',
+      loa: Number(cvRec?.loa) || Number(specRec?.loa) || 0,
+      beam: Number(specRec?.beam) || 0,
+      dwt: cvRec?.dwt || specRec?.dwt || '',
+      teu: Number(specRec?.teu) || 0,
+      etbRaw,
+      etdRaw,
+      etbIso: etbDate ? etbDate.toISOString() : '',
+      etdIso: etdDate ? etdDate.toISOString() : '',
+      etdSource,
+      eportPct: typeof eportRec?.pct === 'number' ? eportRec.pct : null,
+      donePlan: eportRec?.donePlanStr || (eportRec?.doneCont !== undefined && eportRec?.totalCont !== undefined ? `${eportRec.doneCont}/${eportRec.totalCont}` : ''),
+      contTeu: eportRec?.contTeuStr || '',
+      isBarge: Boolean(eportRec?.isBarge)
+    };
+  },
+
+  // Áp dụng thông tin tàu & giờ rời cầu (ETD) tự động từ vesselcalldaily
+  applyMatchedInfoToState(st, forceOverrideEtd = false) {
+    const info = this.matchCurrentVessel(st);
+    st._matchedLiveVessel = info;
+    if (!info) return null;
+
+    // 1. Tự ăn giờ rời cầu (ETD) nếu tìm thấy từ ePort hoặc Cảng vụ (và chưa bị khóa chỉnh tay)
+    if (info.etdIso && (forceOverrideEtd || !st.etdManualOverride || !st.etdAt)) {
+      st.etdAt = info.etdIso;
+      st.etdSource = info.etdSource || 'EPORT';
+      if (forceOverrideEtd) {
+        st.etdManualOverride = false;
+        st.vesselDepartedManual = false;
+      }
+    }
+
+    // 2. Tự điền thông số kỹ thuật (LOA, Beam, Berth) nếu hiện tại đang để giá trị mặc định
+    const loaEl = document.getElementById('cfgLength');
+    if (loaEl && info.loa >= 40 && (!loaEl.value || Number(loaEl.value) === 172)) {
+      loaEl.value = Math.round(info.loa);
+    }
+    const beamEl = document.getElementById('cfgBeam');
+    if (beamEl && info.beam >= 10 && (!beamEl.value || Number(beamEl.value) === 27.6)) {
+      beamEl.value = info.beam;
+    }
+    const berthEl = document.getElementById('cfgBerth');
+    if (berthEl && info.berth) {
+      const normB = this.normalizeBerth(info.berth);
+      if (normB && (!berthEl.value || berthEl.value === 'TV3')) berthEl.value = normB;
+    }
+
+    return info;
+  }
+};
+
 const EtdPaceEngine = {
   toLocalInputValue(isoStr) {
     if (!isoStr) return '';
-    const d = new Date(isoStr);
+    const d = TanVuLiveFeed.parseDateTime(isoStr) || new Date(isoStr);
     if (isNaN(d.getTime())) return '';
     const pad = n => String(n).padStart(2, '0');
     return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
   },
 
   ensureDefaultEtd(st) {
+    // Luôn ưu tiên ăn theo dữ liệu live từ vesselcalldaily (ePort / Cảng vụ) nếu chưa chỉnh tay
+    const liveInfo = TanVuLiveFeed.applyMatchedInfoToState(st, false);
     if (st.etdAt && !isNaN(Date.parse(st.etdAt))) return st.etdAt;
-    // Thử tìm ETD từ dữ liệu ePort Tân Vũ nếu có
-    const sid = String(st.sessionId || '').toUpperCase();
-    const eKey = Object.keys(st.eportJobs || {}).find(k => sid.includes(k.replace(/\s+/g, '_').toUpperCase()));
-    const ej = eKey ? st.eportJobs[eKey] : null;
-    if (ej && ej.etd && !isNaN(Date.parse(ej.etd))) {
-      st.etdAt = new Date(ej.etd).toISOString();
+    if (liveInfo && liveInfo.etdIso) {
+      st.etdAt = liveInfo.etdIso;
+      st.etdSource = liveInfo.etdSource || 'EPORT';
       return st.etdAt;
     }
-    // Mặc định 5 tiếng từ hiện tại để chỉ đạo viên thấy ngay phép tính ETD và bấm chỉnh nhanh 3h/4h/5h/6h
+    // Fallback cuối cùng nếu tàu hoàn toàn không có trong lịch (5 tiếng từ hiện tại)
     st.etdAt = new Date(Date.now() + 5 * 3600000 + 20000).toISOString();
+    st.etdSource = 'DEFAULT';
     return st.etdAt;
   },
 
@@ -6010,16 +6329,11 @@ const EtdPaceEngine = {
 
   evaluate(st, pool, analysis) {
     this.ensureDefaultEtd(st);
+    const liveInfo = st._matchedLiveVessel || TanVuLiveFeed.matchCurrentVessel(st);
     const etdMs = Date.parse(st.etdAt);
     const diffMs = etdMs - Date.now();
     const hoursLeft = diffMs / 3600000;
-    const isOverdue = hoursLeft <= 0.02;
-    const absMins = Math.abs(Math.round(diffMs / 60000));
-    const hh = Math.floor(absMins / 60);
-    const mm = absMins % 60;
-    const countdownText = isOverdue
-      ? `Quá ETD ${hh}h${String(mm).padStart(2, '0')}p`
-      : `Còn ${hh}h${String(mm).padStart(2, '0')}p (${Math.max(0, hoursLeft).toFixed(1)}h)`;
+    const isPastEtd = hoursLeft <= 0.02;
 
     const redThreshold = Number(st.etdRedThreshold) || 25;
     const maxRateQc = Number(st.etdMaxRateQc) || 27;
@@ -6032,37 +6346,83 @@ const EtdPaceEngine = {
     const metricsMap = {};
     (analysis?.craneMetrics || []).forEach(m => { metricsMap[m.id] = m; });
 
-    // 1. Đếm tồn Nhập / Xuất thực tế trong từng Hầm
+    // 1. Đếm tồn & đã làm Nhập / Xuất thực tế trong từng Hầm
     const holdBase = {};
+    let totalShipRem = 0;
+    let totalShipDone = 0;
+
     holds.forEach(h => {
       const baySet = new Set(h.bays || []);
-      const impRem = impJobs.filter(j => {
-        if (j.status === 'C') return false;
+      const impInH = impJobs.filter(j => {
         const p = DataAdapters.parsePos6(j.pos);
         return p && baySet.has(p.bay);
-      }).length;
+      });
+      const impDone = impInH.filter(j => j.status === 'C').length;
+      const impRem = impInH.length - impDone;
+
       const expInH = (pool || []).filter(c => {
         const p = DataAdapters.parsePos6(c.actualPos || c.plannedPos);
         return p && baySet.has(p.bay);
       });
-      const expRem = expInH.filter(c => c.jobStatus !== 'C').length;
+      const expDone = expInH.filter(c => c.jobStatus === 'C').length;
+      const expRem = expInH.length - expDone;
       const expB = expInH.filter(c => c.jobStatus === 'B').length;
       const expA = expInH.filter(c => c.jobStatus === 'A').length;
       const owners = railActive.filter(c => !c.paused && (c.holds || []).includes(h.hold));
+
+      totalShipRem += (impRem + expRem);
+      totalShipDone += (impDone + expDone);
+
       holdBase[h.hold] = {
         holdNo: h.hold,
         label: h.label,
         bays: h.bays || [],
         impRem,
+        impDone,
         expRem,
+        expDone,
         expB,
         expA,
         totalRem: impRem + expRem,
+        totalDone: impDone + expDone,
         owners
       };
     });
 
-    // 2. Tính áp lực ETD trên từng Cẩu đang hoạt động (QC / TK)
+    // Bổ sung cont chưa có vị trí bay vào tổng tồn toàn tàu để không bỏ sót
+    const unmappedRem = (pool || []).filter(c => c.jobStatus !== 'C' && !DataAdapters.parsePos6(c.actualPos || c.plannedPos)).length;
+    const vesselTotalRem = totalShipRem + unmappedRem;
+
+    // 2. XÁC ĐỊNH CHÍNH XÁC TÀU ĐÃ RỜI CẦU HAY CHƯA (KHÔNG BAO GIỜ BÁO "QUÁ ETD" KHI TÀU ĐÃ RỜI!)
+    const onBerthEport = Boolean(liveInfo && liveInfo.onBerthEport);
+    const eportFinished = Boolean(liveInfo && liveInfo.eportPct !== null && liveInfo.eportPct >= 100);
+    const allCargoDone = (vesselTotalRem === 0 && (totalShipDone > 0 || eportFinished));
+    const departedBySchedule = isPastEtd && (
+      allCargoDone ||
+      eportFinished ||
+      (st.liveFeedLoaded && !onBerthEport)
+    );
+    const isDeparted = Boolean(st.vesselDepartedManual || departedBySchedule);
+    const isCompletedWaitingSail = !isDeparted && allCargoDone && !isPastEtd;
+    const isOverdueAtBerth = !isDeparted && isPastEtd && vesselTotalRem > 0;
+
+    const absMins = Math.abs(Math.round(diffMs / 60000));
+    const hh = Math.floor(absMins / 60);
+    const mm = absMins % 60;
+    const etdFormatted = TanVuLiveFeed.fmtVN(st.etdAt);
+
+    let countdownText = '';
+    if (isDeparted) {
+      countdownText = `🚢 Đã rời cầu${etdFormatted !== '—' ? ` (${etdFormatted})` : ''}`;
+    } else if (isCompletedWaitingSail) {
+      countdownText = `✅ Đã xong hàng · Rời sau ${hh}h${String(mm).padStart(2, '0')}p`;
+    } else if (isOverdueAtBerth) {
+      countdownText = `⚠️ Tại cầu vượt ETD ${hh}h${String(mm).padStart(2, '0')}p (Còn ${vesselTotalRem} cont)`;
+    } else {
+      countdownText = `Còn ${hh}h${String(mm).padStart(2, '0')}p (${Math.max(0, hoursLeft).toFixed(1)}h)`;
+    }
+
+    // 3. Tính áp lực ETD trên từng Cẩu đang hoạt động (QC / TK)
     const craneReports = railActive.map((c, rIdx) => {
       const isTK = /^TK/i.test(c.id);
       const maxCap = isTK ? maxRateTk : maxRateQc;
@@ -6071,9 +6431,7 @@ const EtdPaceEngine = {
       const nominalRate = Math.max(10, Number(c.rate) || 20);
       const currentRate = actualRate > 0 ? actualRate : nominalRate;
 
-      let totalRem = 0;
-      let expRem = 0;
-      let impRem = 0;
+      let totalRem = 0, expRem = 0, impRem = 0;
       const holdBreakdown = [];
 
       (c.holds || []).forEach(hNo => {
@@ -6095,10 +6453,12 @@ const EtdPaceEngine = {
 
       const hoursAtCurrent = totalRem > 0 ? (totalRem / Math.max(1, currentRate)) : 0;
       const hoursAtMax = totalRem > 0 ? (totalRem / Math.max(1, maxCap)) : 0;
-      const reqRate = totalRem === 0 ? 0 : (hoursLeft > 0.02 ? (totalRem / hoursLeft) : 999);
-      const bufferHours = hoursLeft - hoursAtCurrent;
+      const reqRate = (isDeparted || totalRem === 0) ? 0 : (hoursLeft > 0.02 ? (totalRem / hoursLeft) : 999);
+      const bufferHours = isDeparted ? 0 : (hoursLeft - hoursAtCurrent);
+      const maxMovesInLeft = isDeparted ? totalRem : Math.floor(maxCap * Math.max(0, hoursLeft));
+      const cutMovesNeeded = (isDeparted || totalRem <= maxMovesInLeft) ? 0 : Math.ceil(totalRem - maxMovesInLeft);
+      const delayHoursNeeded = (isDeparted || totalRem === 0) ? 0 : Math.max(0, hoursAtMax - Math.max(0, hoursLeft));
 
-      // Tìm phương án thực tế trên ray: cẩu dự phòng cùng khe ray & cẩu kề bên rảnh hơn
       const leftAdj = rIdx > 0 ? railActive[rIdx - 1] : null;
       const rightAdj = rIdx < railActive.length - 1 ? railActive[rIdx + 1] : null;
       const leftRailIdx = leftAdj ? CraneRailOrder.getRailIndex(leftAdj.id) : -1;
@@ -6112,43 +6472,55 @@ const EtdPaceEngine = {
         ? `thêm ${directBackups.slice(0, 2).join('/')} (cùng khe ray)`
         : 'thêm 1 PTTB dự phòng hỗ trợ';
       const neighborHint = [leftAdj?.id, rightAdj?.id].filter(Boolean).join(' / ');
+      const hListLabel = (c.holds || []).map(n => 'H' + String(n).padStart(2, '0')).join(', ');
 
       let level = 'GREEN';
       let badgeText = '🟢 Kịp ETD';
       let shortAction = 'Giữ nhịp hiện tại';
       let advice = '';
 
-      if (c.paused) {
+      if (isDeparted) {
+        level = 'DEPARTED';
+        badgeText = '🚢 Đã rời cầu';
+        shortAction = 'Tàu đã rời';
+        advice = `🚢 Tàu đã rời cầu${etdFormatted !== '—' ? ` lúc ${etdFormatted}` : ''} · ${c.id} đã kết thúc làm hàng.`;
+      } else if (c.paused) {
         level = totalRem > 0 ? 'OVERLOAD' : 'AMBER';
         badgeText = '⏸ SỰ CỐ';
         shortAction = 'Tiếp ứng / Thay cẩu';
-        advice = `⏸ ${c.id} đang tạm dừng sự cố với ${totalRem} cont còn lại (H${(c.holds || []).join(', H')}) → Chuyển hầm sang cẩu liền kề hoặc ${backupHint}!`;
+        advice = `⏸ ${c.id} đang tạm dừng sự cố với ${totalRem} cont còn lại (${hListLabel}) → Chuyển hầm sang cẩu liền kề hoặc ${backupHint}!`;
       } else if (totalRem === 0) {
         level = 'DONE';
         badgeText = '✅ Xong';
-        shortAction = 'Hết hàng';
+        shortAction = 'Hoàn tất';
         advice = `✅ ${c.id} đã hoàn thành toàn bộ hầm phụ trách.`;
-      } else if (isOverdue || reqRate > maxCap + 0.05) {
+      } else if (isOverdueAtBerth || (hoursLeft <= 2.0 && reqRate > maxCap + 0.05)) {
         level = 'OVERLOAD';
-        badgeText = isOverdue ? '🚨 QUÁ ETD' : `🚨 >${maxCap}/h QUÁ TẢI`;
-        shortAction = 'BẮT BUỘC THÊM PTTB / ĐỔI SƠ ĐỒ';
-        const extraHours = Math.max(0.1, hoursAtMax - Math.max(0, hoursLeft));
-        advice = `🚨 ${c.id} (${(c.holds || []).map(n => 'H' + String(n).padStart(2, '0')).join(', ')}): còn ${totalRem} cont, hiện ${currentRate.toFixed(0)} mv/h (mất ${hoursAtCurrent.toFixed(1)}h) · ETD ${isOverdue ? 'đã quá giờ' : 'còn ' + hoursLeft.toFixed(1) + 'h'} → Cần ${reqRate >= 900 ? '>99' : reqRate.toFixed(1)} mv/h (VƯỢT TRẦN ${maxCap} mv/h)! Bắt buộc ${backupHint}${neighborHint ? ` hoặc ĐỔI SƠ ĐỒ chuyển bớt hầm sang ${neighborHint}` : ''} (nếu giữ 1 cẩu sẽ trễ ~${extraHours.toFixed(1)}h).`;
+        badgeText = isOverdueAtBerth ? '🚨 VƯỢT ETD' : `🚨 ≤2H · CẮT/LÙI`;
+        shortAction = `LÙI +${Math.max(0.5, Math.ceil(delayHoursNeeded * 2) / 2).toFixed(1)}H / CẮT ${cutMovesNeeded} CONT`;
+        const delayRound = Math.max(0.5, Math.ceil(delayHoursNeeded * 2) / 2);
+        advice = `🚨 ${c.id} (${hListLabel}): còn ${totalRem} cont nhưng ETD ${isOverdueAtBerth ? 'đã quá giờ' : 'chỉ còn ' + hoursLeft.toFixed(1) + 'h'} · Tối đa ${maxCap} mv/h chỉ kịp ${maxMovesInLeft} cont! Khuyến nghị: (1) LÙI ETD thêm +${delayRound.toFixed(1)}h, hoặc (2) CẮT BỚT ~${cutMovesNeeded} cont & nạp lại sơ đồ mới cho Web.`;
+      } else if (reqRate > maxCap + 0.05) {
+        level = 'OVERLOAD';
+        badgeText = `🚨 >${maxCap}/h QUÁ TẢI`;
+        shortAction = 'THÊM PTTB / ĐỔI SƠ ĐỒ';
+        const extraHours = Math.max(0.1, delayHoursNeeded);
+        advice = `🚨 ${c.id} (${hListLabel}): còn ${totalRem} cont, hiện ${currentRate.toFixed(0)} mv/h (mất ${hoursAtCurrent.toFixed(1)}h) · ETD còn ${hoursLeft.toFixed(1)}h → Cần ${reqRate >= 900 ? '>99' : reqRate.toFixed(1)} mv/h (VƯỢT TRẦN ${maxCap} mv/h)! Bắt buộc ${backupHint}${neighborHint ? ` hoặc ĐỔI SƠ ĐỒ chuyển bớt hầm sang ${neighborHint}` : ''} (nếu giữ 1 cẩu sẽ trễ ~${extraHours.toFixed(1)}h).`;
       } else if (reqRate >= redThreshold - 0.05) {
         level = 'RED';
         badgeText = `🔴 ĐỎ ${reqRate.toFixed(1)}/h`;
         shortAction = 'DỒN XE · THÊM PTTB / ĐỔI SƠ ĐỒ';
-        advice = `🔴 CẢNH BÁO ĐỎ ${c.id} (${(c.holds || []).map(n => 'H' + String(n).padStart(2, '0')).join(', ')}): còn ${totalRem} cont, hiện ${currentRate.toFixed(0)} mv/h (mất ${hoursAtCurrent.toFixed(1)}h) · ETD còn ${hoursLeft.toFixed(1)}h → Phải đạt ${reqRate.toFixed(1)} mv/h (chạm trần 25–${maxCap} mv/h)! Dồn xe tăng tốc bãi TV gần, sẵn sàng ${backupHint}${neighborHint ? ` hoặc đổi sơ đồ san hầm sang ${neighborHint}` : ''}.`;
+        advice = `🔴 CẢNH BÁO ĐỎ ${c.id} (${hListLabel}): còn ${totalRem} cont, hiện ${currentRate.toFixed(0)} mv/h (mất ${hoursAtCurrent.toFixed(1)}h) · ETD còn ${hoursLeft.toFixed(1)}h → Phải đạt ${reqRate.toFixed(1)} mv/h (chạm trần 25–${maxCap} mv/h)! Dồn xe tăng tốc bãi TV gần, sẵn sàng ${backupHint}${neighborHint ? ` hoặc đổi sơ đồ san hầm sang ${neighborHint}` : ''}.`;
       } else if (reqRate >= 21 || hoursAtCurrent > hoursLeft + 0.1) {
         level = 'AMBER';
         badgeText = `🟡 ${reqRate.toFixed(1)}/h`;
         shortAction = 'DỒN XE TĂNG TỐC';
-        advice = `⚠️ ${c.id} (${(c.holds || []).map(n => 'H' + String(n).padStart(2, '0')).join(', ')}): còn ${totalRem} cont, NS hiện ${currentRate.toFixed(0)} mv/h (mất ${hoursAtCurrent.toFixed(1)}h) · ETD còn ${hoursLeft.toFixed(1)}h → Cần nâng lên ${reqRate.toFixed(1)} mv/h. Dồn thêm xe kéo & ưu tiên hàng bãi TV gần để không tụt nhịp.`;
+        advice = `⚠️ ${c.id} (${hListLabel}): còn ${totalRem} cont, NS hiện ${currentRate.toFixed(0)} mv/h (mất ${hoursAtCurrent.toFixed(1)}h) · ETD còn ${hoursLeft.toFixed(1)}h → Cần nâng lên ${reqRate.toFixed(1)} mv/h. Dồn thêm xe kéo & ưu tiên hàng bãi TV gần để không tụt nhịp.`;
       } else {
         level = 'GREEN';
         badgeText = `🟢 ${reqRate.toFixed(1)}/h`;
         shortAction = `Dư +${Math.max(0, bufferHours).toFixed(1)}h`;
-        advice = `✅ ${c.id} (${(c.holds || []).map(n => 'H' + String(n).padStart(2, '0')).join(', ')}): còn ${totalRem} cont, hiện ${currentRate.toFixed(0)} mv/h (mất ${hoursAtCurrent.toFixed(1)}h) · ETD còn ${hoursLeft.toFixed(1)}h → Chỉ cần ${reqRate.toFixed(1)} mv/h (dư ${Math.max(0, bufferHours).toFixed(1)}h).`;
+        advice = `✅ ${c.id} (${hListLabel}): còn ${totalRem} cont, hiện ${currentRate.toFixed(0)} mv/h (mất ${hoursAtCurrent.toFixed(1)}h) · ETD còn ${hoursLeft.toFixed(1)}h → Chỉ cần ${reqRate.toFixed(1)} mv/h (dư ${Math.max(0, bufferHours).toFixed(1)}h).`;
       }
 
       const rankScore = level === 'OVERLOAD' ? 4 : (level === 'RED' ? 3 : (level === 'AMBER' ? 2 : (level === 'GREEN' ? 1 : 0)));
@@ -6169,6 +6541,9 @@ const EtdPaceEngine = {
         hoursAtMax,
         reqRate,
         bufferHours,
+        maxMovesInLeft,
+        cutMovesNeeded,
+        delayHoursNeeded,
         level,
         rankScore,
         badgeText,
@@ -6182,11 +6557,80 @@ const EtdPaceEngine = {
     const craneReportMap = {};
     craneReports.forEach(r => { craneReportMap[r.craneId] = r; });
 
-    // 3. Ánh xạ cảnh báo ETD xuống từng Hầm & xác định HẦM TRỌNG ĐIỂM
+    // 4. Đánh giá Khẩn cấp ≤ 2 tiếng (hoặc vượt ETD tại cầu): Lùi giờ tàu HOẶC Cắt bớt hàng & Nạp lại sơ đồ
+    const activeCapPerHr = craneReports.filter(r => !r.crane.paused).reduce((s, r) => s + r.maxCap, 0) || maxRateQc;
+    const vesselMaxMovesLeft = Math.floor(activeCapPerHr * Math.max(0, hoursLeft));
+    const vesselShortfall = isDeparted ? 0 : Math.max(0, vesselTotalRem - vesselMaxMovesLeft);
+    const maxCraneDelay = craneReports.reduce((m, r) => Math.max(m, r.delayHoursNeeded || 0), 0);
+    const sumCraneShortfall = craneReports.reduce((s, r) => s + (r.cutMovesNeeded || 0), 0);
+    const vesselHoursAtMax = vesselTotalRem / Math.max(1, activeCapPerHr);
+    const vesselDelayNeeded = Math.max(0, vesselHoursAtMax - Math.max(0, hoursLeft));
+
+    const isFinal2hImpossible = !isDeparted && vesselTotalRem > 0 && hoursLeft <= 2.0 && (
+      vesselShortfall > 0 || sumCraneShortfall > 0 || isOverdueAtBerth
+    );
+
+    let final2hPlan = null;
+    if (isFinal2hImpossible) {
+      const recDelayHours = Math.max(0.5, Math.ceil(Math.max(maxCraneDelay, vesselDelayNeeded, 0.5) * 2) / 2);
+      const baseMs = isOverdueAtBerth ? Date.now() : etdMs;
+      const suggestedNewEtdIso = new Date(baseMs + recDelayHours * 3600000).toISOString();
+      const recCutCount = Math.max(1, vesselShortfall, sumCraneShortfall);
+
+      // Thống kê ứng viên ưu tiên cắt bớt hàng (Chưa mở B / Bãi ngoài xa / Trên boong)
+      const remPool = (pool || []).filter(x => x.jobStatus !== 'C');
+      const holdACount = remPool.filter(x => x.jobStatus === 'A' || x.jobStatus === 'NO_JOB').length;
+      const offDockCount = remPool.filter(x => x.isOffDock).length;
+      const onDeckCount = remPool.filter(x => {
+        const p = DataAdapters.parsePos6(x.actualPos || x.plannedPos);
+        return p && p.tierNum >= (parseInt(document.getElementById('cfgDeckTier')?.value, 10) || 80);
+      }).length;
+
+      final2hPlan = {
+        recDelayHours,
+        suggestedNewEtdIso,
+        suggestedNewEtdText: TanVuLiveFeed.fmtVN(suggestedNewEtdIso),
+        recCutCount,
+        vesselTotalRem,
+        vesselMaxMovesLeft,
+        activeCapPerHr,
+        holdACount,
+        offDockCount,
+        onDeckCount,
+        headline: isOverdueAtBerth
+          ? `🚨 ĐÃ QUÁ ETD DỰ KIẾN NHƯNG TÀU VẪN CÒN ${vesselTotalRem} CONT TẠI CẦU!`
+          : `🚨 CÒN ${Math.max(0, hoursLeft).toFixed(1)}H TỚI ETD — CÁC PTTB CHẠY TỐI ĐA (${activeCapPerHr} mv/h ≈ ${vesselMaxMovesLeft} cont) KHÔNG THỂ KỊP ${vesselTotalRem} CONT!`,
+        summary: `Khuyến nghị khẩn: (1) LÙI GIỜ TÀU RỜI thêm tối thiểu +${recDelayHours.toFixed(1)}h (tới ${TanVuLiveFeed.fmtVN(suggestedNewEtdIso)}), HOẶC (2) CẮT BỚT tối thiểu ~${recCutCount} cont (ưu tiên: ${holdACount} cont giữ A/chưa job · ${offDockCount} bãi ngoài · ${onDeckCount} trên boong) và NẠP LẠI SƠ ĐỒ (.ASC / Final) mới lên Web.`
+      };
+    }
+
+    // 5. Ánh xạ cảnh báo ETD xuống từng Hầm
     const holdMap = {};
     holds.forEach(h => {
       const hb = holdBase[h.hold];
       const ownerReports = (hb.owners || []).map(o => craneReportMap[o.id]).filter(Boolean);
+
+      if (isDeparted) {
+        holdMap[h.hold] = {
+          ...hb,
+          level: 'DEPARTED',
+          rankScore: 0,
+          isCriticalHold: false,
+          ownerCraneIds: ownerReports.map(r => r.craneId),
+          primaryCraneId: ownerReports[0]?.craneId || '',
+          craneTotalRem: 0,
+          craneHolds: [],
+          currentRate: ownerReports[0]?.currentRate || 0,
+          reqRate: 0,
+          hoursAtCurrent: 0,
+          holdHoursAtCurrent: 0,
+          maxCap: ownerReports[0]?.maxCap || maxRateQc,
+          badgeText: '🚢 Đã rời cầu',
+          shortAction: 'Đã rời cầu',
+          advice: `🚢 Tàu đã rời cầu${etdFormatted !== '—' ? ` lúc ${etdFormatted}` : ''}.`
+        };
+        return;
+      }
 
       if (hb.totalRem === 0) {
         holdMap[h.hold] = {
@@ -6195,6 +6639,7 @@ const EtdPaceEngine = {
           rankScore: 0,
           isCriticalHold: false,
           ownerCraneIds: ownerReports.map(r => r.craneId),
+          primaryCraneId: ownerReports[0]?.craneId || '',
           craneTotalRem: 0,
           craneHolds: [],
           currentRate: ownerReports[0]?.currentRate || 20,
@@ -6217,6 +6662,7 @@ const EtdPaceEngine = {
           rankScore: 4,
           isCriticalHold: true,
           ownerCraneIds: [],
+          primaryCraneId: '',
           craneTotalRem: hb.totalRem,
           craneHolds: [h.hold],
           currentRate: 0,
@@ -6231,7 +6677,6 @@ const EtdPaceEngine = {
         return;
       }
 
-      // Chọn cẩu chịu áp lực nặng nhất đang làm hầm này
       ownerReports.sort((a, b) => b.rankScore - a.rankScore || b.reqRate - a.reqRate);
       const top = ownerReports[0];
       const holdHoursAtCurrent = hb.totalRem / Math.max(1, top.currentRate);
@@ -6258,7 +6703,6 @@ const EtdPaceEngine = {
       };
     });
 
-    // Nếu chưa có hầm nào ở mức Đỏ/Quá tải nhưng có hầm Vàng (AMBER), đánh dấu hầm tồn nhiều nhất trên cẩu căng nhất là Trọng điểm cần chú ý
     const criticalHolds = Object.values(holdMap)
       .filter(h => h.level === 'OVERLOAD' || h.level === 'RED')
       .sort((a, b) => b.rankScore - a.rankScore || b.reqRate - a.reqRate || b.totalRem - a.totalRem);
@@ -6267,14 +6711,26 @@ const EtdPaceEngine = {
       .filter(h => h.level === 'AMBER')
       .sort((a, b) => b.reqRate - a.reqRate || b.totalRem - a.totalRem);
 
-    const worstLevel = criticalHolds.some(h => h.level === 'OVERLOAD')
-      ? 'OVERLOAD'
-      : (criticalHolds.length ? 'RED' : (watchHolds.length ? 'AMBER' : 'GREEN'));
+    const worstLevel = isDeparted
+      ? 'DEPARTED'
+      : (criticalHolds.some(h => h.level === 'OVERLOAD')
+          ? 'OVERLOAD'
+          : (criticalHolds.length ? 'RED' : (watchHolds.length ? 'AMBER' : 'GREEN')));
 
     return {
       etdAt: st.etdAt,
+      etdSource: st.etdSource || 'AUTO',
+      etdFormatted,
+      liveInfo,
       hoursLeft,
-      isOverdue,
+      isPastEtd,
+      isOverdue: isOverdueAtBerth,
+      isDeparted,
+      isCompletedWaitingSail,
+      isFinal2hImpossible,
+      final2hPlan,
+      vesselTotalRem,
+      totalShipDone,
       countdownText,
       redThreshold,
       maxRateQc,
@@ -6294,7 +6750,10 @@ function onEtdDateTimeChange(localVal) {
   const dt = new Date(localVal);
   if (isNaN(dt.getTime())) return;
   state.etdAt = dt.toISOString();
-  ShiftHistoryManager.logAction('ETD TÀU', `Cập nhật giờ rời tàu dự kiến (ETD): ${dt.toLocaleString('vi-VN')}`);
+  state.etdSource = 'MANUAL';
+  state.etdManualOverride = true;
+  state.vesselDepartedManual = false;
+  ShiftHistoryManager.logAction('ETD TÀU', `Chỉnh tay giờ rời cầu (ETD): ${dt.toLocaleString('vi-VN')}`);
   saveCraneAndVesselConfigPersist();
   renderAll();
 }
@@ -6302,9 +6761,100 @@ function onEtdDateTimeChange(localVal) {
 function setEtdHoursFromNow(hours) {
   const h = Number(hours) || 5;
   state.etdAt = new Date(Date.now() + h * 3600000 + 20000).toISOString();
-  ShiftHistoryManager.logAction('ETD TÀU', `Đặt nhanh ETD rời tàu: còn ${h} tiếng`);
+  state.etdSource = 'MANUAL';
+  state.etdManualOverride = true;
+  state.vesselDepartedManual = false;
+  ShiftHistoryManager.logAction('ETD TÀU', `Đặt nhanh ETD rời cầu: còn ${h} tiếng`);
   saveCraneAndVesselConfigPersist();
   renderAll();
+}
+
+function delayEtdByHours(hoursToAdd) {
+  const addH = Math.max(0.5, Number(hoursToAdd) || 1);
+  const curMs = Date.parse(state.etdAt);
+  const baseMs = (!isNaN(curMs) && curMs > Date.now()) ? curMs : Date.now();
+  const newDt = new Date(baseMs + addH * 3600000);
+  state.etdAt = newDt.toISOString();
+  state.etdSource = 'MANUAL';
+  state.etdManualOverride = true;
+  state.vesselDepartedManual = false;
+  ShiftHistoryManager.logAction('LÙI ETD TÀU', `Lùi giờ rời cầu thêm +${addH.toFixed(1)}h → ETD mới: ${TanVuLiveFeed.fmtVN(newDt)}`);
+  saveCraneAndVesselConfigPersist();
+  renderAll();
+}
+
+async function syncEtdFromLiveFeed(showAlert = false) {
+  await TanVuLiveFeed.refresh();
+  const matched = TanVuLiveFeed.applyMatchedInfoToState(state, true);
+  if (matched && matched.etdIso) {
+    saveCraneAndVesselConfigPersist();
+    renderAll();
+    if (showAlert) {
+      alert(`✅ Đã đồng bộ từ lịch tàu Tân Vũ (${matched.etdSource}):\n• Tàu: ${matched.vessel} (${matched.berth || 'TV'})\n• ETD rời cầu: ${TanVuLiveFeed.fmtVN(matched.etdIso)}${matched.loa ? `\n• LOA: ${matched.loa}m` : ''}`);
+    }
+  } else {
+    renderAll();
+    if (showAlert) {
+      alert(`ℹ️ Không tìm thấy tàu "${document.getElementById('cfgVesselName')?.value || state.sessionId}" trong lịch tàu Tân Vũ hôm nay (có thể tàu đã rời cầu hoặc chưa lên lịch Cảng vụ).`);
+    }
+  }
+}
+
+function openReloadStowageForCutoff() {
+  switchTab('tab-setup', 'upload');
+  const card = document.getElementById('card-edi') || document.getElementById('uploadCardsContainer');
+  if (card) card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+function openTanVuScheduleModal() {
+  const list = state.tanVuLiveVessels || [];
+  const titleEl = document.getElementById('exceptionModalTitle');
+  const bodyEl = document.getElementById('exceptionModalBody');
+  const updatedStr = state.liveFeedUpdatedAt ? TanVuLiveFeed.fmtVN(state.liveFeedUpdatedAt) : 'Chưa đồng bộ';
+
+  titleEl.textContent = `⚓ Lịch Tàu & Tiến độ Cảng Tân Vũ (vesselcalldaily · ${list.length} tàu/sà lan)`;
+  bodyEl.innerHTML = `
+    <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px;font-size:11.5px;">
+      <span style="color:var(--muted);">Nguồn hợp nhất 3 API JSON: <b>ePort BerthMap</b> + <b>Lịch Cảng vụ HP</b> + <b>Catalog thông số tàu</b> · Cập nhật: <b>${updatedStr}</b></span>
+      <button class="sm primary" onclick="TanVuLiveFeed.refresh().then(()=>{renderAll();openTanVuScheduleModal();})">🔄 Làm mới ngay</button>
+    </div>
+    <div class="table-wrap" style="max-height:58vh;">
+      <table>
+        <thead>
+          <tr>
+            <th>Bến</th>
+            <th>Tên tàu / Sà lan</th>
+            <th>Hãng / Loại</th>
+            <th>LOA × Beam / DWT</th>
+            <th>Cập (ATB/ETB)</th>
+            <th>Rời (ETD)</th>
+            <th>Trạng thái / Tiến độ</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${list.length ? list.map(v => {
+            const etdDt = TanVuLiveFeed.parseDateTime(v.etd);
+            const leftH = etdDt ? ((etdDt.getTime() - Date.now()) / 3600000) : null;
+            const departedRow = (leftH !== null && leftH <= 0 && (!v.on_berth_eport || (v.progress_pct !== null && v.progress_pct >= 100)));
+            const statusCell = departedRow
+              ? '<span class="badge">🚢 Đã rời cầu</span>'
+              : (v.progress_pct !== null
+                  ? `<b style="color:var(--cyan);">${v.progress_pct}%</b> <span style="color:var(--muted);font-size:10.5px;">(${v.done_plan || v.cont_teu || 'ePort'})</span>`
+                  : '<span class="badge amber">Theo kế hoạch</span>');
+            return `<tr>
+              <td><b style="color:var(--cyan);">${v.berth || '—'}</b></td>
+              <td><b>${v.vessel}</b>${v.is_barge ? ' <span class="badge">Sà lan</span>' : ''}</td>
+              <td>${v.operator || '—'}</td>
+              <td>${v.loa ? v.loa + 'm' : '—'}${v.beam ? ' × ' + v.beam + 'm' : ''}${v.dwt ? ' · ' + v.dwt + 'T' : ''}</td>
+              <td style="color:var(--green);font-weight:700;">${TanVuLiveFeed.fmtVN(v.etb)}</td>
+              <td style="color:var(--amber);font-weight:700;">${TanVuLiveFeed.fmtVN(v.etd)}</td>
+              <td>${statusCell}</td>
+            </tr>`;
+          }).join('') : '<tr><td colspan="7" style="text-align:center;color:var(--muted);padding:14px;">Chưa có dữ liệu tàu tại cầu Cảng Tân Vũ.</td></tr>'}
+        </tbody>
+      </table>
+    </div>`;
+  document.getElementById('exceptionModal').classList.add('open');
 }
 
 function onEtdCapConfigChange() {
@@ -7255,22 +7805,65 @@ function renderHorizontalShipRailCard() {
   const inpTk = document.getElementById('cfgMaxRateTk');
   if (inpTk) inpTk.value = etdEval.maxRateTk;
 
+  // Dải thông tin tàu trực tiếp ăn theo vesselcalldaily.vercel.app
+  const liveMetaBar = document.getElementById('liveVesselMetaBar');
+  if (liveMetaBar) {
+    const lv = etdEval.liveInfo;
+    if (lv) {
+      liveMetaBar.style.display = 'flex';
+      liveMetaBar.innerHTML = `
+        <span class="badge ${etdEval.isDeparted ? '' : 'green'}">${etdEval.isDeparted ? '🚢 ĐÃ RỜI CẦU' : (lv.onBerthEport ? '🟢 Đang làm tại cầu (ePort)' : '🟡 Theo lịch Cảng vụ')}</span>
+        <span><b>${lv.vessel}</b>${lv.berth ? ` · Bến <b>${lv.berth}</b>` : ''}${lv.operator ? ` · ${lv.operator}` : ''}</span>
+        ${lv.loa ? `<span>· LOA <b>${lv.loa}m</b>${lv.beam ? ` × ${lv.beam}m` : ''}${lv.dwt ? ` · ${lv.dwt}T` : ''}</span>` : ''}
+        ${lv.etbRaw ? `<span>· Cập: <b style="color:var(--green);">${TanVuLiveFeed.fmtVN(lv.etbRaw)}</b></span>` : ''}
+        ${lv.etdRaw ? `<span>· Rời (ETD): <b style="color:var(--amber);">${TanVuLiveFeed.fmtVN(lv.etdRaw)}</b></span>` : ''}
+        ${lv.eportPct !== null ? `<span>· ePort: <b style="color:var(--cyan);">${lv.eportPct}%</b>${lv.donePlan ? ` (${lv.donePlan})` : ''}</span>` : ''}
+      `;
+    } else {
+      liveMetaBar.style.display = 'none';
+    }
+  }
+
+  const srcBadge = document.getElementById('etdSourceBadge');
+  if (srcBadge) {
+    const srcMap = {
+      EPORT: { txt: '📡 ePort Live', cls: 'green' },
+      CANGVU: { txt: '📋 Lịch Cảng vụ', cls: '' },
+      MANUAL: { txt: '✏️ Chỉnh tay', cls: 'amber' },
+      DEFAULT: { txt: '⚙️ Mặc định', cls: '' },
+      AUTO: { txt: '🔄 Tự động', cls: '' }
+    };
+    const sm = srcMap[etdEval.etdSource] || srcMap.AUTO;
+    srcBadge.textContent = sm.txt;
+    srcBadge.className = `badge ${sm.cls}`;
+  }
+
   const etdBar = document.getElementById('shipRailEtdBar');
   if (etdBar) {
     etdBar.className = 'etd-bar' + (
-      etdEval.worstLevel === 'OVERLOAD' ? ' etd-overload'
+      etdEval.isDeparted ? ' etd-departed'
+      : (etdEval.worstLevel === 'OVERLOAD' ? ' etd-overload'
       : (etdEval.worstLevel === 'RED' ? ' etd-red'
-      : (etdEval.worstLevel === 'AMBER' ? ' etd-amber' : ''))
+      : (etdEval.worstLevel === 'AMBER' ? ' etd-amber' : '')))
     );
   }
   const cdBadge = document.getElementById('etdCountdownBadge');
   if (cdBadge) {
-    cdBadge.textContent = `⏱️ ${etdEval.countdownText}`;
-    cdBadge.className = `badge ${etdEval.isOverdue || etdEval.hoursLeft <= 4 ? 'red' : (etdEval.hoursLeft <= 6 ? 'amber' : '')}`;
+    cdBadge.textContent = etdEval.isDeparted ? etdEval.countdownText : `⏱️ ${etdEval.countdownText}`;
+    cdBadge.className = `badge ${etdEval.isDeparted ? '' : (etdEval.isCompletedWaitingSail ? 'green' : (etdEval.isOverdue || etdEval.hoursLeft <= 4 ? 'red' : (etdEval.hoursLeft <= 6 ? 'amber' : '')))}`;
   }
   const critBadge = document.getElementById('etdCriticalSummaryBadge');
   if (critBadge) {
-    if (etdEval.criticalHolds.length) {
+    if (etdEval.isDeparted) {
+      critBadge.textContent = '🚢 Tàu đã rời cầu';
+      critBadge.className = 'badge';
+    } else if (etdEval.isCompletedWaitingSail) {
+      critBadge.textContent = '✅ Đã làm xong 100% · Chờ rời cầu';
+      critBadge.className = 'badge green';
+    } else if (etdEval.isFinal2hImpossible && etdEval.final2hPlan) {
+      critBadge.textContent = `🚨 ≤2H KHÔNG KỊP · Lùi +${etdEval.final2hPlan.recDelayHours.toFixed(1)}h hoặc Cắt ~${etdEval.final2hPlan.recCutCount} cont`;
+      critBadge.className = 'badge red';
+    } else if (etdEval.criticalHolds.length) {
       const hNames = etdEval.criticalHolds.map(h => `H${String(h.holdNo).padStart(2, '0')}`).join(', ');
       const topC = etdEval.criticalHolds[0];
       critBadge.textContent = `🔥 Trọng điểm: ${hNames} (${topC.primaryCraneId || 'Chưa cẩu'} · Cần ${topC.reqRate >= 900 ? '>99' : topC.reqRate.toFixed(1)} mv/h)`;
@@ -7283,6 +7876,31 @@ function renderHorizontalShipRailCard() {
     } else {
       critBadge.textContent = '✅ Toàn tàu đang kịp tiến độ ETD';
       critBadge.className = 'badge green';
+    }
+  }
+
+  // Banner khẩn cấp khi còn <= 2 tiếng mà các PTTB chạy hết công suất vẫn không thể kịp
+  const f2hWrap = document.getElementById('etdFinal2hBannerWrap');
+  if (f2hWrap) {
+    if (etdEval.isFinal2hImpossible && etdEval.final2hPlan) {
+      const fp = etdEval.final2hPlan;
+      f2hWrap.style.display = 'block';
+      f2hWrap.innerHTML = `
+        <div class="etd-final2h-banner">
+          <div style="font-weight:900;color:var(--red);font-size:12.5px;">${fp.headline}</div>
+          <div style="margin-top:4px;">
+            • <b>Phương án 1 — Lùi giờ rời tàu (ETD):</b> Đề xuất báo Cảng vụ / Hãng tàu lùi ETD thêm tối thiểu <b>+${fp.recDelayHours.toFixed(1)} giờ</b> (tới khoảng <b>${fp.suggestedNewEtdText}</b>) để các PTTB kịp xếp hết <b>${fp.vesselTotalRem} cont</b>.<br>
+            • <b>Phương án 2 — Cắt bớt hàng & Nạp lại sơ đồ cho Web:</b> Đề xuất cắt bớt tối thiểu <b>~${fp.recCutCount} cont</b> (ưu tiên cắt: <b>${fp.holdACount}</b> cont giữ A/chưa job · <b>${fp.offDockCount}</b> cont bãi ngoài xa · <b>${fp.onDeckCount}</b> cont tầng trên boong) rồi <b>nạp lại file sơ đồ (.ASC / Final Loading)</b> mới lên Web.
+          </div>
+          <div class="etd-final2h-actions">
+            <button type="button" class="danger sm" onclick="delayEtdByHours(${fp.recDelayHours})">⏱️ Lùi ETD thêm +${fp.recDelayHours.toFixed(1)}h (➔ ${fp.suggestedNewEtdText})</button>
+            <button type="button" class="warning sm" onclick="openReloadStowageForCutoff()">📂 Cắt hàng & Nạp lại sơ đồ mới cho Web</button>
+            <button type="button" class="primary sm" onclick="openCriticalHoldsIn3D()">🧊 Soi 3D các hầm không kịp</button>
+          </div>
+        </div>`;
+    } else {
+      f2hWrap.style.display = 'none';
+      f2hWrap.innerHTML = '';
     }
   }
 
@@ -7329,12 +7947,14 @@ function renderHorizontalShipRailCard() {
       ? `<span class="badge ${cr.level === 'OVERLOAD' || cr.level === 'RED' ? 'red' : (cr.level === 'AMBER' ? 'amber' : 'green')}">${cr.badgeText}</span>`
       : '';
 
-    const etdBoxHtml = cr && cr.totalRem > 0 ? `
-      <div class="crane-etd-box ${eCls}" title="${cr.advice.replace(/"/g, '&quot;')}">
-        <div>Còn <b>${cr.totalRem}</b> cont · Hiện <b>${cr.currentRate.toFixed(0)}</b>/h → <b>${cr.hoursAtCurrent.toFixed(1)}h</b></div>
-        <div>ETD ${etdEval.isOverdue ? 'quá giờ' : etdEval.hoursLeft.toFixed(1) + 'h'} → <b>Cần ${cr.reqRate >= 900 ? '>99' : cr.reqRate.toFixed(1)} mv/h</b></div>
-        <div style="font-size:9.5px;margin-top:1px;">⚡ ${cr.shortAction}</div>
-      </div>` : (cr ? `<div class="crane-etd-box etd-green">✅ Đã xong hầm phụ trách</div>` : '');
+    const etdBoxHtml = etdEval.isDeparted
+      ? `<div class="crane-etd-box">🚢 Tàu đã rời cầu</div>`
+      : (cr && cr.totalRem > 0 ? `
+        <div class="crane-etd-box ${eCls}" title="${cr.advice.replace(/"/g, '&quot;')}">
+          <div>Còn <b>${cr.totalRem}</b> cont · Hiện <b>${cr.currentRate.toFixed(0)}</b>/h → <b>${cr.hoursAtCurrent.toFixed(1)}h</b></div>
+          <div>ETD ${etdEval.isOverdue ? 'vượt giờ' : etdEval.hoursLeft.toFixed(1) + 'h'} → <b>Cần ${cr.reqRate >= 900 ? '>99' : cr.reqRate.toFixed(1)} mv/h</b></div>
+          <div style="font-size:9.5px;margin-top:1px;">⚡ ${cr.shortAction}</div>
+        </div>` : (cr ? `<div class="crane-etd-box etd-green">✅ Đã xong hầm phụ trách</div>` : ''));
 
     const barrierHtml = idx < railCranes.length - 1
       ? `<div class="rail-barrier" title="Ràng buộc ray: ${c.id} và ${railCranes[idx+1].id} không thể chạy vượt qua nhau"><span>║</span><span style="font-size:8px;">CHẮN</span><span>║</span></div>`
@@ -7388,7 +8008,9 @@ function renderHorizontalShipRailCard() {
     const firstBay = h.bays[0] || '01';
 
     let holdStatusPill = '';
-    if (he && he.totalRem > 0) {
+    if (etdEval.isDeparted) {
+      holdStatusPill = `<div class="hold-etd-pill" style="background:rgba(100,116,139,0.16);color:var(--muted);">🚢 Đã rời</div>`;
+    } else if (he && he.totalRem > 0) {
       if (he.level === 'OVERLOAD' || he.level === 'RED') {
         holdStatusPill = `<div class="hold-etd-pill ${hEtdCls}">🔥 TRỌNG ĐIỂM · ${he.reqRate >= 900 ? 'QUÁ TẢI' : he.reqRate.toFixed(1) + '/h'}</div>`;
       } else if (he.level === 'AMBER') {
@@ -7445,6 +8067,11 @@ function renderHorizontalShipRailCard() {
   // 3. DẢI KHUYẾN NGHỊ TRỌNG ĐIỂM THEO ETD NGAY DƯỚI THÂN TÀU
   const advStrip = document.getElementById('etdCriticalAdvisoryStrip');
   if (advStrip) {
+    if (etdEval.isDeparted) {
+      advStrip.innerHTML = `<div class="etd-adv-card" style="border-left-color:#64748b;">
+        <strong>🚢 Tàu đã rời cầu${etdEval.etdFormatted !== '—' ? ` lúc ${etdEval.etdFormatted}` : ''}</strong> — Dữ liệu đang lưu trữ ở chế độ xem lại (không phát cảnh báo ETD).
+      </div>`;
+    } else {
     const alertCranes = etdEval.craneReports
       .filter(r => r.totalRem > 0)
       .sort((a, b) => b.rankScore - a.rankScore || b.reqRate - a.reqRate);
@@ -7478,6 +8105,7 @@ function renderHorizontalShipRailCard() {
     }).join('');
 
     advStrip.innerHTML = html;
+    }
   }
 
   const noteEl = document.getElementById('railConstraintNote');
@@ -8215,70 +8843,72 @@ function selectNvBerthSide(side) {
   document.getElementById('btnNvSideStarboard')?.classList.toggle('active', clean === 'STARBOARD');
 }
 
-function pickSuggestedVessel(vName, voyage, berth, loa) {
+function pickSuggestedVessel(vName, voyage, berth, loa, beam = 0, etdRaw = '') {
   document.getElementById('nvVesselName').value = String(vName || '').trim().toUpperCase();
   document.getElementById('nvVoyage').value = String(voyage || '001S').trim().toUpperCase();
   const bSel = document.getElementById('nvBerth');
   if (bSel && berth) {
-    const normB = String(berth).toUpperCase().replace(/[^A-Z0-9]/g, '');
+    const normB = TanVuLiveFeed.normalizeBerth(berth);
     const matchOpt = Array.from(bSel.options).find(o => normB.includes(o.value));
     if (matchOpt) bSel.value = matchOpt.value;
   }
-  if (loa && loa >= 60) document.getElementById('nvLength').value = Math.round(loa);
+  if (loa && loa >= 40) document.getElementById('nvLength').value = Math.round(loa);
+  if (beam && beam >= 10) document.getElementById('nvBeam').value = beam;
+  window._nvPickedEtdRaw = etdRaw || '';
   const msg = document.getElementById('nvModalMsg');
   msg.style.color = 'var(--cyan)';
-  msg.textContent = `Đã điền tàu [${vName}] — hãy kiểm tra số chuyến, chọn Hướng cập mạn Trái/Phải rồi bấm "Khởi tạo & Mở tàu này".`;
+  msg.textContent = `Đã điền tàu [${vName}]${etdRaw ? ` · ETD: ${TanVuLiveFeed.fmtVN(etdRaw)}` : ''} — chọn Hướng cập mạn Trái/Phải rồi bấm "Khởi tạo & Mở tàu này".`;
 }
 
 async function refreshNewVesselSuggestions(forceFetch = false) {
   const atBerthEl = document.getElementById('nvAtBerthList');
   const upcomingEl = document.getElementById('nvUpcomingList');
-  if (forceFetch || !Object.keys(state.eportJobs || {}).length) {
-    try {
-      const { eportMap } = await CloudRepo.listAllVessels();
-      state.eportJobs = eportMap || {};
-    } catch (e) {}
+  if (forceFetch || !state.liveFeedLoaded) {
+    try { await TanVuLiveFeed.refresh(); } catch (e) {}
   }
 
-  // 1. Danh sách tàu đang làm hàng tại cầu từ ePort Tân Vũ
-  const atBerthEntries = Object.entries(state.eportJobs || {});
+  const liveAll = state.tanVuLiveVessels || [];
+  const atBerth = liveAll.filter(v => v.on_berth_eport && !v.is_barge);
+  const upcoming = liveAll.filter(v => !v.on_berth_eport && !v.is_barge);
+
+  // 1. Danh sách tàu đang làm hàng tại cầu (ePort BerthMap + Catalog + Cảng vụ)
   if (atBerthEl) {
-    atBerthEl.innerHTML = atBerthEntries.length ? atBerthEntries.map(([vKey, ej]) => {
-      const safeName = vKey.replace(/'/g, "\'");
-      const safeBerth = String(ej.berth || 'TV3').replace(/'/g, "\'");
+    atBerthEl.innerHTML = atBerth.length ? atBerth.map(v => {
+      const safeName = v.vessel.replace(/'/g, "\\'");
+      const safeBerth = String(v.berth || 'TV3').replace(/'/g, "\\'");
+      const safeEtd = String(v.etd || '').replace(/'/g, "\\'");
       return `
-        <div class="vessel-suggest-card" onclick="pickSuggestedVessel('${safeName}', '${ej.voyage || '001S'}', '${safeBerth}', ${ej.loa || 172})">
+        <div class="vessel-suggest-card" onclick="pickSuggestedVessel('${safeName}', '001S', '${safeBerth}', ${v.loa || 172}, ${v.beam || 0}, '${safeEtd}')">
           <div style="display:flex;justify-content:space-between;align-items:center;gap:4px;">
-            <strong style="font-size:12px;">🚢 ${vKey}</strong>
-            <span class="badge green">${ej.berth || 'TV'}</span>
+            <strong style="font-size:12px;">🚢 ${v.vessel}</strong>
+            <span class="badge green">${v.berth || 'TV'}</span>
           </div>
           <div style="font-size:10.5px;color:var(--muted);margin-top:3px;">
-            Tiến độ ePort: <b>${ej.doneCont || 0}/${ej.totalCont || 0} ${ej.cargoUnit || 'cont'} (${ej.pct || 0}%)</b>
+            ePort: <b>${v.progress_pct !== null ? v.progress_pct + '%' : '—'}</b> ${v.done_plan ? `(${v.done_plan})` : ''} · Rời: <b style="color:var(--amber);">${TanVuLiveFeed.fmtVN(v.etd)}</b>
           </div>
         </div>
       `;
     }).join('') : '<div style="font-size:11px;color:var(--muted);">Chưa lấy được danh sách tàu từ ePort Tân Vũ (bạn có thể gõ tay tên tàu bên dưới).</div>';
   }
 
-  // 2. Danh sách tàu đang chuẩn bị cập cầu (Cảng vụ / Shifting Plan)
-  const upcomingList = await CloudRepo.fetchUpcomingVessels();
+  // 2. Danh sách tàu chuẩn bị cập cầu (Lịch Cảng vụ HP từ vesselcalldaily)
   if (upcomingEl) {
-    upcomingEl.innerHTML = upcomingList.length ? upcomingList.map(u => {
-      const safeName = String(u.vessel_name || '').replace(/'/g, "\'");
-      const safeVoy = String(u.voyage || '001S').replace(/'/g, "\'");
-      const safeBerth = String(u.berth || 'TV3').replace(/'/g, "\'");
+    upcomingEl.innerHTML = upcoming.length ? upcoming.map(v => {
+      const safeName = v.vessel.replace(/'/g, "\\'");
+      const safeBerth = String(v.berth || 'TV3').replace(/'/g, "\\'");
+      const safeEtd = String(v.etd || '').replace(/'/g, "\\'");
       return `
-        <div class="vessel-suggest-card upcoming" onclick="pickSuggestedVessel('${safeName}', '${safeVoy}', '${safeBerth}', ${u.loa || 172})">
+        <div class="vessel-suggest-card upcoming" onclick="pickSuggestedVessel('${safeName}', '001S', '${safeBerth}', ${v.loa || 172}, ${v.beam || 0}, '${safeEtd}')">
           <div style="display:flex;justify-content:space-between;align-items:center;gap:4px;">
-            <strong style="font-size:12px;">⚓ ${u.vessel_name}</strong>
-            <span class="badge amber">${u.berth || 'TV'}</span>
+            <strong style="font-size:12px;">⚓ ${v.vessel}</strong>
+            <span class="badge amber">${v.berth || 'TV'}</span>
           </div>
           <div style="font-size:10.5px;color:var(--muted);margin-top:3px;">
-            ${u.action}${u.eta ? ` · ETA: <b>${u.eta}</b>` : ''}
+            Cập: <b>${TanVuLiveFeed.fmtVN(v.etb)}</b> · Rời: <b style="color:var(--amber);">${TanVuLiveFeed.fmtVN(v.etd)}</b>${v.loa ? ` · ${v.loa}m` : ''}
           </div>
         </div>
       `;
-    }).join('') : '<div style="font-size:11px;color:var(--muted);">Chưa có tàu sắp cập trong dữ liệu Cảng vụ (có thể bấm gõ tay tên tàu mới ở mục 2 bên dưới).</div>';
+    }).join('') : '<div style="font-size:11px;color:var(--muted);">Chưa có tàu sắp cập hôm nay trong lịch Cảng vụ (bạn có thể gõ tay tên tàu ở mục 2 bên dưới).</div>';
   }
 }
 
@@ -8322,6 +8952,17 @@ async function submitNewVesselModal() {
   state.sessionId = id;
   state.berthingSide = side;
   state.isCustomHoldConfig = false;
+  const pickedEtdDt = window._nvPickedEtdRaw ? TanVuLiveFeed.parseDateTime(window._nvPickedEtdRaw) : null;
+  if (pickedEtdDt) {
+    state.etdAt = pickedEtdDt.toISOString();
+    state.etdSource = 'EPORT';
+    state.etdManualOverride = false;
+    state.vesselDepartedManual = false;
+  } else {
+    state.etdAt = '';
+    state.etdManualOverride = false;
+    state.vesselDepartedManual = false;
+  }
   HoldLayoutEngine.syncHoldsForState(state, loa, true);
   if (autoAssign) CraneRailOrder.autoDistributeHolds(state);
 
@@ -9705,27 +10346,39 @@ function renderOpsCockpitAndTicker(pool) {
     issues.push({ severity: 'urgent', title: '⏫ Mũi đang VẾCH (Chìm lái) → Ưu tiên gọi hàng nặng lên các Hầm Mũi', detail: 'Thuật toán đã ưu tiên gọi cont nặng ở nhóm Hầm đầu (Mũi) và hãm cont nặng đuôi Lái.', action: "expandAndScrollTo('panel-smart-dispatch')" });
   }
 
-  // Cảnh báo Tiến độ ETD & Hầm trọng điểm (ưu tiên đầu tiên để Chỉ đạo nhìn là thấy ngay!)
+  // Cảnh báo Tiến độ ETD & Hầm trọng điểm (tự tắt khi tàu đã rời cầu; kích hoạt cảnh báo lùi giờ / cắt hàng khi <= 2h)
   const etdEval = window._latestEtdEval || EtdPaceEngine.evaluate(state, pool, analysis);
-  (etdEval.craneReports || []).filter(r => r.level === 'OVERLOAD' || r.level === 'RED' || r.level === 'AMBER').forEach(r => {
-    const hStr = r.holds.map(n => 'H' + String(n).padStart(2, '0')).join(', ');
-    issues.push({
-      id: `ETD_${r.craneId}_${r.level}`,
-      severity: (r.level === 'OVERLOAD' || r.level === 'RED') ? 'urgent' : 'warn',
-      title: `🔥 ${r.craneId} (${hStr}): Còn ${r.totalRem} cont · Hiện ${r.currentRate.toFixed(0)}/h (${r.hoursAtCurrent.toFixed(1)}h) · ETD ${etdEval.isOverdue ? 'quá giờ' : etdEval.hoursLeft.toFixed(1) + 'h'} → Cần ${r.reqRate >= 900 ? '>99' : r.reqRate.toFixed(1)} mv/h [${r.shortAction}]`,
-      detail: r.advice,
-      action: `openHoldsListIn3D(${JSON.stringify(r.holds)})`
+  if (!etdEval.isDeparted) {
+    if (etdEval.isFinal2hImpossible && etdEval.final2hPlan) {
+      const fp = etdEval.final2hPlan;
+      issues.push({
+        id: `ETD_FINAL_2H_${fp.recCutCount}`,
+        severity: 'urgent',
+        title: `🚨 CÒN ≤2H KHÔNG KỊP ETD (${fp.vesselTotalRem} cont): Lùi ETD +${fp.recDelayHours.toFixed(1)}h HOẶC Cắt ~${fp.recCutCount} cont & nạp lại sơ đồ!`,
+        detail: fp.summary,
+        action: "expandAndScrollTo('shipRailEtdBar')"
+      });
+    }
+    (etdEval.craneReports || []).filter(r => r.level === 'OVERLOAD' || r.level === 'RED' || r.level === 'AMBER').forEach(r => {
+      const hStr = r.holds.map(n => 'H' + String(n).padStart(2, '0')).join(', ');
+      issues.push({
+        id: `ETD_${r.craneId}_${r.level}`,
+        severity: (r.level === 'OVERLOAD' || r.level === 'RED') ? 'urgent' : 'warn',
+        title: `🔥 ${r.craneId} (${hStr}): Còn ${r.totalRem} cont · Hiện ${r.currentRate.toFixed(0)}/h (${r.hoursAtCurrent.toFixed(1)}h) · ETD ${etdEval.isOverdue ? 'vượt giờ' : etdEval.hoursLeft.toFixed(1) + 'h'} → Cần ${r.reqRate >= 900 ? '>99' : r.reqRate.toFixed(1)} mv/h [${r.shortAction}]`,
+        detail: r.advice,
+        action: `openHoldsListIn3D(${JSON.stringify(r.holds)})`
+      });
     });
-  });
-  Object.values(etdEval.holdMap || {}).filter(h => h.totalRem > 0 && !h.ownerCraneIds.length).forEach(uh => {
-    issues.push({
-      id: `ETD_UNASSIGNED_H${uh.holdNo}`,
-      severity: 'urgent',
-      title: `🚨 ${uh.label} còn ${uh.totalRem} cont nhưng CHƯA GÁN CẨU!`,
-      detail: uh.advice,
-      action: `openHold3DModal(${uh.holdNo})`
+    Object.values(etdEval.holdMap || {}).filter(h => h.totalRem > 0 && !h.ownerCraneIds.length).forEach(uh => {
+      issues.push({
+        id: `ETD_UNASSIGNED_H${uh.holdNo}`,
+        severity: 'urgent',
+        title: `🚨 ${uh.label} còn ${uh.totalRem} cont nhưng CHƯA GÁN CẨU!`,
+        detail: uh.advice,
+        action: `openHold3DModal(${uh.holdNo})`
+      });
     });
-  });
+  }
 
   (analysis.railCrossingConflicts || []).forEach(cf => {
     issues.push({ severity: 'urgent', title: `Chéo ray cẩu: ${cf.message}`, detail: 'Bấm "Tự chia Hầm đúng ray" để chỉnh lại thứ tự vật lý.', action: "expandAndScrollTo('panel-ship-rail')" });
@@ -9911,6 +10564,9 @@ function saveCraneAndVesselConfigPersist(showToast = false) {
     deckTier: parseInt(document.getElementById('cfgDeckTier')?.value, 10) || 80,
     holdMaxTier: parseInt(document.getElementById('cfgHoldMaxTier')?.value, 10) || 12,
     etdAt: state.etdAt || '',
+    etdSource: state.etdSource || 'AUTO',
+    etdManualOverride: Boolean(state.etdManualOverride),
+    vesselDepartedManual: Boolean(state.vesselDepartedManual),
     etdMaxRateQc: state.etdMaxRateQc || 27,
     etdMaxRateTk: state.etdMaxRateTk || 26
   };
@@ -9949,6 +10605,9 @@ function restoreLocalCraneAndAttitudeIfNewer(sessionId, dbUpdatedAt) {
       if (raw.holdMaxTier) { const el = document.getElementById('cfgHoldMaxTier'); if (el) el.value = raw.holdMaxTier; }
       if (raw.setupCompleted !== undefined) state.setupCompleted = Boolean(raw.setupCompleted);
       if (raw.etdAt !== undefined) state.etdAt = raw.etdAt;
+      if (raw.etdSource) state.etdSource = raw.etdSource;
+      if (raw.etdManualOverride !== undefined) state.etdManualOverride = Boolean(raw.etdManualOverride);
+      if (raw.vesselDepartedManual !== undefined) state.vesselDepartedManual = Boolean(raw.vesselDepartedManual);
       if (raw.etdMaxRateQc) state.etdMaxRateQc = Number(raw.etdMaxRateQc);
       if (raw.etdMaxRateTk) state.etdMaxRateTk = Number(raw.etdMaxRateTk);
     }
@@ -10695,6 +11354,19 @@ function renderAll() {
   updateEdiFirstRequirementUI();
   updateAdminPinHeaderBtn();
 }
+
+// Tự động đồng bộ 3 nguồn dữ liệu vesselcalldaily.vercel.app mỗi 5 phút (300.000ms)
+setInterval(async () => {
+  if (!AdminPinGuard.isUnlocked()) return;
+  try {
+    await TanVuLiveFeed.refresh();
+    if (state.sessionId) {
+      TanVuLiveFeed.applyMatchedInfoToState(state, false);
+      renderHorizontalShipRailCard();
+      if (typeof renderHold3DViews === 'function') renderHold3DViews();
+    }
+  } catch (e) {}
+}, APP_CONFIG.VESSEL_DAILY_POLL_MS);
 
 // Bộ đếm tự động đánh giá hiệu suất cẩu mỗi 1 tiếng & cập nhật cảnh báo ETD mỗi phút
 setInterval(() => {
@@ -12293,7 +12965,9 @@ class Hold3DCanvasController {
 
       let line1 = `H${String(pr.holdNo).padStart(2, '0')}${craneTxt} · Còn ${he ? he.totalRem : pr.expRemain}`;
       let line2 = '';
-      if (he && he.totalRem > 0) {
+      if (m.etdEval && m.etdEval.isDeparted) {
+        line1 = `🚢 H${String(pr.holdNo).padStart(2, '0')}${craneTxt} · Đã rời cầu`;
+      } else if (he && he.totalRem > 0) {
         const reqStr = he.reqRate >= 900 ? '>99' : he.reqRate.toFixed(1);
         if (isRed) {
           line1 = `🔥 H${String(pr.holdNo).padStart(2, '0')}${craneTxt} · Cần ${reqStr} mv/h (🔴 ĐỎ)`;
@@ -12373,29 +13047,58 @@ function renderHold3DEtdHud(prefix, model) {
   const units = model.holdUnits || [];
   const worstUnit = [...units].sort((a, b) => ((b.etd?.rankScore || 0) - (a.etd?.rankScore || 0)) || ((b.etd?.reqRate || 0) - (a.etd?.reqRate || 0)))[0];
   const he = worstUnit?.etd;
-  const lv = he ? he.level : etd.worstLevel;
-  const cls = lv === 'OVERLOAD' ? 'etd-overload' : (lv === 'RED' ? 'etd-red' : (lv === 'AMBER' ? 'etd-amber' : 'etd-green'));
+  const lv = etd.isDeparted ? 'DEPARTED' : (etd.isFinal2hImpossible ? 'OVERLOAD' : (he ? he.level : etd.worstLevel));
+  const cls = lv === 'DEPARTED' ? 'etd-departed' : (lv === 'OVERLOAD' ? 'etd-overload' : (lv === 'RED' ? 'etd-red' : (lv === 'AMBER' ? 'etd-amber' : 'etd-green')));
   hud.className = `hold3d-etd-hud ${cls}`;
 
   const localVal = EtdPaceEngine.toLocalInputValue(etd.etdAt);
-  const summaryMsg = (he && he.totalRem > 0)
-    ? he.advice
-    : `✅ Các hầm đang xem đã hoàn tất / đang kịp ETD (${etd.countdownText}).`;
+  let pillTxt = '✅ Kịp ETD';
+  let pillCls = 'green';
+  let summaryMsg = '';
+  let extraActionBtns = '';
+
+  if (etd.isDeparted) {
+    pillTxt = '🚢 Đã rời cầu';
+    pillCls = '';
+    summaryMsg = `🚢 Tàu đã rời cầu${etd.etdFormatted !== '—' ? ` lúc ${etd.etdFormatted}` : ''} (dữ liệu đang ở chế độ xem lại · đã hoàn tất).`;
+  } else if (etd.isCompletedWaitingSail) {
+    pillTxt = '✅ Xong hàng';
+    pillCls = 'green';
+    summaryMsg = `✅ Toàn bộ các hầm trên tàu đã hoàn thành 100%, chờ rời cầu (${etd.countdownText}).`;
+  } else if (etd.isFinal2hImpossible && etd.final2hPlan) {
+    const fp = etd.final2hPlan;
+    pillTxt = '🚨 ≤2H KHÔNG KỊP';
+    pillCls = 'red';
+    summaryMsg = `${fp.headline} → ${fp.summary}`;
+    extraActionBtns = `
+      <button type="button" class="danger sm" style="min-height:26px;padding:2px 7px;" onclick="delayEtdByHours(${fp.recDelayHours})">⏱️ Lùi +${fp.recDelayHours.toFixed(1)}h</button>
+      <button type="button" class="warning sm" style="min-height:26px;padding:2px 7px;" onclick="closeModal('hold3DModal');openReloadStowageForCutoff()">📂 Nạp lại sơ đồ</button>`;
+  } else if (he && he.totalRem > 0) {
+    pillTxt = he.badgeText;
+    pillCls = (lv === 'OVERLOAD' || lv === 'RED') ? 'red' : (lv === 'AMBER' ? 'amber' : 'green');
+    summaryMsg = he.advice;
+  } else {
+    pillTxt = '✅ Đã xong hầm';
+    pillCls = 'green';
+    summaryMsg = `✅ Các hầm đang chọn trên 3D đã làm xong (${etd.countdownText}).`;
+  }
 
   hud.innerHTML = `
     <div style="flex:1;min-width:240px;">
       <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:3px;">
-        <span class="badge ${lv === 'OVERLOAD' || lv === 'RED' ? 'red' : (lv === 'AMBER' ? 'amber' : 'green')}">${he && he.totalRem > 0 ? he.badgeText : '✅ Kịp ETD'}</span>
-        <strong>⏱️ ${etd.countdownText}</strong>
-        <span style="font-size:10.5px;color:var(--muted);">(Ngưỡng đỏ: ≥25 mv/h · Trần QC/TK: ${etd.maxRateQc}/${etd.maxRateTk} mv/h)</span>
+        <span class="badge ${pillCls}">${pillTxt}</span>
+        <strong>${etd.isDeparted ? etd.countdownText : '⏱️ ' + etd.countdownText}</strong>
+        <span style="font-size:10.5px;color:var(--muted);">(Nguồn: ${etd.etdSource === 'EPORT' ? 'ePort' : (etd.etdSource === 'CANGVU' ? 'Cảng vụ' : (etd.etdSource === 'MANUAL' ? 'Chỉnh tay' : 'Tự động'))} · Trần QC/TK: ${etd.maxRateQc}/${etd.maxRateTk} mv/h)</span>
       </div>
       <div style="font-size:11px;font-weight:${lv === 'OVERLOAD' || lv === 'RED' ? '750' : '600'};">${summaryMsg}</div>
     </div>
     <div style="display:flex;align-items:center;gap:4px;flex-wrap:wrap;">
-      <input type="datetime-local" value="${localVal}" onchange="onEtdDateTimeChange(this.value)" style="min-height:27px;padding:1px 6px;font-size:11px;font-weight:700;" title="Chỉnh trực tiếp giờ rời tàu ETD">
+      ${extraActionBtns}
+      <input type="datetime-local" value="${localVal}" onchange="onEtdDateTimeChange(this.value)" style="min-height:27px;padding:1px 6px;font-size:11px;font-weight:700;" title="Chỉnh trực tiếp giờ rời cầu ETD">
+      <button type="button" class="sm" style="min-height:26px;padding:2px 6px;" onclick="syncEtdFromLiveFeed(true)" title="Lấy lại ETD tự động từ vesselcalldaily">🔄</button>
+      <button type="button" class="sm" style="min-height:26px;padding:2px 6px;" onclick="setEtdHoursFromNow(2)">2h</button>
       <button type="button" class="sm" style="min-height:26px;padding:2px 6px;" onclick="setEtdHoursFromNow(4)">4h</button>
       <button type="button" class="sm" style="min-height:26px;padding:2px 6px;" onclick="setEtdHoursFromNow(5)">5h</button>
-      <button type="button" class="sm" style="min-height:26px;padding:2px 6px;" onclick="setEtdHoursFromNow(6)">6h</button>
     </div>
   `;
 }
