@@ -2100,6 +2100,9 @@ pre.schema-box {
       <span class="ticker-item"><span class="ticker-dot info"></span>Đang tổng hợp khuyến nghị điều hành theo dữ liệu tàu...</span>
     </div>
   </div>
+  <button class="ghost sm" id="btnAdvisoryAutoTick" style="min-height:26px;padding:3px 8px;white-space:nowrap;font-size:10.5px;" onclick="refreshAdvisoryCardsLive(true, true)" title="Các thẻ khuyến nghị tự động reload 01 phút/lần (Bấm để làm mới ngay)">
+    🔄 1p
+  </button>
   <button class="ghost sm" style="min-height:26px;padding:3px 9px;white-space:nowrap;" onclick="openHistoryInboxModal('audit')" title="Xem lịch sử thao tác & bàn giao ca trước">
     📜 Nhật ký ca
   </button>
@@ -2822,7 +2825,7 @@ pre.schema-box {
         </div>
         <div class="panel-body">
           <div style="font-size:11px;color:var(--muted);margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;gap:6px;flex-wrap:wrap;">
-            <span>Thứ tự cẩu cố định dọc ray <b>Thượng lưu ➔ Hạ lưu (Cửa biển)</b>: <code>QC10 ➔ QC09 ➔ QC08 ➔ QC07 ➔ QC11 ➔ QC12 ➔ TK07 ➔ TK10 ➔ QC06 ➔ QC05 ➔ TK06 ➔ TK05 ➔ TK11 ➔ TK12</code> (không thể vượt qua nhau).</span>
+            <span>Thứ tự cẩu cố định dọc ray <b>Thượng lưu ➔ Hạ lưu (Cửa biển)</b>: <code>QC10 ➔ QC09 ➔ QC08 ➔ QC07 ➔ QC12 ➔ QC11 ➔ TK07 ➔ TK10 ➔ QC06 ➔ QC05 ➔ TK06 ➔ TK05 ➔ TK12 ➔ TK11</code> (không thể vượt qua nhau).</span>
             <div style="display:flex;gap:5px;flex-wrap:wrap;">
               <button class="sm" onclick="toggleBerthingSideQuick()" title="Đổi hướng cập Mạn Trái / Mạn Phải">🔄 Đổi Mạn Trái / Phải</button>
               <button class="primary sm" onclick="autoDistributeHoldsByRail()" title="Tự động chia Hầm cho các cẩu theo đúng thứ tự vật lý trên ray">⚡ Tự chia Hầm đúng ray</button>
@@ -3270,7 +3273,7 @@ pre.schema-box {
     <div class="wiz-pane" id="wpane-3">
       <div style="background:rgba(2,132,199,0.08);border:1px solid var(--cyan);border-radius:8px;padding:9px 11px;margin-bottom:10px;font-size:11.5px;">
         <b>Bước 3/5 — Chọn Thiết bị khai thác & Chia Hầm (Tự lưu cấu hình, reload không bị mất):</b><br>
-        Thứ tự dọc ray Thượng lưu ➔ Hạ lưu: <code>QC10 ➔ QC09 ➔ QC08 ➔ QC07 ➔ QC11 ➔ QC12 ➔ TK07 ➔ TK10 ➔ QC06 ➔ QC05 ➔ TK06 ➔ TK05 ➔ TK11 ➔ TK12</code>
+        Thứ tự dọc ray Thượng lưu ➔ Hạ lưu: <code>QC10 ➔ QC09 ➔ QC08 ➔ QC07 ➔ QC12 ➔ QC11 ➔ TK07 ➔ TK10 ➔ QC06 ➔ QC05 ➔ TK06 ➔ TK05 ➔ TK12 ➔ TK11</code>
       </div>
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;flex-wrap:wrap;gap:6px;">
         <strong style="font-size:11.5px;">Chọn các cẩu tham gia làm tàu:</strong>
@@ -3507,7 +3510,7 @@ const APP_CONFIG = {
 const sb = window.supabase.createClient(APP_CONFIG.SUPABASE_URL, APP_CONFIG.SUPABASE_KEY);
 const sbBot = window.supabase.createClient(APP_CONFIG.BOT_SUPABASE_URL, APP_CONFIG.BOT_SUPABASE_KEY);
 
-const PRESET_CRANES = ['QC10','QC09','QC08','QC07','QC11','QC12','TK07','TK10','QC06','QC05','TK06','TK05','TK11','TK12'];
+const PRESET_CRANES = ['QC10','QC09','QC08','QC07','QC12','QC11','TK07','TK10','QC06','QC05','TK06','TK05','TK12','TK11'];
 const DEFAULT_OFF_DOCK_CATALOG = [
   { code: 'GFW', name: 'Bãi GFW (Ngoài cảng)', distanceKm: 6, trucks: 5 },
   { code: 'HHH', name: 'Bãi Hoàng Huy (HHH)', distanceKm: 8, trucks: 5 },
@@ -3566,8 +3569,8 @@ const state = {
   selectedBays: new Set(),
   calledContainers: new Set(),
   cranes: [
-    { id: 'QC11', active: true, mode: 'BOTH', holds: [1,2,3], paused: false, pauseStart: null, rate: 28 },
-    { id: 'QC12', active: true, mode: 'BOTH', holds: [4,5,6], paused: false, pauseStart: null, rate: 28 },
+    { id: 'QC12', active: true, mode: 'BOTH', holds: [1,2,3], paused: false, pauseStart: null, rate: 28 },
+    { id: 'QC11', active: true, mode: 'BOTH', holds: [4,5,6], paused: false, pauseStart: null, rate: 28 },
     { id: 'TK07', active: true, mode: 'BOTH', holds: [7,8], paused: false, pauseStart: null, rate: 24 },
     { id: 'TK10', active: true, mode: 'IMPORT_ONLY', holds: [9], paused: false, pauseStart: null, rate: 22 }
   ],
@@ -3654,7 +3657,7 @@ const AdminPinGuard = {
       document.body.classList.remove('app-locked-blur');
       if (!this.hasInitializedAppAfterUnlock) {
         this.hasInitializedAppAfterUnlock = true;
-        syncAllCloudData().then(() => refreshBotCommandStatus(false));
+        syncAllCloudData({ isInitialRestore: true }).then(() => refreshBotCommandStatus(false));
       }
     } else {
       // Đóng mọi modal đang mở (kể cả Bot OM) khi hết phiên 60 phút
@@ -3971,7 +3974,7 @@ const CloudRepo = {
     } catch (e) { return null; }
   },
 
-  async loadSessionFromCloud(sessionId) {
+  async loadSessionFromCloud(sessionId, opts = {}) {
     state.sessionId = sessionId || '';
     VesselUploadGuard.lock();
     updateStep1GuardUI();
@@ -4123,7 +4126,9 @@ const CloudRepo = {
 
       HoldLayoutEngine.syncHoldsForState(state, parseFloat(document.getElementById('cfgLength').value) || 172, false);
       renderAll();
-      if (!hasVesselEdiOrAscData()) {
+      if (opts && opts.isInitialRestore && typeof ScreenStateManager !== 'undefined') {
+        ScreenStateManager.restoreAfterDataLoad();
+      } else if (!hasVesselEdiOrAscData()) {
         switchTab('tab-upload');
       }
 
@@ -4135,13 +4140,15 @@ const CloudRepo = {
     }
   },
 
-  async pollLatestJobsOnly() {
+  async pollLatestJobsOnly(silentRefresh = false) {
+    if (!state.sessionId) return false;
     const existingFiles = await this.listExistingSessionFiles(state.sessionId, true);
-    if (existingFiles && existingFiles.size === 0) return;
-    const [jobsJson, resJson, finalJson] = await Promise.all([
+    if (existingFiles && existingFiles.size === 0) return false;
+    const [jobsJson, resJson, finalJson, yardPosJson] = await Promise.all([
       this.downloadFile(state.sessionId, 'jobs.json', existingFiles),
       this.downloadFile(state.sessionId, 'reserved.json', existingFiles),
-      this.downloadFile(state.sessionId, 'final.json', existingFiles)
+      this.downloadFile(state.sessionId, 'final.json', existingFiles),
+      this.downloadFile(state.sessionId, 'yard_positions.json', existingFiles)
     ]);
     let changed = false;
     const nowStr = new Date().toLocaleTimeString('vi-VN');
@@ -4169,11 +4176,22 @@ const CloudRepo = {
       setCardStatus('final', `✓ ${finalJson.source || 'OM_AUTO_BOT'}: ${state.finalLoading.length} Final (${nowStr})`, true);
       changed = true;
     }
+    if (yardPosJson && yardPosJson.updated_at && yardPosJson.updated_at !== state.yardOverridesUpdatedAt) {
+      state.yardPositionOverrides = DataAdapters.normalizeYardPositions(yardPosJson);
+      state.yardOverridesUpdatedAt = yardPosJson.updated_at;
+      setCardStatus('yardpos', `✓ Cloud: ${state.yardPositionOverrides.length} vị trí bãi (${nowStr})`, true);
+      changed = true;
+    }
 
     if (changed) {
-      this.setSub(`Bot OM đồng bộ lúc ${nowStr}`);
-      renderAll();
+      this.setSub(`Đồng bộ Cloud lúc ${nowStr}`);
+      if (!silentRefresh) {
+        const keepY = window.scrollY;
+        renderAll();
+        if (Math.abs(window.scrollY - keepY) > 4) window.scrollTo({ top: keepY, behavior: 'instant' });
+      }
     }
+    return changed;
   }
 };
 
@@ -5322,6 +5340,26 @@ const CraneEngine = {
       });
     }
 
+    // Phân tách KHUNG GIỜ ĐÃ KẾT THÚC (hết giờ) vs KHUNG GIỜ ĐANG CHẠY
+    // VD: Đang là 15:45 -> 15h-16h CHƯA hết giờ (không cảnh báo); khi vừa qua 16:00 -> chốt đánh giá khung 15h-16h!
+    const nowReal = new Date();
+    const currentHourFloorTs = new Date(
+      nowReal.getFullYear(), nowReal.getMonth(), nowReal.getDate(), nowReal.getHours(), 0, 0
+    ).getTime();
+    const prevFullHourStartTs = currentHourFloorTs - 3600000;
+    const fmtHourWindow = (h) => `${pad(h)}h–${pad((h + 1) % 24)}h`;
+
+    slots.forEach(sl => {
+      sl.isCompleted = sl.ts < currentHourFloorTs;
+      sl.windowLabel = fmtHourWindow(sl.hour);
+    });
+
+    const completedSlots = slots.filter(sl => sl.isCompleted);
+    const prevFullSlot = completedSlots.find(sl => sl.ts === prevFullHourStartTs) || null;
+    const lastCompletedSlot = prevFullSlot || (completedSlots.length ? completedSlots[completedSlots.length - 1] : null);
+    const inProgressSlot = slots.find(sl => sl.ts === currentHourFloorTs) || null;
+    const completedSlotKeySet = new Set(completedSlots.map(s => s.key));
+
     // Tính năng suất thực tế (Moves / Giờ hoạt động) cho từng cẩu trong phạm vi đang lọc
     const slotKeySet = new Set(slots.map(s => s.key));
     const latestSlot = slots.length ? slots[slots.length - 1] : null;
@@ -5331,8 +5369,31 @@ const CraneEngine = {
       const impMoves = craneJobsInScope.filter(j => j.io === 'Import').length;
       const expMoves = craneJobsInScope.filter(j => j.io === 'Export').length;
       const activeHours = slots.filter(sl => (hourlyMatrix[sl.key]?.[id] || 0) > 0).length;
-      const avgRate = activeHours > 0 ? +(totalMoves / activeHours).toFixed(1) : 0;
+
+      // Tính riêng trên các khung giờ ĐÃ HẾT GIỜ để giờ đang chạy dở (VD: 16:05 mới có 2 cont) không kéo tụt TB
+      const completedJobs = craneJobsInScope.filter(j => completedSlotKeySet.has(j._dt.bucketKey));
+      const completedMoves = completedJobs.length;
+      const completedImpMoves = completedJobs.filter(j => j.io === 'Import').length;
+      const completedExpMoves = completedJobs.filter(j => j.io === 'Export').length;
+      const completedActiveHours = completedSlots.filter(sl => (hourlyMatrix[sl.key]?.[id] || 0) > 0).length;
+      const completedAvgRate = completedActiveHours > 0 ? +(completedMoves / completedActiveHours).toFixed(1) : 0;
+
+      // Ưu tiên hiển thị năng suất TB trên các giờ đã kết thúc (nếu đã có ít nhất 1 giờ kết thúc)
+      const avgRate = completedActiveHours > 0
+        ? completedAvgRate
+        : (activeHours > 0 ? +(totalMoves / activeHours).toFixed(1) : 0);
+
       const lastHourMoves = latestSlot ? (hourlyMatrix[latestSlot.key]?.[id] || 0) : 0;
+
+      const lastCompletedJobs = lastCompletedSlot
+        ? craneJobsInScope.filter(j => j._dt.bucketKey === lastCompletedSlot.key)
+        : [];
+      const lastCompletedMoves = lastCompletedJobs.length;
+      const lastCompletedImp = lastCompletedJobs.filter(j => j.io === 'Import').length;
+      const lastCompletedExp = lastCompletedJobs.filter(j => j.io === 'Export').length;
+
+      const inProgressMoves = inProgressSlot ? (hourlyMatrix[inProgressSlot.key]?.[id] || 0) : 0;
+
       return {
         id,
         moves: totalMoves,
@@ -5340,8 +5401,21 @@ const CraneEngine = {
         expMoves,
         activeHours,
         avgRate,
+        completedMoves,
+        completedImpMoves,
+        completedExpMoves,
+        completedActiveHours,
+        completedAvgRate,
         lastHourMoves,
-        lastHourLabel: latestSlot ? latestSlot.hourLabel : ''
+        lastHourLabel: latestSlot ? latestSlot.hourLabel : '',
+        lastCompletedKey: lastCompletedSlot ? lastCompletedSlot.key : '',
+        lastCompletedWindow: lastCompletedSlot ? lastCompletedSlot.windowLabel : '',
+        lastCompletedDate: lastCompletedSlot ? lastCompletedSlot.shortDate : '',
+        lastCompletedMoves,
+        lastCompletedImp,
+        lastCompletedExp,
+        inProgressWindow: inProgressSlot ? inProgressSlot.windowLabel : fmtHourWindow(nowReal.getHours()),
+        inProgressMoves
       };
     });
 
@@ -5451,6 +5525,11 @@ const CraneEngine = {
 
     return {
       slots,
+      completedSlots,
+      lastCompletedSlot,
+      inProgressSlot,
+      currentHourFloorTs,
+      prevFullHourStartTs,
       craneIds: CraneRailOrder.sortCranesOnRail(craneIds),
       hourlyMatrix,
       craneMetrics,
@@ -5505,23 +5584,25 @@ const CraneEngine = {
     });
   },
 
-  // Đánh giá hiệu suất thiết bị QC / TK định kỳ 1 tiếng/lần & đề xuất cắt làm việc khi hết đất làm
+  // Đánh giá hiệu suất thiết bị QC / TK theo KHUNG GIỜ VỪA KẾT THÚC (đợi hết giờ: qua 16h mới cảnh báo cho 15h-16h)
+  // Ngưỡng Hàng xuất: dưới 17–19 mv/h (TK < 17 mv/h, QC < 19 mv/h) → Cảnh báo năng suất thấp / sản lượng thấp
   evaluateHourlyEfficiency(st, pool, analysis) {
     const holdImportStats = st._holdImportStats || {};
     const railActive = CraneRailOrder.sortCranesOnRail((st.cranes || []).filter(c => c.active));
     const metricsMap = {};
     (analysis.craneMetrics || []).forEach(m => { metricsMap[m.id] = m; });
-
-    const nonZeroRates = (analysis.craneMetrics || []).filter(m => m.avgRate > 0).map(m => m.avgRate);
-    const vesselAvgRate = nonZeroRates.length
-      ? nonZeroRates.reduce((a, b) => a + b, 0) / nonZeroRates.length
-      : 0;
+    const lastCompletedSlot = analysis.lastCompletedSlot || null;
 
     return railActive.map(c => {
-      const m = metricsMap[c.id] || { moves: 0, impMoves: 0, expMoves: 0, activeHours: 0, avgRate: 0, lastHourMoves: 0, lastHourLabel: '' };
+      const m = metricsMap[c.id] || {
+        moves: 0, impMoves: 0, expMoves: 0, activeHours: 0, avgRate: 0,
+        completedMoves: 0, completedImpMoves: 0, completedExpMoves: 0, completedActiveHours: 0, completedAvgRate: 0,
+        lastHourMoves: 0, lastHourLabel: '',
+        lastCompletedKey: '', lastCompletedWindow: '', lastCompletedDate: '',
+        lastCompletedMoves: 0, lastCompletedImp: 0, lastCompletedExp: 0,
+        inProgressWindow: '', inProgressMoves: 0
+      };
       const isTK = /^TK/i.test(c.id);
-      const minExpectedRate = isTK ? 12 : 16;
-      const minLastHour = isTK ? 10 : 14;
 
       let remImp = 0, remExpB = 0, remExpA = 0;
       (c.holds || []).forEach(hNo => {
@@ -5540,8 +5621,21 @@ const CraneEngine = {
       const totalWorkLeft = (c.mode === 'EXPORT_ONLY' ? 0 : remImp) + (c.mode === 'IMPORT_ONLY' ? 0 : (remExpB + remExpA));
       const blockedRealloc = (analysis.reallocSuggestions || []).find(r => r.craneId === c.id && r.type === 'BLOCKED_BY_RAIL');
 
+      // Xác định cẩu có đang làm Hàng xuất trong khung giờ vừa kết thúc hay không
+      const isExportFocus = (m.lastCompletedExp > 0 && m.lastCompletedExp >= m.lastCompletedImp)
+        || (m.lastCompletedImp === 0 && c.mode !== 'IMPORT_ONLY' && (m.completedExpMoves > 0 || (remImp === 0 && (remExpB + remExpA) > 0)));
+      // Hàng xuất: ngưỡng 17–19 mv/h (TK chuẩn ≥17 mv/h, QC chuẩn ≥19 mv/h); Hàng nhập thuần: TK ≥15, QC ≥17
+      const targetMinRate = isExportFocus ? (isTK ? 17 : 19) : (isTK ? 15 : 17);
+      const evalWindow = m.lastCompletedWindow || '';
+      const evalMoves = m.lastCompletedMoves || 0;
+      let severeLow = false;
+
       let level = 'OK';
-      let advice = `Đang khai thác ổn định (${m.avgRate} mv/h · còn ${remImp} nhập, ${remExpB}B/${remExpA}A xuất).`;
+      let advice = lastCompletedSlot
+        ? `Ổn định — Khung đã chốt ${evalWindow}: ${evalMoves} mv (TB đã xong: ${m.completedAvgRate} mv/h · còn ${remImp} nhập, ${remExpB}B/${remExpA}A xuất).`
+        : (m.inProgressMoves > 0
+            ? `⏳ Đang làm khung ${m.inProgressWindow} (${m.inProgressMoves} mv) — Đợi hết giờ mới đánh giá cảnh báo sản lượng thấp.`
+            : `Chưa có khung giờ đã kết thúc để đánh giá sản lượng (còn ${remImp} nhập, ${remExpB}B/${remExpA}A xuất).`);
 
       if (totalWorkLeft === 0 && (state.liveJobs.length > 0 || pool.length > 0)) {
         level = 'CUT_WORK';
@@ -5551,13 +5645,22 @@ const CraneEngine = {
       } else if (remImp === 0 && remExpB === 0 && remExpA > 0) {
         level = 'LOW_EFFICIENCY';
         advice = `⚠️ Hầm ${c.holds.join(', ')} chỉ còn ${remExpA} cont đang giữ A (0 cont B) → Kiểm tra mở B / Data hãng tàu hoặc tạm cắt ${c.id}.`;
-      } else if (analysis.totalCompletedValid > 0 && (
-        (m.avgRate > 0 && m.avgRate < minExpectedRate) ||
-        (m.lastHourLabel && m.lastHourMoves < minLastHour && m.moves > 0) ||
-        (vesselAvgRate >= 16 && m.avgRate > 0 && m.avgRate < vesselAvgRate * 0.65)
-      )) {
-        level = 'LOW_EFFICIENCY';
-        advice = `⚠️ Sản lượng thấp (${m.avgRate} mv/h, giờ ${m.lastHourLabel || 'gần nhất'}: ${m.lastHourMoves} mv; chuẩn ≥${minExpectedRate} mv/h). Ưu tiên cấp bãi TV gần & kiểm tra xe kéo bãi ngoài cho ${c.id}.`;
+      } else if (lastCompletedSlot && analysis.totalCompletedValid > 0 && !c.paused) {
+        // CHỈ cảnh báo năng suất thấp / sản lượng thấp cho KHUNG GIỜ ĐÃ KẾT THÚC (VD: vừa qua 16h -> kiểm tra khung 15h–16h)
+        const hadWorkInWindow = evalMoves > 0;
+        const stalledWholeWindow = evalMoves === 0 && m.completedMoves > 0 && totalWorkLeft > 0;
+        const isBelowThreshold = (hadWorkInWindow && evalMoves < targetMinRate) || stalledWholeWindow;
+
+        if (isBelowThreshold) {
+          level = 'LOW_EFFICIENCY';
+          severeLow = evalMoves < 17;
+          const cargoTag = isExportFocus ? 'Hàng xuất' : 'Hàng nhập';
+          const stdLabel = isExportFocus ? `chuẩn Xuất QC ≥19 / TK ≥17 mv/h` : `chuẩn Nhập ≥${targetMinRate} mv/h`;
+          const detailSplit = m.lastCompletedExp > 0 || m.lastCompletedImp > 0
+            ? ` (Xuất: ${m.lastCompletedExp}, Nhập: ${m.lastCompletedImp})`
+            : '';
+          advice = `⚠️ Năng suất thấp / Sản lượng thấp khung ${evalWindow}: ${evalMoves} mv ${cargoTag}${detailSplit} — dưới ${stdLabel}${m.completedAvgRate > 0 ? ` (TB giờ đã xong: ${m.completedAvgRate} mv/h)` : ''}. Ưu tiên cấp bãi TV gần & kiểm tra xe kéo bãi ngoài cho ${c.id}.`;
+        }
       }
 
       return {
@@ -5568,7 +5671,12 @@ const CraneEngine = {
         remExpA,
         totalWorkLeft,
         level,
-        advice
+        advice,
+        evalWindow,
+        evalMoves,
+        targetMinRate,
+        isExportFocus,
+        severeLow
       };
     });
   }
@@ -6900,7 +7008,198 @@ function openCriticalHoldsIn3D() {
 // =========================================================================
 // [PHẦN 4] UI CONTROLLERS, ADMIN PIN MODAL, RESPONSIVE RENDERERS
 // =========================================================================
-function switchTab(tabId, subKey = null) {
+// ==================== QUẢN LÝ LƯU & KHÔI PHỤC MÀN HÌNH ĐANG XEM KHI RELOAD (F5) ====================
+const ScreenStateManager = {
+  KEY: 'tos_active_screen_state_v1',
+  FILTER_IDS: [
+    'shiftFilter', 'podStrategy', 'weightStrategy', 'yardFilter',
+    'callableScopeFilter', 'filterCallablePod', 'filterCallableWeight',
+    'filterCallableYard', 'filterCallableType', 'sortCallableTable',
+    'chaseHoldFilter', 'yardReconFilter', 'yardReconSearch'
+  ],
+  _saveDebounce: null,
+  _hasRestoredAfterData: false,
+
+  load() {
+    try {
+      const raw = JSON.parse(localStorage.getItem(this.KEY) || 'null');
+      return (raw && typeof raw === 'object') ? raw : {};
+    } catch (e) {
+      return {};
+    }
+  },
+
+  collectCurrent() {
+    const prev = this.load();
+    const activeTabEl = document.querySelector('.tab-pane.active');
+    const detailPillEl = document.querySelector('#detailSubPillBar .sub-pill.active');
+    const setupPillEl = document.querySelector('#setupSubPillBar .sub-pill.active');
+
+    const collapsedPanels = { ...(prev.collapsedPanels || {}) };
+    document.querySelectorAll('.panel[id]').forEach(p => {
+      if (p.querySelector('.panel-collapse-btn')) {
+        collapsedPanels[p.id] = p.classList.contains('is-collapsed');
+      }
+    });
+
+    const filters = { ...(prev.filters || {}) };
+    this.FILTER_IDS.forEach(id => {
+      const el = document.getElementById(id);
+      if (el && el.value !== undefined) filters[id] = el.value;
+    });
+
+    let openModal = null;
+    if (document.getElementById('hold3DModal')?.classList.contains('open')) {
+      openModal = { type: 'hold3D', hold3d: { ...state.hold3d, selectedHolds: [...(state.hold3d.selectedHolds || [1])] } };
+    } else if (document.getElementById('bayModal')?.classList.contains('open') && window._currentBayModalBay) {
+      openModal = { type: 'bay', bay: window._currentBayModalBay };
+    } else if (document.getElementById('historyInboxModal')?.classList.contains('open')) {
+      const activeItab = ['inbox', 'audit', 'handover'].find(t => document.getElementById(`itab-${t}`)?.classList.contains('active')) || 'inbox';
+      openModal = { type: 'inbox', tab: activeItab };
+    }
+
+    return {
+      sessionId: state.sessionId || document.getElementById('vesselSelect')?.value || prev.sessionId || '',
+      activeTab: activeTabEl ? activeTabEl.id : (prev.activeTab || 'tab-dispatch'),
+      detailSub: detailPillEl ? detailPillEl.dataset.sub : (prev.detailSub || 'ALL'),
+      setupSub: setupPillEl ? setupPillEl.dataset.sub : (prev.setupSub || 'ALL'),
+      theme: document.documentElement.getAttribute('data-theme') || prev.theme || 'light',
+      scrollY: Math.max(0, Math.round(window.scrollY || 0)),
+      collapsedPanels,
+      filters,
+      openModal,
+      savedAt: Date.now()
+    };
+  },
+
+  save(immediate = false) {
+    const doWrite = () => {
+      try {
+        localStorage.setItem(this.KEY, JSON.stringify(this.collectCurrent()));
+      } catch (e) {}
+    };
+    if (immediate) {
+      if (this._saveDebounce) clearTimeout(this._saveDebounce);
+      doWrite();
+    } else {
+      if (this._saveDebounce) clearTimeout(this._saveDebounce);
+      this._saveDebounce = setTimeout(doWrite, 180);
+    }
+  },
+
+  restoreEarlyLayout() {
+    const saved = this.load();
+    if (saved.theme === 'dark' || saved.theme === 'light') {
+      document.documentElement.setAttribute('data-theme', saved.theme);
+    }
+    if (saved.activeTab && document.getElementById(saved.activeTab)) {
+      switchTab(saved.activeTab, null, { preserveScroll: true, skipSave: true });
+    }
+    if (saved.detailSub) switchDetailSub(saved.detailSub, true);
+    if (saved.setupSub) switchSetupSub(saved.setupSub, true);
+
+    if (saved.collapsedPanels && typeof saved.collapsedPanels === 'object') {
+      Object.entries(saved.collapsedPanels).forEach(([pid, isCol]) => {
+        const p = document.getElementById(pid);
+        if (!p) return;
+        p.classList.toggle('is-collapsed', Boolean(isCol));
+        const btn = p.querySelector('.panel-collapse-btn');
+        if (btn) btn.textContent = isCol ? '▶ Mở chi tiết' : '▼ Thu gọn';
+      });
+    }
+  },
+
+  restoreAfterDataLoad() {
+    if (this._hasRestoredAfterData) return;
+    this._hasRestoredAfterData = true;
+    const saved = this.load();
+
+    // 1. Khôi phục tab & sub-tab đang xem (không nhảy sang tab khác khi reload)
+    if (saved.activeTab && document.getElementById(saved.activeTab)) {
+      switchTab(saved.activeTab, null, { preserveScroll: true, skipSave: true });
+    }
+    if (saved.detailSub) switchDetailSub(saved.detailSub, true);
+    if (saved.setupSub) switchSetupSub(saved.setupSub, true);
+
+    // 2. Khôi phục các bộ lọc đang chọn
+    if (saved.filters && typeof saved.filters === 'object') {
+      let needReRenderFilters = false;
+      this.FILTER_IDS.forEach(id => {
+        const el = document.getElementById(id);
+        const val = saved.filters[id];
+        if (!el || val === undefined || val === null) return;
+        if (el.tagName === 'SELECT') {
+          if (Array.from(el.options).some(o => o.value === val)) {
+            if (el.value !== val) { el.value = val; needReRenderFilters = true; }
+          }
+        } else if (el.value !== val) {
+          el.value = val;
+          needReRenderFilters = true;
+        }
+      });
+      if (needReRenderFilters) {
+        try { renderCallableFilteredTable(); } catch (e) {}
+        try { renderYardReconcileTable(); } catch (e) {}
+        try { renderCraneHourlyChart(); } catch (e) {}
+        try { renderDispatchRecommendations(); } catch (e) {}
+        try { renderRollingChaseByHold(); } catch (e) {}
+      }
+    }
+
+    // 3. Khôi phục trạng thái thu gọn/mở rộng panel
+    if (saved.collapsedPanels && typeof saved.collapsedPanels === 'object') {
+      Object.entries(saved.collapsedPanels).forEach(([pid, isCol]) => {
+        const p = document.getElementById(pid);
+        if (!p) return;
+        p.classList.toggle('is-collapsed', Boolean(isCol));
+        const btn = p.querySelector('.panel-collapse-btn');
+        if (btn) btn.textContent = isCol ? '▶ Mở chi tiết' : '▼ Thu gọn';
+      });
+    }
+
+    // 4. Khôi phục popup đang xem (3D Hầm / Sơ đồ Bay / Hộp thư) nếu có
+    if (saved.openModal && saved.openModal.type) {
+      setTimeout(() => {
+        if (saved.openModal.type === 'hold3D' && saved.openModal.hold3d) {
+          Object.assign(state.hold3d, saved.openModal.hold3d);
+          openHold3DModal();
+        } else if (saved.openModal.type === 'bay' && saved.openModal.bay) {
+          openBayPopup(saved.openModal.bay);
+        } else if (saved.openModal.type === 'inbox') {
+          openHistoryInboxModal(saved.openModal.tab || 'inbox');
+        }
+      }, 60);
+    }
+
+    // 5. Khôi phục đúng vị trí cuộn màn hình đang xem
+    if (typeof saved.scrollY === 'number' && saved.scrollY > 0) {
+      const targetY = saved.scrollY;
+      requestAnimationFrame(() => {
+        window.scrollTo({ top: targetY, behavior: 'instant' });
+        setTimeout(() => window.scrollTo({ top: targetY, behavior: 'instant' }), 140);
+      });
+    }
+  },
+
+  bindPersistenceEvents() {
+    if ('scrollRestoration' in history) {
+      try { history.scrollRestoration = 'manual'; } catch (e) {}
+    }
+    window.addEventListener('scroll', () => this.save(false), { passive: true });
+    window.addEventListener('pagehide', () => this.save(true));
+    window.addEventListener('beforeunload', () => this.save(true));
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'hidden') this.save(true);
+    });
+    // Lưu lại khi người dùng đổi bất kỳ bộ lọc nào
+    this.FILTER_IDS.forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.addEventListener('change', () => this.save(false));
+    });
+  }
+};
+
+function switchTab(tabId, subKey = null, opts = {}) {
   // Tự động ánh xạ các tab cũ sang cấu trúc 3 khu vực thông minh (Tiến độ / Chi tiết / Cài đặt)
   let targetTab = tabId;
   let targetSub = subKey;
@@ -6913,15 +7212,18 @@ function switchTab(tabId, subKey = null) {
   const pane = document.getElementById(targetTab);
   if (pane) pane.classList.add('active');
 
-  if (targetTab === 'tab-details' && targetSub) switchDetailSub(targetSub);
-  if (targetTab === 'tab-setup' && targetSub) switchSetupSub(targetSub);
+  if (targetTab === 'tab-details' && targetSub) switchDetailSub(targetSub, Boolean(opts.skipSave));
+  if (targetTab === 'tab-setup' && targetSub) switchSetupSub(targetSub, Boolean(opts.skipSave));
   if (targetTab === 'tab-details' && typeof resizeAndRenderHold3D === 'function') {
     setTimeout(() => resizeAndRenderHold3D('inline'), 80);
   }
-  window.scrollTo({ top: 0, behavior: 'smooth' });
+  if (!opts.preserveScroll) {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+  if (!opts.skipSave) ScreenStateManager.save(true);
 }
 
-function switchDetailSub(subKey = 'ALL') {
+function switchDetailSub(subKey = 'ALL', skipSave = false) {
   document.querySelectorAll('#detailSubPillBar .sub-pill').forEach(b => {
     b.classList.toggle('active', b.dataset.sub === subKey);
   });
@@ -6939,9 +7241,10 @@ function switchDetailSub(subKey = 'ALL') {
   if ((subKey === 'ALL' || subKey === 'holds') && typeof resizeAndRenderHold3D === 'function') {
     setTimeout(() => resizeAndRenderHold3D('inline'), 60);
   }
+  if (!skipSave) ScreenStateManager.save(true);
 }
 
-function switchSetupSub(subKey = 'ALL') {
+function switchSetupSub(subKey = 'ALL', skipSave = false) {
   document.querySelectorAll('#setupSubPillBar .sub-pill').forEach(b => {
     b.classList.toggle('active', b.dataset.sub === subKey);
   });
@@ -6949,18 +7252,25 @@ function switchSetupSub(subKey = 'ALL') {
     const show = (subKey === 'ALL' || sec.dataset.setupSec === subKey);
     sec.classList.toggle('hidden-sub', !show);
   });
+  if (!skipSave) ScreenStateManager.save(true);
 }
 
 function toggleTheme() {
   const cur = document.documentElement.getAttribute('data-theme');
   document.documentElement.setAttribute('data-theme', cur === 'dark' ? 'light' : 'dark');
+  ScreenStateManager.save(true);
   if (typeof hold3dControllers !== 'undefined') {
     if (hold3dControllers.inline) hold3dControllers.inline.draw();
     if (hold3dControllers.modal && document.getElementById('hold3DModal')?.classList.contains('open')) hold3dControllers.modal.draw();
   }
 }
 
-function closeModal(id) { document.getElementById(id)?.classList.remove('open'); }
+function closeModal(id) {
+  document.getElementById(id)?.classList.remove('open');
+  if (typeof ScreenStateManager !== 'undefined' && (id === 'hold3DModal' || id === 'bayModal' || id === 'historyInboxModal')) {
+    ScreenStateManager.save(true);
+  }
+}
 
 function setCardStatus(kind, msg, loaded) {
   const st = document.getElementById(`stat-${kind}`);
@@ -7698,7 +8008,7 @@ function renderCraneHourlyChart() {
           <span class="cp-rate">${m.avgRate} mv/h</span>
         </div>
         <div style="color:var(--muted);font-size:10.5px;margin-top:2px;">
-          Tổng C: <b style="color:var(--ink);">${m.moves}</b> (${m.activeHours}h) · ${m.lastHourLabel}: <b>${m.lastHourMoves}</b>
+          Tổng C: <b style="color:var(--ink);">${m.moves}</b> (${m.activeHours}h) · ${m.lastCompletedWindow ? `Đã chốt ${m.lastCompletedWindow}: <b>${m.lastCompletedMoves}</b>` : `${m.lastHourLabel}: <b>${m.lastHourMoves}</b>`}
         </div>
         <div style="color:var(--muted);font-size:10px;">Nhập ${m.impMoves} · Xuất ${m.expMoves}</div>
       </div>
@@ -8605,6 +8915,7 @@ function openBayPopup(bay) {
     </div>`;
 
   document.getElementById('bayModal').classList.add('open');
+  ScreenStateManager.save(true);
 }
 
 function openHoldDetailPopup(holdNo) {
@@ -9012,10 +9323,11 @@ function resolveDisplayVesselName(sessionId, dbVesselName) {
   return dbName;
 }
 
-async function syncAllCloudData() {
+async function syncAllCloudData(opts = {}) {
   try {
     const sel = document.getElementById('vesselSelect');
-    const prevSelected = state.sessionId || sel.value || '';
+    const savedScreen = (typeof ScreenStateManager !== 'undefined') ? ScreenStateManager.load() : {};
+    const prevSelected = state.sessionId || sel.value || savedScreen.sessionId || '';
     const { sessions, eportMap, deleted } = await CloudRepo.listAllVessels();
     state.eportJobs = eportMap;
 
@@ -9090,7 +9402,7 @@ async function syncAllCloudData() {
       state.todayTide = tide;
       document.getElementById('kpiTideLive').textContent = `Đỉnh ${tide.high_val}m (${tide.high_time}) · Ròng ${tide.low_val}m (${tide.low_time})`;
     }
-    await CloudRepo.loadSessionFromCloud(sel.value);
+    await CloudRepo.loadSessionFromCloud(sel.value, opts);
   } catch (e) {
     CloudRepo.setStatus('⚠ Lỗi đồng bộ', true);
   }
@@ -9108,6 +9420,7 @@ function updateEportBanner(sessionId) {
 async function onSelectVesselSession(val) {
   updateEportBanner(val);
   await CloudRepo.loadSessionFromCloud(val);
+  ScreenStateManager.save(true);
   await refreshBotCommandStatus(false);
 }
 
@@ -10033,7 +10346,7 @@ function runHourlyCraneEfficiencyReview(manualTrigger = false) {
     const cls = ev.level === 'CUT_WORK' ? 'cut' : (ev.level === 'LOW_EFFICIENCY' ? 'low' : '');
     const badge = ev.level === 'CUT_WORK'
       ? '<span class="badge purple">✂️ Hết đất làm · Cắt cẩu</span>'
-      : (ev.level === 'LOW_EFFICIENCY' ? '<span class="badge red">⚠️ Sản lượng thấp</span>' : '<span class="badge green">✅ Hiệu quả</span>');
+      : (ev.level === 'LOW_EFFICIENCY' ? `<span class="badge red">⚠️ Năng suất / Sản lượng thấp${ev.evalWindow ? ' (' + ev.evalWindow + ')' : ''}</span>` : '<span class="badge green">✅ Hiệu quả</span>');
     return `
       <div class="eff-alert-row ${cls}">
         <div style="flex:1;min-width:200px;">
@@ -10107,6 +10420,7 @@ function togglePanelCollapse(panelId, btnEl) {
   if (!collapsed && panelId === 'panel-hold-3d' && typeof resizeAndRenderHold3D === 'function') {
     setTimeout(() => resizeAndRenderHold3D('inline'), 40);
   }
+  ScreenStateManager.save(true);
 }
 
 function expandAndScrollTo(panelId) {
@@ -10237,6 +10551,7 @@ function openHistoryInboxModal(tab = 'inbox') {
   switchInboxTab(tab);
   renderHistoryInboxModal();
   document.getElementById('historyInboxModal').classList.add('open');
+  ScreenStateManager.save(true);
 }
 
 function switchInboxTab(tab) {
@@ -10244,6 +10559,9 @@ function switchInboxTab(tab) {
     document.getElementById(`itab-${t}`)?.classList.toggle('active', t === tab);
     document.getElementById(`ipane-${t}`)?.classList.toggle('active', t === tab);
   });
+  if (document.getElementById('historyInboxModal')?.classList.contains('open')) {
+    ScreenStateManager.save(true);
+  }
 }
 
 function toggleMailCard(recId) {
@@ -10391,7 +10709,25 @@ function renderOpsCockpitAndTicker(pool) {
     issues.push({ id: `HATCH_${a.hold}`, severity: a.severity === 'URGENT' ? 'urgent' : 'warn', title: hTitle, detail: a.actionLabel, action: "expandAndScrollTo('panel-smart-dispatch')" });
   });
   effEvals.filter(e => e.level !== 'OK').forEach(e => {
-    issues.push({ severity: e.level === 'LOW_EFFICIENCY' ? 'warn' : 'info', title: `${e.crane.id}: ${e.level === 'CUT_WORK' ? 'Hết đất làm — Cắt cẩu' : 'Sản lượng thấp (' + e.metrics.avgRate + ' mv/h)'}`, detail: e.advice, action: "expandAndScrollTo('panel-crane-hourly')" });
+    if (e.level === 'CUT_WORK') {
+      issues.push({
+        id: `CUT_${e.crane.id}`,
+        severity: 'info',
+        title: `${e.crane.id}: Hết đất làm — Đề xuất cắt cẩu`,
+        detail: e.advice,
+        action: "expandAndScrollTo('panel-crane-hourly')"
+      });
+    } else {
+      const winTxt = e.evalWindow ? ` khung ${e.evalWindow}` : '';
+      const mvTxt = e.evalWindow ? `${e.evalMoves} mv ${e.isExportFocus ? 'Xuất' : 'Nhập'} < chuẩn ${e.targetMinRate}` : `${e.metrics.avgRate} mv/h`;
+      issues.push({
+        id: `LOW_EFF_${e.crane.id}_${e.metrics.lastCompletedKey || 'GEN'}`,
+        severity: e.severeLow ? 'urgent' : 'warn',
+        title: `${e.crane.id}: Năng suất / Sản lượng thấp${winTxt} (${mvTxt})`,
+        detail: e.advice,
+        action: "expandAndScrollTo('panel-crane-hourly')"
+      });
+    }
   });
   if (noJobList.length > 0) {
     issues.push({ severity: 'warn', title: `${noJobList.length} cont Final chưa có Job trên OM`, detail: 'Cần báo bộ phận Data / Hãng tàu kiểm tra bắn job bổ sung.', action: "openExceptionModal('NO_JOB')" });
@@ -11368,22 +11704,79 @@ setInterval(async () => {
   } catch (e) {}
 }, APP_CONFIG.VESSEL_DAILY_POLL_MS);
 
-// Bộ đếm tự động đánh giá hiệu suất cẩu mỗi 1 tiếng & cập nhật cảnh báo ETD mỗi phút
-setInterval(() => {
-  if (state.sessionId && state.etdAt) {
-    renderHorizontalShipRailCard();
-    if (typeof renderHold3DViews === 'function') renderHold3DViews();
-  }
-  if (Date.now() >= state.nextHourlyEvalAt) {
-    runHourlyCraneEfficiencyReview(true);
-  } else {
-    const minsLeft = Math.max(1, Math.ceil((state.nextHourlyEvalAt - Date.now()) / 60000));
-    const cdEl = document.getElementById('hourlyEvalCountdown');
-    if (cdEl && state.lastHourlyEvalAt) {
-      const tStr = new Date(state.lastHourlyEvalAt).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
-      cdEl.textContent = `Cập nhật ${tStr} · Tự nhắc sau ${minsLeft}p`;
+// Tự động reload toàn bộ thẻ khuyến nghị mỗi 01 phút (60.000ms) để luôn nhận thông báo mới nhất
+// Giữ nguyên tuyệt đối màn hình, tab, bộ lọc, popup và vị trí cuộn đang xem
+let _advisoryRefreshBusy = false;
+async function refreshAdvisoryCardsLive(pullCloud = true, manualClick = false) {
+  if (_advisoryRefreshBusy || !AdminPinGuard.isUnlocked() || !state.sessionId) return;
+  _advisoryRefreshBusy = true;
+  const tickBtn = document.getElementById('btnAdvisoryAutoTick');
+  if (tickBtn && manualClick) tickBtn.textContent = '⏳ Đang tải...';
+  const keepScrollY = window.scrollY;
+  try {
+    let cloudChanged = false;
+    if (pullCloud) {
+      cloudChanged = await CloudRepo.pollLatestJobsOnly(true);
     }
+    const cfg = getLiveVesselCfg();
+    HoldLayoutEngine.syncHoldsForState(state, cfg.length_m, false);
+    const pool = UnifiedPoolBuilder.build(state, cfg.deck_tier_min);
+    ImportExportPrepEngine.computeHoldAndBayStats(state, pool);
+
+    // Cập nhật lại KPI tồn Nhập/Xuất
+    const impJobsAll = (state.liveJobs || []).filter(j => j.io === 'Import' || /dỡ\s*tàu/i.test(j.job_type || ''));
+    const impRem = impJobsAll.filter(j => j.status === 'A' || j.status === 'B').length;
+    const cDone = pool.filter(c => c.jobStatus === 'C').length;
+    const bReady = pool.filter(c => c.jobStatus === 'B').length;
+    const aHold = pool.filter(c => c.jobStatus === 'A').length;
+    const kpiPoolEl = document.getElementById('kpiExportPool');
+    if (kpiPoolEl) {
+      kpiPoolEl.textContent = `Nhập còn ${impRem}/${impJobsAll.length} · Xuất còn ${bReady + aHold} (${bReady}B/${aHold}A/${cDone}C)`;
+    }
+
+    // Reload toàn bộ các thẻ khuyến nghị & cảnh báo theo dữ liệu mới nhất + mốc giờ tròn vừa kết thúc
+    renderHorizontalShipRailCard();
+    renderOffDockSummary(pool);
+    renderExportPrepAdvisory(pool);
+    renderFleetAndQcBalancePanel(pool);
+    renderHatchCoverWatch(pool);
+    renderOpsCockpitAndTicker(pool);
+    renderDispatchRecommendations();
+    renderCraneHourlyChart();
+    runHourlyCraneEfficiencyReview(Date.now() >= state.nextHourlyEvalAt);
+
+    if (cloudChanged) {
+      renderCallableCargoSummary(pool);
+      renderHoldsAndChase();
+      renderCranesSetup();
+    }
+    if (typeof renderHold3DViews === 'function' && (
+      document.getElementById('hold3DModal')?.classList.contains('open') ||
+      document.getElementById('tab-details')?.classList.contains('active')
+    )) {
+      renderHold3DViews();
+    }
+    if (document.getElementById('historyInboxModal')?.classList.contains('open')) {
+      renderHistoryInboxModal();
+    }
+
+    const nowHm = new Date().toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
+    if (tickBtn) {
+      tickBtn.textContent = `🔄 1p · ${nowHm}`;
+      tickBtn.title = `Thẻ khuyến nghị tự động reload 01 phút/lần · Cập nhật gần nhất lúc ${nowHm}`;
+    }
+    if (Math.abs(window.scrollY - keepScrollY) > 6) {
+      window.scrollTo({ top: keepScrollY, behavior: 'instant' });
+    }
+  } catch (e) {
+    if (tickBtn) tickBtn.textContent = '🔄 1p';
+  } finally {
+    _advisoryRefreshBusy = false;
   }
+}
+
+setInterval(() => {
+  refreshAdvisoryCardsLive(true, false);
 }, 60000);
 
 setInterval(() => {
@@ -13482,6 +13875,7 @@ function openHold3DModal(holdNo = null, bayFilter = 'ALL') {
     state.hold3d.selectedBlockId = null;
   }
   document.getElementById('hold3DModal')?.classList.add('open');
+  ScreenStateManager.save(true);
   setTimeout(() => {
     renderHold3DViews();
     if (hold3dControllers.modal) hold3dControllers.modal.draw();
@@ -13505,6 +13899,8 @@ window.addEventListener('resize', () => {
 
 window.addEventListener('DOMContentLoaded', () => {
   ViewModeManager.init();
+  ScreenStateManager.restoreEarlyLayout();
+  ScreenStateManager.bindPersistenceEvents();
   updateStep1GuardUI();
   AdminPinGuard.restoreFromDevice();
   AdminPinGuard.enforceGateUI();
