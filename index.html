@@ -1667,6 +1667,294 @@ pre.schema-box {
   .hold3d-modal-card .hold3d-stage-wrap { height: 52vh; }
   .hold3d-hint { display: none; }
 }
+
+.hold3d-picker-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  align-items: center;
+  padding: 7px 9px;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  margin-bottom: 7px;
+}
+.hold3d-picker-title {
+  font-size: 11px;
+  font-weight: 850;
+  color: var(--muted);
+  margin-right: 3px;
+  white-space: nowrap;
+}
+.hold3d-chip-check {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px;
+  border-radius: 999px;
+  border: 1.5px solid var(--line);
+  background: var(--bg);
+  font-size: 11px;
+  font-weight: 750;
+  cursor: pointer;
+  user-select: none;
+  transition: all 0.12s ease;
+}
+.hold3d-chip-check:hover {
+  border-color: var(--cyan);
+}
+.hold3d-chip-check.checked {
+  background: rgba(2, 132, 199, 0.14);
+  border-color: var(--cyan);
+  color: var(--cyan);
+}
+.hold3d-chip-check input {
+  width: 13px;
+  height: 13px;
+  min-height: auto;
+  margin: 0;
+  accent-color: var(--cyan);
+}
+.hold3d-chip-pct {
+  font-size: 9.5px;
+  padding: 1px 5px;
+  border-radius: 999px;
+  background: rgba(100, 116, 139, 0.16);
+  color: var(--ink);
+  font-weight: 800;
+}
+.hold3d-chip-check.checked .hold3d-chip-pct {
+  background: var(--cyan);
+  color: #fff;
+}
+.hold3d-picker-actions {
+  margin-left: auto;
+  display: inline-flex;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+.hold3d-compare-wrap {
+  margin-top: 8px;
+  padding: 8px 10px;
+  border-radius: 9px;
+  border: 1.5px solid var(--line);
+  background: var(--bg);
+  display: none;
+}
+.hold3d-compare-wrap.show {
+  display: block;
+}
+.hold3d-compare-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 7px;
+  font-size: 11.5px;
+}
+.hold3d-compare-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 7px;
+}
+.hold3d-cmp-card {
+  border: 1px solid var(--line);
+  border-left: 4px solid var(--cyan);
+  border-radius: 8px;
+  padding: 7px 9px;
+  background: var(--card);
+  font-size: 11px;
+}
+.hold3d-cmp-card.lagging {
+  border-left-color: var(--red);
+  background: rgba(220, 38, 38, 0.05);
+}
+.hold3d-cmp-card.leading {
+  border-left-color: var(--green);
+}
+.hold3d-cmp-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 4px;
+}
+
+/* ==================== ETD PACE & CRITICAL HOLD ALERTS ==================== */
+.etd-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 10px;
+  background: var(--bg);
+  border: 1.5px solid var(--line);
+  border-left: 4px solid var(--cyan);
+  border-radius: 9px;
+  margin-bottom: 9px;
+  font-size: 11.5px;
+}
+.etd-bar.etd-red, .etd-bar.etd-overload {
+  border-left-color: var(--red);
+  border-color: rgba(220, 38, 38, 0.45);
+  background: rgba(220, 38, 38, 0.06);
+}
+.etd-bar.etd-amber {
+  border-left-color: var(--amber);
+  background: rgba(217, 119, 6, 0.06);
+}
+.etd-bar input[type="datetime-local"] {
+  min-height: 29px;
+  padding: 2px 7px;
+  font-size: 11.5px;
+  font-weight: 750;
+}
+.etd-quick-btns {
+  display: inline-flex;
+  gap: 3px;
+  flex-wrap: wrap;
+}
+.etd-quick-btns button {
+  min-height: 26px;
+  padding: 2px 7px;
+  font-size: 10.5px;
+}
+.rail-crane-node.etd-red, .rail-crane-node.etd-overload {
+  border-color: var(--red) !important;
+  background: rgba(220, 38, 38, 0.08) !important;
+  box-shadow: 0 0 0 1.5px rgba(220, 38, 38, 0.25);
+}
+.rail-crane-node.etd-amber {
+  border-color: var(--amber) !important;
+  background: rgba(217, 119, 6, 0.07) !important;
+}
+.crane-etd-box {
+  margin-top: 5px;
+  padding: 4px 6px;
+  border-radius: 6px;
+  font-size: 10px;
+  line-height: 1.35;
+  background: var(--card);
+  border: 1px solid var(--line);
+}
+.crane-etd-box.etd-red, .crane-etd-box.etd-overload {
+  background: rgba(220, 38, 38, 0.13);
+  border-color: var(--red);
+  color: var(--red);
+  font-weight: 750;
+}
+.crane-etd-box.etd-amber {
+  background: rgba(217, 119, 6, 0.13);
+  border-color: var(--amber);
+  color: #b45309;
+  font-weight: 700;
+}
+:root[data-theme="dark"] .crane-etd-box.etd-amber { color: #fbbf24; }
+.crane-etd-box.etd-green {
+  background: rgba(5, 150, 105, 0.10);
+  border-color: rgba(5, 150, 105, 0.35);
+  color: var(--green);
+}
+.ship-hold-cell.etd-red, .ship-hold-cell.etd-overload {
+  border: 1.5px solid var(--red) !important;
+  border-top-width: 4px !important;
+  border-top-color: var(--red) !important;
+  background: rgba(220, 38, 38, 0.09) !important;
+}
+.ship-hold-cell.etd-amber {
+  border-color: var(--amber) !important;
+  background: rgba(217, 119, 6, 0.07) !important;
+}
+.hold-etd-pill {
+  font-size: 9px;
+  font-weight: 850;
+  padding: 1px 5px;
+  border-radius: 4px;
+  text-align: center;
+  line-height: 1.3;
+}
+.hold-etd-pill.etd-red, .hold-etd-pill.etd-overload {
+  background: var(--red);
+  color: #fff;
+}
+.hold-etd-pill.etd-amber {
+  background: var(--amber);
+  color: #fff;
+}
+.hold-etd-pill.etd-green {
+  background: rgba(5, 150, 105, 0.16);
+  color: var(--green);
+}
+.etd-advisory-strip {
+  margin-top: 9px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
+  gap: 7px;
+}
+.etd-adv-card {
+  border: 1.5px solid var(--line);
+  border-left: 4px solid var(--cyan);
+  border-radius: 8px;
+  padding: 7px 10px;
+  background: var(--bg);
+  font-size: 11px;
+  line-height: 1.45;
+}
+.etd-adv-card.etd-red, .etd-adv-card.etd-overload {
+  border-color: rgba(220, 38, 38, 0.45);
+  border-left-color: var(--red);
+  background: rgba(220, 38, 38, 0.07);
+}
+.etd-adv-card.etd-amber {
+  border-color: rgba(217, 119, 6, 0.45);
+  border-left-color: var(--amber);
+  background: rgba(217, 119, 6, 0.07);
+}
+.etd-adv-card.etd-green {
+  border-left-color: var(--green);
+}
+.hold3d-etd-hud {
+  margin-bottom: 7px;
+  padding: 7px 10px;
+  border-radius: 9px;
+  border: 1.5px solid var(--line);
+  border-left: 4px solid var(--cyan);
+  background: var(--bg);
+  font-size: 11.5px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.hold3d-etd-hud.etd-red, .hold3d-etd-hud.etd-overload {
+  border-color: rgba(220, 38, 38, 0.55);
+  border-left-color: var(--red);
+  background: rgba(220, 38, 38, 0.10);
+}
+.hold3d-etd-hud.etd-amber {
+  border-color: rgba(217, 119, 6, 0.5);
+  border-left-color: var(--amber);
+  background: rgba(217, 119, 6, 0.09);
+}
+.hold3d-etd-hud.etd-green {
+  border-left-color: var(--green);
+  background: rgba(5, 150, 105, 0.07);
+}
+.hold3d-chip-check.etd-red, .hold3d-chip-check.etd-overload {
+  border-color: var(--red);
+}
+.hold3d-chip-check.etd-red.checked, .hold3d-chip-check.etd-overload.checked {
+  background: rgba(220, 38, 38, 0.16);
+  color: var(--red);
+}
+.hold3d-chip-check.etd-red .hold3d-chip-pct, .hold3d-chip-check.etd-overload .hold3d-chip-pct {
+  background: var(--red);
+  color: #fff;
+}
+.hold3d-chip-check.etd-amber {
+  border-color: var(--amber);
+}
 </style>
 </head>
 <body>
@@ -1885,6 +2173,25 @@ pre.schema-box {
         </div>
       </div>
       <div class="panel-body" style="padding:10px 12px;">
+        <div class="etd-bar" id="shipRailEtdBar">
+          <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
+            <strong style="white-space:nowrap;">🕒 ETD rời tàu:</strong>
+            <input type="datetime-local" id="etdInputRail" onchange="onEtdDateTimeChange(this.value)">
+            <span class="etd-quick-btns" title="Đặt nhanh thời gian còn lại tới lúc rời tàu">
+              <button type="button" class="sm" onclick="setEtdHoursFromNow(3)">Còn 3h</button>
+              <button type="button" class="sm" onclick="setEtdHoursFromNow(4)">Còn 4h</button>
+              <button type="button" class="sm" onclick="setEtdHoursFromNow(5)">Còn 5h</button>
+              <button type="button" class="sm" onclick="setEtdHoursFromNow(6)">Còn 6h</button>
+              <button type="button" class="sm" onclick="setEtdHoursFromNow(8)">Còn 8h</button>
+            </span>
+            <span class="badge" id="etdCountdownBadge">Còn —</span>
+            <span class="badge" title="Ngưỡng cảnh báo đỏ: ≥25 mv/h · Trần tối đa 1 QC/TK: 25–27 mv/h">Trần QC/TK: 25–27 mv/h</span>
+          </div>
+          <div style="margin-left:auto;display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
+            <span id="etdCriticalSummaryBadge" class="badge green">✅ Đang tính tiến độ ETD...</span>
+            <button type="button" class="sm primary" onclick="openCriticalHoldsIn3D()" title="Mở thẳng các hầm trọng điểm trên màn hình 3D">🧊 Soi 3D Trọng điểm</button>
+          </div>
+        </div>
         <div class="quay-axis-bar">
           <span style="color:var(--cyan);">⬅️ THƯỢNG LƯU (TRONG SÔNG)</span>
           <span style="color:var(--muted);font-size:10.5px;">═══ RAY CẨU CẦU TÀU TÂN VŨ (THỨ TỰ CỐ ĐỊNH · KHÔNG CHẠY VƯỢT MẶT) ═══</span>
@@ -1893,6 +2200,7 @@ pre.schema-box {
         <div class="quay-scroll-wrap">
           <div class="quay-scene" id="horizontalShipRailScene"></div>
         </div>
+        <div class="etd-advisory-strip" id="etdCriticalAdvisoryStrip"></div>
         <div id="railConstraintNote" style="margin-top:7px;font-size:11px;color:var(--muted);"></div>
       </div>
     </div>
@@ -2201,11 +2509,16 @@ pre.schema-box {
         </div>
       </div>
       <div class="panel-body">
+        <div class="hold3d-etd-hud" id="inline3dEtdHud"></div>
+        <div class="hold3d-picker-bar" id="inline3dHoldPicker"></div>
         <div class="hold3d-toolbar">
-          <select id="inline3dHoldSelect" onchange="onHold3DControlChange('holdNo', this.value)"></select>
           <select id="inline3dBaySelect" onchange="onHold3DControlChange('bayFilter', this.value)">
             <option value="ALL">Cả Hầm (Tất cả Bay)</option>
           </select>
+          <div class="hold3d-seg" id="inline3dLayoutSeg" style="display:none;" title="Cách bố trí nhiều hầm trong không gian 3D">
+            <button id="inline3dLayoutSide" class="active" onclick="onHold3DControlChange('multiLayout', 'SIDE_BY_SIDE')">↔️ Ngang hàng (So sánh)</button>
+            <button id="inline3dLayoutShip" onclick="onHold3DControlChange('multiLayout', 'ALONG_SHIP')">🚢 Dọc thân tàu</button>
+          </div>
           <div class="hold3d-seg" title="Chọn tô màu container Đã xếp (C) theo Cảng hoặc theo Dải tấn">
             <button id="inline3dModePod" class="active" onclick="onHold3DControlChange('colorMode', 'POD')">🎨 Màu theo Cảng</button>
             <button id="inline3dModeWeight" onclick="onHold3DControlChange('colorMode', 'WEIGHT')">⚖️ Màu theo Dải tấn</button>
@@ -2242,6 +2555,7 @@ pre.schema-box {
             <button onclick="setHold3DCameraPreset('inline', 'ISO')">↺</button>
           </div>
         </div>
+        <div class="hold3d-compare-wrap" id="inline3dCompareWrap"></div>
         <div class="hold3d-legend-bar" id="inline3dLegendBar"></div>
         <div class="hold3d-inspector" id="inline3dInspector">
           <span style="color:var(--muted);">💡 Bấm/chạm vào bất kỳ khối container 3D nào để xem số cont đầy đủ, vị trí, cảng, dải tấn, bãi hoặc gọi xe.</span>
@@ -2505,6 +2819,13 @@ pre.schema-box {
                 <option value="STARBOARD">➡️ Mạn Phải (Starboard · Mũi ra Cửa biển)</option>
               </select>
             </label></div>
+            <div><label>Giờ rời tàu dự kiến (ETD)<br><input id="cfgEtdAt" type="datetime-local" style="width:100%" onchange="onEtdDateTimeChange(this.value)"></label></div>
+            <div><label>Trần NS tối đa 1 QC / 1 TK (mv/h)<br>
+              <div style="display:flex;gap:5px;">
+                <input id="cfgMaxRateQc" type="number" min="20" max="35" value="27" title="Trần QC tối đa (25–27 mv/h)" style="width:50%" onchange="onEtdCapConfigChange()">
+                <input id="cfgMaxRateTk" type="number" min="18" max="32" value="26" title="Trần TK tối đa (25–27 mv/h)" style="width:50%" onchange="onEtdCapConfigChange()">
+              </div>
+            </label></div>
           </div>
           <div style="margin-top:10px;padding-top:9px;border-top:1px dashed var(--line);font-size:11.5px;color:var(--muted);">
             💡 Hệ thống đã bỏ cảnh báo mớn nước cố định. Hãy dùng các nút <b>Báo Nghiêng mạn (Trái/Phải)</b> và <b>Báo Mũi (Chìm/Vếch)</b> ngay trên Tab 1 để nhận khuyến nghị gọi hàng cân bằng tàu theo thực tế hiện trường.
@@ -2602,11 +2923,16 @@ pre.schema-box {
       </div>
       <button class="sm" onclick="closeModal('hold3DModal')">✕ Đóng</button>
     </div>
+    <div class="hold3d-etd-hud" id="modal3dEtdHud"></div>
+    <div class="hold3d-picker-bar" id="modal3dHoldPicker"></div>
     <div class="hold3d-toolbar">
-      <select id="modal3dHoldSelect" onchange="onHold3DControlChange('holdNo', this.value)"></select>
       <select id="modal3dBaySelect" onchange="onHold3DControlChange('bayFilter', this.value)">
         <option value="ALL">Cả Hầm (Tất cả Bay)</option>
       </select>
+      <div class="hold3d-seg" id="modal3dLayoutSeg" style="display:none;" title="Cách bố trí nhiều hầm trong không gian 3D">
+        <button id="modal3dLayoutSide" class="active" onclick="onHold3DControlChange('multiLayout', 'SIDE_BY_SIDE')">↔️ Ngang hàng (So sánh)</button>
+        <button id="modal3dLayoutShip" onclick="onHold3DControlChange('multiLayout', 'ALONG_SHIP')">🚢 Dọc thân tàu</button>
+      </div>
       <div class="hold3d-seg">
         <button id="modal3dModePod" class="active" onclick="onHold3DControlChange('colorMode', 'POD')">🎨 Màu theo Cảng</button>
         <button id="modal3dModeWeight" onclick="onHold3DControlChange('colorMode', 'WEIGHT')">⚖️ Màu theo Dải tấn</button>
@@ -2643,6 +2969,7 @@ pre.schema-box {
         <button onclick="setHold3DCameraPreset('modal', 'ISO')">↺</button>
       </div>
     </div>
+    <div class="hold3d-compare-wrap" id="modal3dCompareWrap"></div>
     <div class="hold3d-legend-bar" id="modal3dLegendBar"></div>
     <div class="hold3d-inspector" id="modal3dInspector">
       <span style="color:var(--muted);">💡 Bấm/chạm vào bất kỳ khối container 3D nào để xem chi tiết & thao tác gọi xe.</span>
@@ -3199,6 +3526,10 @@ const state = {
     { id: 'TK10', active: true, mode: 'IMPORT_ONLY', holds: [9], paused: false, pauseStart: null, rate: 22 }
   ],
   berthingSide: 'PORT', // 'PORT' (Mạn Trái - Mũi hướng Thượng lưu) | 'STARBOARD' (Mạn Phải - Mũi ra Cửa biển)
+  etdAt: '', // ISO datetime rời tàu dự kiến (ETD)
+  etdRedThreshold: 25, // Ngưỡng cảnh báo đỏ (mv/h)
+  etdMaxRateQc: 27, // Năng suất tối đa 1 QC (25–27 mv/h)
+  etdMaxRateTk: 26, // Năng suất tối đa 1 TK (25–27 mv/h)
   eportJobs: {},
   upcomingVessels: [],
   todayTide: null,
@@ -3210,6 +3541,8 @@ const state = {
   shiftHistory: { recommendations: [], actions: [], notes: [] },
   hold3d: {
     holdNo: 1,
+    selectedHolds: [1],
+    multiLayout: 'SIDE_BY_SIDE', // 'SIDE_BY_SIDE' | 'ALONG_SHIP'
     bayFilter: 'ALL',
     colorMode: 'POD', // 'POD' | 'WEIGHT'
     zoneFilter: 'ALL', // 'ALL' | 'HOLD' | 'DECK'
@@ -3448,7 +3781,10 @@ const CloudRepo = {
         vesselAttitude: state.vesselAttitude || { heel: 'EVEN', trim: 'EVEN' },
         setupCompleted: Boolean(state.setupCompleted),
         offDockCatalog: state.offDockCatalog,
-        peakHours: state.peakHours
+        peakHours: state.peakHours,
+        etdAt: state.etdAt || '',
+        etdMaxRateQc: state.etdMaxRateQc || 27,
+        etdMaxRateTk: state.etdMaxRateTk || 26
       },
       updated_at: new Date().toISOString()
     }, { onConflict: 'session_id' });
@@ -3639,6 +3975,9 @@ const CloudRepo = {
         if (s.stats_summary && Array.isArray(s.stats_summary.peakHours)) {
           state.peakHours = s.stats_summary.peakHours;
         }
+        state.etdAt = (s.stats_summary && s.stats_summary.etdAt) ? s.stats_summary.etdAt : '';
+        state.etdMaxRateQc = (s.stats_summary && s.stats_summary.etdMaxRateQc) ? Number(s.stats_summary.etdMaxRateQc) : 27;
+        state.etdMaxRateTk = (s.stats_summary && s.stats_summary.etdMaxRateTk) ? Number(s.stats_summary.etdMaxRateTk) : 26;
         const sideSel = document.getElementById('cfgBerthSide');
         if (sideSel) sideSel.value = state.berthingSide;
         if (Array.isArray(s.crane_config) && s.crane_config.length) state.cranes = s.crane_config;
@@ -5637,6 +5976,377 @@ const OffDockFleetAndQcEngine = {
   }
 };
 
+
+// ==================== [PHẦN 3.5] CẢNH BÁO TIẾN ĐỘ ETD & HẦM TRỌNG ĐIỂM (25–27 MV/H) ====================
+const EtdPaceEngine = {
+  toLocalInputValue(isoStr) {
+    if (!isoStr) return '';
+    const d = new Date(isoStr);
+    if (isNaN(d.getTime())) return '';
+    const pad = n => String(n).padStart(2, '0');
+    return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+  },
+
+  ensureDefaultEtd(st) {
+    if (st.etdAt && !isNaN(Date.parse(st.etdAt))) return st.etdAt;
+    // Thử tìm ETD từ dữ liệu ePort Tân Vũ nếu có
+    const sid = String(st.sessionId || '').toUpperCase();
+    const eKey = Object.keys(st.eportJobs || {}).find(k => sid.includes(k.replace(/\s+/g, '_').toUpperCase()));
+    const ej = eKey ? st.eportJobs[eKey] : null;
+    if (ej && ej.etd && !isNaN(Date.parse(ej.etd))) {
+      st.etdAt = new Date(ej.etd).toISOString();
+      return st.etdAt;
+    }
+    // Mặc định 5 tiếng từ hiện tại để chỉ đạo viên thấy ngay phép tính ETD và bấm chỉnh nhanh 3h/4h/5h/6h
+    st.etdAt = new Date(Date.now() + 5 * 3600000 + 20000).toISOString();
+    return st.etdAt;
+  },
+
+  formatHours(h) {
+    if (!isFinite(h) || h < 0) return '0.0h';
+    if (h >= 100) return '>99h';
+    return `${h.toFixed(1)}h`;
+  },
+
+  evaluate(st, pool, analysis) {
+    this.ensureDefaultEtd(st);
+    const etdMs = Date.parse(st.etdAt);
+    const diffMs = etdMs - Date.now();
+    const hoursLeft = diffMs / 3600000;
+    const isOverdue = hoursLeft <= 0.02;
+    const absMins = Math.abs(Math.round(diffMs / 60000));
+    const hh = Math.floor(absMins / 60);
+    const mm = absMins % 60;
+    const countdownText = isOverdue
+      ? `Quá ETD ${hh}h${String(mm).padStart(2, '0')}p`
+      : `Còn ${hh}h${String(mm).padStart(2, '0')}p (${Math.max(0, hoursLeft).toFixed(1)}h)`;
+
+    const redThreshold = Number(st.etdRedThreshold) || 25;
+    const maxRateQc = Number(st.etdMaxRateQc) || 27;
+    const maxRateTk = Number(st.etdMaxRateTk) || 26;
+
+    const impJobs = (st.liveJobs || []).filter(j => j.io === 'Import' || /dỡ\s*tàu/i.test(j.job_type || ''));
+    const holds = st.holdConfig || [];
+    const railActive = CraneRailOrder.sortCranesOnRail((st.cranes || []).filter(c => c.active));
+    const activeIds = new Set(railActive.map(c => c.id));
+    const metricsMap = {};
+    (analysis?.craneMetrics || []).forEach(m => { metricsMap[m.id] = m; });
+
+    // 1. Đếm tồn Nhập / Xuất thực tế trong từng Hầm
+    const holdBase = {};
+    holds.forEach(h => {
+      const baySet = new Set(h.bays || []);
+      const impRem = impJobs.filter(j => {
+        if (j.status === 'C') return false;
+        const p = DataAdapters.parsePos6(j.pos);
+        return p && baySet.has(p.bay);
+      }).length;
+      const expInH = (pool || []).filter(c => {
+        const p = DataAdapters.parsePos6(c.actualPos || c.plannedPos);
+        return p && baySet.has(p.bay);
+      });
+      const expRem = expInH.filter(c => c.jobStatus !== 'C').length;
+      const expB = expInH.filter(c => c.jobStatus === 'B').length;
+      const expA = expInH.filter(c => c.jobStatus === 'A').length;
+      const owners = railActive.filter(c => !c.paused && (c.holds || []).includes(h.hold));
+      holdBase[h.hold] = {
+        holdNo: h.hold,
+        label: h.label,
+        bays: h.bays || [],
+        impRem,
+        expRem,
+        expB,
+        expA,
+        totalRem: impRem + expRem,
+        owners
+      };
+    });
+
+    // 2. Tính áp lực ETD trên từng Cẩu đang hoạt động (QC / TK)
+    const craneReports = railActive.map((c, rIdx) => {
+      const isTK = /^TK/i.test(c.id);
+      const maxCap = isTK ? maxRateTk : maxRateQc;
+      const m = metricsMap[c.id] || { moves: 0, avgRate: 0 };
+      const actualRate = m.avgRate > 0 ? m.avgRate : 0;
+      const nominalRate = Math.max(10, Number(c.rate) || 20);
+      const currentRate = actualRate > 0 ? actualRate : nominalRate;
+
+      let totalRem = 0;
+      let expRem = 0;
+      let impRem = 0;
+      const holdBreakdown = [];
+
+      (c.holds || []).forEach(hNo => {
+        const hb = holdBase[hNo];
+        if (!hb) return;
+        const activeShares = Math.max(1, hb.owners.filter(o => {
+          if (c.mode === 'EXPORT_ONLY') return o.mode !== 'IMPORT_ONLY';
+          if (c.mode === 'IMPORT_ONLY') return o.mode !== 'EXPORT_ONLY';
+          return true;
+        }).length);
+        const hImp = c.mode === 'EXPORT_ONLY' ? 0 : Math.round(hb.impRem / activeShares);
+        const hExp = c.mode === 'IMPORT_ONLY' ? 0 : Math.round(hb.expRem / activeShares);
+        const hTot = hImp + hExp;
+        impRem += hImp;
+        expRem += hExp;
+        totalRem += hTot;
+        holdBreakdown.push({ holdNo: hNo, label: hb.label, rem: hTot, impRem: hImp, expRem: hExp });
+      });
+
+      const hoursAtCurrent = totalRem > 0 ? (totalRem / Math.max(1, currentRate)) : 0;
+      const hoursAtMax = totalRem > 0 ? (totalRem / Math.max(1, maxCap)) : 0;
+      const reqRate = totalRem === 0 ? 0 : (hoursLeft > 0.02 ? (totalRem / hoursLeft) : 999);
+      const bufferHours = hoursLeft - hoursAtCurrent;
+
+      // Tìm phương án thực tế trên ray: cẩu dự phòng cùng khe ray & cẩu kề bên rảnh hơn
+      const leftAdj = rIdx > 0 ? railActive[rIdx - 1] : null;
+      const rightAdj = rIdx < railActive.length - 1 ? railActive[rIdx + 1] : null;
+      const leftRailIdx = leftAdj ? CraneRailOrder.getRailIndex(leftAdj.id) : -1;
+      const rightRailIdx = rightAdj ? CraneRailOrder.getRailIndex(rightAdj.id) : 999;
+      const directBackups = PRESET_CRANES.filter(id => {
+        if (activeIds.has(id)) return false;
+        const idx = CraneRailOrder.getRailIndex(id);
+        return idx > leftRailIdx && idx < rightRailIdx;
+      });
+      const backupHint = directBackups.length
+        ? `thêm ${directBackups.slice(0, 2).join('/')} (cùng khe ray)`
+        : 'thêm 1 PTTB dự phòng hỗ trợ';
+      const neighborHint = [leftAdj?.id, rightAdj?.id].filter(Boolean).join(' / ');
+
+      let level = 'GREEN';
+      let badgeText = '🟢 Kịp ETD';
+      let shortAction = 'Giữ nhịp hiện tại';
+      let advice = '';
+
+      if (c.paused) {
+        level = totalRem > 0 ? 'OVERLOAD' : 'AMBER';
+        badgeText = '⏸ SỰ CỐ';
+        shortAction = 'Tiếp ứng / Thay cẩu';
+        advice = `⏸ ${c.id} đang tạm dừng sự cố với ${totalRem} cont còn lại (H${(c.holds || []).join(', H')}) → Chuyển hầm sang cẩu liền kề hoặc ${backupHint}!`;
+      } else if (totalRem === 0) {
+        level = 'DONE';
+        badgeText = '✅ Xong';
+        shortAction = 'Hết hàng';
+        advice = `✅ ${c.id} đã hoàn thành toàn bộ hầm phụ trách.`;
+      } else if (isOverdue || reqRate > maxCap + 0.05) {
+        level = 'OVERLOAD';
+        badgeText = isOverdue ? '🚨 QUÁ ETD' : `🚨 >${maxCap}/h QUÁ TẢI`;
+        shortAction = 'BẮT BUỘC THÊM PTTB / ĐỔI SƠ ĐỒ';
+        const extraHours = Math.max(0.1, hoursAtMax - Math.max(0, hoursLeft));
+        advice = `🚨 ${c.id} (${(c.holds || []).map(n => 'H' + String(n).padStart(2, '0')).join(', ')}): còn ${totalRem} cont, hiện ${currentRate.toFixed(0)} mv/h (mất ${hoursAtCurrent.toFixed(1)}h) · ETD ${isOverdue ? 'đã quá giờ' : 'còn ' + hoursLeft.toFixed(1) + 'h'} → Cần ${reqRate >= 900 ? '>99' : reqRate.toFixed(1)} mv/h (VƯỢT TRẦN ${maxCap} mv/h)! Bắt buộc ${backupHint}${neighborHint ? ` hoặc ĐỔI SƠ ĐỒ chuyển bớt hầm sang ${neighborHint}` : ''} (nếu giữ 1 cẩu sẽ trễ ~${extraHours.toFixed(1)}h).`;
+      } else if (reqRate >= redThreshold - 0.05) {
+        level = 'RED';
+        badgeText = `🔴 ĐỎ ${reqRate.toFixed(1)}/h`;
+        shortAction = 'DỒN XE · THÊM PTTB / ĐỔI SƠ ĐỒ';
+        advice = `🔴 CẢNH BÁO ĐỎ ${c.id} (${(c.holds || []).map(n => 'H' + String(n).padStart(2, '0')).join(', ')}): còn ${totalRem} cont, hiện ${currentRate.toFixed(0)} mv/h (mất ${hoursAtCurrent.toFixed(1)}h) · ETD còn ${hoursLeft.toFixed(1)}h → Phải đạt ${reqRate.toFixed(1)} mv/h (chạm trần 25–${maxCap} mv/h)! Dồn xe tăng tốc bãi TV gần, sẵn sàng ${backupHint}${neighborHint ? ` hoặc đổi sơ đồ san hầm sang ${neighborHint}` : ''}.`;
+      } else if (reqRate >= 21 || hoursAtCurrent > hoursLeft + 0.1) {
+        level = 'AMBER';
+        badgeText = `🟡 ${reqRate.toFixed(1)}/h`;
+        shortAction = 'DỒN XE TĂNG TỐC';
+        advice = `⚠️ ${c.id} (${(c.holds || []).map(n => 'H' + String(n).padStart(2, '0')).join(', ')}): còn ${totalRem} cont, NS hiện ${currentRate.toFixed(0)} mv/h (mất ${hoursAtCurrent.toFixed(1)}h) · ETD còn ${hoursLeft.toFixed(1)}h → Cần nâng lên ${reqRate.toFixed(1)} mv/h. Dồn thêm xe kéo & ưu tiên hàng bãi TV gần để không tụt nhịp.`;
+      } else {
+        level = 'GREEN';
+        badgeText = `🟢 ${reqRate.toFixed(1)}/h`;
+        shortAction = `Dư +${Math.max(0, bufferHours).toFixed(1)}h`;
+        advice = `✅ ${c.id} (${(c.holds || []).map(n => 'H' + String(n).padStart(2, '0')).join(', ')}): còn ${totalRem} cont, hiện ${currentRate.toFixed(0)} mv/h (mất ${hoursAtCurrent.toFixed(1)}h) · ETD còn ${hoursLeft.toFixed(1)}h → Chỉ cần ${reqRate.toFixed(1)} mv/h (dư ${Math.max(0, bufferHours).toFixed(1)}h).`;
+      }
+
+      const rankScore = level === 'OVERLOAD' ? 4 : (level === 'RED' ? 3 : (level === 'AMBER' ? 2 : (level === 'GREEN' ? 1 : 0)));
+
+      return {
+        crane: c,
+        craneId: c.id,
+        holds: c.holds || [],
+        holdBreakdown,
+        totalRem,
+        expRem,
+        impRem,
+        currentRate,
+        isActualRate: actualRate > 0,
+        maxCap,
+        redThreshold,
+        hoursAtCurrent,
+        hoursAtMax,
+        reqRate,
+        bufferHours,
+        level,
+        rankScore,
+        badgeText,
+        shortAction,
+        advice,
+        directBackups,
+        neighborHint
+      };
+    });
+
+    const craneReportMap = {};
+    craneReports.forEach(r => { craneReportMap[r.craneId] = r; });
+
+    // 3. Ánh xạ cảnh báo ETD xuống từng Hầm & xác định HẦM TRỌNG ĐIỂM
+    const holdMap = {};
+    holds.forEach(h => {
+      const hb = holdBase[h.hold];
+      const ownerReports = (hb.owners || []).map(o => craneReportMap[o.id]).filter(Boolean);
+
+      if (hb.totalRem === 0) {
+        holdMap[h.hold] = {
+          ...hb,
+          level: 'DONE',
+          rankScore: 0,
+          isCriticalHold: false,
+          ownerCraneIds: ownerReports.map(r => r.craneId),
+          craneTotalRem: 0,
+          craneHolds: [],
+          currentRate: ownerReports[0]?.currentRate || 20,
+          reqRate: 0,
+          hoursAtCurrent: 0,
+          holdHoursAtCurrent: 0,
+          maxCap: ownerReports[0]?.maxCap || maxRateQc,
+          badgeText: '✅ Xong',
+          shortAction: 'Hoàn tất',
+          advice: `✅ ${h.label} đã hoàn thành.`
+        };
+        return;
+      }
+
+      if (!ownerReports.length) {
+        const reqAlone = hoursLeft > 0.02 ? (hb.totalRem / hoursLeft) : 999;
+        holdMap[h.hold] = {
+          ...hb,
+          level: 'OVERLOAD',
+          rankScore: 4,
+          isCriticalHold: true,
+          ownerCraneIds: [],
+          craneTotalRem: hb.totalRem,
+          craneHolds: [h.hold],
+          currentRate: 0,
+          reqRate: reqAlone,
+          hoursAtCurrent: 999,
+          holdHoursAtCurrent: 999,
+          maxCap: maxRateQc,
+          badgeText: '🚨 CHƯA GÁN CẨU',
+          shortAction: 'GÁN CẨU NGAY',
+          advice: `🚨 ${h.label} còn ${hb.totalRem} cont nhưng CHƯA GÁN CẨU PHỤ TRÁCH! Hãy gán PTTB làm ngay (cần ${reqAlone >= 900 ? '>99' : reqAlone.toFixed(1)} mv/h).`
+        };
+        return;
+      }
+
+      // Chọn cẩu chịu áp lực nặng nhất đang làm hầm này
+      ownerReports.sort((a, b) => b.rankScore - a.rankScore || b.reqRate - a.reqRate);
+      const top = ownerReports[0];
+      const holdHoursAtCurrent = hb.totalRem / Math.max(1, top.currentRate);
+      const isCriticalHold = top.level === 'OVERLOAD' || top.level === 'RED';
+
+      holdMap[h.hold] = {
+        ...hb,
+        level: top.level,
+        rankScore: top.rankScore,
+        isCriticalHold,
+        ownerCraneIds: ownerReports.map(r => r.craneId),
+        primaryCraneId: top.craneId,
+        craneTotalRem: top.totalRem,
+        craneHolds: top.holds,
+        currentRate: top.currentRate,
+        isActualRate: top.isActualRate,
+        reqRate: top.reqRate,
+        hoursAtCurrent: top.hoursAtCurrent,
+        holdHoursAtCurrent,
+        maxCap: top.maxCap,
+        badgeText: isCriticalHold ? `🔥 ${top.badgeText}` : top.badgeText,
+        shortAction: top.shortAction,
+        advice: top.advice
+      };
+    });
+
+    // Nếu chưa có hầm nào ở mức Đỏ/Quá tải nhưng có hầm Vàng (AMBER), đánh dấu hầm tồn nhiều nhất trên cẩu căng nhất là Trọng điểm cần chú ý
+    const criticalHolds = Object.values(holdMap)
+      .filter(h => h.level === 'OVERLOAD' || h.level === 'RED')
+      .sort((a, b) => b.rankScore - a.rankScore || b.reqRate - a.reqRate || b.totalRem - a.totalRem);
+
+    const watchHolds = Object.values(holdMap)
+      .filter(h => h.level === 'AMBER')
+      .sort((a, b) => b.reqRate - a.reqRate || b.totalRem - a.totalRem);
+
+    const worstLevel = criticalHolds.some(h => h.level === 'OVERLOAD')
+      ? 'OVERLOAD'
+      : (criticalHolds.length ? 'RED' : (watchHolds.length ? 'AMBER' : 'GREEN'));
+
+    return {
+      etdAt: st.etdAt,
+      hoursLeft,
+      isOverdue,
+      countdownText,
+      redThreshold,
+      maxRateQc,
+      maxRateTk,
+      worstLevel,
+      craneReports,
+      craneReportMap,
+      holdMap,
+      criticalHolds,
+      watchHolds
+    };
+  }
+};
+
+function onEtdDateTimeChange(localVal) {
+  if (!localVal) return;
+  const dt = new Date(localVal);
+  if (isNaN(dt.getTime())) return;
+  state.etdAt = dt.toISOString();
+  ShiftHistoryManager.logAction('ETD TÀU', `Cập nhật giờ rời tàu dự kiến (ETD): ${dt.toLocaleString('vi-VN')}`);
+  saveCraneAndVesselConfigPersist();
+  renderAll();
+}
+
+function setEtdHoursFromNow(hours) {
+  const h = Number(hours) || 5;
+  state.etdAt = new Date(Date.now() + h * 3600000 + 20000).toISOString();
+  ShiftHistoryManager.logAction('ETD TÀU', `Đặt nhanh ETD rời tàu: còn ${h} tiếng`);
+  saveCraneAndVesselConfigPersist();
+  renderAll();
+}
+
+function onEtdCapConfigChange() {
+  const qv = parseInt(document.getElementById('cfgMaxRateQc')?.value, 10);
+  const tv = parseInt(document.getElementById('cfgMaxRateTk')?.value, 10);
+  if (qv >= 20 && qv <= 35) state.etdMaxRateQc = qv;
+  if (tv >= 18 && tv <= 32) state.etdMaxRateTk = tv;
+  saveCraneAndVesselConfigPersist();
+  renderAll();
+}
+
+function updateCraneRate(craneId, val) {
+  const c = state.cranes.find(x => x.id === craneId);
+  const r = parseFloat(val);
+  if (c && r >= 8 && r <= 40) c.rate = r;
+  saveCraneAndVesselConfigPersist();
+  renderAll();
+}
+
+function openCriticalHoldsIn3D() {
+  const etd = window._latestEtdEval;
+  let picks = [];
+  if (etd) {
+    picks = etd.criticalHolds.map(h => h.holdNo);
+    if (!picks.length) picks = etd.watchHolds.map(h => h.holdNo);
+    if (!picks.length) {
+      picks = Object.values(etd.holdMap || {}).filter(h => h.totalRem > 0).slice(0, 3).map(h => h.holdNo);
+    }
+  }
+  if (!picks.length && state.holdConfig.length) picks = [state.holdConfig[0].hold];
+  state.hold3d.selectedHolds = Array.from(new Set(picks)).sort((a, b) => a - b);
+  state.hold3d.holdNo = state.hold3d.selectedHolds[0] || 1;
+  state.hold3d.multiLayout = state.hold3d.selectedHolds.length <= 4 ? 'SIDE_BY_SIDE' : 'ALONG_SHIP';
+  state.hold3d.bayFilter = 'ALL';
+  state.hold3d.selectedBlockId = null;
+  document.getElementById('hold3DModal')?.classList.add('open');
+  setTimeout(() => {
+    renderHold3DViews();
+    if (hold3dControllers.modal) hold3dControllers.modal.draw();
+  }, 40);
+}
+
 // =========================================================================
 // [PHẦN 4] UI CONTROLLERS, ADMIN PIN MODAL, RESPONSIVE RENDERERS
 // =========================================================================
@@ -6529,7 +7239,52 @@ function renderHorizontalShipRailCard() {
   const cfg = getLiveVesselCfg();
   const pool = UnifiedPoolBuilder.build(state, cfg.deck_tier_min);
   const shift = document.getElementById('shiftFilter')?.value || 'ALL';
-  const { craneMetrics, holdProgress, railCrossingConflicts } = CraneEngine.analyzeCraneBalance(state, pool, shift);
+  const analysis = CraneEngine.analyzeCraneBalance(state, pool, shift);
+  const { craneMetrics, holdProgress, railCrossingConflicts } = analysis;
+  const etdEval = EtdPaceEngine.evaluate(state, pool, analysis);
+  window._latestEtdEval = etdEval;
+
+  // Đồng bộ thanh ETD ở Tab 1 & Tab 3
+  const localVal = EtdPaceEngine.toLocalInputValue(etdEval.etdAt);
+  const inpRail = document.getElementById('etdInputRail');
+  if (inpRail && inpRail.value !== localVal) inpRail.value = localVal;
+  const inpCfg = document.getElementById('cfgEtdAt');
+  if (inpCfg && inpCfg.value !== localVal) inpCfg.value = localVal;
+  const inpQc = document.getElementById('cfgMaxRateQc');
+  if (inpQc) inpQc.value = etdEval.maxRateQc;
+  const inpTk = document.getElementById('cfgMaxRateTk');
+  if (inpTk) inpTk.value = etdEval.maxRateTk;
+
+  const etdBar = document.getElementById('shipRailEtdBar');
+  if (etdBar) {
+    etdBar.className = 'etd-bar' + (
+      etdEval.worstLevel === 'OVERLOAD' ? ' etd-overload'
+      : (etdEval.worstLevel === 'RED' ? ' etd-red'
+      : (etdEval.worstLevel === 'AMBER' ? ' etd-amber' : ''))
+    );
+  }
+  const cdBadge = document.getElementById('etdCountdownBadge');
+  if (cdBadge) {
+    cdBadge.textContent = `⏱️ ${etdEval.countdownText}`;
+    cdBadge.className = `badge ${etdEval.isOverdue || etdEval.hoursLeft <= 4 ? 'red' : (etdEval.hoursLeft <= 6 ? 'amber' : '')}`;
+  }
+  const critBadge = document.getElementById('etdCriticalSummaryBadge');
+  if (critBadge) {
+    if (etdEval.criticalHolds.length) {
+      const hNames = etdEval.criticalHolds.map(h => `H${String(h.holdNo).padStart(2, '0')}`).join(', ');
+      const topC = etdEval.criticalHolds[0];
+      critBadge.textContent = `🔥 Trọng điểm: ${hNames} (${topC.primaryCraneId || 'Chưa cẩu'} · Cần ${topC.reqRate >= 900 ? '>99' : topC.reqRate.toFixed(1)} mv/h)`;
+      critBadge.className = 'badge red';
+    } else if (etdEval.watchHolds.length) {
+      const hNames = etdEval.watchHolds.map(h => `H${String(h.holdNo).padStart(2, '0')}`).join(', ');
+      const topW = etdEval.watchHolds[0];
+      critBadge.textContent = `⚠️ Cần tăng tốc: ${hNames} (${topW.primaryCraneId || ''} · Cần ${topW.reqRate.toFixed(1)} mv/h)`;
+      critBadge.className = 'badge amber';
+    } else {
+      critBadge.textContent = '✅ Toàn tàu đang kịp tiến độ ETD';
+      critBadge.className = 'badge green';
+    }
+  }
 
   const isPort = state.berthingSide !== 'STARBOARD';
   const badge = document.getElementById('shipBerthSideBadge');
@@ -6543,7 +7298,6 @@ function renderHorizontalShipRailCard() {
     crossBadge.textContent = `⚠️ ${railCrossingConflicts.length} lỗi chéo ray!`;
   }
 
-  // Sắp xếp toàn bộ cẩu đang bật theo ĐÚNG THỨ TỰ RAY từ Thượng lưu -> Hạ lưu
   const railCranes = CraneRailOrder.sortCranesOnRail((state.cranes || []).filter(c => c.active));
   const colors = ['#0284c7', '#059669', '#d97706', '#7c3aed', '#e11d48', '#0891b2', '#65a30d', '#ea580c'];
   const colorMap = {};
@@ -6555,46 +7309,59 @@ function renderHorizontalShipRailCard() {
   const impJobs = state.liveJobs.filter(j => j.io === 'Import' || j.job_type === 'Dỡ tàu');
   const orderedHolds = CraneRailOrder.getOrderedHoldsAlongQuay(state.holdConfig, state.berthingSide);
 
-  // 1. HÀNG CẨU TRÊN RAY (THƯỢNG LƯU -> HẠ LƯU)
+  const etdClsOf = (lv) => lv === 'OVERLOAD' ? 'etd-overload' : (lv === 'RED' ? 'etd-red' : (lv === 'AMBER' ? 'etd-amber' : 'etd-green'));
+
+  // 1. HÀNG CẨU TRÊN RAY (HIỂN THỊ TRỰC TIẾP CẢNH BÁO ETD, SỐ GIỜ CẦN & TỐC ĐỘ YÊU CẦU MV/H)
   const cranesRowHtml = railCranes.length ? railCranes.map((c, idx) => {
     const m = craneMetrics.find(x => x.id === c.id) || { moves: 0, impMoves: 0, expMoves: 0, avgRate: 0, lastHourMoves: 0, lastHourLabel: '' };
     const col = colorMap[c.id] || 'var(--cyan)';
-    // Tính tiến độ hoàn thành trên các hầm cẩu này phụ trách
+    const cr = etdEval.craneReportMap[c.id];
+    const eCls = cr ? etdClsOf(cr.level) : 'etd-green';
+
     let hTotal = 0, hDone = 0, hReadyB = 0;
     (c.holds || []).forEach(hNo => {
       const hp = holdProgress[hNo];
       if (hp) { hTotal += hp.total; hDone += hp.doneC; hReadyB += hp.readyB; }
     });
     const pct = hTotal > 0 ? Math.round((hDone / hTotal) * 100) : 0;
-    const modeLbl = c.paused ? '<span class="badge red">⏸ Sự cố</span>'
-      : (c.mode === 'IMPORT_ONLY' ? '<span class="badge amber">Chỉ nhập</span>'
-      : (c.mode === 'EXPORT_ONLY' ? '<span class="badge purple">Chỉ xuất</span>' : '<span class="badge green">Nhập+Xuất</span>'));
+
+    const etdBadgeHtml = cr
+      ? `<span class="badge ${cr.level === 'OVERLOAD' || cr.level === 'RED' ? 'red' : (cr.level === 'AMBER' ? 'amber' : 'green')}">${cr.badgeText}</span>`
+      : '';
+
+    const etdBoxHtml = cr && cr.totalRem > 0 ? `
+      <div class="crane-etd-box ${eCls}" title="${cr.advice.replace(/"/g, '&quot;')}">
+        <div>Còn <b>${cr.totalRem}</b> cont · Hiện <b>${cr.currentRate.toFixed(0)}</b>/h → <b>${cr.hoursAtCurrent.toFixed(1)}h</b></div>
+        <div>ETD ${etdEval.isOverdue ? 'quá giờ' : etdEval.hoursLeft.toFixed(1) + 'h'} → <b>Cần ${cr.reqRate >= 900 ? '>99' : cr.reqRate.toFixed(1)} mv/h</b></div>
+        <div style="font-size:9.5px;margin-top:1px;">⚡ ${cr.shortAction}</div>
+      </div>` : (cr ? `<div class="crane-etd-box etd-green">✅ Đã xong hầm phụ trách</div>` : '');
 
     const barrierHtml = idx < railCranes.length - 1
       ? `<div class="rail-barrier" title="Ràng buộc ray: ${c.id} và ${railCranes[idx+1].id} không thể chạy vượt qua nhau"><span>║</span><span style="font-size:8px;">CHẮN</span><span>║</span></div>`
       : '';
 
     return `
-      <div class="rail-crane-node ${c.paused ? 'paused' : ''} ${conflictCraneIds.has(c.id) ? 'crossing-err' : ''}" style="border-top-color:${c.paused ? 'var(--red)' : col};">
+      <div class="rail-crane-node ${c.paused ? 'paused' : ''} ${conflictCraneIds.has(c.id) ? 'crossing-err' : ''} ${eCls}" style="border-top-color:${(c.paused || cr?.level === 'OVERLOAD' || cr?.level === 'RED') ? 'var(--red)' : col};">
         <div style="display:flex;justify-content:space-between;align-items:center;gap:4px;">
-          <strong style="font-size:12.5px;color:${col};">🏗️ #${idx + 1} ${c.id}</strong>
-          ${modeLbl}
+          <strong style="font-size:12.5px;color:${(cr?.level === 'OVERLOAD' || cr?.level === 'RED') ? 'var(--red)' : col};">🏗️ #${idx + 1} ${c.id}</strong>
+          ${etdBadgeHtml}
         </div>
         <div style="font-size:10.5px;color:var(--muted);margin-top:3px;display:flex;justify-content:space-between;">
           <span>Hầm: <b style="color:var(--ink);">${c.holds.length ? c.holds.map(n => 'H' + n).join(', ') : 'Chưa gán'}</b></span>
-          <span style="font-weight:850;color:var(--cyan);">${m.avgRate} mv/h</span>
+          <span style="font-weight:850;color:var(--cyan);">${cr ? cr.currentRate.toFixed(0) : m.avgRate} mv/h${cr && !cr.isActualRate ? '*' : ''}</span>
         </div>
-        <div class="prog-track" style="margin:4px 0;"><div class="prog-fill" style="width:${pct}%;background:${col};"></div></div>
+        <div class="prog-track" style="margin:4px 0;"><div class="prog-fill" style="width:${pct}%;background:${(cr?.level === 'OVERLOAD' || cr?.level === 'RED') ? 'var(--red)' : col};"></div></div>
         <div style="font-size:10px;display:flex;justify-content:space-between;color:var(--muted);">
           <span>C: <b style="color:var(--ink);">${m.moves}</b> (N:${m.impMoves}/X:${m.expMoves})</span>
           <span>Còn B: <b style="color:${hReadyB > 0 ? 'var(--cyan)' : 'var(--green)'};">${hReadyB}</b></span>
         </div>
+        ${etdBoxHtml}
       </div>
       ${barrierHtml}
     `;
   }).join('') : '<div style="padding:10px;color:var(--muted);">Chưa kích hoạt cẩu nào (Vào Tab 3 để chọn thiết bị).</div>';
 
-  // 2. HÌNH CON TÀU NẰM NGANG (MŨI HƯỚNG TRÁI KHI CẬP MẠN TRÁI | MŨI HƯỚNG PHẢI KHI CẬP MẠN PHẢI)
+  // 2. HÌNH CON TÀU NẰM NGANG + CẢNH BÁO HẦM TRỌNG ĐIỂM NGAY TRÊN TỪNG Ô HẦM
   const bowHtml = (sideCls) => `
     <div class="ship-bow ${sideCls}">
       <div style="font-size:15px;line-height:1;">${sideCls === 'left-bow' ? '◀' : '▶'}</div>
@@ -6612,31 +7379,45 @@ function renderHorizontalShipRailCard() {
     const owners = railCranes.filter(c => (c.holds || []).includes(h.hold));
     const topCol = owners.length ? (colorMap[owners[0].id] || 'var(--cyan)') : 'var(--line)';
     const hp = holdProgress[h.hold] || { total: 0, doneC: 0, readyB: 0, pct: 0 };
+    const he = etdEval.holdMap[h.hold];
+    const hEtdCls = he ? etdClsOf(he.level) : '';
     const impInH = impJobs.filter(j => { const p = DataAdapters.parsePos6(j.pos); return p && h.bays.includes(p.bay); });
     const impDone = impInH.filter(j => j.status === 'C').length;
     const impPct = impInH.length ? Math.round((impDone / impInH.length) * 100) : 100;
     const bayRange = h.bays.length > 1 ? `${h.bays[0]}–${h.bays[h.bays.length - 1]}` : (h.bays[0] || '--');
     const firstBay = h.bays[0] || '01';
 
+    let holdStatusPill = '';
+    if (he && he.totalRem > 0) {
+      if (he.level === 'OVERLOAD' || he.level === 'RED') {
+        holdStatusPill = `<div class="hold-etd-pill ${hEtdCls}">🔥 TRỌNG ĐIỂM · ${he.reqRate >= 900 ? 'QUÁ TẢI' : he.reqRate.toFixed(1) + '/h'}</div>`;
+      } else if (he.level === 'AMBER') {
+        holdStatusPill = `<div class="hold-etd-pill etd-amber">⚠️ Cần ${he.reqRate.toFixed(1)}/h</div>`;
+      } else {
+        holdStatusPill = `<div class="hold-etd-pill etd-green">✓ ~${he.holdHoursAtCurrent.toFixed(1)}h · ${he.reqRate.toFixed(0)}/h</div>`;
+      }
+    }
+
     return `
-      <div class="ship-hold-cell" style="border-top-color:${topCol};" onclick="openBayPopup('${firstBay}')" title="Bấm xem sơ đồ Bay ${firstBay} (${h.label})">
+      <div class="ship-hold-cell ${he && he.totalRem > 0 ? hEtdCls : ''}" style="border-top-color:${(he && (he.level === 'OVERLOAD' || he.level === 'RED')) ? 'var(--red)' : topCol};" onclick="openBayPopup('${firstBay}')" title="${he ? he.advice.replace(/"/g, '&quot;') : ''}">
         <div style="display:flex;justify-content:space-between;align-items:center;gap:2px;">
-          <b style="font-size:11px;">H${String(h.hold).padStart(2,'0')}</b>
+          <b style="font-size:11px;color:${he?.isCriticalHold ? 'var(--red)' : 'inherit'};">H${String(h.hold).padStart(2,'0')}</b>
           <span style="display:inline-flex;align-items:center;gap:3px;">
             <span style="font-size:9px;color:var(--muted);">B${bayRange}</span>
             <button class="sm" style="padding:0 4px;min-height:17px;font-size:9px;border-radius:4px;background:rgba(2,132,199,0.14);color:var(--cyan);border-color:var(--cyan);" title="Xem Hầm H${String(h.hold).padStart(2,'0')} dạng 3D" onclick="event.stopPropagation();openHold3DModal(${h.hold})">3D</button>
           </span>
         </div>
-        <div style="display:flex;flex-wrap:wrap;gap:2px;min-height:16px;">
-          ${owners.length ? owners.map(o => `<span class="badge" style="padding:1px 5px;font-size:9px;background:${colorMap[o.id]}22;color:${colorMap[o.id]};">${o.id}</span>`).join('') : '<span style="font-size:9px;color:var(--muted);">Trống cẩu</span>'}
+        ${holdStatusPill}
+        <div style="display:flex;flex-wrap:wrap;gap:2px;min-height:15px;">
+          ${owners.length ? owners.map(o => `<span class="badge" style="padding:1px 5px;font-size:9px;background:${colorMap[o.id]}22;color:${colorMap[o.id]};">${o.id}</span>`).join('') : '<span style="font-size:9px;color:var(--red);font-weight:800;">Trống cẩu</span>'}
         </div>
         <div>
           <div class="prog-track" style="height:5px;margin:2px 0;" title="Tiến độ dỡ nhập ${impPct}%"><div class="prog-fill imp" style="width:${impPct}%;"></div></div>
           <div class="prog-track" style="height:5px;margin:2px 0;" title="Tiến độ xếp xuất ${hp.pct}%"><div class="prog-fill" style="width:${hp.pct}%;"></div></div>
         </div>
         <div style="font-size:9.5px;display:flex;justify-content:space-between;color:var(--muted);">
-          <span>X:${hp.pct}%</span>
-          <b style="color:${hp.readyB > 0 ? 'var(--cyan)' : 'var(--green)'};">${hp.readyB}B</b>
+          <span>Còn: <b style="color:var(--ink);">${he ? he.totalRem : hp.readyB}</b></span>
+          <b style="color:${hp.readyB > 0 ? 'var(--cyan)' : 'var(--green)'};">X:${hp.pct}%</b>
         </div>
       </div>
     `;
@@ -6661,14 +7442,67 @@ function renderHorizontalShipRailCard() {
     </div>
   `;
 
+  // 3. DẢI KHUYẾN NGHỊ TRỌNG ĐIỂM THEO ETD NGAY DƯỚI THÂN TÀU
+  const advStrip = document.getElementById('etdCriticalAdvisoryStrip');
+  if (advStrip) {
+    const alertCranes = etdEval.craneReports
+      .filter(r => r.totalRem > 0)
+      .sort((a, b) => b.rankScore - a.rankScore || b.reqRate - a.reqRate);
+    const unassignedHolds = Object.values(etdEval.holdMap).filter(h => h.totalRem > 0 && !h.ownerCraneIds.length);
+
+    let html = unassignedHolds.map(uh => `
+      <div class="etd-adv-card etd-overload">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:4px;">
+          <strong style="color:var(--red);">🚨 ${uh.label} (CHƯA GÁN CẨU · Còn ${uh.totalRem} cont)</strong>
+          <button class="sm danger" onclick="openHold3DModal(${uh.holdNo})">🧊 3D</button>
+        </div>
+        <div style="margin-top:3px;">${uh.advice}</div>
+      </div>`).join('');
+
+    html += alertCranes.map(r => {
+      const cls = etdClsOf(r.level);
+      const hListStr = r.holds.map(n => `H${String(n).padStart(2, '0')}`).join(', ');
+      const firstHold = r.holds[0] || 1;
+      const holdsArg = JSON.stringify(r.holds);
+      return `
+        <div class="etd-adv-card ${cls}">
+          <div style="display:flex;justify-content:space-between;align-items:center;gap:4px;flex-wrap:wrap;">
+            <strong>${r.level === 'OVERLOAD' || r.level === 'RED' ? '🔥 ' : ''}${r.craneId} (${hListStr || 'Chưa hầm'})</strong>
+            <div style="display:flex;gap:4px;align-items:center;">
+              <span class="badge ${r.level === 'OVERLOAD' || r.level === 'RED' ? 'red' : (r.level === 'AMBER' ? 'amber' : 'green')}">${r.badgeText}</span>
+              <button class="sm" style="padding:1px 6px;min-height:22px;" onclick='openHoldsListIn3D(${holdsArg})' title="Mở các hầm của ${r.craneId} lên màn hình 3D để đối chiếu">🧊 3D</button>
+            </div>
+          </div>
+          <div style="margin-top:3px;font-size:11px;">${r.advice}</div>
+        </div>`;
+    }).join('');
+
+    advStrip.innerHTML = html;
+  }
+
   const noteEl = document.getElementById('railConstraintNote');
   if (noteEl) {
     if (railCrossingConflicts.length) {
       noteEl.innerHTML = `<span style="color:var(--red);font-weight:800;">⚠️ Phát hiện gán hầm ngược thứ tự ray: ${railCrossingConflicts.map(x => x.message).join('; ')}. Vào <b>⚙️ Cài đặt → Cẩu & Ray</b> để bấm <b>"⚡ Tự chia Hầm đúng ray"</b>!</span>`;
     } else {
-      noteEl.innerHTML = `✅ Thứ tự thiết bị khớp đúng ray cầu tàu (<b>Thượng lưu ➔ Hạ lưu</b>). Bấm trực tiếp vào từng ô Hầm trên thân tàu để mở sơ đồ Bay chi tiết.`;
+      noteEl.innerHTML = `✅ Thứ tự thiết bị khớp đúng ray cầu tàu (<b>Thượng lưu ➔ Hạ lưu</b>). Số có dấu <code>*</code> là năng suất định mức thiết lập (chưa có dữ liệu hoàn tất C); tự chuyển sang năng suất thực tế khi có cont C. Bấm vào từng ô Hầm để mở sơ đồ Bay hoặc bấm <b>3D</b>.`;
     }
   }
+}
+
+function openHoldsListIn3D(holdsArr) {
+  const valid = (Array.isArray(holdsArr) ? holdsArr : []).map(n => parseInt(n, 10)).filter(n => !isNaN(n));
+  if (!valid.length) { openHold3DModal(); return; }
+  state.hold3d.selectedHolds = Array.from(new Set(valid)).sort((a, b) => a - b);
+  state.hold3d.holdNo = state.hold3d.selectedHolds[0];
+  state.hold3d.multiLayout = state.hold3d.selectedHolds.length <= 4 ? 'SIDE_BY_SIDE' : 'ALONG_SHIP';
+  state.hold3d.bayFilter = 'ALL';
+  state.hold3d.selectedBlockId = null;
+  document.getElementById('hold3DModal')?.classList.add('open');
+  setTimeout(() => {
+    renderHold3DViews();
+    if (hold3dControllers.modal) hold3dControllers.modal.draw();
+  }, 40);
 }
 
 function toggleBerthingSideQuick() {
@@ -7226,7 +8060,7 @@ function renderCranesSetup() {
   document.getElementById('craneAssignmentTable').innerHTML = `
     <div class="table-wrap">
       <table>
-        <thead><tr><th>Thiết bị</th><th>Chế độ</th><th>Hầm phụ trách</th><th>Sự cố / Gián đoạn</th></tr></thead>
+        <thead><tr><th>Thiết bị</th><th>Chế độ</th><th>Hầm phụ trách</th><th>NS định mức (mv/h)</th><th>Sự cố / Gián đoạn</th></tr></thead>
         <tbody>
           ${CraneRailOrder.sortCranesOnRail(state.cranes.filter(c => c.active)).map((c, idx) => {
             const sec = c.paused && c.pauseStart ? Math.floor((Date.now() - c.pauseStart) / 1000) : 0;
@@ -7243,6 +8077,7 @@ function renderCranesSetup() {
                   </select>
                 </td>
                 <td><input value="${c.holds.join(',')}" style="width:88px" onchange="updateCraneHolds('${c.id}', this.value)"></td>
+                <td><input type="number" min="10" max="35" value="${c.rate || 20}" style="width:64px" onchange="updateCraneRate('${c.id}', this.value)" title="Năng suất dự kiến (mv/h) khi chưa có cont hoàn tất C"></td>
                 <td>
                   <button class="sm ${c.paused ? 'danger' : 'warning'}" onclick="toggleCranePause('${c.id}')">
                     ${c.paused ? `▶ Tiếp (${mm}:${ss})` : '⏸ Tạm dừng'}
@@ -8870,6 +9705,28 @@ function renderOpsCockpitAndTicker(pool) {
     issues.push({ severity: 'urgent', title: '⏫ Mũi đang VẾCH (Chìm lái) → Ưu tiên gọi hàng nặng lên các Hầm Mũi', detail: 'Thuật toán đã ưu tiên gọi cont nặng ở nhóm Hầm đầu (Mũi) và hãm cont nặng đuôi Lái.', action: "expandAndScrollTo('panel-smart-dispatch')" });
   }
 
+  // Cảnh báo Tiến độ ETD & Hầm trọng điểm (ưu tiên đầu tiên để Chỉ đạo nhìn là thấy ngay!)
+  const etdEval = window._latestEtdEval || EtdPaceEngine.evaluate(state, pool, analysis);
+  (etdEval.craneReports || []).filter(r => r.level === 'OVERLOAD' || r.level === 'RED' || r.level === 'AMBER').forEach(r => {
+    const hStr = r.holds.map(n => 'H' + String(n).padStart(2, '0')).join(', ');
+    issues.push({
+      id: `ETD_${r.craneId}_${r.level}`,
+      severity: (r.level === 'OVERLOAD' || r.level === 'RED') ? 'urgent' : 'warn',
+      title: `🔥 ${r.craneId} (${hStr}): Còn ${r.totalRem} cont · Hiện ${r.currentRate.toFixed(0)}/h (${r.hoursAtCurrent.toFixed(1)}h) · ETD ${etdEval.isOverdue ? 'quá giờ' : etdEval.hoursLeft.toFixed(1) + 'h'} → Cần ${r.reqRate >= 900 ? '>99' : r.reqRate.toFixed(1)} mv/h [${r.shortAction}]`,
+      detail: r.advice,
+      action: `openHoldsListIn3D(${JSON.stringify(r.holds)})`
+    });
+  });
+  Object.values(etdEval.holdMap || {}).filter(h => h.totalRem > 0 && !h.ownerCraneIds.length).forEach(uh => {
+    issues.push({
+      id: `ETD_UNASSIGNED_H${uh.holdNo}`,
+      severity: 'urgent',
+      title: `🚨 ${uh.label} còn ${uh.totalRem} cont nhưng CHƯA GÁN CẨU!`,
+      detail: uh.advice,
+      action: `openHold3DModal(${uh.holdNo})`
+    });
+  });
+
   (analysis.railCrossingConflicts || []).forEach(cf => {
     issues.push({ severity: 'urgent', title: `Chéo ray cẩu: ${cf.message}`, detail: 'Bấm "Tự chia Hầm đúng ray" để chỉnh lại thứ tự vật lý.', action: "expandAndScrollTo('panel-ship-rail')" });
   });
@@ -9052,7 +9909,10 @@ function saveCraneAndVesselConfigPersist(showToast = false) {
     vesselAttitude: state.vesselAttitude,
     setupCompleted: state.setupCompleted,
     deckTier: parseInt(document.getElementById('cfgDeckTier')?.value, 10) || 80,
-    holdMaxTier: parseInt(document.getElementById('cfgHoldMaxTier')?.value, 10) || 12
+    holdMaxTier: parseInt(document.getElementById('cfgHoldMaxTier')?.value, 10) || 12,
+    etdAt: state.etdAt || '',
+    etdMaxRateQc: state.etdMaxRateQc || 27,
+    etdMaxRateTk: state.etdMaxRateTk || 26
   };
   try { localStorage.setItem(localCraneCfgKey(sid), JSON.stringify(snap)); } catch (e) {}
 
@@ -9088,6 +9948,9 @@ function restoreLocalCraneAndAttitudeIfNewer(sessionId, dbUpdatedAt) {
       if (raw.deckTier) { const el = document.getElementById('cfgDeckTier'); if (el) el.value = raw.deckTier; }
       if (raw.holdMaxTier) { const el = document.getElementById('cfgHoldMaxTier'); if (el) el.value = raw.holdMaxTier; }
       if (raw.setupCompleted !== undefined) state.setupCompleted = Boolean(raw.setupCompleted);
+      if (raw.etdAt !== undefined) state.etdAt = raw.etdAt;
+      if (raw.etdMaxRateQc) state.etdMaxRateQc = Number(raw.etdMaxRateQc);
+      if (raw.etdMaxRateTk) state.etdMaxRateTk = Number(raw.etdMaxRateTk);
     }
   } catch (e) {}
 }
@@ -9691,6 +10554,8 @@ const HELP_TOPICS = {
         <li><b>Khối màu nổi (Cont đã xếp C):</b> Cho phép chuyển nhanh giữa <b>🎨 Màu theo Cảng (POD)</b> hoặc <b>⚖️ Màu theo Dải tấn</b>. Nội dung hiển thị <b>4 số cuối container</b> và <b>Tên cảng</b>.</li>
         <li><b>Khối màu tím đồng nhất (Hàng Nhập):</b> Toàn bộ container hàng nhập đang trên tàu hiển thị cùng 1 màu tím để phân biệt tức thì với hàng xuất.</li>
         <li><b>Khối màu xám đậm (Cont để lại / ROB suy đoán):</b> Container để lại (ROB/Transit) hoặc các vị trí đỡ tầng bên dưới các container đang nằm ở tầng cao (vì container không thể lơ lửng trên không).</li>
+        <li><b>Cảnh báo Tiến độ ETD & Hầm trọng điểm (Trần 25–27 mv/h):</b> Tự tính số giờ cần thiết theo năng suất thực tế của cẩu phụ trách và đối chiếu với thời gian còn lại trước giờ tàu rời (ETD). Khi năng suất yêu cầu chạm <b>≥25 mv/h</b> (VD: 100 cont / còn 4 tiếng = 25 mv/h) sẽ tự chuyển <b>Cảnh báo Đỏ</b> kèm khuyến nghị dồn xe, đổi sơ đồ hoặc thêm PTTB; vượt <b>27 mv/h</b> báo <b>Quá tải bắt buộc thêm PTTB / san hầm</b>.</li>
+        <li><b>Tích chọn nhiều Hầm để so sánh tiến độ:</b> Tích trực tiếp nhiều thẻ Hầm (VD: <code>H01</code>, <code>H04</code>, <code>H07</code>) hoặc bấm <b>⚡ Hầm đang làm</b> / <b>🚢 Cả tàu</b>. Có thể chuyển qua lại giữa <b>↔️ Ngang hàng (So sánh chiều cao & nắp hầm ngang tầm)</b> và <b>🚢 Dọc thân tàu</b>, kèm bảng đối chiếu % Dỡ/Xếp và cảnh báo Hầm chậm nhất.</li>
         <li><b>Thao tác 3D:</b> Kéo chuột/ngón tay để xoay 360°, cuộn chuột hoặc bấm ➕/➖ để phóng to, bấm <b>Tách Bay</b> để tách rời Bay 20'/40' không bị che khuất, và chạm trực tiếp vào bất kỳ khối nào để xem chi tiết / Gọi xe.</li>
       </ul>`
   },
@@ -9831,8 +10696,12 @@ function renderAll() {
   updateAdminPinHeaderBtn();
 }
 
-// Bộ đếm tự động đánh giá hiệu suất cẩu mỗi 1 tiếng (60 phút) 1 lần
+// Bộ đếm tự động đánh giá hiệu suất cẩu mỗi 1 tiếng & cập nhật cảnh báo ETD mỗi phút
 setInterval(() => {
+  if (state.sessionId && state.etdAt) {
+    renderHorizontalShipRailCard();
+    if (typeof renderHold3DViews === 'function') renderHold3DViews();
+  }
   if (Date.now() >= state.nextHourlyEvalAt) {
     runHourlyCraneEfficiencyReview(true);
   } else {
@@ -10256,22 +11125,12 @@ async function deleteCurrentVesselSession() {
 
 
 // =========================================================================
-// [PHẦN 6] MÔ PHỎNG HẦM HÀNG 3D TRỰC QUAN (CANVAS 3D + TOPOLOGICAL PAINTER)
+// [PHẦN 6] MÔ PHỎNG HẦM HÀNG 3D ĐA HẦM TRỰC QUAN (SO SÁNH & CĂN CHỈNH TIẾN ĐỘ)
 // =========================================================================
 const Hold3DEngine = {
   POD_PALETTE: [
-    '#0284c7', // Xanh dương đậm
-    '#059669', // Xanh ngọc lục
-    '#ea580c', // Cam đậm
-    '#db2777', // Hồng cánh sen
-    '#0d9488', // Xanh mòng két
-    '#ca8a04', // Vàng mù tạt
-    '#dc2626', // Đỏ tươi
-    '#2563eb', // Xanh lam
-    '#65a30d', // Xanh cốm đậm
-    '#e11d48', // Đỏ hồng
-    '#0891b2', // Xanh cyan đậm
-    '#b45309'  // Nâu cam
+    '#0284c7', '#059669', '#ea580c', '#db2777', '#0d9488', '#ca8a04',
+    '#dc2626', '#2563eb', '#65a30d', '#e11d48', '#0891b2', '#b45309'
   ],
 
   WEIGHT_BAND_META: [
@@ -10321,126 +11180,215 @@ const Hold3DEngine = {
     return /\bROB\b|TRANSIT|RESTOW|\bSTAY\b|ĐỂ LẠI|DE LAI/.test(hay);
   },
 
-  buildHoldModel(holdNo, opts = {}) {
+  getBayRole(bayStr) {
+    const n = parseInt(bayStr, 10);
+    const rem = (n - 1) % 4;
+    const blk = Math.floor((n - 1) / 4);
+    if (rem === 0) return { kind: '20F', blk, n, evenBay: String(n + 1).padStart(2, '0'), pairBay: String(n + 2).padStart(2, '0') };
+    if (rem === 2) return { kind: '20A', blk, n, evenBay: String(n - 1).padStart(2, '0'), pairBay: String(n - 2).padStart(2, '0') };
+    return { kind: '40', blk, n, foreBay: String(n - 1).padStart(2, '0'), aftBay: String(n + 1).padStart(2, '0') };
+  },
+
+  // Tính nhanh tóm tắt tiến độ tất cả các Hầm cho thanh checkbox chọn Hầm
+  computeAllHoldQuickSummary() {
+    const cfg = getLiveVesselCfg();
+    const holds = state.holdConfig || [];
+    const pool = UnifiedPoolBuilder.build(state, cfg.deck_tier_min);
+    const impJobs = (state.liveJobs || []).filter(j => j.io === 'Import' || /dỡ\s*tàu/i.test(j.job_type || ''));
+    const activeCranes = CraneRailOrder.sortCranesOnRail((state.cranes || []).filter(c => c.active));
+
+    return holds.map(h => {
+      const baySet = new Set(h.bays || []);
+      const expInH = pool.filter(c => { const p = DataAdapters.parsePos6(c.actualPos || c.plannedPos); return p && baySet.has(p.bay); });
+      const expDone = expInH.filter(c => c.jobStatus === 'C').length;
+      const expPct = expInH.length ? Math.round((expDone / expInH.length) * 100) : 0;
+
+      const impInH = impJobs.filter(j => { const p = DataAdapters.parsePos6(j.pos); return p && baySet.has(p.bay); });
+      const impDone = impInH.filter(j => j.status === 'C').length;
+      const impRem = impInH.length - impDone;
+
+      const owners = activeCranes.filter(c => (c.holds || []).includes(h.hold)).map(c => c.id);
+      return {
+        hold: h.hold,
+        label: h.label,
+        bays: h.bays || [],
+        owners,
+        expTotal: expInH.length,
+        expDone,
+        expPct,
+        impTotal: impInH.length,
+        impDone,
+        impRem
+      };
+    });
+  },
+
+  buildMultiHoldModel(selectedHoldNos, opts = {}) {
     const cfg = getLiveVesselCfg();
     const holdConfig = state.holdConfig || [];
-    const h = holdConfig.find(x => x.hold === holdNo) || holdConfig[0];
-    if (!h) {
-      return { hold: null, bays: [], rows: [], holdTiers: [], deckTiers: [], blocks: [], podColorMap: {}, effDeckMin: cfg.deck_tier_min || 80, counts: { loaded: 0, asc: 0, imp: 0, rob: 0 } };
+    const uniqueNums = Array.from(new Set((selectedHoldNos || []).map(n => parseInt(n, 10)).filter(n => !isNaN(n))))
+      .filter(n => holdConfig.some(h => h.hold === n))
+      .sort((a, b) => a - b);
+
+    const chosenHolds = uniqueNums.length
+      ? uniqueNums.map(n => holdConfig.find(h => h.hold === n)).filter(Boolean)
+      : (holdConfig.length ? [holdConfig[0]] : []);
+
+    if (!chosenHolds.length) {
+      return {
+        hold: null, selectedHolds: [], holdUnits: [], bays: [], rows: [],
+        holdTiers: [], deckTiers: [], blocks: [], podColorMap: {},
+        effDeckMin: cfg.deck_tier_min || 80, multiLayout: opts.multiLayout || 'SIDE_BY_SIDE',
+        counts: { loaded: 0, asc: 0, imp: 0, rob: 0 }
+      };
     }
 
-    const holdBays = [...(h.bays || [])].sort((a, b) => parseInt(a, 10) - parseInt(b, 10));
-    const baySet = new Set(holdBays);
     const pool = UnifiedPoolBuilder.build(state, cfg.deck_tier_min);
+    const impJobsAll = (state.liveJobs || []).filter(j => j.io === 'Import' || /dỡ\s*tàu/i.test(j.job_type || ''));
+    const activeCranes = CraneRailOrder.sortCranesOnRail((state.cranes || []).filter(c => c.active));
+
     const bayFilter = opts.bayFilter || 'ALL';
     const zoneFilter = opts.zoneFilter || 'ALL';
     const separateBays = Boolean(opts.separateBays);
     const extendedRob = Boolean(opts.extendedRob);
     const showDischargedImp = Boolean(opts.showDischargedImp);
+    const multiLayout = chosenHolds.length > 1 ? (opts.multiLayout || 'SIDE_BY_SIDE') : 'SINGLE';
 
-    // 1. Thu thập toàn bộ ứng viên vị trí trong Hầm để nhận diện ngưỡng Boong (70/80)
-    const rawSlotRecords = new Map(); // key = `${bay}_${row}_${tier}` -> record
+    // Bước 1: Thu thập toàn bộ bản ghi thô theo từng Hầm (để suy đoán ROB chính xác trong nội bộ từng hầm)
     const allParsedPts = [];
+    const perHoldRaw = chosenHolds.map(h => {
+      const holdBays = [...(h.bays || [])].sort((a, b) => parseInt(a, 10) - parseInt(b, 10));
+      const baySet = new Set(holdBays);
+      const rawSlotRecords = new Map();
 
-    const registerPt = (p) => { if (p) allParsedPts.push(p); };
-
-    // 1A. Container Xuất ĐÃ XẾP (C) - ưu tiên tuyệt đối trên vị trí thực tế
-    pool.filter(c => c.jobStatus === 'C').forEach(c => {
-      const p = DataAdapters.parsePos6(c.actualPos || c.plannedPos, cfg.deck_tier_min);
-      if (!p || !baySet.has(p.bay)) return;
-      registerPt(p);
-      const key = `${p.bay}_${p.row}_${p.tier}`;
-      rawSlotRecords.set(key, {
-        id: `EXP_C_${c.cntr}_${key}`,
-        kind: 'LOADED_EXPORT',
-        bay: p.bay, row: p.row, tier: p.tier, tierNum: p.tierNum, pos: p.raw,
-        cntr: c.cntr, pod: c.pod || '---', weight: Number(c.weight) || 0,
-        size: c.size || '40HC', iso: c.iso || '', crane: c.crane || '',
-        yardPos: c.yardPos || '---', transferPort: c.transferPort || 'TV', isOffDock: Boolean(c.isOffDock),
-        jobStatus: 'C', inst: c.inst || ''
+      // 1A. Xuất đã xếp (C)
+      pool.filter(c => c.jobStatus === 'C').forEach(c => {
+        const p = DataAdapters.parsePos6(c.actualPos || c.plannedPos, cfg.deck_tier_min);
+        if (!p || !baySet.has(p.bay)) return;
+        allParsedPts.push(p);
+        const key = `${p.bay}_${p.row}_${p.tier}`;
+        rawSlotRecords.set(key, {
+          id: `H${h.hold}_EXP_C_${c.cntr}_${key}`,
+          holdNo: h.hold, holdLabel: h.label,
+          kind: 'LOADED_EXPORT',
+          bay: p.bay, row: p.row, tier: p.tier, tierNum: p.tierNum, pos: p.raw,
+          cntr: c.cntr, pod: c.pod || '---', weight: Number(c.weight) || 0,
+          size: c.size || '40HC', iso: c.iso || '', crane: c.crane || '',
+          yardPos: c.yardPos || '---', transferPort: c.transferPort || 'TV', isOffDock: Boolean(c.isOffDock),
+          jobStatus: 'C', inst: c.inst || ''
+        });
       });
+
+      // 1B. Xuất dự kiến theo ASC / Pool chưa C
+      pool.filter(c => c.jobStatus !== 'C' && c.plannedPos).forEach(c => {
+        const p = DataAdapters.parsePos6(c.plannedPos, cfg.deck_tier_min);
+        if (!p || !baySet.has(p.bay)) return;
+        allParsedPts.push(p);
+        const key = `${p.bay}_${p.row}_${p.tier}`;
+        if (rawSlotRecords.has(key)) return;
+        const explicitRob = this.isExplicitRob(c);
+        rawSlotRecords.set(key, {
+          id: `H${h.hold}_${explicitRob ? 'ROB_EXP' : 'ASC'}_${c.cntr}_${key}`,
+          holdNo: h.hold, holdLabel: h.label,
+          kind: explicitRob ? 'ROB_INFERRED' : 'PLANNED_ASC',
+          isExplicitRob: explicitRob,
+          bay: p.bay, row: p.row, tier: p.tier, tierNum: p.tierNum, pos: p.raw,
+          cntr: c.cntr, pod: c.pod || '---', weight: Number(c.weight) || 0,
+          size: c.size || '40HC', iso: c.iso || '', crane: c.crane || '',
+          yardPos: c.yardPos || '---', transferPort: c.transferPort || 'TV', isOffDock: Boolean(c.isOffDock),
+          jobStatus: c.jobStatus || 'B', inst: c.inst || ''
+        });
+      });
+
+      (state.preStowagePlan || []).forEach(ps => {
+        const p = DataAdapters.parsePos6(ps.pos, cfg.deck_tier_min);
+        if (!p || !baySet.has(p.bay)) return;
+        allParsedPts.push(p);
+        const key = `${p.bay}_${p.row}_${p.tier}`;
+        if (rawSlotRecords.has(key)) return;
+        const explicitRob = this.isExplicitRob(ps);
+        rawSlotRecords.set(key, {
+          id: `H${h.hold}_${explicitRob ? 'ROB_ASC' : 'ASC_RAW'}_${ps.cntr}_${key}`,
+          holdNo: h.hold, holdLabel: h.label,
+          kind: explicitRob ? 'ROB_INFERRED' : 'PLANNED_ASC',
+          isExplicitRob: explicitRob,
+          bay: p.bay, row: p.row, tier: p.tier, tierNum: p.tierNum, pos: p.raw,
+          cntr: ps.cntr || '', pod: ps.pod || '---', weight: Number(ps.weight) || 0,
+          size: String(ps.iso || '').startsWith('2') ? '20DC' : '40HC', iso: ps.iso || '',
+          crane: '', yardPos: '---', transferPort: 'TV', isOffDock: false,
+          jobStatus: 'ASC', inst: ps.inst || ''
+        });
+      });
+
+      // 1C. Hàng Nhập trong hầm
+      const impByCntr = new Map();
+      (state.sbpImport || []).forEach(s => {
+        const p = DataAdapters.parsePos6(s.pos, cfg.deck_tier_min);
+        if (!p || !baySet.has(p.bay)) return;
+        impByCntr.set(s.cntr, {
+          cntr: s.cntr, p, status: 'B', pod: s.pod || 'VNTVP',
+          weight: Number(s.weight) || 0, size: s.size || '40HC', iso: s.iso || '', crane: ''
+        });
+      });
+      impJobsAll.forEach(j => {
+        const p = DataAdapters.parsePos6(j.pos, cfg.deck_tier_min);
+        if (!p || !baySet.has(p.bay)) return;
+        const prev = impByCntr.get(j.cntr);
+        impByCntr.set(j.cntr, {
+          cntr: j.cntr, p, status: j.status || (prev ? prev.status : 'B'),
+          pod: j.pod || (prev ? prev.pod : 'VNTVP'),
+          weight: prev ? prev.weight : 0, size: prev ? prev.size : '40HC', iso: prev ? prev.iso : '',
+          crane: j.crane || ''
+        });
+      });
+
+      impByCntr.forEach(imp => {
+        const p = imp.p;
+        if (imp.status === 'C' && !showDischargedImp) return;
+        allParsedPts.push(p);
+        const key = `${p.bay}_${p.row}_${p.tier}`;
+        if (rawSlotRecords.has(key)) return;
+        rawSlotRecords.set(key, {
+          id: `H${h.hold}_IMP_${imp.cntr}_${key}`,
+          holdNo: h.hold, holdLabel: h.label,
+          kind: 'IMPORT',
+          discharged: imp.status === 'C',
+          bay: p.bay, row: p.row, tier: p.tier, tierNum: p.tierNum, pos: p.raw,
+          cntr: imp.cntr, pod: imp.pod || 'VNTVP', weight: imp.weight || 0,
+          size: imp.size || '40HC', iso: imp.iso || '', crane: imp.crane || '',
+          yardPos: 'Trên tàu (Nhập)', transferPort: 'IMPORT', isOffDock: false,
+          jobStatus: imp.status, inst: ''
+        });
+      });
+
+      // Tính thống kê tiến độ chuẩn cho Hầm này
+      const expInH = pool.filter(c => { const p = DataAdapters.parsePos6(c.actualPos || c.plannedPos); return p && baySet.has(p.bay); });
+      const expDone = expInH.filter(c => c.jobStatus === 'C').length;
+      const expReadyB = expInH.filter(c => c.jobStatus === 'B').length;
+      const expHoldA = expInH.filter(c => c.jobStatus === 'A').length;
+      const expRemain = expInH.filter(c => c.jobStatus !== 'C').length;
+      const expPct = expInH.length ? Math.round((expDone / expInH.length) * 100) : 0;
+
+      const impInH = impJobsAll.filter(j => { const p = DataAdapters.parsePos6(j.pos); return p && baySet.has(p.bay); });
+      const impDone = impInH.filter(j => j.status === 'C').length;
+      const impRemain = impInH.length - impDone;
+      const impPct = impInH.length ? Math.round((impDone / impInH.length) * 100) : 100;
+
+      const ownerCranes = activeCranes.filter(c => (c.holds || []).includes(h.hold)).map(c => c.id);
+
+      return {
+        hold: h, holdBays, baySet, rawSlotRecords,
+        progress: {
+          holdNo: h.hold, label: h.label, bays: holdBays, ownerCranes,
+          expTotal: expInH.length, expDone, expReadyB, expHoldA, expRemain, expPct,
+          impTotal: impInH.length, impDone, impRemain, impPct,
+          underDeckRemain: 0, onDeckRemain: 0,
+          counts: { loaded: 0, asc: 0, imp: 0, rob: 0 }
+        }
+      };
     });
 
-    // 1B. Container Dự kiến theo ASC / EDI (từ pool chưa C + từ preStowagePlan chưa khớp)
-    pool.filter(c => c.jobStatus !== 'C' && c.plannedPos).forEach(c => {
-      const p = DataAdapters.parsePos6(c.plannedPos, cfg.deck_tier_min);
-      if (!p || !baySet.has(p.bay)) return;
-      registerPt(p);
-      const key = `${p.bay}_${p.row}_${p.tier}`;
-      if (rawSlotRecords.has(key)) return;
-      const explicitRob = this.isExplicitRob(c);
-      rawSlotRecords.set(key, {
-        id: `${explicitRob ? 'ROB_EXP' : 'ASC'}_${c.cntr}_${key}`,
-        kind: explicitRob ? 'ROB_INFERRED' : 'PLANNED_ASC',
-        isExplicitRob: explicitRob,
-        bay: p.bay, row: p.row, tier: p.tier, tierNum: p.tierNum, pos: p.raw,
-        cntr: c.cntr, pod: c.pod || '---', weight: Number(c.weight) || 0,
-        size: c.size || '40HC', iso: c.iso || '', crane: c.crane || '',
-        yardPos: c.yardPos || '---', transferPort: c.transferPort || 'TV', isOffDock: Boolean(c.isOffDock),
-        jobStatus: c.jobStatus || 'B', inst: c.inst || ''
-      });
-    });
-
-    (state.preStowagePlan || []).forEach(ps => {
-      const p = DataAdapters.parsePos6(ps.pos, cfg.deck_tier_min);
-      if (!p || !baySet.has(p.bay)) return;
-      registerPt(p);
-      const key = `${p.bay}_${p.row}_${p.tier}`;
-      if (rawSlotRecords.has(key)) return;
-      const explicitRob = this.isExplicitRob(ps);
-      rawSlotRecords.set(key, {
-        id: `${explicitRob ? 'ROB_ASC' : 'ASC_RAW'}_${ps.cntr}_${key}`,
-        kind: explicitRob ? 'ROB_INFERRED' : 'PLANNED_ASC',
-        isExplicitRob: explicitRob,
-        bay: p.bay, row: p.row, tier: p.tier, tierNum: p.tierNum, pos: p.raw,
-        cntr: ps.cntr || '', pod: ps.pod || '---', weight: Number(ps.weight) || 0,
-        size: String(ps.iso || '').startsWith('2') ? '20DC' : '40HC', iso: ps.iso || '',
-        crane: '', yardPos: '---', transferPort: 'TV', isOffDock: false,
-        jobStatus: 'ASC', inst: ps.inst || ''
-      });
-    });
-
-    // 1C. Container Hàng Nhập (SBP + liveJobs Import)
-    const impByCntr = new Map();
-    (state.sbpImport || []).forEach(s => {
-      const p = DataAdapters.parsePos6(s.pos, cfg.deck_tier_min);
-      if (!p || !baySet.has(p.bay)) return;
-      impByCntr.set(s.cntr, {
-        cntr: s.cntr, p, status: 'B', pod: s.pod || 'VNTVP',
-        weight: Number(s.weight) || 0, size: s.size || '40HC', iso: s.iso || '', crane: ''
-      });
-    });
-    (state.liveJobs || []).filter(j => j.io === 'Import' || /dỡ\s*tàu/i.test(j.job_type || '')).forEach(j => {
-      const p = DataAdapters.parsePos6(j.pos, cfg.deck_tier_min);
-      if (!p || !baySet.has(p.bay)) return;
-      const prev = impByCntr.get(j.cntr);
-      impByCntr.set(j.cntr, {
-        cntr: j.cntr, p, status: j.status || (prev ? prev.status : 'B'),
-        pod: j.pod || (prev ? prev.pod : 'VNTVP'),
-        weight: prev ? prev.weight : 0, size: prev ? prev.size : '40HC', iso: prev ? prev.iso : '',
-        crane: j.crane || ''
-      });
-    });
-
-    impByCntr.forEach(imp => {
-      const p = imp.p;
-      if (imp.status === 'C' && !showDischargedImp) return;
-      registerPt(p);
-      const key = `${p.bay}_${p.row}_${p.tier}`;
-      if (rawSlotRecords.has(key)) return;
-      rawSlotRecords.set(key, {
-        id: `IMP_${imp.cntr}_${key}`,
-        kind: 'IMPORT',
-        discharged: imp.status === 'C',
-        bay: p.bay, row: p.row, tier: p.tier, tierNum: p.tierNum, pos: p.raw,
-        cntr: imp.cntr, pod: imp.pod || 'VNTVP', weight: imp.weight || 0,
-        size: imp.size || '40HC', iso: imp.iso || '', crane: imp.crane || '',
-        yardPos: 'Trên tàu (Nhập)', transferPort: 'IMPORT', isOffDock: false,
-        jobStatus: imp.status, inst: ''
-      });
-    });
-
-    // 2. Xác định ngưỡng Mặt Boong & Dải Row / Tier của Hầm
+    // Bước 2: Thống nhất dải Row, Hold Tiers, Deck Tiers và ngưỡng Mặt Boong chung cho mọi hầm đang so sánh
     const hasTier70s = allParsedPts.some(p => p.tierNum >= 70 && p.tierNum < 80);
     const effDeckMin = hasTier70s ? 70 : (cfg.deck_tier_min || 80);
 
@@ -10475,99 +11423,6 @@ const Hold3DEngine = {
     const deckTiers = [];
     for (let t = minDeckTier; t <= maxDeckTier; t += 2) deckTiers.push(t);
 
-    // 3. SUY ĐOÁN VỊ TRÍ CONT ĐỂ LẠI (ROB) ĐỠ TẦNG VẬT LÝ (Không cho container lơ lửng!)
-    const getBayRole = (bayStr) => {
-      const n = parseInt(bayStr, 10);
-      const rem = (n - 1) % 4;
-      const blk = Math.floor((n - 1) / 4);
-      if (rem === 0) return { kind: '20F', blk, n, evenBay: String(n + 1).padStart(2, '0'), pairBay: String(n + 2).padStart(2, '0') };
-      if (rem === 2) return { kind: '20A', blk, n, evenBay: String(n - 1).padStart(2, '0'), pairBay: String(n - 2).padStart(2, '0') };
-      return { kind: '40', blk, n, foreBay: String(n - 1).padStart(2, '0'), aftBay: String(n + 1).padStart(2, '0') };
-    };
-
-    const hasSlot = (bayStr, rowStr, tierNum) => rawSlotRecords.has(`${bayStr}_${rowStr}_${String(tierNum).padStart(2, '0')}`);
-
-    const existingList = Array.from(rawSlotRecords.values());
-    existingList.forEach(rec => {
-      const isDeck = rec.tierNum >= effDeckMin;
-      const baseT = isDeck ? minDeckTier : 2;
-      const role = getBayRole(rec.bay);
-
-      for (let t = rec.tierNum - 2; t >= baseT; t -= 2) {
-        const tStr = String(t).padStart(2, '0');
-        if (role.kind === '40') {
-          const has40 = hasSlot(rec.bay, rec.row, t);
-          const hasF = hasSlot(role.foreBay, rec.row, t);
-          const hasA = hasSlot(role.aftBay, rec.row, t);
-          if (has40 || (hasF && hasA)) continue;
-          if (hasF && !hasA && baySet.has(role.aftBay)) {
-            const k = `${role.aftBay}_${rec.row}_${tStr}`;
-            rawSlotRecords.set(k, {
-              id: `ROB_INF_${k}`, kind: 'ROB_INFERRED', isExplicitRob: false,
-              bay: role.aftBay, row: rec.row, tier: tStr, tierNum: t, pos: `${role.aftBay}${rec.row}${tStr}`,
-              cntr: '', pod: 'ROB', weight: 0, size: '20ft (Suy đoán)', iso: '', crane: '',
-              yardPos: 'Để lại trên tàu', transferPort: 'ROB', isOffDock: false, jobStatus: 'ROB', inst: 'Đỡ chân cont tầng trên'
-            });
-          } else if (!hasF && hasA && baySet.has(role.foreBay)) {
-            const k = `${role.foreBay}_${rec.row}_${tStr}`;
-            rawSlotRecords.set(k, {
-              id: `ROB_INF_${k}`, kind: 'ROB_INFERRED', isExplicitRob: false,
-              bay: role.foreBay, row: rec.row, tier: tStr, tierNum: t, pos: `${role.foreBay}${rec.row}${tStr}`,
-              cntr: '', pod: 'ROB', weight: 0, size: '20ft (Suy đoán)', iso: '', crane: '',
-              yardPos: 'Để lại trên tàu', transferPort: 'ROB', isOffDock: false, jobStatus: 'ROB', inst: 'Đỡ chân cont tầng trên'
-            });
-          } else {
-            const k = `${rec.bay}_${rec.row}_${tStr}`;
-            rawSlotRecords.set(k, {
-              id: `ROB_INF_${k}`, kind: 'ROB_INFERRED', isExplicitRob: false,
-              bay: rec.bay, row: rec.row, tier: tStr, tierNum: t, pos: `${rec.bay}${rec.row}${tStr}`,
-              cntr: '', pod: 'ROB', weight: 0, size: '40ft (Suy đoán)', iso: '', crane: '',
-              yardPos: 'Để lại trên tàu', transferPort: 'ROB', isOffDock: false, jobStatus: 'ROB', inst: 'Đỡ chân cont tầng trên'
-            });
-          }
-        } else {
-          // Bay 20ft (lẻ)
-          const supported = hasSlot(rec.bay, rec.row, t) || hasSlot(role.evenBay, rec.row, t);
-          if (!supported) {
-            const k = `${rec.bay}_${rec.row}_${tStr}`;
-            rawSlotRecords.set(k, {
-              id: `ROB_INF_${k}`, kind: 'ROB_INFERRED', isExplicitRob: false,
-              bay: rec.bay, row: rec.row, tier: tStr, tierNum: t, pos: `${rec.bay}${rec.row}${tStr}`,
-              cntr: '', pod: 'ROB', weight: 0, size: '20ft (Suy đoán)', iso: '', crane: '',
-              yardPos: 'Để lại trên tàu', transferPort: 'ROB', isOffDock: false, jobStatus: 'ROB', inst: 'Đỡ chân cont tầng trên'
-            });
-          }
-        }
-      }
-    });
-
-    // Suy đoán ROB mở rộng đối xứng (tùy chọn)
-    if (extendedRob) {
-      const snap = Array.from(rawSlotRecords.values()).filter(r => r.kind !== 'ROB_INFERRED');
-      snap.forEach(rec => {
-        if (rec.tierNum >= effDeckMin) return; // chỉ suy đoán đối xứng dưới hầm
-        const rn = parseInt(rec.row, 10);
-        if (rn === 0) return;
-        const symRow = String(rn % 2 === 1 ? rn + 1 : rn - 1).padStart(2, '0');
-        const role = getBayRole(rec.bay);
-        const tStr = rec.tier;
-        const occupiedSym = hasSlot(rec.bay, symRow, rec.tierNum)
-          || (role.kind !== '40' && hasSlot(role.evenBay, symRow, rec.tierNum))
-          || (role.kind === '40' && (hasSlot(role.foreBay, symRow, rec.tierNum) || hasSlot(role.aftBay, symRow, rec.tierNum)));
-        if (!occupiedSym) {
-          const k = `${rec.bay}_${symRow}_${tStr}`;
-          rawSlotRecords.set(k, {
-            id: `ROB_SYM_${k}`, kind: 'ROB_INFERRED', isExplicitRob: false,
-            bay: rec.bay, row: symRow, tier: tStr, tierNum: rec.tierNum, pos: `${rec.bay}${symRow}${tStr}`,
-            cntr: '', pod: 'ROB', weight: 0, size: role.kind === '40' ? '40ft (Suy đoán)' : '20ft (Suy đoán)',
-            iso: '', crane: '', yardPos: 'Suy đoán đối xứng', transferPort: 'ROB', isOffDock: false,
-            jobStatus: 'ROB', inst: 'Vị trí để lại suy đoán đối xứng'
-          });
-        }
-      });
-    }
-
-    // 4. Lọc theo Bay & Vùng (Boong / Hầm) và gán tọa độ 3D [x0..x1, y0..y1, z0..z1]
     const rowIdxMap = {};
     rows.forEach((r, i) => { rowIdxMap[r] = i; });
     const rowCenterOffset = (rows.length - 1) / 2;
@@ -10577,87 +11432,276 @@ const Hold3DEngine = {
     const deckTierIdxMap = {};
     deckTiers.forEach((t, i) => { deckTierIdxMap[t] = i; });
 
-    const deckBaseY = holdTiers.length + 0.85; // Khoảng hở cho Nắp hầm / Mặt Boong
+    const deckBaseY = holdTiers.length + 0.85;
 
-    // Nhóm các block 40ft trong hầm
-    const uniqueBlks = Array.from(new Set(holdBays.map(b => Math.floor((parseInt(b, 10) - 1) / 4)))).sort((a, b) => a - b);
-    const blkIdxMap = {};
-    uniqueBlks.forEach((b, i) => { blkIdxMap[b] = i; });
+    // Bước 3: Suy đoán ROB đỡ tầng trong từng hầm & dựng hệ tọa độ cục bộ từng hầm
+    const holdUnits = perHoldRaw.map(item => {
+      const { hold, holdBays, baySet, rawSlotRecords, progress } = item;
+      const hasSlot = (bayStr, rowStr, tierNum) => rawSlotRecords.has(`${bayStr}_${rowStr}_${String(tierNum).padStart(2, '0')}`);
 
-    const filteredBays = bayFilter === 'ALL' ? holdBays : holdBays.filter(b => b === bayFilter);
-    const sepIndexMap = {};
-    filteredBays.forEach((b, i) => { sepIndexMap[b] = i; });
+      const existingList = Array.from(rawSlotRecords.values());
+      existingList.forEach(rec => {
+        const isDeck = rec.tierNum >= effDeckMin;
+        const baseT = isDeck ? minDeckTier : 2;
+        const role = this.getBayRole(rec.bay);
 
-    const blocks = [];
-    const counts = { loaded: 0, asc: 0, imp: 0, rob: 0 };
+        for (let t = rec.tierNum - 2; t >= baseT; t -= 2) {
+          const tStr = String(t).padStart(2, '0');
+          if (role.kind === '40') {
+            const has40 = hasSlot(rec.bay, rec.row, t);
+            const hasF = hasSlot(role.foreBay, rec.row, t);
+            const hasA = hasSlot(role.aftBay, rec.row, t);
+            if (has40 || (hasF && hasA)) continue;
+            if (hasF && !hasA && baySet.has(role.aftBay)) {
+              const k = `${role.aftBay}_${rec.row}_${tStr}`;
+              rawSlotRecords.set(k, {
+                id: `H${hold.hold}_ROB_INF_${k}`, holdNo: hold.hold, holdLabel: hold.label,
+                kind: 'ROB_INFERRED', isExplicitRob: false,
+                bay: role.aftBay, row: rec.row, tier: tStr, tierNum: t, pos: `${role.aftBay}${rec.row}${tStr}`,
+                cntr: '', pod: 'ROB', weight: 0, size: '20ft (Suy đoán)', iso: '', crane: '',
+                yardPos: 'Để lại trên tàu', transferPort: 'ROB', isOffDock: false, jobStatus: 'ROB', inst: 'Đỡ chân cont tầng trên'
+              });
+            } else if (!hasF && hasA && baySet.has(role.foreBay)) {
+              const k = `${role.foreBay}_${rec.row}_${tStr}`;
+              rawSlotRecords.set(k, {
+                id: `H${hold.hold}_ROB_INF_${k}`, holdNo: hold.hold, holdLabel: hold.label,
+                kind: 'ROB_INFERRED', isExplicitRob: false,
+                bay: role.foreBay, row: rec.row, tier: tStr, tierNum: t, pos: `${role.foreBay}${rec.row}${tStr}`,
+                cntr: '', pod: 'ROB', weight: 0, size: '20ft (Suy đoán)', iso: '', crane: '',
+                yardPos: 'Để lại trên tàu', transferPort: 'ROB', isOffDock: false, jobStatus: 'ROB', inst: 'Đỡ chân cont tầng trên'
+              });
+            } else {
+              const k = `${rec.bay}_${rec.row}_${tStr}`;
+              rawSlotRecords.set(k, {
+                id: `H${hold.hold}_ROB_INF_${k}`, holdNo: hold.hold, holdLabel: hold.label,
+                kind: 'ROB_INFERRED', isExplicitRob: false,
+                bay: rec.bay, row: rec.row, tier: tStr, tierNum: t, pos: `${rec.bay}${rec.row}${tStr}`,
+                cntr: '', pod: 'ROB', weight: 0, size: '40ft (Suy đoán)', iso: '', crane: '',
+                yardPos: 'Để lại trên tàu', transferPort: 'ROB', isOffDock: false, jobStatus: 'ROB', inst: 'Đỡ chân cont tầng trên'
+              });
+            }
+          } else {
+            const supported = hasSlot(rec.bay, rec.row, t) || hasSlot(role.evenBay, rec.row, t);
+            if (!supported) {
+              const k = `${rec.bay}_${rec.row}_${tStr}`;
+              rawSlotRecords.set(k, {
+                id: `H${hold.hold}_ROB_INF_${k}`, holdNo: hold.hold, holdLabel: hold.label,
+                kind: 'ROB_INFERRED', isExplicitRob: false,
+                bay: rec.bay, row: rec.row, tier: tStr, tierNum: t, pos: `${rec.bay}${rec.row}${tStr}`,
+                cntr: '', pod: 'ROB', weight: 0, size: '20ft (Suy đoán)', iso: '', crane: '',
+                yardPos: 'Để lại trên tàu', transferPort: 'ROB', isOffDock: false, jobStatus: 'ROB', inst: 'Đỡ chân cont tầng trên'
+              });
+            }
+          }
+        }
+      });
 
-    rawSlotRecords.forEach(rec => {
-      if (bayFilter !== 'ALL' && rec.bay !== bayFilter) return;
-      const isDeck = rec.tierNum >= effDeckMin;
-      if (zoneFilter === 'HOLD' && isDeck) return;
-      if (zoneFilter === 'DECK' && !isDeck) return;
-
-      const rIdx = rowIdxMap[rec.row];
-      if (rIdx === undefined) return;
-      const tIdx = isDeck ? deckTierIdxMap[rec.tierNum] : holdTierIdxMap[rec.tierNum];
-      if (tIdx === undefined) return;
-
-      const xCenter = rIdx - rowCenterOffset;
-      const x0 = xCenter - 0.45;
-      const x1 = xCenter + 0.45;
-
-      const y0 = isDeck ? (deckBaseY + tIdx * 0.96) : (tIdx * 0.96);
-      const y1 = y0 + 0.88;
-
-      const role = getBayRole(rec.bay);
-      let z0 = -0.95, z1 = 0.95;
-      if (separateBays) {
-        const sIdx = sepIndexMap[rec.bay] || 0;
-        const sCenter = (sIdx - (filteredBays.length - 1) / 2) * 2.45;
-        const halfL = role.kind === '40' ? 0.95 : 0.48;
-        z0 = sCenter - halfL;
-        z1 = sCenter + halfL;
-      } else {
-        const bOrder = blkIdxMap[role.blk] || 0;
-        const blkCenter = (bOrder - (uniqueBlks.length - 1) / 2) * 2.65;
-        if (role.kind === '20F') { z0 = blkCenter - 0.98; z1 = blkCenter - 0.04; }
-        else if (role.kind === '20A') { z0 = blkCenter + 0.04; z1 = blkCenter + 0.98; }
-        else { z0 = blkCenter - 0.98; z1 = blkCenter + 0.98; }
+      if (extendedRob) {
+        const snap = Array.from(rawSlotRecords.values()).filter(r => r.kind !== 'ROB_INFERRED');
+        snap.forEach(rec => {
+          if (rec.tierNum >= effDeckMin) return;
+          const rn = parseInt(rec.row, 10);
+          if (rn === 0) return;
+          const symRow = String(rn % 2 === 1 ? rn + 1 : rn - 1).padStart(2, '0');
+          const role = this.getBayRole(rec.bay);
+          const tStr = rec.tier;
+          const occupiedSym = hasSlot(rec.bay, symRow, rec.tierNum)
+            || (role.kind !== '40' && hasSlot(role.evenBay, symRow, rec.tierNum))
+            || (role.kind === '40' && (hasSlot(role.foreBay, symRow, rec.tierNum) || hasSlot(role.aftBay, symRow, rec.tierNum)));
+          if (!occupiedSym) {
+            const k = `${rec.bay}_${symRow}_${tStr}`;
+            rawSlotRecords.set(k, {
+              id: `H${hold.hold}_ROB_SYM_${k}`, holdNo: hold.hold, holdLabel: hold.label,
+              kind: 'ROB_INFERRED', isExplicitRob: false,
+              bay: rec.bay, row: symRow, tier: tStr, tierNum: rec.tierNum, pos: `${rec.bay}${symRow}${tStr}`,
+              cntr: '', pod: 'ROB', weight: 0, size: role.kind === '40' ? '40ft (Suy đoán)' : '20ft (Suy đoán)',
+              iso: '', crane: '', yardPos: 'Suy đoán đối xứng', transferPort: 'ROB', isOffDock: false,
+              jobStatus: 'ROB', inst: 'Vị trí để lại suy đoán đối xứng'
+            });
+          }
+        });
       }
 
-      if (rec.kind === 'LOADED_EXPORT') counts.loaded++;
-      else if (rec.kind === 'PLANNED_ASC') counts.asc++;
-      else if (rec.kind === 'IMPORT') counts.imp++;
-      else counts.rob++;
-
-      blocks.push({
-        ...rec,
-        isDeck,
-        x0, x1, y0, y1, z0, z1,
-        tierKey: (isDeck ? 1000 : 0) + rec.tierNum,
-        weightBand: this.getWeightBandInfo(rec.weight)
+      // Đếm tồn dưới hầm / trên boong trong hầm này (tính theo ASC chưa xếp)
+      rawSlotRecords.forEach(rec => {
+        if (rec.kind === 'PLANNED_ASC') {
+          if (rec.tierNum >= effDeckMin) progress.onDeckRemain++;
+          else progress.underDeckRemain++;
+        }
       });
+
+      const uniqueBlks = Array.from(new Set(holdBays.map(b => Math.floor((parseInt(b, 10) - 1) / 4)))).sort((a, b) => a - b);
+      const blkIdxMap = {};
+      uniqueBlks.forEach((b, i) => { blkIdxMap[b] = i; });
+      const filteredBays = bayFilter === 'ALL' ? holdBays : holdBays.filter(b => b === bayFilter);
+      const sepIndexMap = {};
+      filteredBays.forEach((b, i) => { sepIndexMap[b] = i; });
+
+      const localBlocks = [];
+      rawSlotRecords.forEach(rec => {
+        if (bayFilter !== 'ALL' && rec.bay !== bayFilter) return;
+        const isDeck = rec.tierNum >= effDeckMin;
+        if (zoneFilter === 'HOLD' && isDeck) return;
+        if (zoneFilter === 'DECK' && !isDeck) return;
+
+        const rIdx = rowIdxMap[rec.row];
+        if (rIdx === undefined) return;
+        const tIdx = isDeck ? deckTierIdxMap[rec.tierNum] : holdTierIdxMap[rec.tierNum];
+        if (tIdx === undefined) return;
+
+        const xCenter = rIdx - rowCenterOffset;
+        const x0 = xCenter - 0.45;
+        const x1 = xCenter + 0.45;
+        const y0 = isDeck ? (deckBaseY + tIdx * 0.96) : (tIdx * 0.96);
+        const y1 = y0 + 0.88;
+
+        const role = this.getBayRole(rec.bay);
+        let z0 = -0.95, z1 = 0.95;
+        if (separateBays) {
+          const sIdx = sepIndexMap[rec.bay] || 0;
+          const sCenter = (sIdx - Math.max(0, filteredBays.length - 1) / 2) * 2.45;
+          const halfL = role.kind === '40' ? 0.95 : 0.48;
+          z0 = sCenter - halfL;
+          z1 = sCenter + halfL;
+        } else {
+          const bOrder = blkIdxMap[role.blk] || 0;
+          const blkCenter = (bOrder - Math.max(0, uniqueBlks.length - 1) / 2) * 2.65;
+          if (role.kind === '20F') { z0 = blkCenter - 0.98; z1 = blkCenter - 0.04; }
+          else if (role.kind === '20A') { z0 = blkCenter + 0.04; z1 = blkCenter + 0.98; }
+          else { z0 = blkCenter - 0.98; z1 = blkCenter + 0.98; }
+        }
+
+        if (rec.kind === 'LOADED_EXPORT') progress.counts.loaded++;
+        else if (rec.kind === 'PLANNED_ASC') progress.counts.asc++;
+        else if (rec.kind === 'IMPORT') progress.counts.imp++;
+        else progress.counts.rob++;
+
+        localBlocks.push({
+          ...rec,
+          isDeck,
+          x0, x1, y0, y1, z0, z1,
+          tierKey: (isDeck ? 1000 : 0) + rec.tierNum,
+          weightBand: this.getWeightBandInfo(rec.weight)
+        });
+      });
+
+      const localZMin = localBlocks.length ? Math.min(-1.02, ...localBlocks.map(b => b.z0)) : -1.02;
+      const localZMax = localBlocks.length ? Math.max(1.02, ...localBlocks.map(b => b.z1)) : 1.02;
+      const depthZ = Math.max(2.1, localZMax - localZMin);
+
+      return {
+        hold,
+        bays: holdBays,
+        progress,
+        localBlocks,
+        localZMin,
+        localZMax,
+        depthZ,
+        offsetX: 0,
+        offsetZ: 0
+      };
     });
 
-    const podColorMap = this.buildPodColorMap(blocks);
-    const zMinAll = blocks.length ? Math.min(...blocks.map(b => b.z0)) : -1.1;
-    const zMaxAll = blocks.length ? Math.max(...blocks.map(b => b.z1)) : 1.1;
+    // Bước 4: Định vị từng Hầm vào không gian 3D chung theo chế độ Xếp ngang hàng hoặc Dọc thân tàu
+    const holdWidthX = rows.length + 2.4;
+    if (multiLayout === 'SIDE_BY_SIDE') {
+      const k = holdUnits.length;
+      holdUnits.forEach((u, i) => {
+        u.offsetX = (i - (k - 1) / 2) * holdWidthX;
+        u.offsetZ = 0;
+      });
+    } else if (multiLayout === 'ALONG_SHIP') {
+      const bulkheadGap = 1.2;
+      let cursorZ = 0;
+      holdUnits.forEach((u, i) => {
+        u.offsetX = 0;
+        u.offsetZ = cursorZ - u.localZMin;
+        cursorZ += u.depthZ + bulkheadGap;
+      });
+      const totalSpanZ = Math.max(2, cursorZ - bulkheadGap);
+      const shiftZ = -totalSpanZ / 2;
+      holdUnits.forEach(u => { u.offsetZ += shiftZ; });
+    }
+
+    // Dịch khối sang tọa độ thế giới & tổng hợp chỉ số chung
+    const allBlocks = [];
+    const totalCounts = { loaded: 0, asc: 0, imp: 0, rob: 0 };
+    const allBays = [];
+
+    holdUnits.forEach(u => {
+      allBays.push(...u.bays);
+      u.xMinFrame = u.offsetX - rowCenterOffset - 0.65;
+      u.xMaxFrame = u.offsetX + rowCenterOffset + 0.65;
+      u.zMinFrame = u.offsetZ + u.localZMin - 0.22;
+      u.zMaxFrame = u.offsetZ + u.localZMax + 0.22;
+      u.centerX = u.offsetX;
+      u.centerZ = (u.zMinFrame + u.zMaxFrame) / 2;
+
+      u.blocks = u.localBlocks.map(b => {
+        const wb = {
+          ...b,
+          x0: b.x0 + u.offsetX,
+          x1: b.x1 + u.offsetX,
+          z0: b.z0 + u.offsetZ,
+          z1: b.z1 + u.offsetZ
+        };
+        allBlocks.push(wb);
+        return wb;
+      });
+
+      totalCounts.loaded += u.progress.counts.loaded;
+      totalCounts.asc += u.progress.counts.asc;
+      totalCounts.imp += u.progress.counts.imp;
+      totalCounts.rob += u.progress.counts.rob;
+    });
+
+    // Đánh dấu Hầm chậm nhất / nhanh nhất để căn chỉnh tiến độ khi so sánh >= 2 hầm
+    const withExp = holdUnits.filter(u => u.progress.expTotal > 0);
+    let minExpPct = 100, maxExpPct = 0;
+    withExp.forEach(u => {
+      if (u.progress.expPct < minExpPct) minExpPct = u.progress.expPct;
+      if (u.progress.expPct > maxExpPct) maxExpPct = u.progress.expPct;
+    });
+    const deltaPct = withExp.length >= 2 ? (maxExpPct - minExpPct) : 0;
+    holdUnits.forEach(u => {
+      u.progress.paceTag = 'NORMAL';
+      if (withExp.length >= 2 && deltaPct >= 10 && u.progress.expTotal > 0) {
+        if (u.progress.expPct === minExpPct) u.progress.paceTag = 'LAGGING';
+        else if (u.progress.expPct === maxExpPct) u.progress.paceTag = 'LEADING';
+      }
+    });
+
+    const podColorMap = this.buildPodColorMap(allBlocks);
+    const xMinAll = Math.min(...holdUnits.map(u => u.xMinFrame));
+    const xMaxAll = Math.max(...holdUnits.map(u => u.xMaxFrame));
+    const zMinAll = Math.min(...holdUnits.map(u => u.zMinFrame));
+    const zMaxAll = Math.max(...holdUnits.map(u => u.zMaxFrame));
+
+    const etdEval = window._latestEtdEval || EtdPaceEngine.evaluate(state, pool, CraneEngine.analyzeCraneBalance(state, pool, 'ALL'));
+    holdUnits.forEach(u => {
+      u.etd = (etdEval.holdMap && etdEval.holdMap[u.hold.hold]) ? etdEval.holdMap[u.hold.hold] : null;
+    });
 
     return {
-      hold: h,
-      bays: holdBays,
-      filteredBays,
+      hold: holdUnits[0].hold,
+      selectedHolds: holdUnits.map(u => u.hold.hold),
+      holdUnits,
+      etdEval,
+      multiLayout,
+      deltaPct,
+      minExpPct,
+      maxExpPct,
+      bays: allBays,
       rows,
       holdTiers,
       deckTiers,
       effDeckMin,
       deckBaseY,
       rowCenterOffset,
-      zMinAll: Math.min(-1.05, zMinAll),
-      zMaxAll: Math.max(1.05, zMaxAll),
-      blocks,
+      xMinAll, xMaxAll, zMinAll, zMaxAll,
+      blocks: allBlocks,
       podColorMap,
-      counts
+      counts: totalCounts
     };
   },
 
@@ -10711,11 +11755,11 @@ const Hold3DEngine = {
 
 class Hold3DCanvasController {
   constructor(prefix) {
-    this.prefix = prefix; // 'inline' | 'modal'
+    this.prefix = prefix;
     this.canvas = document.getElementById(`${prefix}3dCanvas`);
     this.stage = document.getElementById(`${prefix}3dStageWrap`);
-    this.yaw = -0.56;
-    this.pitch = 0.36;
+    this.yaw = -0.52;
+    this.pitch = 0.34;
     this.zoom = 1.0;
     this.panX = 0;
     this.panY = 0;
@@ -10773,11 +11817,10 @@ class Hold3DCanvasController {
     this.canvas.addEventListener('wheel', e => {
       e.preventDefault();
       const f = e.deltaY < 0 ? 1.1 : 0.91;
-      this.zoom = Math.max(0.45, Math.min(3.2, this.zoom * f));
+      this.zoom = Math.max(0.4, Math.min(4.0, this.zoom * f));
       this.draw();
     }, { passive: false });
 
-    // Touch support (1 finger = rotate, 2 fingers = pinch zoom)
     let pinchDist = 0;
     this.canvas.addEventListener('touchstart', e => {
       if (e.touches.length === 1) {
@@ -10800,7 +11843,7 @@ class Hold3DCanvasController {
           e.touches[0].clientX - e.touches[1].clientX,
           e.touches[0].clientY - e.touches[1].clientY
         );
-        this.zoom = Math.max(0.45, Math.min(3.2, this.zoom * (nd / pinchDist)));
+        this.zoom = Math.max(0.4, Math.min(4.0, this.zoom * (nd / pinchDist)));
         pinchDist = nd;
         this.draw();
       }
@@ -10818,9 +11861,9 @@ class Hold3DCanvasController {
     this.panY = 0;
     this.zoom = 1.0;
     if (preset === 'FRONT') { this.yaw = 0.0; this.pitch = 0.08; }
-    else if (preset === 'TOP') { this.yaw = -0.22; this.pitch = 1.12; }
-    else if (preset === 'SIDE') { this.yaw = -1.32; this.pitch = 0.24; }
-    else { this.yaw = -0.56; this.pitch = 0.36; }
+    else if (preset === 'TOP') { this.yaw = -0.18; this.pitch = 1.15; }
+    else if (preset === 'SIDE') { this.yaw = -1.35; this.pitch = 0.22; }
+    else { this.yaw = -0.52; this.pitch = 0.34; }
     this.draw();
   }
 
@@ -10857,13 +11900,13 @@ class Hold3DCanvasController {
   drawFaceText(ctx, pTL, pTR, pBL, line1, line2, textColor, isWhiteBg) {
     const faceW = Math.hypot(pTR.x - pTL.x, pTR.y - pTL.y);
     const faceH = Math.hypot(pBL.x - pTL.x, pBL.y - pTL.y);
-    if (faceW < 18 || faceH < 12) return;
+    if (faceW < 15 || faceH < 10) return;
 
     const W = 100, H = 64;
     const ux = (pTR.x - pTL.x) / W, uy = (pTR.y - pTL.y) / W;
     const vx = (pBL.x - pTL.x) / H, vy = (pBL.y - pTL.y) / H;
     const det = Math.abs(ux * vy - uy * vx);
-    if (det < 0.015) return;
+    if (det < 0.01) return;
 
     ctx.save();
     ctx.transform(ux, uy, vx, vy, pTL.x, pTL.y);
@@ -10906,7 +11949,7 @@ class Hold3DCanvasController {
     const m = this.model;
     const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
 
-    if (!m || !m.hold) {
+    if (!m || !m.holdUnits || !m.holdUnits.length) {
       ctx.fillStyle = isDark ? '#94a3b8' : '#64748b';
       ctx.font = '700 14px Inter, sans-serif';
       ctx.textAlign = 'center';
@@ -10914,19 +11957,19 @@ class Hold3DCanvasController {
       return;
     }
 
-    // Tâm mô hình 3D theo trục Y để căn giữa gọn trong khung
+    const isMulti = m.holdUnits.length > 1;
     const totalH = (state.hold3d.zoneFilter === 'HOLD')
       ? Math.max(3, m.holdTiers.length)
       : (m.deckBaseY + Math.max(2, m.deckTiers.length));
+    const centerX = (m.xMinAll + m.xMaxAll) / 2;
     const centerY = (state.hold3d.zoneFilter === 'DECK')
       ? (m.deckBaseY + m.deckTiers.length * 0.45)
       : (totalH * 0.46);
     const centerZ = (m.zMinAll + m.zMaxAll) / 2;
 
-    const spanX = Math.max(6, m.rows.length + 1.5);
-    const spanY = Math.max(5, totalH + 1.5);
-    const spanZ = Math.max(2.6, (m.zMaxAll - m.zMinAll) + 1.5);
-    const baseScale = Math.min(cssW / (spanX * 1.18 + spanZ * 0.45), cssH / (spanY * 1.18 + spanZ * 0.25)) * this.zoom;
+    const spanX = Math.max(6, (m.xMaxAll - m.xMinAll) + 1.8);
+    const spanY = Math.max(5, totalH + 1.8);
+    const spanZ = Math.max(2.6, (m.zMaxAll - m.zMinAll) + 1.8);
 
     const cy = Math.cos(this.yaw), sy = Math.sin(this.yaw);
     const cp = Math.cos(this.pitch), sp = Math.sin(this.pitch);
@@ -10934,18 +11977,29 @@ class Hold3DCanvasController {
     const vy = sp;
     const vz = cy * cp;
 
+    const horizSpan = (m.multiLayout === 'ALONG_SHIP' && isMulti)
+      ? Math.max(spanX * 1.15, spanZ * 1.08)
+      : (spanX * 1.08 + spanZ * 0.34);
+    const vertSpan = spanY * 1.18 + spanZ * 0.20;
+    const baseScale = Math.min(cssW / horizSpan, cssH / vertSpan) * this.zoom;
+
+    // Khoảng cách camera thích ứng theo độ rộng mô hình (tránh méo phối cảnh khi xem nhiều hầm)
+    const camDist = Math.max(42, Math.max(spanX, spanY, spanZ) * 3.1);
+    const eyeX = centerX + camDist * vx;
+    const eyeZ = centerZ + camDist * vz;
+
     const originX = cssW / 2 + this.panX;
-    const originY = cssH / 2 + 12 + this.panY;
+    const originY = cssH / 2 + 16 + this.panY;
 
     const proj = (x, y, z) => {
-      const rx = x;
+      const rx = x - centerX;
       const ry = y - centerY;
       const rz = z - centerZ;
       const x1 = rx * cy - rz * sy;
       const z1 = rx * sy + rz * cy;
       const y2 = ry * cp - z1 * sp;
       const z2 = ry * sp + z1 * cp;
-      const persp = 36 / (36 - Math.max(-18, Math.min(18, z2)));
+      const persp = camDist / Math.max(8, camDist - z2);
       return {
         x: originX + x1 * baseScale * persp,
         y: originY - y2 * baseScale * persp,
@@ -10962,76 +12016,21 @@ class Hold3DCanvasController {
       if (stroke) { ctx.strokeStyle = stroke; ctx.lineWidth = lineW; ctx.stroke(); }
     };
 
-    // 1. VẼ ĐÁY HẦM & KHUNG VÁCH HẦM (HOLD TANK TOP & BULKHEADS)
-    const xMinFrame = -m.rowCenterOffset - 0.65;
-    const xMaxFrame = m.rowCenterOffset + 0.65;
-    const zMinFrame = m.zMinAll - 0.25;
-    const zMaxFrame = m.zMaxAll + 0.25;
-
-    if (state.hold3d.zoneFilter !== 'DECK') {
-      const floorPts = [
-        proj(xMinFrame, 0, zMinFrame),
-        proj(xMaxFrame, 0, zMinFrame),
-        proj(xMaxFrame, 0, zMaxFrame),
-        proj(xMinFrame, 0, zMaxFrame)
-      ];
-      drawQuad(floorPts, isDark ? 'rgba(30,41,59,0.55)' : 'rgba(148,163,184,0.22)', isDark ? '#334155' : '#94a3b8', 1.2);
-
-      // Lưới kẻ theo Row trên sàn hầm & số Row
-      ctx.lineWidth = 0.8;
-      ctx.strokeStyle = isDark ? 'rgba(148,163,184,0.18)' : 'rgba(100,116,139,0.25)';
-      m.rows.forEach((r, idx) => {
-        const cx = idx - m.rowCenterOffset;
-        const p1 = proj(cx - 0.5, 0, zMinFrame);
-        const p2 = proj(cx - 0.5, 0, zMaxFrame);
-        ctx.beginPath(); ctx.moveTo(p1.x, p1.y); ctx.lineTo(p2.x, p2.y); ctx.stroke();
-
-        const lblZ = vz >= 0 ? zMaxFrame + 0.32 : zMinFrame - 0.32;
-        const lp = proj(cx, 0, lblZ);
-        ctx.fillStyle = isDark ? '#94a3b8' : '#334155';
-        ctx.font = '800 10px Inter, sans-serif';
-        ctx.textAlign = 'center';
-        ctx.fillText(r, lp.x, lp.y + 4);
-      });
-
-      // Nhãn MẠN TRÁI / MẠN PHẢI
-      const portLbl = proj(xMinFrame - 0.55, 0, centerZ);
-      const stbdLbl = proj(xMaxFrame + 0.55, 0, centerZ);
-      ctx.font = '900 10px Inter, sans-serif';
-      ctx.fillStyle = '#0284c7';
-      ctx.fillText('PORT (TRÁI)', portLbl.x, portLbl.y);
-      ctx.fillStyle = '#059669';
-      ctx.fillText('STBD (PHẢI)', stbdLbl.x, stbdLbl.y);
+    // Đường tham chiếu Mặt Boong chạy xuyên qua tất cả các Hầm khi Xếp ngang so sánh
+    if (isMulti && m.multiLayout === 'SIDE_BY_SIDE' && state.hold3d.zoneFilter !== 'HOLD') {
+      const refY = m.deckBaseY - 0.12;
+      const refZ = vz >= 0 ? m.zMaxAll + 0.1 : m.zMinAll - 0.1;
+      const pL = proj(m.xMinAll - 0.6, refY, refZ);
+      const pR = proj(m.xMaxAll + 0.6, refY, refZ);
+      ctx.save();
+      ctx.setLineDash([6, 4]);
+      ctx.strokeStyle = isDark ? 'rgba(56,189,248,0.45)' : 'rgba(2,132,199,0.45)';
+      ctx.lineWidth = 1.4;
+      ctx.beginPath(); ctx.moveTo(pL.x, pL.y); ctx.lineTo(pR.x, pR.y); ctx.stroke();
+      ctx.restore();
     }
 
-    // Hàm vẽ Mặt Boong / Nắp hầm (Hatch Cover)
-    const drawHatchCoverSlab = () => {
-      if (state.hold3d.zoneFilter === 'HOLD') return;
-      const yBot = m.deckBaseY - 0.38;
-      const yTop = m.deckBaseY - 0.08;
-      const padX = 0.25;
-      const deckPtsTop = [
-        proj(xMinFrame - padX, yTop, zMinFrame),
-        proj(xMaxFrame + padX, yTop, zMinFrame),
-        proj(xMaxFrame + padX, yTop, zMaxFrame),
-        proj(xMinFrame - padX, yTop, zMaxFrame)
-      ];
-      const deckPtsFront = vz >= 0
-        ? [proj(xMinFrame - padX, yTop, zMaxFrame), proj(xMaxFrame + padX, yTop, zMaxFrame), proj(xMaxFrame + padX, yBot, zMaxFrame), proj(xMinFrame - padX, yBot, zMaxFrame)]
-        : [proj(xMaxFrame + padX, yTop, zMinFrame), proj(xMinFrame - padX, yTop, zMinFrame), proj(xMinFrame - padX, yBot, zMinFrame), proj(xMaxFrame + padX, yBot, zMinFrame)];
-
-      drawQuad(deckPtsFront, isDark ? 'rgba(71,85,105,0.85)' : 'rgba(51,65,85,0.78)', '#0f172a', 1);
-      drawQuad(deckPtsTop, isDark ? 'rgba(100,116,139,0.34)' : 'rgba(71,85,105,0.22)', isDark ? '#64748b' : '#475569', 1.2);
-
-      // Nhãn NẮP HẦM / MẶT BOONG
-      const dLbl = proj(xMaxFrame + padX + 0.55, yTop, centerZ);
-      ctx.fillStyle = isDark ? '#38bdf8' : '#0c2340';
-      ctx.font = '850 9.5px Inter, sans-serif';
-      ctx.textAlign = 'left';
-      ctx.fillText(`NẮP HẦM (Boong ≥${m.effDeckMin})`, dLbl.x, dLbl.y);
-    };
-
-    // Hàm vẽ 1 khối container 3D theo đúng quy ước màu & chữ của người dùng
+    // Hàm vẽ 1 khối container 3D
     const drawContainerBlock = (b) => {
       const c000 = proj(b.x0, b.y0, b.z0);
       const c100 = proj(b.x1, b.y0, b.z0);
@@ -11042,18 +12041,10 @@ class Hold3DCanvasController {
       const c111 = proj(b.x1, b.y1, b.z1);
       const c011 = proj(b.x0, b.y1, b.z1);
 
-      let baseCol = '#ffffff';
-      let topCol = '#f8fafc';
-      let sideCol = '#e2e8f0';
-      let strokeCol = '#334155';
-      let textCol = '#0f172a';
-      let line1 = '';
-      let line2 = '';
-      let isWhiteBg = false;
-      let alpha = 1.0;
+      let baseCol = '#ffffff', topCol = '#f8fafc', sideCol = '#e2e8f0', strokeCol = '#334155', textCol = '#0f172a';
+      let line1 = '', line2 = '', isWhiteBg = false, alpha = 1.0;
 
       if (b.kind === 'PLANNED_ASC') {
-        // Vị trí dự kiến theo ASC: KHUNG MÀU NỀN TRẮNG, nội dung TÊN CẢNG + DẢI TẤN
         baseCol = '#ffffff';
         topCol = '#f8fafc';
         sideCol = '#e2e8f0';
@@ -11063,7 +12054,6 @@ class Hold3DCanvasController {
         line2 = b.weightBand.short;
         isWhiteBg = true;
       } else if (b.kind === 'LOADED_EXPORT') {
-        // Cont đã xếp rồi: MÀU NỀN THEO CẢNG HOẶC DẢI TẤN (chọn được), nội dung 4 SỐ CONT + CẢNG
         if (state.hold3d.colorMode === 'WEIGHT') {
           baseCol = b.weightBand.color;
           textCol = b.weightBand.text;
@@ -11077,7 +12067,6 @@ class Hold3DCanvasController {
         line1 = b.cntr ? b.cntr.slice(-4) : '----';
         line2 = b.pod || '---';
       } else if (b.kind === 'IMPORT') {
-        // Cont hàng nhập: CÙNG 1 MÀU ĐỒNG NHẤT (Tím đặc trưng)
         baseCol = Hold3DEngine.IMPORT_COLOR;
         topCol = '#8b5cf6';
         sideCol = '#5b21b6';
@@ -11087,7 +12076,6 @@ class Hold3DCanvasController {
         line2 = b.cntr ? b.cntr.slice(-4) : '';
         if (b.discharged) alpha = 0.55;
       } else {
-        // Cont để lại hoặc vị trí để lại suy đoán: KHỐI MÀU XÁM ĐẬM
         baseCol = '#334155';
         topCol = '#475569';
         sideCol = '#1e293b';
@@ -11103,12 +12091,10 @@ class Hold3DCanvasController {
       ctx.save();
       if (alpha < 1) ctx.globalAlpha = alpha;
 
-      const borderW = isSelected ? 2.4 : (isWhiteBg ? 1.45 : 1.0);
+      const borderW = isSelected ? 2.4 : (isWhiteBg ? 1.35 : 0.95);
       const effStroke = isSelected ? '#38bdf8' : (isCalled ? '#f97316' : strokeCol);
 
-      // Vẽ 3 mặt hướng về phía camera
-      // Mặt X (Left/Right)
-      let sidePoly = null, sideTL, sideTR, sideBL;
+      let sidePoly, sideTL, sideTR, sideBL;
       if (vx >= 0) {
         sidePoly = [c111, c110, c100, c101];
         sideTL = c111; sideTR = c110; sideBL = c101;
@@ -11118,8 +12104,7 @@ class Hold3DCanvasController {
       }
       drawQuad(sidePoly, sideCol, effStroke, borderW);
 
-      // Mặt Z (Front/Back)
-      let frontPoly = null, frontTL, frontTR, frontBL;
+      let frontPoly, frontTL, frontTR, frontBL;
       if (vz >= 0) {
         frontPoly = [c011, c111, c101, c001];
         frontTL = c011; frontTR = c111; frontBL = c001;
@@ -11129,16 +12114,9 @@ class Hold3DCanvasController {
       }
       drawQuad(frontPoly, baseCol, effStroke, borderW);
 
-      // Mặt Y (Top/Bottom)
-      let topPoly = null;
-      if (vy >= 0) {
-        topPoly = [c010, c110, c111, c011];
-      } else {
-        topPoly = [c001, c101, c100, c000];
-      }
+      const topPoly = (vy >= 0) ? [c010, c110, c111, c011] : [c001, c101, c100, c000];
       drawQuad(topPoly, topCol, effStroke, borderW);
 
-      // Vẽ chữ sắc nét lên mặt chính hướng về camera
       if (vy > 0.88) {
         this.drawFaceText(ctx, c010, c110, c011, line1, line2, textCol, isWhiteBg);
       } else if (Math.abs(vx) > Math.abs(vz) * 1.25) {
@@ -11149,63 +12127,227 @@ class Hold3DCanvasController {
 
       ctx.restore();
 
-      // Lưu vùng chọn 2D (hit-test) theo đúng thứ tự vẽ (phần tử vẽ sau nằm trên cùng)
       this.hitPolys.push({ block: b, poly: frontPoly });
       this.hitPolys.push({ block: b, poly: topPoly });
       this.hitPolys.push({ block: b, poly: sidePoly });
     };
 
-    // 2. PHÂN NHÓM THEO TẦNG & SẮP XẾP TOPO-PAINTER KHÔNG BAO GIỜ LỖI CHỒNG HÌNH
-    const underBlocks = m.blocks.filter(b => !b.isDeck);
-    const deckBlocks = m.blocks.filter(b => b.isDeck);
+    // Sắp xếp thứ tự vẽ giữa các Hầm theo BSP phối cảnh chính xác 100%
+    const orderedUnits = [...m.holdUnits].sort((a, b) => {
+      if (m.multiLayout === 'SIDE_BY_SIDE') {
+        return Math.abs(b.centerX - eyeX) - Math.abs(a.centerX - eyeX);
+      }
+      if (m.multiLayout === 'ALONG_SHIP') {
+        return Math.abs(b.centerZ - eyeZ) - Math.abs(a.centerZ - eyeZ);
+      }
+      return 0;
+    });
 
-    const drawZoneBlocks = (zoneList) => {
-      const byTier = new Map();
-      zoneList.forEach(b => {
-        if (!byTier.has(b.tierKey)) byTier.set(b.tierKey, []);
-        byTier.get(b.tierKey).push(b);
-      });
-      const tierKeys = Array.from(byTier.keys()).sort((a, b) => vy >= 0 ? (a - b) : (b - a));
-      tierKeys.forEach(tk => {
-        const sorted = Hold3DEngine.topoSortTier(byTier.get(tk), vx, vz);
-        sorted.forEach(b => drawContainerBlock(b));
-      });
-    };
+    // Vẽ từng Hầm hoàn chỉnh (Đáy hầm -> Dưới hầm -> Nắp hầm -> Trên boong)
+    const floatingHeaders = [];
 
-    if (vy >= 0) {
-      drawZoneBlocks(underBlocks);
-      drawHatchCoverSlab();
-      drawZoneBlocks(deckBlocks);
-    } else {
-      drawZoneBlocks(deckBlocks);
-      drawHatchCoverSlab();
-      drawZoneBlocks(underBlocks);
-    }
+    orderedUnits.forEach(u => {
+      const { xMinFrame, xMaxFrame, zMinFrame, zMaxFrame, centerZ: uCz, progress } = u;
 
-    // 3. Thước Tier bên cạnh Hầm
+      // Đáy hầm & lưới Row
+      if (state.hold3d.zoneFilter !== 'DECK') {
+        const floorPts = [
+          proj(xMinFrame, 0, zMinFrame),
+          proj(xMaxFrame, 0, zMinFrame),
+          proj(xMaxFrame, 0, zMaxFrame),
+          proj(xMinFrame, 0, zMaxFrame)
+        ];
+        const etdLv = u.etd ? u.etd.level : 'GREEN';
+        const isEtdRed = etdLv === 'OVERLOAD' || etdLv === 'RED';
+        const isEtdAmber = etdLv === 'AMBER';
+        const floorFill = isEtdRed
+          ? (isDark ? 'rgba(220,38,38,0.28)' : 'rgba(220,38,38,0.16)')
+          : (isEtdAmber ? (isDark ? 'rgba(217,119,6,0.24)' : 'rgba(217,119,6,0.14)') : (isDark ? 'rgba(30,41,59,0.55)' : 'rgba(148,163,184,0.22)'));
+        const floorStroke = isEtdRed ? '#dc2626' : (isEtdAmber ? '#d97706' : (progress.paceTag === 'LAGGING' ? '#ef4444' : (progress.paceTag === 'LEADING' ? '#10b981' : (isDark ? '#334155' : '#94a3b8'))));
+        drawQuad(floorPts, floorFill, floorStroke, isEtdRed ? 2.6 : (isEtdAmber || progress.paceTag !== 'NORMAL' ? 1.8 : 1.1));
+
+        ctx.lineWidth = 0.7;
+        ctx.strokeStyle = isDark ? 'rgba(148,163,184,0.16)' : 'rgba(100,116,139,0.22)';
+        const showEveryRow = m.holdUnits.length <= 3;
+        m.rows.forEach((r, idx) => {
+          const cx = u.offsetX + idx - m.rowCenterOffset;
+          const p1 = proj(cx - 0.5, 0, zMinFrame);
+          const p2 = proj(cx - 0.5, 0, zMaxFrame);
+          ctx.beginPath(); ctx.moveTo(p1.x, p1.y); ctx.lineTo(p2.x, p2.y); ctx.stroke();
+
+          if ((showEveryRow || idx % 2 === 0) && (m.multiLayout !== 'ALONG_SHIP' || u === m.holdUnits[m.holdUnits.length - 1])) {
+            const lblZ = vz >= 0 ? zMaxFrame + 0.28 : zMinFrame - 0.28;
+            const lp = proj(cx, 0, lblZ);
+            ctx.fillStyle = isDark ? '#94a3b8' : '#334155';
+            ctx.font = `800 ${isMulti ? 9 : 10}px Inter, sans-serif`;
+            ctx.textAlign = 'center';
+            ctx.fillText(r, lp.x, lp.y + 4);
+          }
+        });
+      }
+
+      const drawHatchCoverSlab = () => {
+        if (state.hold3d.zoneFilter === 'HOLD') return;
+        const yBot = m.deckBaseY - 0.36;
+        const yTop = m.deckBaseY - 0.08;
+        const padX = 0.22;
+        const deckPtsTop = [
+          proj(xMinFrame - padX, yTop, zMinFrame),
+          proj(xMaxFrame + padX, yTop, zMinFrame),
+          proj(xMaxFrame + padX, yTop, zMaxFrame),
+          proj(xMinFrame - padX, yTop, zMaxFrame)
+        ];
+        const deckPtsFront = vz >= 0
+          ? [proj(xMinFrame - padX, yTop, zMaxFrame), proj(xMaxFrame + padX, yTop, zMaxFrame), proj(xMaxFrame + padX, yBot, zMaxFrame), proj(xMinFrame - padX, yBot, zMaxFrame)]
+          : [proj(xMaxFrame + padX, yTop, zMinFrame), proj(xMinFrame - padX, yTop, zMinFrame), proj(xMinFrame - padX, yBot, zMinFrame), proj(xMaxFrame + padX, yBot, zMinFrame)];
+
+        drawQuad(deckPtsFront, isDark ? 'rgba(71,85,105,0.85)' : 'rgba(51,65,85,0.78)', '#0f172a', 1);
+        drawQuad(deckPtsTop, isDark ? 'rgba(100,116,139,0.34)' : 'rgba(71,85,105,0.22)', isDark ? '#64748b' : '#475569', 1.1);
+      };
+
+      const underBlocks = u.blocks.filter(b => !b.isDeck);
+      const deckBlocks = u.blocks.filter(b => b.isDeck);
+
+      const drawZoneBlocks = (zoneList) => {
+        const byTier = new Map();
+        zoneList.forEach(b => {
+          if (!byTier.has(b.tierKey)) byTier.set(b.tierKey, []);
+          byTier.get(b.tierKey).push(b);
+        });
+        const tierKeys = Array.from(byTier.keys()).sort((a, b) => vy >= 0 ? (a - b) : (b - a));
+        tierKeys.forEach(tk => {
+          const sorted = Hold3DEngine.topoSortTier(byTier.get(tk), vx, vz);
+          sorted.forEach(b => drawContainerBlock(b));
+        });
+      };
+
+      if (vy >= 0) {
+        drawZoneBlocks(underBlocks);
+        drawHatchCoverSlab();
+        drawZoneBlocks(deckBlocks);
+      } else {
+        drawZoneBlocks(deckBlocks);
+        drawHatchCoverSlab();
+        drawZoneBlocks(underBlocks);
+      }
+
+      // Lưu nhãn nổi tên Hầm + Cẩu + % tiến độ để vẽ trên cùng cho rõ nét
+      const topY = (state.hold3d.zoneFilter === 'HOLD') ? (m.holdTiers.length + 0.55) : (m.deckBaseY + m.deckTiers.length + 0.55);
+      const hp = proj(u.centerX, topY, uCz);
+      floatingHeaders.push({ u, pt: hp });
+    });
+
+    // Thước Tier ở mép trái ngoài cùng & nhãn Mạn Trái / Mạn Phải / Mũi / Lái
     ctx.font = '800 9.5px Inter, sans-serif';
     ctx.fillStyle = isDark ? '#94a3b8' : '#475569';
     ctx.textAlign = 'right';
-    const rulerX = xMinFrame - 0.18;
+    const rulerX = m.xMinAll - 0.22;
+    const rulerZ = vz >= 0 ? m.zMaxAll : m.zMinAll;
     if (state.hold3d.zoneFilter !== 'DECK') {
       m.holdTiers.forEach((t, i) => {
-        const p = proj(rulerX, i * 0.96 + 0.44, vz >= 0 ? zMaxFrame : zMinFrame);
+        const p = proj(rulerX, i * 0.96 + 0.44, rulerZ);
         ctx.fillText(`T${String(t).padStart(2, '0')}`, p.x, p.y + 3);
       });
     }
     if (state.hold3d.zoneFilter !== 'HOLD') {
       m.deckTiers.forEach((t, i) => {
-        const p = proj(rulerX, m.deckBaseY + i * 0.96 + 0.44, vz >= 0 ? zMaxFrame : zMinFrame);
+        const p = proj(rulerX, m.deckBaseY + i * 0.96 + 0.44, rulerZ);
         ctx.fillText(`T${String(t).padStart(2, '0')}`, p.x, p.y + 3);
       });
+      const dLbl = proj(m.xMaxAll + 0.45, m.deckBaseY - 0.08, centerZ);
+      ctx.fillStyle = isDark ? '#38bdf8' : '#0c2340';
+      ctx.font = '850 9.5px Inter, sans-serif';
+      ctx.textAlign = 'left';
+      ctx.fillText(`NẮP HẦM (≥${m.effDeckMin})`, dLbl.x, dLbl.y);
     }
 
-    // Nếu không có khối nào trong vùng lọc
+    if (!isMulti || m.multiLayout === 'ALONG_SHIP') {
+      const portLbl = proj(m.xMinAll - 0.55, 0, centerZ);
+      const stbdLbl = proj(m.xMaxAll + 0.55, 0, centerZ);
+      ctx.font = '900 10px Inter, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillStyle = '#0284c7';
+      ctx.fillText('PORT (TRÁI)', portLbl.x, portLbl.y);
+      ctx.fillStyle = '#059669';
+      ctx.fillText('STBD (PHẢI)', stbdLbl.x, stbdLbl.y);
+    }
+    if (isMulti && m.multiLayout === 'ALONG_SHIP') {
+      const bowP = proj(centerX, 0, m.zMinAll - 0.65);
+      const sternP = proj(centerX, 0, m.zMaxAll + 0.65);
+      ctx.font = '900 10.5px Inter, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillStyle = '#0284c7';
+      ctx.fillText('▲ MŨI TÀU (BOW)', bowP.x, bowP.y);
+      ctx.fillStyle = '#f59e0b';
+      ctx.fillText('▼ LÁI TÀU (STERN)', sternP.x, sternP.y);
+    }
+
+    // Vẽ thẻ cảnh báo ETD & Hầm trọng điểm nổi trực tiếp trên đỉnh MỖI HẦM trong không gian 3D
+    floatingHeaders.forEach(({ u, pt }) => {
+      const pr = u.progress;
+      const he = u.etd;
+      const lv = he ? he.level : 'GREEN';
+      const isRed = lv === 'OVERLOAD' || lv === 'RED';
+      const isAmber = lv === 'AMBER';
+      const craneTxt = pr.ownerCranes.length ? ` · ${pr.ownerCranes.join('/')}` : ' · CHƯA CẨU';
+
+      let line1 = `H${String(pr.holdNo).padStart(2, '0')}${craneTxt} · Còn ${he ? he.totalRem : pr.expRemain}`;
+      let line2 = '';
+      if (he && he.totalRem > 0) {
+        const reqStr = he.reqRate >= 900 ? '>99' : he.reqRate.toFixed(1);
+        if (isRed) {
+          line1 = `🔥 H${String(pr.holdNo).padStart(2, '0')}${craneTxt} · Cần ${reqStr} mv/h (🔴 ĐỎ)`;
+          line2 = `Còn ${he.totalRem} (Cẩu ${he.craneTotalRem} · ${he.hoursAtCurrent.toFixed(1)}h) · ${he.shortAction}`;
+        } else if (isAmber) {
+          line1 = `⚠️ H${String(pr.holdNo).padStart(2, '0')}${craneTxt} · Cần ${reqStr} mv/h`;
+          line2 = `Còn ${he.totalRem} · Hiện ${he.currentRate.toFixed(0)}/h (${he.hoursAtCurrent.toFixed(1)}h) · Tăng tốc`;
+        } else {
+          line1 = `H${String(pr.holdNo).padStart(2, '0')}${craneTxt} · X:${pr.expPct}% · Cần ${reqStr}/h`;
+        }
+      } else {
+        line1 = `✅ H${String(pr.holdNo).padStart(2, '0')}${craneTxt} · Xong`;
+      }
+
+      ctx.save();
+      ctx.font = '850 10.5px Inter, sans-serif';
+      const w1 = ctx.measureText(line1).width;
+      ctx.font = '750 9.5px Inter, sans-serif';
+      const w2 = line2 ? ctx.measureText(line2).width : 0;
+      const tw = Math.max(w1, w2) + 16;
+      const th = line2 ? 33 : 21;
+      const bx = Math.max(6, Math.min(cssW - tw - 6, pt.x - tw / 2));
+      const by = Math.max(36, pt.y - th / 2);
+
+      const bgCol = isRed
+        ? 'rgba(220, 38, 38, 0.94)'
+        : (isAmber ? 'rgba(217, 119, 6, 0.93)' : (pr.paceTag === 'LEADING' ? 'rgba(5, 150, 105, 0.90)' : 'rgba(15, 23, 42, 0.84)'));
+
+      ctx.fillStyle = bgCol;
+      ctx.beginPath();
+      ctx.roundRect ? ctx.roundRect(bx, by, tw, th, 8) : ctx.rect(bx, by, tw, th);
+      ctx.fill();
+      ctx.strokeStyle = isRed ? '#fecaca' : 'rgba(255,255,255,0.28)';
+      ctx.lineWidth = isRed ? 1.5 : 1;
+      ctx.stroke();
+
+      ctx.fillStyle = '#ffffff';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.font = '850 10.5px Inter, sans-serif';
+      ctx.fillText(line1, bx + tw / 2, line2 ? (by + 11) : (by + th / 2 + 0.5));
+      if (line2) {
+        ctx.font = '750 9.5px Inter, sans-serif';
+        ctx.fillStyle = '#fef2f2';
+        ctx.fillText(line2, bx + tw / 2, by + 24);
+      }
+      ctx.restore();
+    });
+
     if (m.blocks.length === 0) {
       ctx.fillStyle = isDark ? '#94a3b8' : '#64748b';
       ctx.font = '700 13px Inter, sans-serif';
       ctx.textAlign = 'center';
-      ctx.fillText(`Chưa có container trong ${m.hold.label} (bộ lọc hiện tại).`, cssW / 2, cssH / 2);
+      ctx.fillText('Chưa có container trong các Hầm đang chọn (theo bộ lọc hiện tại).', cssW / 2, cssH / 2);
     }
   }
 }
@@ -11221,20 +12363,169 @@ function ensureHold3DControllers() {
   }
 }
 
-function syncHold3DControlsDOM(prefix, model) {
-  const holds = state.holdConfig || [];
-  const hSel = document.getElementById(`${prefix}3dHoldSelect`);
-  if (hSel) {
-    hSel.innerHTML = holds.map(h =>
-      `<option value="${h.hold}">${h.label} (Bay ${h.bays.join(', ')})</option>`
-    ).join('');
-    if (model && model.hold) hSel.value = String(model.hold.hold);
+function renderHold3DEtdHud(prefix, model) {
+  const hud = document.getElementById(`${prefix}3dEtdHud`);
+  if (!hud || !model) return;
+  const etd = model.etdEval;
+  if (!etd) { hud.style.display = 'none'; return; }
+  hud.style.display = 'flex';
+
+  const units = model.holdUnits || [];
+  const worstUnit = [...units].sort((a, b) => ((b.etd?.rankScore || 0) - (a.etd?.rankScore || 0)) || ((b.etd?.reqRate || 0) - (a.etd?.reqRate || 0)))[0];
+  const he = worstUnit?.etd;
+  const lv = he ? he.level : etd.worstLevel;
+  const cls = lv === 'OVERLOAD' ? 'etd-overload' : (lv === 'RED' ? 'etd-red' : (lv === 'AMBER' ? 'etd-amber' : 'etd-green'));
+  hud.className = `hold3d-etd-hud ${cls}`;
+
+  const localVal = EtdPaceEngine.toLocalInputValue(etd.etdAt);
+  const summaryMsg = (he && he.totalRem > 0)
+    ? he.advice
+    : `✅ Các hầm đang xem đã hoàn tất / đang kịp ETD (${etd.countdownText}).`;
+
+  hud.innerHTML = `
+    <div style="flex:1;min-width:240px;">
+      <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:3px;">
+        <span class="badge ${lv === 'OVERLOAD' || lv === 'RED' ? 'red' : (lv === 'AMBER' ? 'amber' : 'green')}">${he && he.totalRem > 0 ? he.badgeText : '✅ Kịp ETD'}</span>
+        <strong>⏱️ ${etd.countdownText}</strong>
+        <span style="font-size:10.5px;color:var(--muted);">(Ngưỡng đỏ: ≥25 mv/h · Trần QC/TK: ${etd.maxRateQc}/${etd.maxRateTk} mv/h)</span>
+      </div>
+      <div style="font-size:11px;font-weight:${lv === 'OVERLOAD' || lv === 'RED' ? '750' : '600'};">${summaryMsg}</div>
+    </div>
+    <div style="display:flex;align-items:center;gap:4px;flex-wrap:wrap;">
+      <input type="datetime-local" value="${localVal}" onchange="onEtdDateTimeChange(this.value)" style="min-height:27px;padding:1px 6px;font-size:11px;font-weight:700;" title="Chỉnh trực tiếp giờ rời tàu ETD">
+      <button type="button" class="sm" style="min-height:26px;padding:2px 6px;" onclick="setEtdHoursFromNow(4)">4h</button>
+      <button type="button" class="sm" style="min-height:26px;padding:2px 6px;" onclick="setEtdHoursFromNow(5)">5h</button>
+      <button type="button" class="sm" style="min-height:26px;padding:2px 6px;" onclick="setEtdHoursFromNow(6)">6h</button>
+    </div>
+  `;
+}
+
+function renderHold3DPicker(prefix, summaryList, model) {
+  const wrap = document.getElementById(`${prefix}3dHoldPicker`);
+  if (!wrap) return;
+  const selSet = new Set(state.hold3d.selectedHolds || []);
+  const etdMap = model?.etdEval?.holdMap || {};
+
+  const chipsHtml = summaryList.map(h => {
+    const checked = selSet.has(h.hold);
+    const he = etdMap[h.hold];
+    const lv = he ? he.level : 'GREEN';
+    const eCls = lv === 'OVERLOAD' ? 'etd-overload' : (lv === 'RED' ? 'etd-red' : (lv === 'AMBER' ? 'etd-amber' : ''));
+    const ico = (lv === 'OVERLOAD' || lv === 'RED') ? '🔴' : (lv === 'AMBER' ? '🟡' : '');
+    const cranePart = h.owners.length ? ` <span style="opacity:0.8;font-weight:700;">${h.owners[0]}</span>` : '';
+    const rightTxt = (he && he.totalRem > 0 && (lv === 'OVERLOAD' || lv === 'RED' || lv === 'AMBER'))
+      ? `${he.reqRate >= 900 ? '>99' : he.reqRate.toFixed(0)}/h`
+      : `${h.expPct}%`;
+    return `
+      <label class="hold3d-chip-check ${checked ? 'checked' : ''} ${eCls}" title="${he ? he.advice.replace(/"/g, '&quot;') : h.label}">
+        <input type="checkbox" ${checked ? 'checked' : ''} onchange="toggleHold3DSelection(${h.hold}, this.checked)">
+        <span>${ico}H${String(h.hold).padStart(2, '0')}${cranePart}</span>
+        <span class="hold3d-chip-pct">${rightTxt}</span>
+      </label>`;
+  }).join('');
+
+  wrap.innerHTML = `
+    <span class="hold3d-picker-title">☑️ Tích Hầm so sánh (${selSet.size}/${summaryList.length}):</span>
+    ${chipsHtml}
+    <span class="hold3d-picker-actions">
+      <button class="sm danger" onclick="selectHold3DPreset('CRITICAL')" title="Tích nhanh các Hầm trọng điểm đang cảnh báo đỏ / căng tiến độ ETD">🔥 Trọng điểm</button>
+      <button class="sm primary" onclick="selectHold3DPreset('ACTIVE_CRANES')" title="Tích nhanh tất cả các Hầm đang có cẩu hoạt động">⚡ Đang làm</button>
+      <button class="sm" onclick="selectHold3DPreset('ALL')" title="Hiển thị toàn bộ các Hầm dọc thân tàu">🚢 Cả tàu</button>
+      <button class="sm" onclick="selectHold3DPreset('SINGLE')" title="Thu gọn về 1 hầm đầu tiên">1 Hầm</button>
+    </span>
+  `;
+}
+
+function renderHold3DCompareStrip(prefix, model) {
+  const wrap = document.getElementById(`${prefix}3dCompareWrap`);
+  if (!wrap) return;
+  if (!model || !model.holdUnits || model.holdUnits.length < 2) {
+    wrap.classList.remove('show');
+    wrap.innerHTML = '';
+    return;
   }
+
+  wrap.classList.add('show');
+  const units = model.holdUnits;
+  const lagging = units.find(u => u.progress.paceTag === 'LAGGING');
+  const leading = units.find(u => u.progress.paceTag === 'LEADING');
+  const totalUnderRem = units.reduce((s, u) => s + u.progress.underDeckRemain, 0);
+  const totalDeckRem = units.reduce((s, u) => s + u.progress.onDeckRemain, 0);
+  const totalImpRem = units.reduce((s, u) => s + u.progress.impRemain, 0);
+
+  const deltaBadge = model.deltaPct >= 15
+    ? `<span class="badge red">⚠️ Lệch tiến độ Xuất: Δ${model.deltaPct}%</span>`
+    : `<span class="badge green">✅ Tiến độ khá đều (Δ${model.deltaPct}%)</span>`;
+
+  const alignHint = (lagging && leading && model.deltaPct >= 10)
+    ? `<span>💡 Căn chỉnh: <b>${lagging.progress.label}</b> (${lagging.progress.expPct}%) đang chậm hơn <b>${leading.progress.label}</b> (${leading.progress.expPct}%) → ưu tiên cấp hàng bãi TV gần & mở B cho <b>${lagging.progress.label}</b>.</span>`
+    : `<span>Đang đối chiếu <b>${units.length} hầm</b> · Tồn chung: Nhập còn <b>${totalImpRem}</b> · Dưới hầm còn <b>${totalUnderRem}</b> · Boong còn <b>${totalDeckRem}</b>.</span>`;
+
+  const cardsHtml = units.map(u => {
+    const p = u.progress;
+    const cls = p.paceTag === 'LAGGING' ? 'lagging' : (p.paceTag === 'LEADING' ? 'leading' : '');
+    const pacePill = p.paceTag === 'LAGGING'
+      ? '<span class="badge red">🐢 Chậm nhất</span>'
+      : (p.paceTag === 'LEADING' ? '<span class="badge green">🚀 Nhanh nhất</span>' : '<span class="badge">⚖️ Cân nhịp</span>');
+
+    return `
+      <div class="hold3d-cmp-card ${cls}">
+        <div class="hold3d-cmp-row">
+          <strong style="color:var(--cyan);cursor:pointer;" onclick="openHoldDetailPopup(${p.holdNo})">${p.label} ${p.ownerCranes.length ? `(${p.ownerCranes.join('/')})` : ''}</strong>
+          <div style="display:flex;align-items:center;gap:4px;">
+            ${pacePill}
+            <button class="sm" style="padding:0 5px;min-height:20px;" title="Bỏ tích hầm này" onclick="toggleHold3DSelection(${p.holdNo}, false)">✕</button>
+          </div>
+        </div>
+        <div style="margin-top:4px;font-size:10.5px;color:var(--muted);">
+          <div class="hold3d-cmp-row"><span>Nhập: <b>${p.impDone}/${p.impTotal}</b></span><span>${p.impRemain === 0 ? '✓ Sạch nhập' : `Còn ${p.impRemain}`}</span></div>
+          <div class="prog-track" style="height:5px;"><div class="prog-fill imp" style="width:${p.impPct}%"></div></div>
+          <div class="hold3d-cmp-row" style="margin-top:3px;"><span>Xuất: <b style="color:var(--ink);">${p.expDone}/${p.expTotal}</b></span><b style="color:${p.paceTag === 'LAGGING' ? 'var(--red)' : 'var(--green)'};">${p.expPct}%</b></div>
+          <div class="prog-track" style="height:5px;"><div class="prog-fill" style="width:${p.expPct}%;background:${p.paceTag === 'LAGGING' ? 'var(--red)' : 'var(--green)'};"></div></div>
+        </div>
+        <div style="margin-top:4px;font-size:10px;color:var(--muted);display:flex;justify-content:space-between;flex-wrap:wrap;gap:3px;">
+          <span>Hầm còn: <b style="color:var(--ink);">${p.underDeckRemain}</b> · Boong: <b style="color:var(--ink);">${p.onDeckRemain}</b></span>
+          <span>B:${p.expReadyB} / A:${p.expHoldA} · ROB:${p.counts.rob}</span>
+        </div>
+        ${u.etd && u.etd.totalRem > 0 ? `
+          <div class="crane-etd-box ${u.etd.level === 'OVERLOAD' ? 'etd-overload' : (u.etd.level === 'RED' ? 'etd-red' : (u.etd.level === 'AMBER' ? 'etd-amber' : 'etd-green'))}" style="margin-top:5px;">
+            <div><b>${u.etd.badgeText}</b> · Hiện ${u.etd.currentRate.toFixed(0)}/h (Cẩu mất ${u.etd.hoursAtCurrent.toFixed(1)}h) → <b>Cần ${u.etd.reqRate >= 900 ? '>99' : u.etd.reqRate.toFixed(1)} mv/h</b></div>
+            <div style="font-size:9.5px;margin-top:1px;">💡 ${u.etd.shortAction}</div>
+          </div>` : ''}
+      </div>`;
+  }).join('');
+
+  wrap.innerHTML = `
+    <div class="hold3d-compare-head">
+      <div style="display:flex;align-items:center;gap:7px;flex-wrap:wrap;">
+        <strong>📊 Đối chiếu & Căn chỉnh Tiến độ (${units.length} Hầm)</strong>
+        ${deltaBadge}
+      </div>
+      <div style="font-size:11px;color:var(--muted);">${alignHint}</div>
+    </div>
+    <div class="hold3d-compare-grid">${cardsHtml}</div>
+  `;
+}
+
+function syncHold3DControlsDOM(prefix, model, summaryList) {
+  renderHold3DEtdHud(prefix, model);
+  renderHold3DPicker(prefix, summaryList, model);
+
+  const isMulti = model && model.holdUnits && model.holdUnits.length > 1;
+  const layoutSeg = document.getElementById(`${prefix}3dLayoutSeg`);
+  if (layoutSeg) layoutSeg.style.display = isMulti ? 'inline-flex' : 'none';
+  document.getElementById(`${prefix}3dLayoutSide`)?.classList.toggle('active', state.hold3d.multiLayout === 'SIDE_BY_SIDE');
+  document.getElementById(`${prefix}3dLayoutShip`)?.classList.toggle('active', state.hold3d.multiLayout === 'ALONG_SHIP');
 
   const bSel = document.getElementById(`${prefix}3dBaySelect`);
   if (bSel && model) {
-    bSel.innerHTML = `<option value="ALL">Cả Hầm (${model.bays.join('-')})</option>` +
-      model.bays.map(b => `<option value="${b}">Chỉ Bay ${b}</option>`).join('');
+    const allLabel = isMulti
+      ? `Tất cả Bay (${model.holdUnits.length} hầm)`
+      : `Cả Hầm (${model.bays.join('-')})`;
+    const bayOpts = model.holdUnits.flatMap(u =>
+      u.bays.map(b => `<option value="${b}">${isMulti ? `H${String(u.hold.hold).padStart(2,'0')} · ` : ''}Chỉ Bay ${b}</option>`)
+    ).join('');
+    bSel.innerHTML = `<option value="ALL">${allLabel}</option>${bayOpts}`;
     bSel.value = (state.hold3d.bayFilter === 'ALL' || model.bays.includes(state.hold3d.bayFilter))
       ? state.hold3d.bayFilter : 'ALL';
   }
@@ -11252,15 +12543,20 @@ function syncHold3DControlsDOM(prefix, model) {
   const cbImp = document.getElementById(`${prefix}3dShowImpDone`);
   if (cbImp) cbImp.checked = Boolean(state.hold3d.showDischargedImp);
 
-  if (model && model.hold) {
+  if (model && model.holdUnits.length) {
     const c = model.counts;
     const totalB = model.blocks.length;
+    const holdsTxt = isMulti
+      ? `${model.holdUnits.length} Hầm (${model.holdUnits.map(u => 'H' + String(u.hold.hold).padStart(2, '0')).join(', ')})`
+      : `${model.hold.label} (Bay ${model.bays.join(', ')})`;
+
     const stBadge = document.getElementById(`${prefix}3dStatsBadge`);
-    if (stBadge) stBadge.textContent = `${model.hold.label} · ${totalB} khối 3D`;
+    if (stBadge) stBadge.textContent = `${holdsTxt} · ${totalB} khối 3D`;
 
     const ovTitle = document.getElementById(`${prefix}3dOverlayTitle`);
     if (ovTitle) {
-      ovTitle.textContent = `${model.hold.label} (Bay ${state.hold3d.bayFilter === 'ALL' ? model.bays.join(', ') : state.hold3d.bayFilter}) · ${state.hold3d.colorMode === 'WEIGHT' ? 'Màu Dải tấn' : 'Màu Cảng (POD)'}`;
+      const layLbl = isMulti ? (state.hold3d.multiLayout === 'ALONG_SHIP' ? 'Dọc thân tàu' : 'Ngang hàng so sánh') : '3D';
+      ovTitle.textContent = `${holdsTxt} · ${layLbl} · ${state.hold3d.colorMode === 'WEIGHT' ? 'Dải tấn' : 'Cảng (POD)'}`;
     }
     const ovCnt = document.getElementById(`${prefix}3dOverlayCounts`);
     if (ovCnt) {
@@ -11268,8 +12564,9 @@ function syncHold3DControlsDOM(prefix, model) {
     }
     if (prefix === 'modal') {
       const mTitle = document.getElementById('modal3dTitle');
-      if (mTitle) mTitle.textContent = `🧊 Mô phỏng 3D ${model.hold.label} (Bay ${model.bays.join(', ')})`;
+      if (mTitle) mTitle.textContent = `🧊 Mô phỏng 3D · ${holdsTxt}`;
     }
+    renderHold3DCompareStrip(prefix, model);
     renderHold3DLegend(`${prefix}3dLegendBar`, model);
   }
 }
@@ -11331,13 +12628,15 @@ function renderHold3DInspector(block) {
               ? `<span class="badge purple">📥 Hàng Nhập (${block.jobStatus})</span>`
               : '<span class="badge" style="background:#334155;color:#fff;">🧱 ROB / Để lại suy đoán</span>'));
 
+    const hTag = block.holdLabel || `HOLD ${String(block.holdNo || state.hold3d.holdNo).padStart(2, '0')}`;
     const callBtn = (block.kind === 'PLANNED_ASC' && block.jobStatus === 'B' && block.cntr)
-      ? `<button class="primary sm" onclick="markContainerCalled('${block.cntr}', 'H${state.hold3d.holdNo}_3D', '${block.pos}');renderHold3DViews();">${state.calledContainers.has(block.cntr) ? '✓ Đã gọi xe' : '📞 Gọi xe ngay'}</button>`
+      ? `<button class="primary sm" onclick="markContainerCalled('${block.cntr}', 'H${block.holdNo || state.hold3d.holdNo}_3D', '${block.pos}');renderHold3DViews();">${state.calledContainers.has(block.cntr) ? '✓ Đã gọi xe' : '📞 Gọi xe ngay'}</button>`
       : '';
 
     el.innerHTML = `
       <div style="display:flex;align-items:center;gap:7px;flex-wrap:wrap;">
         ${kindLabel}
+        <span class="badge">${hTag}</span>
         <b>${block.cntr || 'Vị trí để lại suy đoán'}</b>
         <span>· Vị trí: <b style="color:var(--cyan);">${block.pos}</b> (Bay ${block.bay} · Row ${block.row} · Tier ${block.tier})</span>
         <span>· POD: <b>${block.pod}</b></span>
@@ -11355,19 +12654,73 @@ function renderHold3DInspector(block) {
   });
 }
 
+function toggleHold3DSelection(holdNo, isChecked) {
+  const num = parseInt(holdNo, 10);
+  if (isNaN(num)) return;
+  let list = Array.isArray(state.hold3d.selectedHolds) ? [...state.hold3d.selectedHolds] : [state.hold3d.holdNo || 1];
+  if (isChecked) {
+    if (!list.includes(num)) list.push(num);
+  } else {
+    if (list.length <= 1) {
+      renderHold3DViews();
+      return; // Luôn giữ tối thiểu 1 hầm
+    }
+    list = list.filter(x => x !== num);
+  }
+  list.sort((a, b) => a - b);
+  state.hold3d.selectedHolds = list;
+  state.hold3d.holdNo = list[0];
+  state.hold3d.bayFilter = 'ALL';
+  state.hold3d.selectedBlockId = null;
+  renderHold3DViews();
+}
+
+function selectHold3DPreset(preset) {
+  const holds = state.holdConfig || [];
+  if (!holds.length) return;
+  if (preset === 'CRITICAL') {
+    const etd = window._latestEtdEval;
+    let crit = etd ? etd.criticalHolds.map(h => h.holdNo) : [];
+    if (!crit.length && etd) crit = etd.watchHolds.map(h => h.holdNo);
+    if (!crit.length && etd) crit = Object.values(etd.holdMap || {}).filter(h => h.totalRem > 0).slice(0, 3).map(h => h.holdNo);
+    state.hold3d.selectedHolds = crit.length ? Array.from(new Set(crit)).sort((a, b) => a - b) : [holds[0].hold];
+    state.hold3d.multiLayout = state.hold3d.selectedHolds.length <= 4 ? 'SIDE_BY_SIDE' : 'ALONG_SHIP';
+  } else if (preset === 'ALL') {
+    state.hold3d.selectedHolds = holds.map(h => h.hold);
+    if (holds.length >= 4) state.hold3d.multiLayout = 'ALONG_SHIP';
+  } else if (preset === 'ACTIVE_CRANES') {
+    const activeHolds = Array.from(new Set(
+      (state.cranes || []).filter(c => c.active && !c.paused).flatMap(c => c.holds || [])
+    )).filter(n => holds.some(h => h.hold === n)).sort((a, b) => a - b);
+    state.hold3d.selectedHolds = activeHolds.length ? activeHolds : [holds[0].hold];
+    state.hold3d.multiLayout = state.hold3d.selectedHolds.length <= 4 ? 'SIDE_BY_SIDE' : 'ALONG_SHIP';
+  } else {
+    const first = (state.hold3d.selectedHolds && state.hold3d.selectedHolds.length) ? state.hold3d.selectedHolds[0] : holds[0].hold;
+    state.hold3d.selectedHolds = [first];
+  }
+  state.hold3d.holdNo = state.hold3d.selectedHolds[0];
+  state.hold3d.bayFilter = 'ALL';
+  state.hold3d.selectedBlockId = null;
+  renderHold3DViews();
+}
+
 function renderHold3DViews() {
   ensureHold3DControllers();
   const holds = state.holdConfig || [];
   if (!holds.length) return;
-  if (!holds.some(h => h.hold === state.hold3d.holdNo)) {
-    state.hold3d.holdNo = holds[0].hold;
-    state.hold3d.bayFilter = 'ALL';
-  }
-  const model = Hold3DEngine.buildHoldModel(state.hold3d.holdNo, state.hold3d);
+
+  const validSet = new Set(holds.map(h => h.hold));
+  let curSel = (state.hold3d.selectedHolds || []).filter(n => validSet.has(n));
+  if (!curSel.length) curSel = [validSet.has(state.hold3d.holdNo) ? state.hold3d.holdNo : holds[0].hold];
+  state.hold3d.selectedHolds = curSel;
+  state.hold3d.holdNo = curSel[0];
+
+  const summaryList = Hold3DEngine.computeAllHoldQuickSummary();
+  const model = Hold3DEngine.buildMultiHoldModel(curSel, state.hold3d);
   window._latestHold3DModel = model;
 
-  syncHold3DControlsDOM('inline', model);
-  syncHold3DControlsDOM('modal', model);
+  syncHold3DControlsDOM('inline', model, summaryList);
+  syncHold3DControlsDOM('modal', model, summaryList);
 
   if (hold3dControllers.inline) hold3dControllers.inline.setModel(model);
   const modalOpen = document.getElementById('hold3DModal')?.classList.contains('open');
@@ -11391,7 +12744,9 @@ function resizeAndRenderHold3D(prefix = 'inline') {
 
 function onHold3DControlChange(key, value) {
   if (key === 'holdNo') {
-    state.hold3d.holdNo = parseInt(value, 10) || 1;
+    const n = parseInt(value, 10) || 1;
+    state.hold3d.holdNo = n;
+    state.hold3d.selectedHolds = [n];
     state.hold3d.bayFilter = 'ALL';
     state.hold3d.selectedBlockId = null;
   } else {
@@ -11410,14 +12765,16 @@ function zoomHold3D(prefix, factor) {
   ensureHold3DControllers();
   const ctrl = hold3dControllers[prefix];
   if (ctrl) {
-    ctrl.zoom = Math.max(0.45, Math.min(3.2, ctrl.zoom * factor));
+    ctrl.zoom = Math.max(0.4, Math.min(4.0, ctrl.zoom * factor));
     ctrl.draw();
   }
 }
 
 function openHold3DModal(holdNo = null, bayFilter = 'ALL') {
   if (holdNo !== null && holdNo !== undefined) {
-    state.hold3d.holdNo = parseInt(holdNo, 10) || 1;
+    const n = parseInt(holdNo, 10) || 1;
+    state.hold3d.holdNo = n;
+    state.hold3d.selectedHolds = [n];
     state.hold3d.bayFilter = bayFilter || 'ALL';
     state.hold3d.selectedBlockId = null;
   }
@@ -11442,7 +12799,6 @@ window.addEventListener('resize', () => {
     hold3dControllers.modal.draw();
   }
 });
-
 
 window.addEventListener('DOMContentLoaded', () => {
   ViewModeManager.init();
