@@ -1472,6 +1472,201 @@ pre.schema-box {
   opacity: 0.7;
 }
 .dismiss-x-btn:hover { color: var(--red) !important; opacity: 1; }
+
+/* ==================== 3D HOLD STRUCTURE VIEWER ==================== */
+.hold3d-panel {
+  border-top: 3px solid var(--cyan);
+}
+.hold3d-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+  padding: 8px 10px;
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  margin-bottom: 8px;
+}
+.hold3d-toolbar select {
+  min-height: 30px;
+  padding: 3px 8px;
+  font-size: 11.5px;
+  font-weight: 700;
+}
+.hold3d-seg {
+  display: inline-flex;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  overflow: hidden;
+  background: var(--card);
+}
+.hold3d-seg button {
+  border: 0;
+  border-radius: 0;
+  min-height: 29px;
+  padding: 3px 9px;
+  font-size: 11px;
+  background: transparent;
+  color: var(--muted);
+}
+.hold3d-seg button.active {
+  background: var(--cyan);
+  color: #fff;
+}
+.hold3d-stage-wrap {
+  position: relative;
+  width: 100%;
+  height: 440px;
+  border: 1.5px solid var(--line);
+  border-radius: 10px;
+  overflow: hidden;
+  background: radial-gradient(circle at 50% 25%, #f8fafc 0%, #e2e8f0 100%);
+  user-select: none;
+  touch-action: none;
+}
+:root[data-theme="dark"] .hold3d-stage-wrap {
+  background: radial-gradient(circle at 50% 25%, #132840 0%, #07121e 100%);
+}
+.hold3d-modal-card {
+  width: min(1240px, 98vw) !important;
+  max-height: 94vh !important;
+  padding: 13px !important;
+}
+.hold3d-modal-card .hold3d-stage-wrap {
+  height: min(60vh, 560px);
+}
+.hold3d-canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+  cursor: grab;
+}
+.hold3d-canvas:active {
+  cursor: grabbing;
+}
+.hold3d-overlay-top {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  right: 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 6px;
+  pointer-events: none;
+  flex-wrap: wrap;
+}
+.hold3d-overlay-pill {
+  background: rgba(15, 23, 42, 0.78);
+  color: #f8fafc;
+  padding: 4px 9px;
+  border-radius: 999px;
+  font-size: 10.5px;
+  font-weight: 750;
+  backdrop-filter: blur(4px);
+  border: 1px solid rgba(255,255,255,0.16);
+}
+.hold3d-cam-bar {
+  position: absolute;
+  bottom: 8px;
+  right: 8px;
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+  z-index: 5;
+}
+.hold3d-cam-bar button {
+  min-height: 27px;
+  padding: 2px 8px;
+  font-size: 10.5px;
+  background: rgba(15, 23, 42, 0.82);
+  color: #f8fafc;
+  border: 1px solid rgba(255,255,255,0.22);
+  backdrop-filter: blur(4px);
+}
+.hold3d-cam-bar button:hover {
+  background: var(--cyan);
+  border-color: var(--cyan);
+}
+.hold3d-hint {
+  position: absolute;
+  bottom: 8px;
+  left: 8px;
+  background: rgba(15, 23, 42, 0.72);
+  color: #e2e8f0;
+  padding: 3px 8px;
+  border-radius: 6px;
+  font-size: 10px;
+  pointer-events: none;
+}
+.hold3d-legend-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  align-items: center;
+  margin-top: 8px;
+  padding: 7px 10px;
+  border-radius: 8px;
+  background: var(--bg);
+  border: 1px solid var(--line);
+  font-size: 11px;
+}
+.hold3d-swatch {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 2px 7px;
+  border-radius: 6px;
+  background: var(--card);
+  border: 1px solid var(--line);
+  font-weight: 700;
+  font-size: 10.5px;
+}
+.hold3d-swatch-box {
+  width: 13px;
+  height: 13px;
+  border-radius: 3px;
+  display: inline-block;
+  flex-shrink: 0;
+}
+.hold3d-inspector {
+  margin-top: 8px;
+  padding: 8px 11px;
+  border-radius: 8px;
+  border: 1.5px solid var(--cyan);
+  background: var(--bg);
+  font-size: 11.5px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.hold3d-check {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  padding: 3px 7px;
+  border-radius: 6px;
+  background: var(--card);
+  border: 1px solid var(--line);
+  user-select: none;
+}
+.hold3d-check input {
+  min-height: auto;
+  margin: 0;
+  width: 14px;
+  height: 14px;
+}
+@media (max-width: 768px) {
+  .hold3d-stage-wrap { height: 340px; }
+  .hold3d-modal-card .hold3d-stage-wrap { height: 52vh; }
+  .hold3d-hint { display: none; }
+}
 </style>
 </head>
 <body>
@@ -1992,7 +2187,68 @@ pre.schema-box {
     </div>
 
     <div class="detail-sub-sec" data-detail-sec="holds">
-      
+
+    <!-- PANEL MÔ PHỎNG HẦM HÀNG 3D TRỰC QUAN -->
+    <div class="panel hold3d-panel" id="panel-hold-3d">
+      <div class="panel-head">
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+          <h3>🧊 Mô phỏng Hầm hàng 3D Trực quan (ASC · Đã xếp · Nhập · ROB để lại) <button type="button" class="help-q-btn" onclick="openHelpPopup('hold3d')" title="Hướng dẫn cấu trúc Hầm 3D">?</button></h3>
+          <span class="badge" id="inline3dStatsBadge">Đang dựng 3D...</span>
+        </div>
+        <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">
+          <button class="primary sm" onclick="openHold3DModal()">⛶ Mở 3D Toàn màn hình</button>
+          <button class="panel-collapse-btn" onclick="togglePanelCollapse('panel-hold-3d', this)">▼ Thu gọn</button>
+        </div>
+      </div>
+      <div class="panel-body">
+        <div class="hold3d-toolbar">
+          <select id="inline3dHoldSelect" onchange="onHold3DControlChange('holdNo', this.value)"></select>
+          <select id="inline3dBaySelect" onchange="onHold3DControlChange('bayFilter', this.value)">
+            <option value="ALL">Cả Hầm (Tất cả Bay)</option>
+          </select>
+          <div class="hold3d-seg" title="Chọn tô màu container Đã xếp (C) theo Cảng hoặc theo Dải tấn">
+            <button id="inline3dModePod" class="active" onclick="onHold3DControlChange('colorMode', 'POD')">🎨 Màu theo Cảng</button>
+            <button id="inline3dModeWeight" onclick="onHold3DControlChange('colorMode', 'WEIGHT')">⚖️ Màu theo Dải tấn</button>
+          </div>
+          <select id="inline3dZoneSelect" onchange="onHold3DControlChange('zoneFilter', this.value)">
+            <option value="ALL">Cả Boong & Dưới hầm</option>
+            <option value="HOLD">Chỉ Dưới hầm</option>
+            <option value="DECK">Chỉ Trên boong</option>
+          </select>
+          <label class="hold3d-check" title="Tách riêng các Bay 20'/40' dọc trục để quan sát không bị che khuất">
+            <input type="checkbox" id="inline3dSeparateBays" onchange="onHold3DControlChange('separateBays', this.checked)"> Tách Bay
+          </label>
+          <label class="hold3d-check" title="Suy đoán thêm các khối xám đậm đối xứng ở tầng đáy">
+            <input type="checkbox" id="inline3dExtRob" onchange="onHold3DControlChange('extendedRob', this.checked)"> ROB đối xứng
+          </label>
+          <label class="hold3d-check" title="Hiển thị thêm container nhập đã dỡ (C)">
+            <input type="checkbox" id="inline3dShowImpDone" onchange="onHold3DControlChange('showDischargedImp', this.checked)"> Nhập đã dỡ
+          </label>
+        </div>
+        <div class="hold3d-stage-wrap" id="inline3dStageWrap">
+          <canvas class="hold3d-canvas" id="inline3dCanvas"></canvas>
+          <div class="hold3d-overlay-top">
+            <span class="hold3d-overlay-pill" id="inline3dOverlayTitle">HOLD 01 · 3D</span>
+            <span class="hold3d-overlay-pill" id="inline3dOverlayCounts">Đã xếp: 0 · ASC: 0 · Nhập: 0 · ROB: 0</span>
+          </div>
+          <div class="hold3d-hint">🖱️ Kéo để xoay 360° · Cuộn để phóng to · Bấm vào khối xem chi tiết</div>
+          <div class="hold3d-cam-bar">
+            <button onclick="setHold3DCameraPreset('inline', 'ISO')">🧊 3D</button>
+            <button onclick="setHold3DCameraPreset('inline', 'FRONT')">📐 Mặt cắt</button>
+            <button onclick="setHold3DCameraPreset('inline', 'TOP')">👁️ Trên</button>
+            <button onclick="setHold3DCameraPreset('inline', 'SIDE')">↔️ Mạn</button>
+            <button onclick="zoomHold3D('inline', 1.18)">➕</button>
+            <button onclick="zoomHold3D('inline', 0.85)">➖</button>
+            <button onclick="setHold3DCameraPreset('inline', 'ISO')">↺</button>
+          </div>
+        </div>
+        <div class="hold3d-legend-bar" id="inline3dLegendBar"></div>
+        <div class="hold3d-inspector" id="inline3dInspector">
+          <span style="color:var(--muted);">💡 Bấm/chạm vào bất kỳ khối container 3D nào để xem số cont đầy đủ, vị trí, cảng, dải tấn, bãi hoặc gọi xe.</span>
+        </div>
+      </div>
+    </div>
+
     <div class="panel">
       <div class="panel-head">
         <h3>🚢 Cấu trúc Hầm hàng Động (<span id="holdCountBadge" style="color:var(--cyan);">0 Hầm</span>) & Tiến độ Dỡ/Xếp</h3>
@@ -2328,10 +2584,69 @@ pre.schema-box {
         <span class="badge green">C: Đã xếp</span>
         <span class="badge">B: Sẵn sàng (Bấm để gọi)</span>
         <span class="badge amber">A: Giữ lại</span>
+        <button class="primary sm" id="btnBayModalTo3D" onclick="openCurrentBayHoldIn3D()">🧊 Xem Hầm 3D</button>
         <button class="sm" onclick="closeModal('bayModal')">✕ Đóng</button>
       </div>
     </div>
     <div id="bayModalBody"></div>
+  </div>
+</div>
+
+<!-- MODAL 1A: MÔ PHỎNG HẦM HÀNG 3D TOÀN MÀN HÌNH -->
+<div class="modal-shade" id="hold3DModal" onclick="if(event.target===this) closeModal('hold3DModal')">
+  <div class="modal-card hold3d-modal-card">
+    <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--line);padding-bottom:8px;margin-bottom:8px;gap:8px;flex-wrap:wrap;">
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+        <h3 id="modal3dTitle" style="margin:0;">🧊 Mô phỏng Hầm hàng 3D</h3>
+        <span class="badge" id="modal3dStatsBadge">0 khối</span>
+      </div>
+      <button class="sm" onclick="closeModal('hold3DModal')">✕ Đóng</button>
+    </div>
+    <div class="hold3d-toolbar">
+      <select id="modal3dHoldSelect" onchange="onHold3DControlChange('holdNo', this.value)"></select>
+      <select id="modal3dBaySelect" onchange="onHold3DControlChange('bayFilter', this.value)">
+        <option value="ALL">Cả Hầm (Tất cả Bay)</option>
+      </select>
+      <div class="hold3d-seg">
+        <button id="modal3dModePod" class="active" onclick="onHold3DControlChange('colorMode', 'POD')">🎨 Màu theo Cảng</button>
+        <button id="modal3dModeWeight" onclick="onHold3DControlChange('colorMode', 'WEIGHT')">⚖️ Màu theo Dải tấn</button>
+      </div>
+      <select id="modal3dZoneSelect" onchange="onHold3DControlChange('zoneFilter', this.value)">
+        <option value="ALL">Cả Boong & Dưới hầm</option>
+        <option value="HOLD">Chỉ Dưới hầm</option>
+        <option value="DECK">Chỉ Trên boong</option>
+      </select>
+      <label class="hold3d-check">
+        <input type="checkbox" id="modal3dSeparateBays" onchange="onHold3DControlChange('separateBays', this.checked)"> Tách Bay
+      </label>
+      <label class="hold3d-check">
+        <input type="checkbox" id="modal3dExtRob" onchange="onHold3DControlChange('extendedRob', this.checked)"> ROB đối xứng
+      </label>
+      <label class="hold3d-check">
+        <input type="checkbox" id="modal3dShowImpDone" onchange="onHold3DControlChange('showDischargedImp', this.checked)"> Nhập đã dỡ
+      </label>
+    </div>
+    <div class="hold3d-stage-wrap" id="modal3dStageWrap">
+      <canvas class="hold3d-canvas" id="modal3dCanvas"></canvas>
+      <div class="hold3d-overlay-top">
+        <span class="hold3d-overlay-pill" id="modal3dOverlayTitle">HOLD 01 · 3D</span>
+        <span class="hold3d-overlay-pill" id="modal3dOverlayCounts">Đã xếp: 0 · ASC: 0 · Nhập: 0 · ROB: 0</span>
+      </div>
+      <div class="hold3d-hint">🖱️ Kéo để xoay 360° · Cuộn để phóng to · Bấm vào khối xem chi tiết</div>
+      <div class="hold3d-cam-bar">
+        <button onclick="setHold3DCameraPreset('modal', 'ISO')">🧊 3D</button>
+        <button onclick="setHold3DCameraPreset('modal', 'FRONT')">📐 Mặt cắt</button>
+        <button onclick="setHold3DCameraPreset('modal', 'TOP')">👁️ Trên</button>
+        <button onclick="setHold3DCameraPreset('modal', 'SIDE')">↔️ Mạn</button>
+        <button onclick="zoomHold3D('modal', 1.18)">➕</button>
+        <button onclick="zoomHold3D('modal', 0.85)">➖</button>
+        <button onclick="setHold3DCameraPreset('modal', 'ISO')">↺</button>
+      </div>
+    </div>
+    <div class="hold3d-legend-bar" id="modal3dLegendBar"></div>
+    <div class="hold3d-inspector" id="modal3dInspector">
+      <span style="color:var(--muted);">💡 Bấm/chạm vào bất kỳ khối container 3D nào để xem chi tiết & thao tác gọi xe.</span>
+    </div>
   </div>
 </div>
 
@@ -2892,7 +3207,17 @@ const state = {
   vesselAttitude: { heel: 'EVEN', trim: 'EVEN' }, // heel: EVEN | LIST_PORT | LIST_STARBOARD ; trim: EVEN | BOW_DOWN | BOW_UP
   setupCompleted: false,
   dismissedRecs: new Set(),
-  shiftHistory: { recommendations: [], actions: [], notes: [] }
+  shiftHistory: { recommendations: [], actions: [], notes: [] },
+  hold3d: {
+    holdNo: 1,
+    bayFilter: 'ALL',
+    colorMode: 'POD', // 'POD' | 'WEIGHT'
+    zoneFilter: 'ALL', // 'ALL' | 'HOLD' | 'DECK'
+    separateBays: false,
+    extendedRob: false,
+    showDischargedImp: false,
+    selectedBlockId: null
+  }
 };
 
 const AdminPinGuard = {
@@ -2946,7 +3271,7 @@ const AdminPinGuard = {
       }
     } else {
       // Đóng mọi modal đang mở (kể cả Bot OM) khi hết phiên 60 phút
-      ['bayModal','botSchemaModal','botControlModal','adminPinModal','newVesselModal'].forEach(id => closeModal(id));
+      ['bayModal','hold3DModal','botSchemaModal','botControlModal','adminPinModal','newVesselModal'].forEach(id => closeModal(id));
       document.body.classList.add('app-locked-blur');
       gate.classList.add('open');
       if (reasonText) {
@@ -5330,6 +5655,9 @@ function switchTab(tabId, subKey = null) {
 
   if (targetTab === 'tab-details' && targetSub) switchDetailSub(targetSub);
   if (targetTab === 'tab-setup' && targetSub) switchSetupSub(targetSub);
+  if (targetTab === 'tab-details' && typeof resizeAndRenderHold3D === 'function') {
+    setTimeout(() => resizeAndRenderHold3D('inline'), 80);
+  }
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
@@ -5348,6 +5676,9 @@ function switchDetailSub(subKey = 'ALL') {
       });
     }
   });
+  if ((subKey === 'ALL' || subKey === 'holds') && typeof resizeAndRenderHold3D === 'function') {
+    setTimeout(() => resizeAndRenderHold3D('inline'), 60);
+  }
 }
 
 function switchSetupSub(subKey = 'ALL') {
@@ -5363,6 +5694,10 @@ function switchSetupSub(subKey = 'ALL') {
 function toggleTheme() {
   const cur = document.documentElement.getAttribute('data-theme');
   document.documentElement.setAttribute('data-theme', cur === 'dark' ? 'light' : 'dark');
+  if (typeof hold3dControllers !== 'undefined') {
+    if (hold3dControllers.inline) hold3dControllers.inline.draw();
+    if (hold3dControllers.modal && document.getElementById('hold3DModal')?.classList.contains('open')) hold3dControllers.modal.draw();
+  }
 }
 
 function closeModal(id) { document.getElementById(id)?.classList.remove('open'); }
@@ -6287,7 +6622,10 @@ function renderHorizontalShipRailCard() {
       <div class="ship-hold-cell" style="border-top-color:${topCol};" onclick="openBayPopup('${firstBay}')" title="Bấm xem sơ đồ Bay ${firstBay} (${h.label})">
         <div style="display:flex;justify-content:space-between;align-items:center;gap:2px;">
           <b style="font-size:11px;">H${String(h.hold).padStart(2,'0')}</b>
-          <span style="font-size:9px;color:var(--muted);">B${bayRange}</span>
+          <span style="display:inline-flex;align-items:center;gap:3px;">
+            <span style="font-size:9px;color:var(--muted);">B${bayRange}</span>
+            <button class="sm" style="padding:0 4px;min-height:17px;font-size:9px;border-radius:4px;background:rgba(2,132,199,0.14);color:var(--cyan);border-color:var(--cyan);" title="Xem Hầm H${String(h.hold).padStart(2,'0')} dạng 3D" onclick="event.stopPropagation();openHold3DModal(${h.hold})">3D</button>
+          </span>
         </div>
         <div style="display:flex;flex-wrap:wrap;gap:2px;min-height:16px;">
           ${owners.length ? owners.map(o => `<span class="badge" style="padding:1px 5px;font-size:9px;background:${colorMap[o.id]}22;color:${colorMap[o.id]};">${o.id}</span>`).join('') : '<span style="font-size:9px;color:var(--muted);">Trống cẩu</span>'}
@@ -6497,6 +6835,7 @@ function renderHoldsAndChase() {
           <strong style="cursor:pointer;color:var(--cyan);" onclick="openHoldDetailPopup(${h.hold})" title="Bấm xem Popup chi tiết toàn Hầm (Nhập & Xuất)">${h.label} 🔍</strong>
           <div style="display:flex;gap:4px;align-items:center;">
             <span class="badge ${impRem === 0 ? 'green' : 'amber'}">${impRem === 0 ? '✓ Sạch nhập' : `Nhập còn ${impRem}`}</span>
+            <button class="primary sm" style="padding:1px 6px;min-height:22px;" title="Mở mô phỏng 3D cấu trúc Hầm này" onclick="openHold3DModal(${h.hold})">🧊 3D</button>
             <button class="sm" style="padding:1px 6px;min-height:22px;" title="Chi tiết Hầm (Nhập & Xuất)" onclick="openHoldDetailPopup(${h.hold})">📋</button>
             ${holds.length > 1 ? `<button class="sm" style="padding:1px 6px;min-height:22px;" title="Xóa hầm này" onclick="removeManualHold(${h.hold})">✕</button>` : ''}
           </div>
@@ -6536,6 +6875,7 @@ function renderHoldsAndChase() {
   }).join('');
 
   renderRollingChaseByHold();
+  if (typeof renderHold3DViews === 'function') renderHold3DViews();
 }
 
 function recalcHoldsAuto() {
@@ -6649,6 +6989,8 @@ function openBayPopup(bay) {
   const impRemain = impInBay.filter(x => x.status !== 'C').length;
 
   const holdNo = HoldLayoutEngine.getHoldByBay(bay, state.holdConfig);
+  window._currentBayModalHold = holdNo;
+  window._currentBayModalBay = bay;
   document.getElementById('bayModalTitle').textContent =
     `Sơ đồ Bay ${bay} (HOLD ${String(holdNo).padStart(2,'0')}) · Nhập còn ${impRemain}/${impInBay.length} · Xuất ${expInBay.length} cont`;
 
@@ -8286,6 +8628,9 @@ function togglePanelCollapse(panelId, btnEl) {
   if (!p) return;
   const collapsed = p.classList.toggle('is-collapsed');
   if (btnEl) btnEl.textContent = collapsed ? '▶ Mở chi tiết' : '▼ Thu gọn';
+  if (!collapsed && panelId === 'panel-hold-3d' && typeof resizeAndRenderHold3D === 'function') {
+    setTimeout(() => resizeAndRenderHold3D('inline'), 40);
+  }
 }
 
 function expandAndScrollTo(panelId) {
@@ -9338,6 +9683,17 @@ const HELP_TOPICS = {
         <li>Nếu thực tế container dự kiến bị giữ trạng thái <b>A</b> hoặc đã đảo vị trí, hệ thống tự tìm container <b>B</b> thay thế cùng <b>POD</b>, cùng <b>Kích cỡ</b>, đúng quy định <b>UD/OD</b> trong phạm vi <b>dung sai trọng lượng 3–5 tấn</b> (ưu tiên ≤ 3 tấn trước).</li>
       </ul>`
   },
+  hold3d: {
+    title: '🧊 Hướng dẫn Hiển thị Hầm 3D & Quy ước Màu sắc',
+    html: `
+      <ul style="padding-left:18px;margin:0;display:flex;flex-direction:column;gap:6px;">
+        <li><b>Khung màu nền trắng (Dự kiến ASC):</b> Các vị trí container dự kiến theo sơ đồ <code>.ASC / .EDI</code> chưa xếp hoàn tất (C). Bên trong ghi rõ <b>Tên cảng (POD)</b> và <b>Dải tấn</b>.</li>
+        <li><b>Khối màu nổi (Cont đã xếp C):</b> Cho phép chuyển nhanh giữa <b>🎨 Màu theo Cảng (POD)</b> hoặc <b>⚖️ Màu theo Dải tấn</b>. Nội dung hiển thị <b>4 số cuối container</b> và <b>Tên cảng</b>.</li>
+        <li><b>Khối màu tím đồng nhất (Hàng Nhập):</b> Toàn bộ container hàng nhập đang trên tàu hiển thị cùng 1 màu tím để phân biệt tức thì với hàng xuất.</li>
+        <li><b>Khối màu xám đậm (Cont để lại / ROB suy đoán):</b> Container để lại (ROB/Transit) hoặc các vị trí đỡ tầng bên dưới các container đang nằm ở tầng cao (vì container không thể lơ lửng trên không).</li>
+        <li><b>Thao tác 3D:</b> Kéo chuột/ngón tay để xoay 360°, cuộn chuột hoặc bấm ➕/➖ để phóng to, bấm <b>Tách Bay</b> để tách rời Bay 20'/40' không bị che khuất, và chạm trực tiếp vào bất kỳ khối nào để xem chi tiết / Gọi xe.</li>
+      </ul>`
+  },
   setup: {
     title: '⚙️ Quy trình Nạp File & Chạy Bot OM cho người mới',
     html: `
@@ -9897,6 +10253,1196 @@ async function deleteCurrentVesselSession() {
     alert('❌ Lỗi khi xóa tàu: ' + err.message);
   }
 }
+
+
+// =========================================================================
+// [PHẦN 6] MÔ PHỎNG HẦM HÀNG 3D TRỰC QUAN (CANVAS 3D + TOPOLOGICAL PAINTER)
+// =========================================================================
+const Hold3DEngine = {
+  POD_PALETTE: [
+    '#0284c7', // Xanh dương đậm
+    '#059669', // Xanh ngọc lục
+    '#ea580c', // Cam đậm
+    '#db2777', // Hồng cánh sen
+    '#0d9488', // Xanh mòng két
+    '#ca8a04', // Vàng mù tạt
+    '#dc2626', // Đỏ tươi
+    '#2563eb', // Xanh lam
+    '#65a30d', // Xanh cốm đậm
+    '#e11d48', // Đỏ hồng
+    '#0891b2', // Xanh cyan đậm
+    '#b45309'  // Nâu cam
+  ],
+
+  WEIGHT_BAND_META: [
+    { id: 'W_0_10',  short: '0-10T',  label: '0 – 10T',     color: '#16a34a', text: '#ffffff', match: w => w > 0 && w < 10 },
+    { id: 'W_10_15', short: '10-15T', label: '10 – 15.99T', color: '#0d9488', text: '#ffffff', match: w => w >= 10 && w < 16 },
+    { id: 'W_16_20', short: '16-20T', label: '16 – 20.99T', color: '#0284c7', text: '#ffffff', match: w => w >= 16 && w < 21 },
+    { id: 'W_21_25', short: '21-25T', label: '21 – 25.99T', color: '#eab308', text: '#0f172a', match: w => w >= 21 && w < 26 },
+    { id: 'W_26_30', short: '26-30T', label: '26 – 30T',    color: '#ea580c', text: '#ffffff', match: w => w >= 26 && w <= 30 },
+    { id: 'W_GT_30', short: '>30T',   label: 'Trên 30T',    color: '#dc2626', text: '#ffffff', match: w => w > 30 }
+  ],
+
+  IMPORT_COLOR: '#7c3aed',
+  ROB_COLOR: '#334155',
+
+  getWeightBandInfo(weight) {
+    const w = Number(weight) || 0;
+    if (w <= 0) return { id: 'W_NONE', short: 'Chưa TL', label: 'Chưa rõ tấn', color: '#0ea5e9', text: '#ffffff' };
+    const found = this.WEIGHT_BAND_META.find(b => b.match(w));
+    return found || this.WEIGHT_BAND_META[this.WEIGHT_BAND_META.length - 1];
+  },
+
+  shadeHex(hex, factor) {
+    const clean = String(hex || '#334155').replace('#', '');
+    if (clean.length !== 6) return hex;
+    const r = Math.max(0, Math.min(255, Math.round(parseInt(clean.slice(0, 2), 16) * factor)));
+    const g = Math.max(0, Math.min(255, Math.round(parseInt(clean.slice(2, 4), 16) * factor)));
+    const b = Math.max(0, Math.min(255, Math.round(parseInt(clean.slice(4, 6), 16) * factor)));
+    return `rgb(${r},${g},${b})`;
+  },
+
+  buildPodColorMap(blocks) {
+    const pods = Array.from(new Set(
+      (blocks || [])
+        .filter(b => b.kind === 'LOADED_EXPORT' || b.kind === 'PLANNED_ASC')
+        .map(b => String(b.pod || 'KHÁC').trim().toUpperCase())
+        .filter(Boolean)
+    )).sort();
+    const map = {};
+    pods.forEach((pod, idx) => {
+      map[pod] = this.POD_PALETTE[idx % this.POD_PALETTE.length];
+    });
+    return map;
+  },
+
+  isExplicitRob(obj) {
+    const hay = `${obj.inst || ''} ${obj.note || ''} ${obj.yardStatus || ''} ${obj.yard_status || ''} ${obj.jobStatus || ''} ${obj.status || ''}`.toUpperCase();
+    return /\bROB\b|TRANSIT|RESTOW|\bSTAY\b|ĐỂ LẠI|DE LAI/.test(hay);
+  },
+
+  buildHoldModel(holdNo, opts = {}) {
+    const cfg = getLiveVesselCfg();
+    const holdConfig = state.holdConfig || [];
+    const h = holdConfig.find(x => x.hold === holdNo) || holdConfig[0];
+    if (!h) {
+      return { hold: null, bays: [], rows: [], holdTiers: [], deckTiers: [], blocks: [], podColorMap: {}, effDeckMin: cfg.deck_tier_min || 80, counts: { loaded: 0, asc: 0, imp: 0, rob: 0 } };
+    }
+
+    const holdBays = [...(h.bays || [])].sort((a, b) => parseInt(a, 10) - parseInt(b, 10));
+    const baySet = new Set(holdBays);
+    const pool = UnifiedPoolBuilder.build(state, cfg.deck_tier_min);
+    const bayFilter = opts.bayFilter || 'ALL';
+    const zoneFilter = opts.zoneFilter || 'ALL';
+    const separateBays = Boolean(opts.separateBays);
+    const extendedRob = Boolean(opts.extendedRob);
+    const showDischargedImp = Boolean(opts.showDischargedImp);
+
+    // 1. Thu thập toàn bộ ứng viên vị trí trong Hầm để nhận diện ngưỡng Boong (70/80)
+    const rawSlotRecords = new Map(); // key = `${bay}_${row}_${tier}` -> record
+    const allParsedPts = [];
+
+    const registerPt = (p) => { if (p) allParsedPts.push(p); };
+
+    // 1A. Container Xuất ĐÃ XẾP (C) - ưu tiên tuyệt đối trên vị trí thực tế
+    pool.filter(c => c.jobStatus === 'C').forEach(c => {
+      const p = DataAdapters.parsePos6(c.actualPos || c.plannedPos, cfg.deck_tier_min);
+      if (!p || !baySet.has(p.bay)) return;
+      registerPt(p);
+      const key = `${p.bay}_${p.row}_${p.tier}`;
+      rawSlotRecords.set(key, {
+        id: `EXP_C_${c.cntr}_${key}`,
+        kind: 'LOADED_EXPORT',
+        bay: p.bay, row: p.row, tier: p.tier, tierNum: p.tierNum, pos: p.raw,
+        cntr: c.cntr, pod: c.pod || '---', weight: Number(c.weight) || 0,
+        size: c.size || '40HC', iso: c.iso || '', crane: c.crane || '',
+        yardPos: c.yardPos || '---', transferPort: c.transferPort || 'TV', isOffDock: Boolean(c.isOffDock),
+        jobStatus: 'C', inst: c.inst || ''
+      });
+    });
+
+    // 1B. Container Dự kiến theo ASC / EDI (từ pool chưa C + từ preStowagePlan chưa khớp)
+    pool.filter(c => c.jobStatus !== 'C' && c.plannedPos).forEach(c => {
+      const p = DataAdapters.parsePos6(c.plannedPos, cfg.deck_tier_min);
+      if (!p || !baySet.has(p.bay)) return;
+      registerPt(p);
+      const key = `${p.bay}_${p.row}_${p.tier}`;
+      if (rawSlotRecords.has(key)) return;
+      const explicitRob = this.isExplicitRob(c);
+      rawSlotRecords.set(key, {
+        id: `${explicitRob ? 'ROB_EXP' : 'ASC'}_${c.cntr}_${key}`,
+        kind: explicitRob ? 'ROB_INFERRED' : 'PLANNED_ASC',
+        isExplicitRob: explicitRob,
+        bay: p.bay, row: p.row, tier: p.tier, tierNum: p.tierNum, pos: p.raw,
+        cntr: c.cntr, pod: c.pod || '---', weight: Number(c.weight) || 0,
+        size: c.size || '40HC', iso: c.iso || '', crane: c.crane || '',
+        yardPos: c.yardPos || '---', transferPort: c.transferPort || 'TV', isOffDock: Boolean(c.isOffDock),
+        jobStatus: c.jobStatus || 'B', inst: c.inst || ''
+      });
+    });
+
+    (state.preStowagePlan || []).forEach(ps => {
+      const p = DataAdapters.parsePos6(ps.pos, cfg.deck_tier_min);
+      if (!p || !baySet.has(p.bay)) return;
+      registerPt(p);
+      const key = `${p.bay}_${p.row}_${p.tier}`;
+      if (rawSlotRecords.has(key)) return;
+      const explicitRob = this.isExplicitRob(ps);
+      rawSlotRecords.set(key, {
+        id: `${explicitRob ? 'ROB_ASC' : 'ASC_RAW'}_${ps.cntr}_${key}`,
+        kind: explicitRob ? 'ROB_INFERRED' : 'PLANNED_ASC',
+        isExplicitRob: explicitRob,
+        bay: p.bay, row: p.row, tier: p.tier, tierNum: p.tierNum, pos: p.raw,
+        cntr: ps.cntr || '', pod: ps.pod || '---', weight: Number(ps.weight) || 0,
+        size: String(ps.iso || '').startsWith('2') ? '20DC' : '40HC', iso: ps.iso || '',
+        crane: '', yardPos: '---', transferPort: 'TV', isOffDock: false,
+        jobStatus: 'ASC', inst: ps.inst || ''
+      });
+    });
+
+    // 1C. Container Hàng Nhập (SBP + liveJobs Import)
+    const impByCntr = new Map();
+    (state.sbpImport || []).forEach(s => {
+      const p = DataAdapters.parsePos6(s.pos, cfg.deck_tier_min);
+      if (!p || !baySet.has(p.bay)) return;
+      impByCntr.set(s.cntr, {
+        cntr: s.cntr, p, status: 'B', pod: s.pod || 'VNTVP',
+        weight: Number(s.weight) || 0, size: s.size || '40HC', iso: s.iso || '', crane: ''
+      });
+    });
+    (state.liveJobs || []).filter(j => j.io === 'Import' || /dỡ\s*tàu/i.test(j.job_type || '')).forEach(j => {
+      const p = DataAdapters.parsePos6(j.pos, cfg.deck_tier_min);
+      if (!p || !baySet.has(p.bay)) return;
+      const prev = impByCntr.get(j.cntr);
+      impByCntr.set(j.cntr, {
+        cntr: j.cntr, p, status: j.status || (prev ? prev.status : 'B'),
+        pod: j.pod || (prev ? prev.pod : 'VNTVP'),
+        weight: prev ? prev.weight : 0, size: prev ? prev.size : '40HC', iso: prev ? prev.iso : '',
+        crane: j.crane || ''
+      });
+    });
+
+    impByCntr.forEach(imp => {
+      const p = imp.p;
+      if (imp.status === 'C' && !showDischargedImp) return;
+      registerPt(p);
+      const key = `${p.bay}_${p.row}_${p.tier}`;
+      if (rawSlotRecords.has(key)) return;
+      rawSlotRecords.set(key, {
+        id: `IMP_${imp.cntr}_${key}`,
+        kind: 'IMPORT',
+        discharged: imp.status === 'C',
+        bay: p.bay, row: p.row, tier: p.tier, tierNum: p.tierNum, pos: p.raw,
+        cntr: imp.cntr, pod: imp.pod || 'VNTVP', weight: imp.weight || 0,
+        size: imp.size || '40HC', iso: imp.iso || '', crane: imp.crane || '',
+        yardPos: 'Trên tàu (Nhập)', transferPort: 'IMPORT', isOffDock: false,
+        jobStatus: imp.status, inst: ''
+      });
+    });
+
+    // 2. Xác định ngưỡng Mặt Boong & Dải Row / Tier của Hầm
+    const hasTier70s = allParsedPts.some(p => p.tierNum >= 70 && p.tierNum < 80);
+    const effDeckMin = hasTier70s ? 70 : (cfg.deck_tier_min || 80);
+
+    let maxRowNum = 8;
+    let hasRow00 = false;
+    let maxHoldTier = Math.max(8, cfg.hold_max_tier || 12);
+    let minDeckTier = hasTier70s ? 72 : Math.max(80, effDeckMin);
+    let maxDeckTier = hasTier70s ? 78 : Math.max(84, effDeckMin + 4);
+
+    allParsedPts.forEach(p => {
+      const rn = parseInt(p.row, 10);
+      if (rn === 0) hasRow00 = true;
+      if (rn > maxRowNum) maxRowNum = rn;
+      const sym = rn === 0 ? 0 : (rn % 2 === 1 ? rn + 1 : rn - 1);
+      if (sym > maxRowNum) maxRowNum = sym;
+      if (p.tierNum >= effDeckMin) {
+        if (p.tierNum < minDeckTier) minDeckTier = p.tierNum;
+        if (p.tierNum > maxDeckTier) maxDeckTier = p.tierNum;
+      } else if (p.tierNum > 0) {
+        if (p.tierNum > maxHoldTier) maxHoldTier = p.tierNum;
+      }
+    });
+    maxRowNum = Math.min(20, maxRowNum);
+    const maxEven = maxRowNum % 2 === 0 ? maxRowNum : maxRowNum + 1;
+    const rows = [];
+    for (let r = maxEven; r >= 2; r -= 2) rows.push(String(r).padStart(2, '0'));
+    if (hasRow00 || maxEven <= 10) rows.push('00');
+    for (let r = 1; r <= maxEven - 1; r += 2) rows.push(String(r).padStart(2, '0'));
+
+    const holdTiers = [];
+    for (let t = 2; t <= maxHoldTier; t += 2) holdTiers.push(t);
+    const deckTiers = [];
+    for (let t = minDeckTier; t <= maxDeckTier; t += 2) deckTiers.push(t);
+
+    // 3. SUY ĐOÁN VỊ TRÍ CONT ĐỂ LẠI (ROB) ĐỠ TẦNG VẬT LÝ (Không cho container lơ lửng!)
+    const getBayRole = (bayStr) => {
+      const n = parseInt(bayStr, 10);
+      const rem = (n - 1) % 4;
+      const blk = Math.floor((n - 1) / 4);
+      if (rem === 0) return { kind: '20F', blk, n, evenBay: String(n + 1).padStart(2, '0'), pairBay: String(n + 2).padStart(2, '0') };
+      if (rem === 2) return { kind: '20A', blk, n, evenBay: String(n - 1).padStart(2, '0'), pairBay: String(n - 2).padStart(2, '0') };
+      return { kind: '40', blk, n, foreBay: String(n - 1).padStart(2, '0'), aftBay: String(n + 1).padStart(2, '0') };
+    };
+
+    const hasSlot = (bayStr, rowStr, tierNum) => rawSlotRecords.has(`${bayStr}_${rowStr}_${String(tierNum).padStart(2, '0')}`);
+
+    const existingList = Array.from(rawSlotRecords.values());
+    existingList.forEach(rec => {
+      const isDeck = rec.tierNum >= effDeckMin;
+      const baseT = isDeck ? minDeckTier : 2;
+      const role = getBayRole(rec.bay);
+
+      for (let t = rec.tierNum - 2; t >= baseT; t -= 2) {
+        const tStr = String(t).padStart(2, '0');
+        if (role.kind === '40') {
+          const has40 = hasSlot(rec.bay, rec.row, t);
+          const hasF = hasSlot(role.foreBay, rec.row, t);
+          const hasA = hasSlot(role.aftBay, rec.row, t);
+          if (has40 || (hasF && hasA)) continue;
+          if (hasF && !hasA && baySet.has(role.aftBay)) {
+            const k = `${role.aftBay}_${rec.row}_${tStr}`;
+            rawSlotRecords.set(k, {
+              id: `ROB_INF_${k}`, kind: 'ROB_INFERRED', isExplicitRob: false,
+              bay: role.aftBay, row: rec.row, tier: tStr, tierNum: t, pos: `${role.aftBay}${rec.row}${tStr}`,
+              cntr: '', pod: 'ROB', weight: 0, size: '20ft (Suy đoán)', iso: '', crane: '',
+              yardPos: 'Để lại trên tàu', transferPort: 'ROB', isOffDock: false, jobStatus: 'ROB', inst: 'Đỡ chân cont tầng trên'
+            });
+          } else if (!hasF && hasA && baySet.has(role.foreBay)) {
+            const k = `${role.foreBay}_${rec.row}_${tStr}`;
+            rawSlotRecords.set(k, {
+              id: `ROB_INF_${k}`, kind: 'ROB_INFERRED', isExplicitRob: false,
+              bay: role.foreBay, row: rec.row, tier: tStr, tierNum: t, pos: `${role.foreBay}${rec.row}${tStr}`,
+              cntr: '', pod: 'ROB', weight: 0, size: '20ft (Suy đoán)', iso: '', crane: '',
+              yardPos: 'Để lại trên tàu', transferPort: 'ROB', isOffDock: false, jobStatus: 'ROB', inst: 'Đỡ chân cont tầng trên'
+            });
+          } else {
+            const k = `${rec.bay}_${rec.row}_${tStr}`;
+            rawSlotRecords.set(k, {
+              id: `ROB_INF_${k}`, kind: 'ROB_INFERRED', isExplicitRob: false,
+              bay: rec.bay, row: rec.row, tier: tStr, tierNum: t, pos: `${rec.bay}${rec.row}${tStr}`,
+              cntr: '', pod: 'ROB', weight: 0, size: '40ft (Suy đoán)', iso: '', crane: '',
+              yardPos: 'Để lại trên tàu', transferPort: 'ROB', isOffDock: false, jobStatus: 'ROB', inst: 'Đỡ chân cont tầng trên'
+            });
+          }
+        } else {
+          // Bay 20ft (lẻ)
+          const supported = hasSlot(rec.bay, rec.row, t) || hasSlot(role.evenBay, rec.row, t);
+          if (!supported) {
+            const k = `${rec.bay}_${rec.row}_${tStr}`;
+            rawSlotRecords.set(k, {
+              id: `ROB_INF_${k}`, kind: 'ROB_INFERRED', isExplicitRob: false,
+              bay: rec.bay, row: rec.row, tier: tStr, tierNum: t, pos: `${rec.bay}${rec.row}${tStr}`,
+              cntr: '', pod: 'ROB', weight: 0, size: '20ft (Suy đoán)', iso: '', crane: '',
+              yardPos: 'Để lại trên tàu', transferPort: 'ROB', isOffDock: false, jobStatus: 'ROB', inst: 'Đỡ chân cont tầng trên'
+            });
+          }
+        }
+      }
+    });
+
+    // Suy đoán ROB mở rộng đối xứng (tùy chọn)
+    if (extendedRob) {
+      const snap = Array.from(rawSlotRecords.values()).filter(r => r.kind !== 'ROB_INFERRED');
+      snap.forEach(rec => {
+        if (rec.tierNum >= effDeckMin) return; // chỉ suy đoán đối xứng dưới hầm
+        const rn = parseInt(rec.row, 10);
+        if (rn === 0) return;
+        const symRow = String(rn % 2 === 1 ? rn + 1 : rn - 1).padStart(2, '0');
+        const role = getBayRole(rec.bay);
+        const tStr = rec.tier;
+        const occupiedSym = hasSlot(rec.bay, symRow, rec.tierNum)
+          || (role.kind !== '40' && hasSlot(role.evenBay, symRow, rec.tierNum))
+          || (role.kind === '40' && (hasSlot(role.foreBay, symRow, rec.tierNum) || hasSlot(role.aftBay, symRow, rec.tierNum)));
+        if (!occupiedSym) {
+          const k = `${rec.bay}_${symRow}_${tStr}`;
+          rawSlotRecords.set(k, {
+            id: `ROB_SYM_${k}`, kind: 'ROB_INFERRED', isExplicitRob: false,
+            bay: rec.bay, row: symRow, tier: tStr, tierNum: rec.tierNum, pos: `${rec.bay}${symRow}${tStr}`,
+            cntr: '', pod: 'ROB', weight: 0, size: role.kind === '40' ? '40ft (Suy đoán)' : '20ft (Suy đoán)',
+            iso: '', crane: '', yardPos: 'Suy đoán đối xứng', transferPort: 'ROB', isOffDock: false,
+            jobStatus: 'ROB', inst: 'Vị trí để lại suy đoán đối xứng'
+          });
+        }
+      });
+    }
+
+    // 4. Lọc theo Bay & Vùng (Boong / Hầm) và gán tọa độ 3D [x0..x1, y0..y1, z0..z1]
+    const rowIdxMap = {};
+    rows.forEach((r, i) => { rowIdxMap[r] = i; });
+    const rowCenterOffset = (rows.length - 1) / 2;
+
+    const holdTierIdxMap = {};
+    holdTiers.forEach((t, i) => { holdTierIdxMap[t] = i; });
+    const deckTierIdxMap = {};
+    deckTiers.forEach((t, i) => { deckTierIdxMap[t] = i; });
+
+    const deckBaseY = holdTiers.length + 0.85; // Khoảng hở cho Nắp hầm / Mặt Boong
+
+    // Nhóm các block 40ft trong hầm
+    const uniqueBlks = Array.from(new Set(holdBays.map(b => Math.floor((parseInt(b, 10) - 1) / 4)))).sort((a, b) => a - b);
+    const blkIdxMap = {};
+    uniqueBlks.forEach((b, i) => { blkIdxMap[b] = i; });
+
+    const filteredBays = bayFilter === 'ALL' ? holdBays : holdBays.filter(b => b === bayFilter);
+    const sepIndexMap = {};
+    filteredBays.forEach((b, i) => { sepIndexMap[b] = i; });
+
+    const blocks = [];
+    const counts = { loaded: 0, asc: 0, imp: 0, rob: 0 };
+
+    rawSlotRecords.forEach(rec => {
+      if (bayFilter !== 'ALL' && rec.bay !== bayFilter) return;
+      const isDeck = rec.tierNum >= effDeckMin;
+      if (zoneFilter === 'HOLD' && isDeck) return;
+      if (zoneFilter === 'DECK' && !isDeck) return;
+
+      const rIdx = rowIdxMap[rec.row];
+      if (rIdx === undefined) return;
+      const tIdx = isDeck ? deckTierIdxMap[rec.tierNum] : holdTierIdxMap[rec.tierNum];
+      if (tIdx === undefined) return;
+
+      const xCenter = rIdx - rowCenterOffset;
+      const x0 = xCenter - 0.45;
+      const x1 = xCenter + 0.45;
+
+      const y0 = isDeck ? (deckBaseY + tIdx * 0.96) : (tIdx * 0.96);
+      const y1 = y0 + 0.88;
+
+      const role = getBayRole(rec.bay);
+      let z0 = -0.95, z1 = 0.95;
+      if (separateBays) {
+        const sIdx = sepIndexMap[rec.bay] || 0;
+        const sCenter = (sIdx - (filteredBays.length - 1) / 2) * 2.45;
+        const halfL = role.kind === '40' ? 0.95 : 0.48;
+        z0 = sCenter - halfL;
+        z1 = sCenter + halfL;
+      } else {
+        const bOrder = blkIdxMap[role.blk] || 0;
+        const blkCenter = (bOrder - (uniqueBlks.length - 1) / 2) * 2.65;
+        if (role.kind === '20F') { z0 = blkCenter - 0.98; z1 = blkCenter - 0.04; }
+        else if (role.kind === '20A') { z0 = blkCenter + 0.04; z1 = blkCenter + 0.98; }
+        else { z0 = blkCenter - 0.98; z1 = blkCenter + 0.98; }
+      }
+
+      if (rec.kind === 'LOADED_EXPORT') counts.loaded++;
+      else if (rec.kind === 'PLANNED_ASC') counts.asc++;
+      else if (rec.kind === 'IMPORT') counts.imp++;
+      else counts.rob++;
+
+      blocks.push({
+        ...rec,
+        isDeck,
+        x0, x1, y0, y1, z0, z1,
+        tierKey: (isDeck ? 1000 : 0) + rec.tierNum,
+        weightBand: this.getWeightBandInfo(rec.weight)
+      });
+    });
+
+    const podColorMap = this.buildPodColorMap(blocks);
+    const zMinAll = blocks.length ? Math.min(...blocks.map(b => b.z0)) : -1.1;
+    const zMaxAll = blocks.length ? Math.max(...blocks.map(b => b.z1)) : 1.1;
+
+    return {
+      hold: h,
+      bays: holdBays,
+      filteredBays,
+      rows,
+      holdTiers,
+      deckTiers,
+      effDeckMin,
+      deckBaseY,
+      rowCenterOffset,
+      zMinAll: Math.min(-1.05, zMinAll),
+      zMaxAll: Math.max(1.05, zMaxAll),
+      blocks,
+      podColorMap,
+      counts
+    };
+  },
+
+  topoSortTier(tierBlocks, vx, vz) {
+    const n = tierBlocks.length;
+    if (n <= 1) return tierBlocks;
+    const adj = Array.from({ length: n }, () => []);
+    const indeg = new Int32Array(n);
+    const eps = 1e-4;
+    for (let i = 0; i < n; i++) {
+      const a = tierBlocks[i];
+      for (let j = i + 1; j < n; j++) {
+        const b = tierBlocks[j];
+        let aBefore = false, bBefore = false;
+        if (vx >= 0) {
+          if (a.x1 <= b.x0 + eps) aBefore = true;
+          else if (b.x1 <= a.x0 + eps) bBefore = true;
+        } else {
+          if (a.x0 >= b.x1 - eps) aBefore = true;
+          else if (b.x0 >= a.x1 - eps) bBefore = true;
+        }
+        if (vz >= 0) {
+          if (a.z1 <= b.z0 + eps) aBefore = true;
+          else if (b.z1 <= a.z0 + eps) bBefore = true;
+        } else {
+          if (a.z0 >= b.z1 - eps) aBefore = true;
+          else if (b.z0 >= a.z1 - eps) bBefore = true;
+        }
+        if (aBefore && !bBefore) { adj[i].push(j); indeg[j]++; }
+        else if (bBefore && !aBefore) { adj[j].push(i); indeg[i]++; }
+      }
+    }
+    const q = [];
+    for (let i = 0; i < n; i++) if (indeg[i] === 0) q.push(i);
+    const out = [];
+    while (q.length) {
+      const u = q.shift();
+      out.push(tierBlocks[u]);
+      for (const v of adj[u]) {
+        indeg[v]--;
+        if (indeg[v] === 0) q.push(v);
+      }
+    }
+    if (out.length < n) {
+      const seen = new Set(out);
+      tierBlocks.forEach(b => { if (!seen.has(b)) out.push(b); });
+    }
+    return out;
+  }
+};
+
+class Hold3DCanvasController {
+  constructor(prefix) {
+    this.prefix = prefix; // 'inline' | 'modal'
+    this.canvas = document.getElementById(`${prefix}3dCanvas`);
+    this.stage = document.getElementById(`${prefix}3dStageWrap`);
+    this.yaw = -0.56;
+    this.pitch = 0.36;
+    this.zoom = 1.0;
+    this.panX = 0;
+    this.panY = 0;
+    this.dragging = false;
+    this.movedDist = 0;
+    this.lastX = 0;
+    this.lastY = 0;
+    this.hitPolys = [];
+    this.model = null;
+    this.bindEvents();
+  }
+
+  bindEvents() {
+    if (!this.canvas) return;
+    const onDown = (clientX, clientY, isRight) => {
+      this.dragging = true;
+      this.panMode = Boolean(isRight);
+      this.movedDist = 0;
+      this.lastX = clientX;
+      this.lastY = clientY;
+    };
+    const onMove = (clientX, clientY) => {
+      if (!this.dragging) return;
+      const dx = clientX - this.lastX;
+      const dy = clientY - this.lastY;
+      this.lastX = clientX;
+      this.lastY = clientY;
+      this.movedDist += Math.hypot(dx, dy);
+      if (this.panMode) {
+        this.panX += dx;
+        this.panY += dy;
+      } else {
+        this.yaw += dx * 0.0085;
+        this.pitch = Math.max(-0.25, Math.min(1.28, this.pitch + dy * 0.0075));
+      }
+      this.draw();
+    };
+    const onUp = (clientX, clientY) => {
+      if (!this.dragging) return;
+      this.dragging = false;
+      if (this.movedDist < 7) {
+        const rect = this.canvas.getBoundingClientRect();
+        this.handlePick(clientX - rect.left, clientY - rect.top);
+      }
+    };
+
+    this.canvas.addEventListener('mousedown', e => {
+      e.preventDefault();
+      onDown(e.clientX, e.clientY, e.button === 2 || e.shiftKey);
+    });
+    window.addEventListener('mousemove', e => onMove(e.clientX, e.clientY));
+    window.addEventListener('mouseup', e => onUp(e.clientX, e.clientY));
+    this.canvas.addEventListener('contextmenu', e => e.preventDefault());
+
+    this.canvas.addEventListener('wheel', e => {
+      e.preventDefault();
+      const f = e.deltaY < 0 ? 1.1 : 0.91;
+      this.zoom = Math.max(0.45, Math.min(3.2, this.zoom * f));
+      this.draw();
+    }, { passive: false });
+
+    // Touch support (1 finger = rotate, 2 fingers = pinch zoom)
+    let pinchDist = 0;
+    this.canvas.addEventListener('touchstart', e => {
+      if (e.touches.length === 1) {
+        onDown(e.touches[0].clientX, e.touches[0].clientY, false);
+      } else if (e.touches.length === 2) {
+        this.dragging = false;
+        pinchDist = Math.hypot(
+          e.touches[0].clientX - e.touches[1].clientX,
+          e.touches[0].clientY - e.touches[1].clientY
+        );
+      }
+    }, { passive: true });
+    this.canvas.addEventListener('touchmove', e => {
+      if (e.touches.length === 1 && this.dragging) {
+        e.preventDefault();
+        onMove(e.touches[0].clientX, e.touches[0].clientY);
+      } else if (e.touches.length === 2 && pinchDist > 0) {
+        e.preventDefault();
+        const nd = Math.hypot(
+          e.touches[0].clientX - e.touches[1].clientX,
+          e.touches[0].clientY - e.touches[1].clientY
+        );
+        this.zoom = Math.max(0.45, Math.min(3.2, this.zoom * (nd / pinchDist)));
+        pinchDist = nd;
+        this.draw();
+      }
+    }, { passive: false });
+    this.canvas.addEventListener('touchend', e => {
+      if (e.changedTouches.length === 1 && this.dragging) {
+        onUp(e.changedTouches[0].clientX, e.changedTouches[0].clientY);
+      }
+      if (e.touches.length < 2) pinchDist = 0;
+    });
+  }
+
+  setPreset(preset) {
+    this.panX = 0;
+    this.panY = 0;
+    this.zoom = 1.0;
+    if (preset === 'FRONT') { this.yaw = 0.0; this.pitch = 0.08; }
+    else if (preset === 'TOP') { this.yaw = -0.22; this.pitch = 1.12; }
+    else if (preset === 'SIDE') { this.yaw = -1.32; this.pitch = 0.24; }
+    else { this.yaw = -0.56; this.pitch = 0.36; }
+    this.draw();
+  }
+
+  setModel(model) {
+    this.model = model;
+    this.draw();
+  }
+
+  pointInPoly(px, py, pts) {
+    let inside = false;
+    for (let i = 0, j = pts.length - 1; i < pts.length; j = i++) {
+      const xi = pts[i].x, yi = pts[i].y, xj = pts[j].x, yj = pts[j].y;
+      const intersect = ((yi > py) !== (yj > py)) && (px < (xj - xi) * (py - yi) / ((yj - yi) || 1e-9) + xi);
+      if (intersect) inside = !inside;
+    }
+    return inside;
+  }
+
+  handlePick(mx, my) {
+    for (let i = this.hitPolys.length - 1; i >= 0; i--) {
+      const hp = this.hitPolys[i];
+      if (this.pointInPoly(mx, my, hp.poly)) {
+        state.hold3d.selectedBlockId = hp.block.id;
+        renderHold3DInspector(hp.block);
+        this.draw();
+        return;
+      }
+    }
+    state.hold3d.selectedBlockId = null;
+    renderHold3DInspector(null);
+    this.draw();
+  }
+
+  drawFaceText(ctx, pTL, pTR, pBL, line1, line2, textColor, isWhiteBg) {
+    const faceW = Math.hypot(pTR.x - pTL.x, pTR.y - pTL.y);
+    const faceH = Math.hypot(pBL.x - pTL.x, pBL.y - pTL.y);
+    if (faceW < 18 || faceH < 12) return;
+
+    const W = 100, H = 64;
+    const ux = (pTR.x - pTL.x) / W, uy = (pTR.y - pTL.y) / W;
+    const vx = (pBL.x - pTL.x) / H, vy = (pBL.y - pTL.y) / H;
+    const det = Math.abs(ux * vy - uy * vx);
+    if (det < 0.015) return;
+
+    ctx.save();
+    ctx.transform(ux, uy, vx, vy, pTL.x, pTL.y);
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillStyle = textColor;
+
+    const s1 = String(line1 || '').slice(0, 7);
+    const s2 = String(line2 || '').slice(0, 8);
+    if (s1 && s2) {
+      ctx.font = `900 ${s1.length > 5 ? 20 : 23}px Inter, "Segoe UI", sans-serif`;
+      ctx.fillText(s1, W / 2, H * 0.34, W - 10);
+      ctx.font = `800 ${s2.length > 6 ? 16 : 18}px Inter, "Segoe UI", sans-serif`;
+      ctx.globalAlpha = isWhiteBg ? 0.92 : 0.95;
+      ctx.fillText(s2, W / 2, H * 0.72, W - 10);
+    } else if (s1) {
+      ctx.font = '900 22px Inter, "Segoe UI", sans-serif';
+      ctx.fillText(s1, W / 2, H * 0.52, W - 10);
+    }
+    ctx.restore();
+  }
+
+  draw() {
+    if (!this.canvas || !this.stage) return;
+    const rect = this.stage.getBoundingClientRect();
+    const cssW = Math.max(260, Math.floor(rect.width));
+    const cssH = Math.max(240, Math.floor(rect.height));
+    const dpr = Math.min(2, window.devicePixelRatio || 1);
+
+    if (this.canvas.width !== Math.floor(cssW * dpr) || this.canvas.height !== Math.floor(cssH * dpr)) {
+      this.canvas.width = Math.floor(cssW * dpr);
+      this.canvas.height = Math.floor(cssH * dpr);
+    }
+
+    const ctx = this.canvas.getContext('2d');
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.clearRect(0, 0, cssW, cssH);
+    this.hitPolys = [];
+
+    const m = this.model;
+    const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+
+    if (!m || !m.hold) {
+      ctx.fillStyle = isDark ? '#94a3b8' : '#64748b';
+      ctx.font = '700 14px Inter, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('Chưa có dữ liệu Hầm / Bay để dựng mô hình 3D.', cssW / 2, cssH / 2);
+      return;
+    }
+
+    // Tâm mô hình 3D theo trục Y để căn giữa gọn trong khung
+    const totalH = (state.hold3d.zoneFilter === 'HOLD')
+      ? Math.max(3, m.holdTiers.length)
+      : (m.deckBaseY + Math.max(2, m.deckTiers.length));
+    const centerY = (state.hold3d.zoneFilter === 'DECK')
+      ? (m.deckBaseY + m.deckTiers.length * 0.45)
+      : (totalH * 0.46);
+    const centerZ = (m.zMinAll + m.zMaxAll) / 2;
+
+    const spanX = Math.max(6, m.rows.length + 1.5);
+    const spanY = Math.max(5, totalH + 1.5);
+    const spanZ = Math.max(2.6, (m.zMaxAll - m.zMinAll) + 1.5);
+    const baseScale = Math.min(cssW / (spanX * 1.18 + spanZ * 0.45), cssH / (spanY * 1.18 + spanZ * 0.25)) * this.zoom;
+
+    const cy = Math.cos(this.yaw), sy = Math.sin(this.yaw);
+    const cp = Math.cos(this.pitch), sp = Math.sin(this.pitch);
+    const vx = sy * cp;
+    const vy = sp;
+    const vz = cy * cp;
+
+    const originX = cssW / 2 + this.panX;
+    const originY = cssH / 2 + 12 + this.panY;
+
+    const proj = (x, y, z) => {
+      const rx = x;
+      const ry = y - centerY;
+      const rz = z - centerZ;
+      const x1 = rx * cy - rz * sy;
+      const z1 = rx * sy + rz * cy;
+      const y2 = ry * cp - z1 * sp;
+      const z2 = ry * sp + z1 * cp;
+      const persp = 36 / (36 - Math.max(-18, Math.min(18, z2)));
+      return {
+        x: originX + x1 * baseScale * persp,
+        y: originY - y2 * baseScale * persp,
+        z: z2
+      };
+    };
+
+    const drawQuad = (pts, fill, stroke, lineW = 1) => {
+      ctx.beginPath();
+      ctx.moveTo(pts[0].x, pts[0].y);
+      for (let i = 1; i < pts.length; i++) ctx.lineTo(pts[i].x, pts[i].y);
+      ctx.closePath();
+      if (fill) { ctx.fillStyle = fill; ctx.fill(); }
+      if (stroke) { ctx.strokeStyle = stroke; ctx.lineWidth = lineW; ctx.stroke(); }
+    };
+
+    // 1. VẼ ĐÁY HẦM & KHUNG VÁCH HẦM (HOLD TANK TOP & BULKHEADS)
+    const xMinFrame = -m.rowCenterOffset - 0.65;
+    const xMaxFrame = m.rowCenterOffset + 0.65;
+    const zMinFrame = m.zMinAll - 0.25;
+    const zMaxFrame = m.zMaxAll + 0.25;
+
+    if (state.hold3d.zoneFilter !== 'DECK') {
+      const floorPts = [
+        proj(xMinFrame, 0, zMinFrame),
+        proj(xMaxFrame, 0, zMinFrame),
+        proj(xMaxFrame, 0, zMaxFrame),
+        proj(xMinFrame, 0, zMaxFrame)
+      ];
+      drawQuad(floorPts, isDark ? 'rgba(30,41,59,0.55)' : 'rgba(148,163,184,0.22)', isDark ? '#334155' : '#94a3b8', 1.2);
+
+      // Lưới kẻ theo Row trên sàn hầm & số Row
+      ctx.lineWidth = 0.8;
+      ctx.strokeStyle = isDark ? 'rgba(148,163,184,0.18)' : 'rgba(100,116,139,0.25)';
+      m.rows.forEach((r, idx) => {
+        const cx = idx - m.rowCenterOffset;
+        const p1 = proj(cx - 0.5, 0, zMinFrame);
+        const p2 = proj(cx - 0.5, 0, zMaxFrame);
+        ctx.beginPath(); ctx.moveTo(p1.x, p1.y); ctx.lineTo(p2.x, p2.y); ctx.stroke();
+
+        const lblZ = vz >= 0 ? zMaxFrame + 0.32 : zMinFrame - 0.32;
+        const lp = proj(cx, 0, lblZ);
+        ctx.fillStyle = isDark ? '#94a3b8' : '#334155';
+        ctx.font = '800 10px Inter, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText(r, lp.x, lp.y + 4);
+      });
+
+      // Nhãn MẠN TRÁI / MẠN PHẢI
+      const portLbl = proj(xMinFrame - 0.55, 0, centerZ);
+      const stbdLbl = proj(xMaxFrame + 0.55, 0, centerZ);
+      ctx.font = '900 10px Inter, sans-serif';
+      ctx.fillStyle = '#0284c7';
+      ctx.fillText('PORT (TRÁI)', portLbl.x, portLbl.y);
+      ctx.fillStyle = '#059669';
+      ctx.fillText('STBD (PHẢI)', stbdLbl.x, stbdLbl.y);
+    }
+
+    // Hàm vẽ Mặt Boong / Nắp hầm (Hatch Cover)
+    const drawHatchCoverSlab = () => {
+      if (state.hold3d.zoneFilter === 'HOLD') return;
+      const yBot = m.deckBaseY - 0.38;
+      const yTop = m.deckBaseY - 0.08;
+      const padX = 0.25;
+      const deckPtsTop = [
+        proj(xMinFrame - padX, yTop, zMinFrame),
+        proj(xMaxFrame + padX, yTop, zMinFrame),
+        proj(xMaxFrame + padX, yTop, zMaxFrame),
+        proj(xMinFrame - padX, yTop, zMaxFrame)
+      ];
+      const deckPtsFront = vz >= 0
+        ? [proj(xMinFrame - padX, yTop, zMaxFrame), proj(xMaxFrame + padX, yTop, zMaxFrame), proj(xMaxFrame + padX, yBot, zMaxFrame), proj(xMinFrame - padX, yBot, zMaxFrame)]
+        : [proj(xMaxFrame + padX, yTop, zMinFrame), proj(xMinFrame - padX, yTop, zMinFrame), proj(xMinFrame - padX, yBot, zMinFrame), proj(xMaxFrame + padX, yBot, zMinFrame)];
+
+      drawQuad(deckPtsFront, isDark ? 'rgba(71,85,105,0.85)' : 'rgba(51,65,85,0.78)', '#0f172a', 1);
+      drawQuad(deckPtsTop, isDark ? 'rgba(100,116,139,0.34)' : 'rgba(71,85,105,0.22)', isDark ? '#64748b' : '#475569', 1.2);
+
+      // Nhãn NẮP HẦM / MẶT BOONG
+      const dLbl = proj(xMaxFrame + padX + 0.55, yTop, centerZ);
+      ctx.fillStyle = isDark ? '#38bdf8' : '#0c2340';
+      ctx.font = '850 9.5px Inter, sans-serif';
+      ctx.textAlign = 'left';
+      ctx.fillText(`NẮP HẦM (Boong ≥${m.effDeckMin})`, dLbl.x, dLbl.y);
+    };
+
+    // Hàm vẽ 1 khối container 3D theo đúng quy ước màu & chữ của người dùng
+    const drawContainerBlock = (b) => {
+      const c000 = proj(b.x0, b.y0, b.z0);
+      const c100 = proj(b.x1, b.y0, b.z0);
+      const c110 = proj(b.x1, b.y1, b.z0);
+      const c010 = proj(b.x0, b.y1, b.z0);
+      const c001 = proj(b.x0, b.y0, b.z1);
+      const c101 = proj(b.x1, b.y0, b.z1);
+      const c111 = proj(b.x1, b.y1, b.z1);
+      const c011 = proj(b.x0, b.y1, b.z1);
+
+      let baseCol = '#ffffff';
+      let topCol = '#f8fafc';
+      let sideCol = '#e2e8f0';
+      let strokeCol = '#334155';
+      let textCol = '#0f172a';
+      let line1 = '';
+      let line2 = '';
+      let isWhiteBg = false;
+      let alpha = 1.0;
+
+      if (b.kind === 'PLANNED_ASC') {
+        // Vị trí dự kiến theo ASC: KHUNG MÀU NỀN TRẮNG, nội dung TÊN CẢNG + DẢI TẤN
+        baseCol = '#ffffff';
+        topCol = '#f8fafc';
+        sideCol = '#e2e8f0';
+        strokeCol = b.jobStatus === 'A' ? '#d97706' : '#1e293b';
+        textCol = '#0f172a';
+        line1 = b.pod || '---';
+        line2 = b.weightBand.short;
+        isWhiteBg = true;
+      } else if (b.kind === 'LOADED_EXPORT') {
+        // Cont đã xếp rồi: MÀU NỀN THEO CẢNG HOẶC DẢI TẤN (chọn được), nội dung 4 SỐ CONT + CẢNG
+        if (state.hold3d.colorMode === 'WEIGHT') {
+          baseCol = b.weightBand.color;
+          textCol = b.weightBand.text;
+        } else {
+          baseCol = m.podColorMap[String(b.pod || 'KHÁC').trim().toUpperCase()] || '#0284c7';
+          textCol = '#ffffff';
+        }
+        topCol = Hold3DEngine.shadeHex(baseCol, 1.16);
+        sideCol = Hold3DEngine.shadeHex(baseCol, 0.78);
+        strokeCol = Hold3DEngine.shadeHex(baseCol, 0.55);
+        line1 = b.cntr ? b.cntr.slice(-4) : '----';
+        line2 = b.pod || '---';
+      } else if (b.kind === 'IMPORT') {
+        // Cont hàng nhập: CÙNG 1 MÀU ĐỒNG NHẤT (Tím đặc trưng)
+        baseCol = Hold3DEngine.IMPORT_COLOR;
+        topCol = '#8b5cf6';
+        sideCol = '#5b21b6';
+        strokeCol = '#4c1d95';
+        textCol = '#ffffff';
+        line1 = b.discharged ? 'NHẬP✓' : 'NHẬP';
+        line2 = b.cntr ? b.cntr.slice(-4) : '';
+        if (b.discharged) alpha = 0.55;
+      } else {
+        // Cont để lại hoặc vị trí để lại suy đoán: KHỐI MÀU XÁM ĐẬM
+        baseCol = '#334155';
+        topCol = '#475569';
+        sideCol = '#1e293b';
+        strokeCol = '#0f172a';
+        textCol = '#cbd5e1';
+        line1 = b.cntr ? b.cntr.slice(-4) : 'ROB';
+        line2 = b.isExplicitRob ? 'ĐỂ LẠI' : 'ROB';
+      }
+
+      const isSelected = state.hold3d.selectedBlockId === b.id;
+      const isCalled = b.cntr && state.calledContainers.has(b.cntr);
+
+      ctx.save();
+      if (alpha < 1) ctx.globalAlpha = alpha;
+
+      const borderW = isSelected ? 2.4 : (isWhiteBg ? 1.45 : 1.0);
+      const effStroke = isSelected ? '#38bdf8' : (isCalled ? '#f97316' : strokeCol);
+
+      // Vẽ 3 mặt hướng về phía camera
+      // Mặt X (Left/Right)
+      let sidePoly = null, sideTL, sideTR, sideBL;
+      if (vx >= 0) {
+        sidePoly = [c111, c110, c100, c101];
+        sideTL = c111; sideTR = c110; sideBL = c101;
+      } else {
+        sidePoly = [c010, c011, c001, c000];
+        sideTL = c010; sideTR = c011; sideBL = c000;
+      }
+      drawQuad(sidePoly, sideCol, effStroke, borderW);
+
+      // Mặt Z (Front/Back)
+      let frontPoly = null, frontTL, frontTR, frontBL;
+      if (vz >= 0) {
+        frontPoly = [c011, c111, c101, c001];
+        frontTL = c011; frontTR = c111; frontBL = c001;
+      } else {
+        frontPoly = [c110, c010, c000, c100];
+        frontTL = c110; frontTR = c010; frontBL = c100;
+      }
+      drawQuad(frontPoly, baseCol, effStroke, borderW);
+
+      // Mặt Y (Top/Bottom)
+      let topPoly = null;
+      if (vy >= 0) {
+        topPoly = [c010, c110, c111, c011];
+      } else {
+        topPoly = [c001, c101, c100, c000];
+      }
+      drawQuad(topPoly, topCol, effStroke, borderW);
+
+      // Vẽ chữ sắc nét lên mặt chính hướng về camera
+      if (vy > 0.88) {
+        this.drawFaceText(ctx, c010, c110, c011, line1, line2, textCol, isWhiteBg);
+      } else if (Math.abs(vx) > Math.abs(vz) * 1.25) {
+        this.drawFaceText(ctx, sideTL, sideTR, sideBL, line1, line2, textCol, isWhiteBg);
+      } else {
+        this.drawFaceText(ctx, frontTL, frontTR, frontBL, line1, line2, textCol, isWhiteBg);
+      }
+
+      ctx.restore();
+
+      // Lưu vùng chọn 2D (hit-test) theo đúng thứ tự vẽ (phần tử vẽ sau nằm trên cùng)
+      this.hitPolys.push({ block: b, poly: frontPoly });
+      this.hitPolys.push({ block: b, poly: topPoly });
+      this.hitPolys.push({ block: b, poly: sidePoly });
+    };
+
+    // 2. PHÂN NHÓM THEO TẦNG & SẮP XẾP TOPO-PAINTER KHÔNG BAO GIỜ LỖI CHỒNG HÌNH
+    const underBlocks = m.blocks.filter(b => !b.isDeck);
+    const deckBlocks = m.blocks.filter(b => b.isDeck);
+
+    const drawZoneBlocks = (zoneList) => {
+      const byTier = new Map();
+      zoneList.forEach(b => {
+        if (!byTier.has(b.tierKey)) byTier.set(b.tierKey, []);
+        byTier.get(b.tierKey).push(b);
+      });
+      const tierKeys = Array.from(byTier.keys()).sort((a, b) => vy >= 0 ? (a - b) : (b - a));
+      tierKeys.forEach(tk => {
+        const sorted = Hold3DEngine.topoSortTier(byTier.get(tk), vx, vz);
+        sorted.forEach(b => drawContainerBlock(b));
+      });
+    };
+
+    if (vy >= 0) {
+      drawZoneBlocks(underBlocks);
+      drawHatchCoverSlab();
+      drawZoneBlocks(deckBlocks);
+    } else {
+      drawZoneBlocks(deckBlocks);
+      drawHatchCoverSlab();
+      drawZoneBlocks(underBlocks);
+    }
+
+    // 3. Thước Tier bên cạnh Hầm
+    ctx.font = '800 9.5px Inter, sans-serif';
+    ctx.fillStyle = isDark ? '#94a3b8' : '#475569';
+    ctx.textAlign = 'right';
+    const rulerX = xMinFrame - 0.18;
+    if (state.hold3d.zoneFilter !== 'DECK') {
+      m.holdTiers.forEach((t, i) => {
+        const p = proj(rulerX, i * 0.96 + 0.44, vz >= 0 ? zMaxFrame : zMinFrame);
+        ctx.fillText(`T${String(t).padStart(2, '0')}`, p.x, p.y + 3);
+      });
+    }
+    if (state.hold3d.zoneFilter !== 'HOLD') {
+      m.deckTiers.forEach((t, i) => {
+        const p = proj(rulerX, m.deckBaseY + i * 0.96 + 0.44, vz >= 0 ? zMaxFrame : zMinFrame);
+        ctx.fillText(`T${String(t).padStart(2, '0')}`, p.x, p.y + 3);
+      });
+    }
+
+    // Nếu không có khối nào trong vùng lọc
+    if (m.blocks.length === 0) {
+      ctx.fillStyle = isDark ? '#94a3b8' : '#64748b';
+      ctx.font = '700 13px Inter, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText(`Chưa có container trong ${m.hold.label} (bộ lọc hiện tại).`, cssW / 2, cssH / 2);
+    }
+  }
+}
+
+const hold3dControllers = { inline: null, modal: null };
+
+function ensureHold3DControllers() {
+  if (!hold3dControllers.inline && document.getElementById('inline3dCanvas')) {
+    hold3dControllers.inline = new Hold3DCanvasController('inline');
+  }
+  if (!hold3dControllers.modal && document.getElementById('modal3dCanvas')) {
+    hold3dControllers.modal = new Hold3DCanvasController('modal');
+  }
+}
+
+function syncHold3DControlsDOM(prefix, model) {
+  const holds = state.holdConfig || [];
+  const hSel = document.getElementById(`${prefix}3dHoldSelect`);
+  if (hSel) {
+    hSel.innerHTML = holds.map(h =>
+      `<option value="${h.hold}">${h.label} (Bay ${h.bays.join(', ')})</option>`
+    ).join('');
+    if (model && model.hold) hSel.value = String(model.hold.hold);
+  }
+
+  const bSel = document.getElementById(`${prefix}3dBaySelect`);
+  if (bSel && model) {
+    bSel.innerHTML = `<option value="ALL">Cả Hầm (${model.bays.join('-')})</option>` +
+      model.bays.map(b => `<option value="${b}">Chỉ Bay ${b}</option>`).join('');
+    bSel.value = (state.hold3d.bayFilter === 'ALL' || model.bays.includes(state.hold3d.bayFilter))
+      ? state.hold3d.bayFilter : 'ALL';
+  }
+
+  const zSel = document.getElementById(`${prefix}3dZoneSelect`);
+  if (zSel) zSel.value = state.hold3d.zoneFilter;
+
+  document.getElementById(`${prefix}3dModePod`)?.classList.toggle('active', state.hold3d.colorMode === 'POD');
+  document.getElementById(`${prefix}3dModeWeight`)?.classList.toggle('active', state.hold3d.colorMode === 'WEIGHT');
+
+  const cbSep = document.getElementById(`${prefix}3dSeparateBays`);
+  if (cbSep) cbSep.checked = Boolean(state.hold3d.separateBays);
+  const cbRob = document.getElementById(`${prefix}3dExtRob`);
+  if (cbRob) cbRob.checked = Boolean(state.hold3d.extendedRob);
+  const cbImp = document.getElementById(`${prefix}3dShowImpDone`);
+  if (cbImp) cbImp.checked = Boolean(state.hold3d.showDischargedImp);
+
+  if (model && model.hold) {
+    const c = model.counts;
+    const totalB = model.blocks.length;
+    const stBadge = document.getElementById(`${prefix}3dStatsBadge`);
+    if (stBadge) stBadge.textContent = `${model.hold.label} · ${totalB} khối 3D`;
+
+    const ovTitle = document.getElementById(`${prefix}3dOverlayTitle`);
+    if (ovTitle) {
+      ovTitle.textContent = `${model.hold.label} (Bay ${state.hold3d.bayFilter === 'ALL' ? model.bays.join(', ') : state.hold3d.bayFilter}) · ${state.hold3d.colorMode === 'WEIGHT' ? 'Màu Dải tấn' : 'Màu Cảng (POD)'}`;
+    }
+    const ovCnt = document.getElementById(`${prefix}3dOverlayCounts`);
+    if (ovCnt) {
+      ovCnt.textContent = `Đã xếp C: ${c.loaded} · Dự kiến ASC: ${c.asc} · Nhập: ${c.imp} · ROB: ${c.rob}`;
+    }
+    if (prefix === 'modal') {
+      const mTitle = document.getElementById('modal3dTitle');
+      if (mTitle) mTitle.textContent = `🧊 Mô phỏng 3D ${model.hold.label} (Bay ${model.bays.join(', ')})`;
+    }
+    renderHold3DLegend(`${prefix}3dLegendBar`, model);
+  }
+}
+
+function renderHold3DLegend(elId, model) {
+  const el = document.getElementById(elId);
+  if (!el || !model) return;
+  const mode = state.hold3d.colorMode;
+
+  let loadedSwatches = '';
+  if (mode === 'WEIGHT') {
+    loadedSwatches = Hold3DEngine.WEIGHT_BAND_META.map(wb => `
+      <span class="hold3d-swatch">
+        <i class="hold3d-swatch-box" style="background:${wb.color};"></i>
+        <span>${wb.short}</span>
+      </span>`).join('');
+  } else {
+    const entries = Object.entries(model.podColorMap || {});
+    loadedSwatches = entries.length
+      ? entries.map(([pod, col]) => `
+          <span class="hold3d-swatch">
+            <i class="hold3d-swatch-box" style="background:${col};"></i>
+            <span>${pod}</span>
+          </span>`).join('')
+      : '<span class="hold3d-swatch"><i class="hold3d-swatch-box" style="background:#0284c7;"></i><span>Theo Cảng (POD)</span></span>';
+  }
+
+  el.innerHTML = `
+    <span class="hold3d-swatch" title="Vị trí dự kiến theo ASC chưa xếp (C)">
+      <i class="hold3d-swatch-box" style="background:#ffffff;border:2px solid #1e293b;"></i>
+      <span>Dự kiến ASC (Cảng + Dải tấn)</span>
+    </span>
+    <span class="hold3d-swatch" title="Container hàng nhập trên tàu">
+      <i class="hold3d-swatch-box" style="background:${Hold3DEngine.IMPORT_COLOR};"></i>
+      <span>Hàng Nhập (1 màu)</span>
+    </span>
+    <span class="hold3d-swatch" title="Container để lại (ROB) hoặc vị trí suy đoán đỡ tầng">
+      <i class="hold3d-swatch-box" style="background:${Hold3DEngine.ROB_COLOR};border:1px solid #0f172a;"></i>
+      <span>Để lại / ROB suy đoán</span>
+    </span>
+    <span style="color:var(--muted);font-weight:800;margin-left:4px;">Đã xếp (4 số + Cảng · ${mode === 'WEIGHT' ? 'Dải tấn' : 'Cảng'}):</span>
+    ${loadedSwatches}
+  `;
+}
+
+function renderHold3DInspector(block) {
+  ['inline3dInspector', 'modal3dInspector'].forEach(elId => {
+    const el = document.getElementById(elId);
+    if (!el) return;
+    if (!block) {
+      el.innerHTML = `<span style="color:var(--muted);">💡 Bấm/chạm vào bất kỳ khối container 3D nào để xem số cont đầy đủ, vị trí, cảng, dải tấn, bãi hoặc gọi xe.</span>`;
+      return;
+    }
+    const kindLabel = block.kind === 'LOADED_EXPORT'
+      ? '<span class="badge green">✅ Đã xếp (C)</span>'
+      : (block.kind === 'PLANNED_ASC'
+          ? `<span class="badge" style="background:#fff;color:#0f172a;border:1.5px solid #334155;">📋 Dự kiến ASC (${block.jobStatus})</span>`
+          : (block.kind === 'IMPORT'
+              ? `<span class="badge purple">📥 Hàng Nhập (${block.jobStatus})</span>`
+              : '<span class="badge" style="background:#334155;color:#fff;">🧱 ROB / Để lại suy đoán</span>'));
+
+    const callBtn = (block.kind === 'PLANNED_ASC' && block.jobStatus === 'B' && block.cntr)
+      ? `<button class="primary sm" onclick="markContainerCalled('${block.cntr}', 'H${state.hold3d.holdNo}_3D', '${block.pos}');renderHold3DViews();">${state.calledContainers.has(block.cntr) ? '✓ Đã gọi xe' : '📞 Gọi xe ngay'}</button>`
+      : '';
+
+    el.innerHTML = `
+      <div style="display:flex;align-items:center;gap:7px;flex-wrap:wrap;">
+        ${kindLabel}
+        <b>${block.cntr || 'Vị trí để lại suy đoán'}</b>
+        <span>· Vị trí: <b style="color:var(--cyan);">${block.pos}</b> (Bay ${block.bay} · Row ${block.row} · Tier ${block.tier})</span>
+        <span>· POD: <b>${block.pod}</b></span>
+        <span>· TL: <b>${block.weight > 0 ? block.weight.toFixed(2) + 'T' : '—'}</b> (${block.weightBand?.label || '—'})</span>
+        <span>· ${block.size}${block.iso ? ' / ' + block.iso : ''}</span>
+        ${block.kind !== 'ROB_INFERRED' && block.kind !== 'IMPORT' ? `<span>· Bãi: <b>${block.isOffDock ? block.transferPort : ('TV ' + block.yardPos)}</b></span>` : ''}
+        ${block.crane ? `<span>· Cẩu: <b>${block.crane}</b></span>` : ''}
+        ${block.inst ? `<span class="badge amber">${block.inst}</span>` : ''}
+      </div>
+      <div style="display:flex;gap:5px;align-items:center;">
+        ${callBtn}
+        <button class="sm" onclick="openBayPopup('${block.bay}')">📐 Mở Bay ${block.bay} (2D)</button>
+      </div>
+    `;
+  });
+}
+
+function renderHold3DViews() {
+  ensureHold3DControllers();
+  const holds = state.holdConfig || [];
+  if (!holds.length) return;
+  if (!holds.some(h => h.hold === state.hold3d.holdNo)) {
+    state.hold3d.holdNo = holds[0].hold;
+    state.hold3d.bayFilter = 'ALL';
+  }
+  const model = Hold3DEngine.buildHoldModel(state.hold3d.holdNo, state.hold3d);
+  window._latestHold3DModel = model;
+
+  syncHold3DControlsDOM('inline', model);
+  syncHold3DControlsDOM('modal', model);
+
+  if (hold3dControllers.inline) hold3dControllers.inline.setModel(model);
+  const modalOpen = document.getElementById('hold3DModal')?.classList.contains('open');
+  if (modalOpen && hold3dControllers.modal) hold3dControllers.modal.setModel(model);
+
+  const selBlock = state.hold3d.selectedBlockId
+    ? model.blocks.find(b => b.id === state.hold3d.selectedBlockId) || null
+    : null;
+  renderHold3DInspector(selBlock);
+}
+
+function resizeAndRenderHold3D(prefix = 'inline') {
+  ensureHold3DControllers();
+  if (!window._latestHold3DModel) {
+    renderHold3DViews();
+    return;
+  }
+  const ctrl = hold3dControllers[prefix];
+  if (ctrl) ctrl.setModel(window._latestHold3DModel);
+}
+
+function onHold3DControlChange(key, value) {
+  if (key === 'holdNo') {
+    state.hold3d.holdNo = parseInt(value, 10) || 1;
+    state.hold3d.bayFilter = 'ALL';
+    state.hold3d.selectedBlockId = null;
+  } else {
+    state.hold3d[key] = value;
+  }
+  renderHold3DViews();
+}
+
+function setHold3DCameraPreset(prefix, preset) {
+  ensureHold3DControllers();
+  const ctrl = hold3dControllers[prefix];
+  if (ctrl) ctrl.setPreset(preset);
+}
+
+function zoomHold3D(prefix, factor) {
+  ensureHold3DControllers();
+  const ctrl = hold3dControllers[prefix];
+  if (ctrl) {
+    ctrl.zoom = Math.max(0.45, Math.min(3.2, ctrl.zoom * factor));
+    ctrl.draw();
+  }
+}
+
+function openHold3DModal(holdNo = null, bayFilter = 'ALL') {
+  if (holdNo !== null && holdNo !== undefined) {
+    state.hold3d.holdNo = parseInt(holdNo, 10) || 1;
+    state.hold3d.bayFilter = bayFilter || 'ALL';
+    state.hold3d.selectedBlockId = null;
+  }
+  document.getElementById('hold3DModal')?.classList.add('open');
+  setTimeout(() => {
+    renderHold3DViews();
+    if (hold3dControllers.modal) hold3dControllers.modal.draw();
+  }, 40);
+}
+
+function openCurrentBayHoldIn3D() {
+  const hNo = window._currentBayModalHold || state.hold3d.holdNo || 1;
+  closeModal('bayModal');
+  openHold3DModal(hNo, 'ALL');
+}
+
+window.addEventListener('resize', () => {
+  if (hold3dControllers.inline && document.getElementById('tab-details')?.classList.contains('active')) {
+    hold3dControllers.inline.draw();
+  }
+  if (hold3dControllers.modal && document.getElementById('hold3DModal')?.classList.contains('open')) {
+    hold3dControllers.modal.draw();
+  }
+});
+
 
 window.addEventListener('DOMContentLoaded', () => {
   ViewModeManager.init();
